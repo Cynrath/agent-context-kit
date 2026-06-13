@@ -4,7 +4,7 @@
 Make hosted candidate evidence exact-SHA, privacy-safe, permission-minimal, and suitable for future GO/NO-GO decisions.
 
 ## Current State
-The manual RC workflow exists, but its dedicated reviewed hosted evidence remains open.
+The manual RC workflow existed without reviewed exact-SHA hosted evidence.
 
 ## Scope
 Harden workflow inputs/concurrency/permissions/output summaries, static gates, and execute read-only hosted evidence for an exact reviewed commit.
@@ -37,7 +37,7 @@ Full local gates and hosted run inspection.
 Revert workflow hardening; retain previous evidence as historical.
 
 ## Completion Evidence
-Local hardening implemented: exact SHA/candidate/predecessor inputs, current origin/master validation, per-commit/version concurrency, read-only permissions, no-upload boundaries, and positive/negative input tests. First hosted run `27478415124` passed all Windows evidence and all non-performance Ubuntu/macOS checks; those two runners exposed a null `$env:TEMP` portability defect before benchmark execution. Portable temp fallback is pending repeat validation and dispatch without changing the 2,000-file/30-second threshold.
+Completed on 2026-06-13. Exact SHA/candidate/predecessor inputs, current origin/master validation, per-commit/version concurrency, read-only permissions, no-upload boundaries, and positive/negative input tests are enforced. First hosted run `27478415124` exposed a null `$env:TEMP` portability defect on Ubuntu/macOS. Commit `4c4fa64` added portable temp fallback without changing the 2,000-file/30-second threshold, passed standard 8/8, and hosted run `27478635057` then passed Windows, Ubuntu, and macOS. Benchmarks were 1.265s, 0.957s, and 0.684s respectively.
 
 ## Commit
 `ci: harden hosted release candidate evidence`

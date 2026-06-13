@@ -3,10 +3,10 @@
 This is the unified execution queue. PROJECT-CONTROL-0102 is complete; PROJECT-CONTROL-0103 now governs release recovery, security/supply-chain evidence, and conditional next-prerelease work.
 
 ## Active PROJECT-CONTROL-0103
-1. TASK-0126 release recovery and idempotent verification.
-2. TASK-0127 alpha.2 supply-chain evidence refresh.
-3. TASK-0128 hosted release-candidate evidence hardening.
-4. TASK-0129 private vulnerability reporting verification.
+1. TASK-0126 release recovery and idempotent verification - completed.
+2. TASK-0127 alpha.2 supply-chain evidence refresh - completed.
+3. TASK-0128 hosted release-candidate evidence hardening - completed; run `27478635057` green on three operating systems.
+4. TASK-0129 private vulnerability reporting verification - next.
 5. TASK-0130 security notification and recovery ownership.
 6. TASK-0131 NuGet owner identity disposition.
 7. TASK-0132 signing, SBOM, and provenance implementation/decision.
@@ -35,7 +35,7 @@ This is the unified execution queue. PROJECT-CONTROL-0102 is complete; PROJECT-C
 ## Maintainer-Gated Release/Security Track
 These actions require explicit maintainer control and do not block safe local-only product/documentation work:
 
-1. Run the manual hosted RC evidence workflow on the exact reviewed commit.
+1. Rerun the manual hosted RC evidence workflow only for a different selected final-candidate commit; alpha.2 evidence is green at `4c4fa64`.
 2. Enable and verify private vulnerability reporting and record primary/backup security notification ownership.
 3. Decide NuGet owner profile alignment: `Cyranth` versus public persona/package author `Cynrath`.
 4. Decide author signing or record dated accepted risk.

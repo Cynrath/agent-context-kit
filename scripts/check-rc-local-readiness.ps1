@@ -90,13 +90,13 @@ foreach ($entry in $requiredPaths) {
 }
 
 Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "LOCAL READY / REMOTE NO-GO" -Description "Local-versus-remote decision"
-Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "178/178 tests" -Description "Validated test count"
+Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "186/186 tests" -Description "Validated test count"
 Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "PENDING MAINTAINER" -Description "Maintainer evidence boundary"
 Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "docs/V100_GAP_ANALYSIS.md" -Description "Open gap source of truth"
 Require-Text -RelativePath "docs\MAINTAINER_RC_DECISION.md" -Needle "NO-GO for release-candidate publication" -Description "Maintainer NO-GO decision"
 Require-Text -RelativePath "docs\V100_GAP_ANALYSIS.md" -Needle "AgentContextKit is **not ready for 1.0 general availability**" -Description "1.0 GA blocker statement"
-Require-Text -RelativePath "docs\HOSTED_VALIDATION_STATUS.md" -Needle "37d52200fead0ce5c53571205d324b9b7ff6c75b" -Description "Hosted evidence commit"
-Require-Text -RelativePath "docs\HOSTED_VALIDATION_STATUS.md" -Needle "zero runs" -Description "Manual RC workflow missing-run boundary"
+Require-Text -RelativePath "docs\HOSTED_VALIDATION_STATUS.md" -Needle "4c4fa64ff34287dff01818d52f49b521efb3176d" -Description "Hosted evidence commit"
+Require-Text -RelativePath "docs\HOSTED_VALIDATION_STATUS.md" -Needle "27478635057" -Description "Successful manual RC workflow run"
 Require-Text -RelativePath "docs\PRIVATE_VULNERABILITY_REPORTING_STATUS.md" -Needle "enabled: false" -Description "Verified disabled private-reporting state"
 Require-Text -RelativePath "docs\PUBLISHED_SUPPLY_CHAIN_STATUS.md" -Needle "No author signature was observed" -Description "Published author-signature boundary"
 

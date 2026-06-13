@@ -16,5 +16,6 @@ PROJECT-CONTROL-0102 completed the authorized `v0.2.0-alpha.2` release sequence.
 12. Published-package and source-package smoke are both pinned to `0.2.0-alpha.2` after publication.
 13. `docs/V100_GAP_ANALYSIS.md`, `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md`, and `docs/MAINTAINER_RC_DECISION.md` remain the historical 1.0/RC evidence boundary.
 14. TASK-0126 is complete: commit `2f68f14` passed 8/8 and recovery run `27478046088` is green with publish jobs skipped.
-15. TASK-0127 alpha.2 published supply-chain evidence is refreshed. TASK-0128 local workflow hardening is implemented; validate, push, require 8/8, then dispatch exact three-OS RC evidence.
-16. Continue TASK-0127 through TASK-0134 without per-task prompts; record permanent human/external blockers and continue independent work.
+15. TASK-0127 alpha.2 published supply-chain evidence is refreshed.
+16. TASK-0128 is complete: `4c4fa64` passed standard 8/8 and exact hosted RC run `27478635057` passed Windows, Ubuntu, and macOS with the unchanged 2,000-file/30-second tripwire.
+17. Continue with TASK-0129 through TASK-0134 without per-task prompts; record permanent human/external blockers and continue independent work.

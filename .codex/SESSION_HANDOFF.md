@@ -8,7 +8,7 @@ AgentContextKit is an offline-first, security-first, docs-first, task-first .NET
 - TASK-0126 must create a read-only `verify-existing` release operation with no login, OIDC, contents write, publish, tag, or release mutation.
 - TASK-0126 is complete. Commit `2f68f14` passed 8/8 and read-only recovery run `27478046088` verified immutable alpha.2 package/tag/release/assets without publish permissions or OIDC login.
 - TASK-0127 refreshed alpha.2 supply-chain evidence: NuGet/release hashes, exact metadata commit, NuGet.org repository signature, absent author signature/SBOM/attestation, and `Cyranth`/`Cynrath` identity disposition remain explicitly scoped.
-- TASK-0128 local hardening adds exact commit/candidate/predecessor inputs and negative tests to the read-only three-OS RC evidence workflow. Hosted dispatch remains after validation/push.
+- TASK-0128 is complete. Commit `4c4fa64` passed standard 8/8 and hosted RC run `27478635057` passed Windows, Ubuntu, and macOS for exact commit/candidate/predecessor evidence. The 2,000-file benchmark passed in 1.265s/0.957s/0.684s without changing the 30-second threshold.
 - PROJECT-CONTROL-0102 completed the authorized alpha.2 implementation, publication, post-publish synchronization, and hosted validation sequence.
 - `v0.2.0-alpha.2` is published on GitHub and NuGet; exact tag `v0.2.0-alpha.2` points to package commit `f540479a92cbe66097f6796553828ee49ddd5512`.
 - Local `master` started aligned with `origin/master` at `0cac249`; task docs were committed as `23595e2`.

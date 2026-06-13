@@ -4,7 +4,7 @@
 `.github/workflows/release-candidate-evidence.yml` is a manual-only Windows, Ubuntu, and macOS evidence workflow for a future release-candidate decision. It does not publish or approve a release.
 
 ## Current Hosted Status
-The workflow is being hardened under TASK-0128 for an exact current `origin/master` commit and explicit candidate/predecessor versions. Dedicated Windows, Ubuntu, and macOS execution evidence remains pending until the hardened workflow is pushed and dispatched.
+TASK-0128 completed the hardened workflow and exact hosted run. Run [27478635057](https://github.com/Cynrath/agent-context-kit/actions/runs/27478635057) passed on Windows, Ubuntu, and macOS for exact commit `4c4fa64ff34287dff01818d52f49b521efb3176d`, predecessor `0.2.0-alpha.1`, and source candidate `0.2.0-alpha.2.ci.27478635057`.
 
 ## What It Verifies
 - restore, Release build, and the full test suite on each runner;
@@ -40,10 +40,15 @@ This static gate verifies required markers and rejects push/PR triggers, uploads
 
 Local Windows reproduction on 2026-06-12 passed the isolated predecessor/source package install, predecessor scan JSON, current-source `config-check`, config hash immutability, baseline scan, SARIF parse, and final scan. The first run exposed fixture self-noise; the sanitized predecessor fixture now ignores only its own non-Critical `.ackit/config.yml` keyword matches while Critical findings remain unsuppressible.
 
-No local `actionlint` or YAML parser was available. Static marker checks and local PowerShell smoke passed, but GitHub workflow syntax/runner behavior still requires the manual hosted dispatch.
+The first hosted attempt, run `27478415124`, exposed a null `$env:TEMP` assumption on Ubuntu and macOS before the benchmark started. The performance script now resolves `TEMP`, `TMPDIR`, `RUNNER_TEMP`, then `.NET`'s platform temp path. The repeat run passed without changing the 2,000-file/30-second threshold.
+
+Hosted benchmark evidence from the successful run:
+- Windows: 1.265 seconds;
+- Ubuntu: 0.957 seconds;
+- macOS: 0.684 seconds.
 
 ## Maintainer Execution
-After the commit is pushed, open GitHub Actions and manually dispatch `release-candidate-evidence` from the reviewed branch. Record:
+For a future final candidate, dispatch `release-candidate-evidence` from the reviewed branch and record:
 - workflow URL and commit SHA;
 - each OS result;
 - predecessor and candidate package versions;
@@ -61,9 +66,7 @@ gh workflow run release-candidate-evidence.yml `
   -f predecessor_version=0.2.0-alpha.1
 ```
 
-TASK-0128 is authorized to execute this command after push and standard 8/8 validation.
-
-Do not treat a local pass as hosted evidence. Do not tag, publish, or call the project RC-ready until all required jobs are green and remaining P0/P1 decisions are resolved or explicitly accepted.
+TASK-0128's dispatch is complete. Do not reuse its alpha.2 evidence as proof for a different commit or version. Do not tag, publish, or call the project RC-ready until remaining P0/P1 decisions are resolved or explicitly accepted.
 
 ## Failure Interpretation
 - Predecessor install failure can indicate NuGet/network availability rather than source behavior.

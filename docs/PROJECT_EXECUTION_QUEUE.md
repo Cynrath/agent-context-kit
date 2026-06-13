@@ -3,10 +3,10 @@
 ## Active PROJECT-CONTROL-0103 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 61 | In progress | TASK-0126 release recovery verification | P0 | Blocks reliable recovery evidence | release workflow/scripts/tests/docs | local gates, 8/8, verify-existing run | Dispatch only; verifier read-only | Green idempotent alpha.2 verification |
-| 62 | Queued | TASK-0127 alpha.2 supply-chain evidence | P1 | None for current release | evidence/status/gates | exact artifact audit | Read-only queries | Alpha.2 evidence is reproducible |
-| 63 | Queued | TASK-0128 hosted RC evidence hardening | P0 future release | Blocks future candidate | RC workflow/gates/evidence | exact hosted matrix | Dispatch only | Reviewed hosted evidence |
-| 64 | Queued | TASK-0129 private vulnerability reporting | P0 future release | External setting/permission | security status/evidence | enabled boolean re-read | Yes if permitted | Enabled or precise blocker |
+| 61 | Completed | TASK-0126 release recovery verification | P0 | Complete | release workflow/scripts/tests/docs | local gates, 8/8, verify-existing run | Dispatch only; verifier read-only | Run `27478046088` green |
+| 62 | Completed | TASK-0127 alpha.2 supply-chain evidence | P1 | Complete | evidence/status/gates | exact artifact audit | Read-only queries | Alpha.2 evidence is reproducible |
+| 63 | Completed | TASK-0128 hosted RC evidence hardening | P0 future release | Complete for reviewed alpha.2 state | RC workflow/gates/evidence | exact hosted matrix | Dispatch only | Run `27478635057` green on three OS |
+| 64 | In progress | TASK-0129 private vulnerability reporting | P0 future release | External setting/permission | security status/evidence | enabled boolean re-read | Yes if permitted | Enabled or precise blocker |
 | 65 | Queued | TASK-0130 notification/recovery ownership | P0/P1 | Human backup may block | security/recovery/decision docs | evidence structure | No unless notification settings change | Truthful ownership/procedure |
 | 66 | Queued | TASK-0131 NuGet identity disposition | P1 | Human account action may block | NuGet/evidence/decision docs | public identity review | Possible, not automatic | Alignment or dated exception |
 | 67 | Queued | TASK-0132 signing/SBOM/provenance | P1 | Certificate/permissions | workflow/scripts/evidence | SBOM/privacy/digest/attestation gates | Possible isolated workflow | Implement/defer decisions recorded |
@@ -35,7 +35,7 @@
 ## Maintainer-Gated Release/Security Track
 | Order | Status | Action | Priority | Blocking status | Expected evidence | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M1 | Maintainer action required | Manual hosted RC evidence workflow | P0 | Blocks RC | Exact candidate run URLs and Windows/Ubuntu/macOS results | Hosted predecessor/config/baseline/SARIF/performance workflow | Yes | Green run for exact reviewed candidate |
+| M1 | Verified for alpha.2 state | Manual hosted RC evidence workflow | P0 | Rerun for a different final candidate | Run `27478635057`, exact `4c4fa64`, three-OS results | Hosted predecessor/config/baseline/SARIF/performance workflow | Yes | Green run recorded; future candidate must rerun |
 | M2 | Maintainer action required | Private vulnerability reporting and notification ownership | P0 | Blocks RC | `enabled: true`, visible report entry, date, owner, primary/backup notification owners | Read-only API/UI verification after setting change | Yes | Verified private channel and response ownership |
 | M3 | Maintainer action required | NuGet owner identity alignment | P1 | Blocks RC unless explicitly accepted | `Cyranth`/`Cynrath` alignment or dated intentional exception | NuGet package/profile review | Yes | Public owner identity has an owned disposition |
 | M4 | Maintainer decision required | Author signing | P1 | Complete or accept risk | Sign/defer decision, evidence, lifecycle owner, review date | Exact package verification | Possibly | Author-signing control or dated accepted risk |

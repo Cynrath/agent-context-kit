@@ -1,21 +1,21 @@
 # Hosted Validation Status
 
-The alpha.2 post-publish commit passed the standard hosted matrix. The separate manual 1.0 RC evidence workflow maps to blocker `RB-001` in `docs/RELEASE_BLOCKER_BOARD.md` and remains maintainer-gated.
+The alpha.2 recovery, supply-chain, and hosted RC hardening commits passed the standard hosted matrix. TASK-0128 also completed the separate read-only three-OS release-candidate evidence workflow. This closes the missing hosted-run evidence for the reviewed alpha.2 state; it does not approve a future release candidate or 1.0 GA.
 
 ## Current Commit
 - Branch: `master`
-- Commit: `ead65120928835419fb91bf695e845721620c394`
+- Commit: `4c4fa64ff34287dff01818d52f49b521efb3176d`
 - Local/remote state observed on 2026-06-13: `master` equals `origin/master`.
-- Commit title: `chore: complete v0.2.0-alpha.2 post-publish sync`
+- Commit title: `fix: make hosted performance evidence cross-platform`
 
 ## Successful Standard Workflows
 The following public GitHub Actions runs completed successfully on 2026-06-13 for the exact commit above.
 
 | Workflow | Run | Hosted Scope | Result |
 | --- | --- | --- | --- |
-| `ci` | [27471224858](https://github.com/Cynrath/agent-context-kit/actions/runs/27471224858) | Restore, build, test, and self-scan on `windows-2025` and `ubuntu-latest` | SUCCESS |
-| `cross-platform-smoke` | [27471224861](https://github.com/Cynrath/agent-context-kit/actions/runs/27471224861) | Published `AgentContextKit` `0.2.0-alpha.2` smoke on Windows, Ubuntu, and macOS | SUCCESS |
-| `cross-platform-source-smoke` | [27471224867](https://github.com/Cynrath/agent-context-kit/actions/runs/27471224867) | Source restore/build/test, local alpha.2 package install, and smoke on Windows, Ubuntu, and macOS | SUCCESS |
+| `ci` | [27478583268](https://github.com/Cynrath/agent-context-kit/actions/runs/27478583268) | Restore, build, test, and self-scan on `windows-2025` and `ubuntu-latest` | SUCCESS |
+| `cross-platform-smoke` | [27478583266](https://github.com/Cynrath/agent-context-kit/actions/runs/27478583266) | Published `AgentContextKit` `0.2.0-alpha.2` smoke on Windows, Ubuntu, and macOS | SUCCESS |
+| `cross-platform-source-smoke` | [27478583272](https://github.com/Cynrath/agent-context-kit/actions/runs/27478583272) | Source restore/build/test, local alpha.2 package install, and smoke on Windows, Ubuntu, and macOS | SUCCESS |
 
 ## Evidence Value
 These runs verify that:
@@ -23,36 +23,20 @@ These runs verify that:
 - the published package remains installable and usable on Windows, Ubuntu, and macOS;
 - the current source package builds, installs, and completes its source smoke flow on Windows, Ubuntu, and macOS.
 
-This evidence strengthens runtime/platform and package portability confidence. It does not verify the dedicated release-candidate predecessor upgrade flow.
+This evidence strengthens runtime/platform and package portability confidence.
 
-## Missing Manual RC Evidence
-The active `release-candidate-evidence` workflow had **zero runs** when checked on 2026-06-13.
+## Dedicated RC Evidence
+Run [27478635057](https://github.com/Cynrath/agent-context-kit/actions/runs/27478635057) completed successfully on 2026-06-13 for exact commit `4c4fa64ff34287dff01818d52f49b521efb3176d`.
 
-The following remain unverified in hosted Actions:
-- isolated predecessor and source-candidate tool comparison;
-- predecessor config hash immutability;
-- current-source `config-check` against the predecessor fixture;
-- baseline create/load/classification flow;
-- baseline-aware SARIF parse;
-- the 2,000-file performance tripwire on all three hosted operating systems.
+| Runner | Result | 2,000-file benchmark |
+| --- | --- | --- |
+| `windows-2025` | SUCCESS | 1.265 seconds |
+| `ubuntu-latest` | SUCCESS | 0.957 seconds |
+| `macos-latest` | SUCCESS | 0.684 seconds |
 
-Therefore `docs/MAINTAINER_RC_DECISION.md` remains **NO-GO for release-candidate publication**.
+The run verified isolated predecessor `0.2.0-alpha.1` installation, current-source candidate `0.2.0-alpha.2.ci.27478635057`, predecessor config hash immutability, `config-check`, baseline create/load/classification, baseline-aware SARIF parsing, final clean scan, and the unchanged 30-second performance tripwire. No artifact or SARIF upload occurred.
 
-## Maintainer Dispatch Packet
-The following command is documentation only. Running it is a remote write and requires explicit maintainer action.
-
-```powershell
-gh workflow run release-candidate-evidence.yml --repo Cynrath/agent-context-kit --ref master
-```
-
-Read-only result discovery:
-
-```powershell
-gh run list --repo Cynrath/agent-context-kit --workflow release-candidate-evidence.yml --limit 5
-gh run view <run-id> --repo Cynrath/agent-context-kit --json headSha,status,conclusion,url,jobs
-```
-
-Record the exact run URL, commit SHA, each OS result, benchmark elapsed time, predecessor version, source-candidate package version, and any accepted runner warning in `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md` or a dedicated result-sync task. Do not record secrets or raw environment data.
+`docs/MAINTAINER_RC_DECISION.md` remains **NO-GO for release-candidate publication** because private reporting, security/recovery ownership, NuGet identity, signing/SBOM/provenance, final version scope, and candidate approval remain unresolved. A future final candidate must rerun this exact-SHA workflow.
 
 ## Remote Boundary
-This status was produced from read-only Git and GitHub CLI queries. It did not dispatch workflows, edit settings, upload artifacts/SARIF, push, tag, create releases, or publish packages.
+The workflow dispatch created only an Actions run record. The evidence job used `contents: read`, did not edit settings, upload artifacts/SARIF, push, tag, create releases, or publish packages.

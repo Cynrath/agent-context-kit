@@ -6,12 +6,12 @@ Local evidence preparation includes TASK-0084 through TASK-0096 baseline/config 
 ## Local Evidence Matrix
 | Area | Local Evidence | Status | Remaining Blocker |
 | --- | --- | --- | --- |
-| Baseline policy | schema/fingerprint fixtures, explicit update, integrity checks, new/existing CI tests, JSON/SARIF/report/Web UI parity, manual three-OS workflow design | Ready locally | successful hosted workflow run |
-| Config compatibility | published `0.2.0-alpha.1` config fixture plus read-only `config-check` human/JSON/exit/privacy contract tests | Ready locally | hosted predecessor-config smoke and RC sign-off |
+| Baseline policy | schema/fingerprint fixtures, explicit update, integrity checks, new/existing CI tests, JSON/SARIF/report/Web UI parity, three-OS run `27478635057` | Verified for reviewed alpha.2 state | rerun and sign off for a different final candidate |
+| Config compatibility | published `0.2.0-alpha.1` config fixture plus read-only `config-check` human/JSON/exit/privacy contract tests and hosted predecessor smoke | Verified for reviewed alpha.2 state | final candidate sign-off |
 | CLI/JSON/SARIF | contract tests, additive schema rules, exit-code parity, conditional local freeze, machine-readable schemas/golden fixtures | Ready locally | final candidate maintainer sign-off |
-| Performance | disposable 2,000-file benchmark with 30-second tripwire plus manual three-OS workflow design | Initial local evidence | successful hosted run, memory, cancellation, mixed corpus |
+| Performance | disposable 2,000-file benchmark with unchanged 30-second tripwire; hosted Windows 1.265s, Ubuntu 0.957s, macOS 0.684s | Hosted tripwire verified | memory, cancellation, mixed corpus |
 | Security response | policy, Critical regression tests, privacy boundaries, clean dated dependency review, metadata-only maintainer evidence register/handoff | Ready locally | enable and verify private GitHub reporting; record maintainer evidence |
-| Runtime support | .NET 10, three-OS workflow policy, and manual RC workflow | Documented | fresh hosted RC run and final support window |
+| Runtime support | .NET 10, three-OS standard workflows, and successful dedicated RC run `27478635057` | Verified for reviewed alpha.2 state | final support window and future-candidate rerun |
 | Supply chain | exact published package/release audit plus explicit owner alignment, sign/defer, SBOM, provenance, and recovery evidence fields | Published state verified | dated maintainer decisions and any approved remote publication |
 | Migration/localization | upgrade/rollback guide, fixtures, read-only config diagnostics, explicit no-auto-migration policy, 13-command EN/TR human/error/JSON parity matrix | Ready locally | hosted evidence and final candidate sign-off |
 
@@ -42,14 +42,14 @@ Local evidence recorded on 2026-06-12:
 - TASK-0093 added machine-readable schemas/golden fixtures and TASK-0094 added English/Turkish human/error/exit/JSON semantic parity tests plus a local release gate.
 - TASK-0095 added the security/supply-chain evidence register, maintainer procedure, explicit pending/verified vocabulary, and a local evidence-structure gate. Remote/security credential actions remain pending.
 - TASK-0096 adds `docs/RC_LOCAL_READINESS.md` and a read-only orchestration gate that reports `LOCAL READY / REMOTE NO-GO`; it does not close hosted, security-setting, supply-chain, version, or approval blockers.
-- TASK-0097 records successful standard `ci`, published-package smoke, and source-package smoke for commit `37d5220`. The dedicated manual RC workflow still has zero runs, so predecessor/config/baseline/performance hosted blockers remain open.
+- TASK-0128 records successful standard 8/8 validation and dedicated RC run `27478635057` for exact commit `4c4fa64ff34287dff01818d52f49b521efb3176d`. Predecessor/config/baseline/SARIF/performance hosted evidence is complete for this reviewed alpha.2 state.
 - TASK-0099 records the exact published package/release state: valid NuGet.org repository signature, no observed author signature, no package/release SBOM, no accessible GitHub package attestation, and a NuGet owner profile differing from the project persona.
 
 The former xUnit test-tooling warning is resolved locally. Remaining supply-chain decisions are signing, SBOM, provenance, recovery policy, and release-date revalidation.
 
 ## Maintainer-Only Evidence
 - Enable and verify private vulnerability reporting.
-- Push reviewed source and obtain green Windows/Ubuntu/macOS CI, source-package smoke, baseline upgrade smoke, and benchmark evidence.
+- Rerun green Windows/Ubuntu/macOS CI, source-package smoke, baseline upgrade smoke, and benchmark evidence for any different final candidate commit.
 - Decide signing, SBOM, provenance, and package recovery/deprecation policy.
 - Select/version a release candidate, create tag/GitHub pre-release, publish NuGet only in a dedicated approved release task.
 - Record dependency vulnerability/deprecation review with the release date.

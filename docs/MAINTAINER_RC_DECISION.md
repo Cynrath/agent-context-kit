@@ -3,15 +3,15 @@
 ## Current Decision
 **NO-GO for release-candidate publication.**
 
-The local contract freeze, machine-readable schema assets, localization parity gate, security/supply-chain handoff, and consolidated local-readiness gate are prepared and validated, but hosted evidence, remote security settings, supply-chain publication decisions, and final version/release approval remain incomplete.
+The local contract freeze, machine-readable schema assets, localization parity gate, security/supply-chain handoff, consolidated local-readiness gate, and reviewed alpha.2 hosted evidence are complete. Remote security settings, ownership/recovery, supply-chain decisions, final version scope, and release approval remain incomplete.
 
 ## Decision Inputs
 | Area | Current State | Required For GO | Owner / Action |
 | --- | --- | --- | --- |
 | Local contract freeze | Complete locally | Review `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` with no unresolved breaking change | Maintainer review |
-| Local tests and gates | Complete locally: 178/178 tests and clean gates | Rerun on final candidate commit | Local/CI validation |
-| Hosted RC workflow | Standard `ci`, published smoke, and source smoke are green at `37d5220`; dedicated RC workflow has zero runs | Green Windows, Ubuntu, and macOS manual RC run for final candidate commit | Maintainer dispatch |
-| Upgrade/config evidence | Local fixtures pass | Hosted predecessor install, config hash, `config-check`, baseline, SARIF, and final scan pass | Hosted workflow |
+| Local tests and gates | Complete locally: 186/186 tests and clean gates | Rerun on final candidate commit | Local/CI validation |
+| Hosted RC workflow | Standard 8/8 and dedicated run `27478635057` are green at `4c4fa64` on Windows, Ubuntu, and macOS | Rerun for a different final candidate commit | Release automation |
+| Upgrade/config evidence | Local fixtures and hosted predecessor install/config hash/`config-check`/baseline/SARIF/final scan pass | Review and rerun for a different selected candidate | Hosted workflow |
 | JSON/SARIF contract | TASK-0093 machine-readable schemas, golden fixtures, live-output tests, and local gate exist | Review the final candidate assets and rerun the contract gate | Maintainer review |
 | Security reporting | Read-only GitHub API verified private reporting disabled on 2026-06-13; response handoff is ready | Enable and verify private reporting, record notification owners and non-sensitive evidence | Maintainer GitHub settings |
 | Dependency review | Clean on 2026-06-12 | Rerun on final candidate date | Maintainer/release validation |
