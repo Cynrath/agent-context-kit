@@ -2,6 +2,9 @@
 
 Prefer minimal, tested, secure changes that follow the project docs and task files.
 
+## Maintenance Note
+This file is hand-maintained. `ackit generate` does not regenerate it. Update it through a regular `docs/tasks/` task and a normal commit, never through the generator.
+
 ## Workflow
 - Task-first workflow is mandatory. Every implementation change starts from a `docs/tasks/` record before code is written.
 
