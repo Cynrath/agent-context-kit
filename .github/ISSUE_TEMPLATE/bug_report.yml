@@ -14,7 +14,7 @@ body:
     attributes:
       label: ackit version
       description: Run `ackit version`.
-      placeholder: AgentContextKit 0.2.0-alpha.1
+      placeholder: AgentContextKit 0.2.0-alpha.2
     validations:
       required: true
   - type: input
