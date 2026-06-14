@@ -32,3 +32,8 @@ Use the same repository rules as AGENTS.md.
 - `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci`
 - `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- doctor`
 - `powershell -ExecutionPolicy Bypass -File scripts/verify-release.ps1`
+
+## Commit And Push Policy
+- Follow `AGENTS.md` for the full commit and push policy. Hard prohibitions (force push, history rewrite, tag movement, release/NuGet publish, secret exposure, user-file deletion) remain in force.
+- Normal `master` commit and push is allowed only when the active project control task explicitly authorizes agent write access and only after local validation passes. Tag, release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow.
+- Do not include model name, generator, or AI authorship in commit messages.

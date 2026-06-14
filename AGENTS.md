@@ -26,9 +26,11 @@
 
 ## Git Discipline
 - Check `git status` before edits.
-- Never push, publish, force-push, or create remotes from an agent session.
+- Hard prohibitions: never force-push, never rewrite history, never move an existing tag, never create a remote, never publish a package, never create a release, never delete user changes, never expose secrets, never fabricate owner, identity, signature, or recovery evidence.
+- Agents may create logical commits and perform normal `master` pushes only when the active project control task explicitly authorizes agent write access and only after local validation passes. Tag, release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow.
 - Use small logical commits when practical.
 - Do not commit `.env`, dumps, uploads, `bin/`, `obj/`, `node_modules`, backups, or generated junk.
+- Do not include model name, generator, or AI authorship in commit messages.
 
 ## Repository Health
 - README: yes

@@ -38,4 +38,6 @@ powershell -ExecutionPolicy Bypass -File scripts/verify-release.ps1
 
 ## Release Boundaries
 - Keep public release actions maintainer-only.
-- Do not push, tag, publish, create remotes, delete files, or automatically redact without explicit maintainer approval.
+- Hard prohibitions: never force-push, never rewrite history, never move an existing tag, never create a remote, never publish a package, never create a release, never delete user changes, never expose secrets, never fabricate owner, identity, signature, or recovery evidence.
+- Normal `master` commit and push is allowed only when the active project control task explicitly authorizes agent write access and only after local validation passes. Tag, release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow.
+- Do not include model name, generator, or AI authorship in commit messages.
