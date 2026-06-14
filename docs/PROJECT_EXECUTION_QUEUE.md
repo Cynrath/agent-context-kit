@@ -1,5 +1,15 @@
 # Project Execution Queue
 
+## Active PROJECT-CONTROL-0106 Track
+| Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 75 | In progress | PROJECT-CONTROL-0106 repo rules and continuation sync | Low | None | `docs/tasks/PROJECT-CONTROL-0106-...md` plus TASK-0140 through TASK-0145 task files; agent instruction surfaces; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Agent rule sync, queue/handoff consistency, scanner rule doc consistency, instruction surface alignment, next work selection, and final validation all complete |
+
+## Active PROJECT-CONTROL-0105 Track
+| Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 74 | Completed | PROJECT-CONTROL-0105 post-0104 audit and continuation | Low | None | PROJECT-CONTROL-0105 task file, queue and SARIF_OUTPUT.md updates, next TASK | full local validation suite, hosted 3/3 | Push after validation | 10-item 0104 audit closed and next safe task queued; 197/197 green |
+
 ## Active PROJECT-CONTROL-0104 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -7,7 +17,6 @@
 | 71 | Completed | TASK-0136 active docs project control and test count refresh | Low | None | active queue, NEXT_TASKS, NEXT_STEPS | local Markdown link gate and `git diff --check` | Push after validation | Active control row points to PROJECT-CONTROL-0104 |
 | 72 | Completed | TASK-0137 scanner rule catalog extension | Low | None | Core catalog, focused tests, SCANNER_RULES.md | `dotnet test` 187/187 green, `ackit scan --ci` and `doctor` clean | Push after validation | `ACKIT006` and `ACKIT007` added with ruleId and Suppression coverage |
 | 73 | Completed | TASK-0138 issue template guard test and final audit sync | Low | None | new test, queue, NEXT_TASKS | `dotnet test` 192/192 green | Push after validation | CI guard against placeholder drift and final docs refresh |
-| 74 | In progress | PROJECT-CONTROL-0105 post-0104 audit and continuation | Low | None | PROJECT-CONTROL-0105 task file, queue and SARIF_OUTPUT.md updates, next TASK | full local validation suite, hosted 3/3 | Push after validation | 10-item 0104 audit closed and next safe task queued |
 
 ## Active PROJECT-CONTROL-0103 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
@@ -78,9 +87,9 @@
 Maintainer-gated work does not block local-only product/docs progress, but no local task may claim release-ready, 1.0-ready, active security controls, signing, SBOM, provenance, or hosted RC completion without exact evidence.
 
 ## Local Validation
-Last verified locally on 2026-06-14 at commit `d104e02`:
+Last verified locally on 2026-06-14 at commit `a179bae`:
 - `dotnet build AgentContextKit.sln -c Release` clean, 0 warnings, 0 errors.
-- `dotnet test AgentContextKit.sln -c Release --no-build` 186/186 green.
+- `dotnet test AgentContextKit.sln -c Release --no-build` 197/197 green.
 - `ackit scan --ci` and `ackit doctor` clean.
 - `powershell -ExecutionPolicy Bypass -File scripts/check-local-markdown-links.ps1 -FailOnIssues` clean across 227 local targets.
 
