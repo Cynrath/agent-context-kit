@@ -34,6 +34,12 @@
 - Do not commit `.env`, dumps, uploads, `bin/`, `obj/`, `node_modules`, backups, or generated junk.
 - Do not include model name, generator, or AI authorship in commit messages.
 
+## Commit Completeness Hard Rule
+- Before any push, run `git status` and confirm the working tree is clean.
+- Run `powershell -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` to confirm no Markdown or other tracked source file is left untracked.
+- Never leave a newly created `.md` task file, plan, queue row, or test file uncommitted. New files must be added and committed in the same logical commit that creates them, or in an immediately following commit, before any push.
+- If a push reveals a missing commit, stop and commit the missing file before continuing; do not continue to the next task.
+
 ## Repository Health
 - README: yes
 - LICENSE: yes

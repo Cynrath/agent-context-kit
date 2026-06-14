@@ -9,6 +9,11 @@
 - Do not include model name, generator, or AI authorship in commit messages.
 - `0.2.0-alpha.3` is NO-GO until `RB-003` and `RB-008` are resolved; do not prepare or publish alpha.3 packages, tags, or releases.
 
+## Commit Completeness Hard Rule
+- Before any push, run `git status` and confirm the working tree is clean.
+- Run `powershell -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` to confirm no tracked source file is left untracked.
+- Never leave a newly created `.md` task file, plan, queue row, or test file uncommitted. New files must be added and committed in the same logical commit that creates them, or in an immediately following commit, before any push.
+
 ## Release Status
 - Current release: `v0.2.0-alpha.2` published on GitHub and NuGet as a pre-release.
 - Current source matches the published `v0.2.0-alpha.2` release plus post-publish workflow/documentation fixes.

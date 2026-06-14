@@ -5,6 +5,11 @@ Prefer minimal, tested, secure changes that follow the project docs and task fil
 ## Maintenance Note
 This file is hand-maintained. `ackit generate` does not regenerate it. Update it through a regular `docs/tasks/` task and a normal commit, never through the generator.
 
+## Commit Completeness Hard Rule
+- Before any push, run `git status` and confirm the working tree is clean.
+- Run `powershell -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` to confirm no tracked source file is left untracked.
+- Never leave a newly created `.md` task file, plan, queue row, or test file uncommitted. New files must be added and committed in the same logical commit that creates them, or in an immediately following commit, before any push.
+
 ## Workflow
 - Task-first workflow is mandatory. Every implementation change starts from a `docs/tasks/` record before code is written.
 
