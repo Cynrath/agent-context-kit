@@ -1,10 +1,18 @@
-param([switch]$FailOnIssues)
+param(
+    [switch]$FailOnIssues,
+    [string]$WorkflowPath
+)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$workflowPath = Join-Path $repoRoot ".github\workflows\release.yml"
+$workflowPath = if ([string]::IsNullOrWhiteSpace($WorkflowPath)) {
+    Join-Path $repoRoot ".github\workflows\release.yml"
+}
+else {
+    (Resolve-Path $WorkflowPath).Path
+}
 $issues = [System.Collections.Generic.List[string]]::new()
 
 if (-not (Test-Path $workflowPath)) {
@@ -37,6 +45,7 @@ $required = @(
     "scripts/verify-published-package.ps1",
     "scripts/verify-existing-release.ps1",
     "scripts/test-release-recovery.ps1",
+    "scripts/test-supply-chain-workflow.ps1",
     "scripts/check-local-markdown-links.ps1",
     "scripts/verify-release.ps1",
     'git tag --list $tagName',
@@ -66,7 +75,7 @@ if (-not $validateBlock.Contains('pwsh -NoProfile -File scripts/test-local-markd
     $issues.Add("Markdown link gates must run in isolated pwsh child processes.") | Out-Null
 }
 
-foreach ($marker in @("if: inputs.operation == 'publish'", "environment: nuget-release", "contents: write", "id-token: write", "NuGet/login@v1", "user: Cyranth", "steps.login.outputs.NUGET_API_KEY", "dotnet nuget push", "gh release create")) {
+foreach ($marker in @("if: inputs.operation == 'publish'", "environment: nuget-release", "contents: write", "id-token: write", "attestations: write", "NuGet/login@v1", "user: Cyranth", "steps.login.outputs.NUGET_API_KEY", "dotnet nuget push", "gh release create", "actions/attest@v4", "gh attestation verify", "ackit-attestation-subject")) {
     if (-not $publishBlock.Contains($marker)) { $issues.Add("Publish permission/operation marker missing: $marker") | Out-Null }
 }
 
@@ -74,7 +83,7 @@ foreach ($marker in @("if: inputs.operation == 'verify-existing'", "contents: re
     if (-not $verifyBlock.Contains($marker)) { $issues.Add("Read-only verification marker missing: $marker") | Out-Null }
 }
 
-foreach ($forbidden in @("contents: write", "id-token: write", "NuGet/login@", "dotnet nuget push", "gh release create", "gh release upload", "gh release edit", "git push", "environment: nuget-release", "NUGET_API_KEY")) {
+foreach ($forbidden in @("contents: write", "id-token: write", "attestations: write", "actions/attest@", "gh attestation", "NuGet/login@", "dotnet nuget push", "gh release create", "gh release upload", "gh release edit", "git push", "environment: nuget-release", "NUGET_API_KEY")) {
     if ($verifyBlock.Contains($forbidden)) {
         $issues.Add("Read-only verification job contains forbidden marker: $forbidden") | Out-Null
     }
@@ -96,6 +105,13 @@ $tagIndex = $publishBlock.IndexOf('git tag "$tagName"', [StringComparison]::Ordi
 $releaseIndex = $publishBlock.IndexOf("gh release create", [StringComparison]::Ordinal)
 if ($publishIndex -lt 0 -or $tagIndex -lt 0 -or $releaseIndex -lt 0 -or $publishIndex -gt $tagIndex -or $tagIndex -gt $releaseIndex) {
     $issues.Add("Publish job must publish and verify NuGet before tag and GitHub Release creation.") | Out-Null
+}
+
+$verifyReleaseIndex = $publishBlock.IndexOf("Verify tag and release", [StringComparison]::Ordinal)
+$attestIndex = $publishBlock.IndexOf("actions/attest@v4", [StringComparison]::Ordinal)
+$verifyAttestationIndex = $publishBlock.IndexOf("gh attestation verify", [StringComparison]::Ordinal)
+if ($verifyReleaseIndex -lt 0 -or $attestIndex -lt 0 -or $verifyAttestationIndex -lt 0 -or $verifyReleaseIndex -gt $attestIndex -or $attestIndex -gt $verifyAttestationIndex) {
+    $issues.Add("Exact GitHub Release asset must be verified before provenance creation and attestation verification.") | Out-Null
 }
 
 $publishedVerifier = Get-Content -Raw (Join-Path $repoRoot "scripts\verify-published-package.ps1")

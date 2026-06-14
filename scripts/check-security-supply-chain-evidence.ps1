@@ -56,6 +56,7 @@ $publishedSupplyChainTask = Read-RequiredFile "docs\tasks\TASK-0127-alpha2-suppl
 $privateReportingVerificationScript = Read-RequiredFile "scripts\check-private-vulnerability-reporting.ps1" "Private-reporting verification script"
 $notificationOwnership = Read-RequiredFile "docs\SECURITY_NOTIFICATION_OWNERSHIP.md" "Security notification ownership"
 $packageRecovery = Read-RequiredFile "docs\PACKAGE_RECOVERY.md" "Package recovery procedure"
+$supplyChainDecisions = Read-RequiredFile "docs\SUPPLY_CHAIN_DECISIONS.md" "Signing/SBOM/provenance decisions"
 
 foreach ($marker in @(
     "Local evidence register prepared on 2026-06-12",
@@ -66,9 +67,9 @@ foreach ($marker in @(
     "VERIFIED PUBLISHED STATE",
     "Private vulnerability reporting | VERIFIED MAINTAINER: ENABLED on 2026-06-14",
     "NuGet owner identity | ACCEPTED RISK on 2026-06-14",
-    "NuGet package signature | VERIFIED PUBLISHED STATE: Alpha.2 repository signature; no author signature observed",
-    "SBOM | VERIFIED PUBLISHED STATE: Not present in alpha.2 package or GitHub Release assets",
-    "Build/package provenance | VERIFIED PUBLISHED STATE: No accessible GitHub attestation for alpha.2 package digest",
+    "NuGet package signature | ACCEPTED RISK: author signing deferred on 2026-06-14",
+    "SBOM | ACCEPTED RISK: publication deferred on 2026-06-14",
+    "Build/package provenance | IMPLEMENTED LOCALLY / HOSTED PENDING",
     "Candidate commit:",
     "Decision date:",
     "Maintainer: Cynrath",
@@ -106,6 +107,10 @@ Require-Text $packageRecovery 'Decision owner: `Cynrath`' "Package recovery deci
 Require-Text $packageRecovery "NuGet unlist/deprecate/account-recovery authority: unverified" "Package recovery authority blocker"
 Require-Text $packageRecovery "never overwrite or reuse the published version" "Immutable package recovery boundary"
 Require-Text (Read-RequiredFile "docs\NUGET_OWNER_IDENTITY.md" "NuGet owner identity disposition") "ACCEPTED RISK through the next pre-release decision or 2026-09-30" "Bounded NuGet identity disposition"
+Require-Text $supplyChainDecisions "Author Signing" "Author-signing decision"
+Require-Text $supplyChainDecisions "SBOM" "SBOM decision"
+Require-Text $supplyChainDecisions "GitHub Artifact Provenance" "Provenance decision"
+Require-Text $supplyChainDecisions "actions/attest@v4" "Official attestation action boundary"
 Require-Text $privateReportingTask "No GitHub setting change" "Private-reporting task remote-write boundary"
 Require-Text $publishedSupplyChainStatus "No author signature was observed" "Published author-signature boundary"
 Require-Text $publishedSupplyChainStatus "no accessible GitHub artifact attestation" "Published provenance boundary"

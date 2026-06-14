@@ -35,9 +35,9 @@ NuGet.org repository signing must not be described as author-signed. Before 1.0 
 - recovery/deprecation procedure for a bad package.
 - alignment of the public NuGet owner profile `Cyranth` with the project persona and package author `Cynrath`.
 
-These decisions may require remote credentials/services and remain maintainer-only blockers. This task does not sign, publish, or upload anything.
+TASK-0132 records the current decisions in `docs/SUPPLY_CHAIN_DECISIONS.md`: author signing and SBOM are bounded deferrals, while exact GitHub Release package provenance is implemented for the next publish workflow. No claim is made that alpha.2 has project provenance.
 
-TASK-0095 consolidates the decision fields. TASK-0127 refreshes the exact published package/release state for alpha.2. TASK-0129 verifies private reporting. TASK-0130 accepts the immutable-package recovery procedure while leaving NuGet execution authority and backup ownership explicit. Owner identity alignment, author signing, SBOM publication, and provenance remain follow-up tasks; no unverified control is claimed.
+TASK-0095 consolidates the decision fields. TASK-0127 refreshes the exact published package/release state for alpha.2. TASK-0129 verifies private reporting. TASK-0130 accepts the immutable-package recovery procedure while leaving destructive authority and backup ownership explicit. TASK-0131 dispositions the owner identity. TASK-0132 defers author signing/SBOM with bounded accepted risk and adds future-release provenance; no unverified published control is claimed.
 
 ## Recovery
 If a bad package is published, stop recommending the version, document impact, publish a fixed successor rather than replacing immutable package content, and update release/install guidance. NuGet unlisting/deprecation is a maintainer remote action. Operational ownership, activation thresholds, communication, and the tabletop boundary are defined in `docs/PACKAGE_RECOVERY.md`.

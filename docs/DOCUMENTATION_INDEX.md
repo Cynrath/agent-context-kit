@@ -126,6 +126,7 @@
 - `scripts/verify-published-package.ps1`: disposable NuGet/local-package install and full installed-tool smoke verification.
 - `scripts/check-security-supply-chain-evidence.ps1`: validates pending/verified evidence structure and optionally reruns dependency reviews.
 - `scripts/check-private-vulnerability-reporting.ps1`: performs metadata-only GitHub verification and can require `enabled: true`.
+- `scripts/test-supply-chain-workflow.ps1`: positive/negative release provenance permission and action tests.
 - `docs/RC_LOCAL_READINESS.md`: consolidated local RC evidence with an explicit remote NO-GO boundary.
 - `scripts/check-rc-local-readiness.ps1`: read-only orchestration gate for final local RC evidence.
 - `docs/HOSTED_VALIDATION_STATUS.md`: exact standard Actions run evidence and the remaining manual RC workflow gap.
@@ -133,6 +134,7 @@
 - `docs/SECURITY_NOTIFICATION_OWNERSHIP.md`: primary/backup notification ownership and continuity boundary.
 - `docs/PACKAGE_RECOVERY.md`: immutable-package recovery thresholds, ownership, communication, and tabletop evidence.
 - `docs/NUGET_OWNER_IDENTITY.md`: verified `Cyranth`/`Cynrath` boundary and bounded accepted-risk disposition.
+- `docs/SUPPLY_CHAIN_DECISIONS.md`: author-signing and SBOM deferrals plus future-release provenance implementation.
 - `docs/PUBLISHED_SUPPLY_CHAIN_STATUS.md`: exact published package signature, owner identity, SBOM, release asset, and provenance-attestation audit.
 - `scripts/check-published-supply-chain-status.ps1`: local structure gate for the published supply-chain truth boundary.
 - `scripts/test-samples.ps1`: local sample smoke validation helper.

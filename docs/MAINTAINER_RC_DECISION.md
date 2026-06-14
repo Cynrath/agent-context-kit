@@ -15,8 +15,8 @@ The local contract freeze, machine-readable schema assets, localization parity g
 | JSON/SARIF contract | TASK-0093 machine-readable schemas, golden fixtures, live-output tests, and local gate exist | Review the final candidate assets and rerun the contract gate | Maintainer review |
 | Security reporting | Private reporting enabled; `Cynrath` primary triage owner; backup unassigned | Assign independent backup and verify coverage | Security ownership task |
 | Dependency review | Clean on 2026-06-12 | Rerun on final candidate date | Maintainer/release validation |
-| NuGet ownership/signing | Owner identity difference has bounded accepted-risk disposition through 2026-09-30; valid repository signature, no author signature; destructive recovery authority remains unverified | Recheck identity disposition, verify recovery authority, and record author sign/defer decision | Maintainer NuGet/supply-chain decision |
-| SBOM/provenance | No package/release SBOM and no accessible GitHub attestation for the exact published digest | Record explicit publish/attest or defer decisions, evidence, owner, and review date | Maintainer supply-chain decision |
+| NuGet ownership/signing | Owner identity difference and author signing have bounded accepted-risk dispositions through 2026-09-30; valid repository signature; destructive recovery authority remains unverified | Recheck dispositions and verify recovery authority | Maintainer NuGet/supply-chain decision |
+| SBOM/provenance | SBOM is bounded-deferred through 2026-09-30; provenance is implemented for the next exact GitHub Release nupkg but has no hosted publication evidence yet | Require attestation creation/verification in the next publish run | Release workflow |
 | Localization parity | TASK-0094 human/error/exit/JSON parity matrix and local gate complete | Rerun on final candidate and review intended stable technical tokens | Maintainer review |
 | Version and release | Not selected | Select version, update metadata, review package diff, approve release plan | Dedicated release task |
 

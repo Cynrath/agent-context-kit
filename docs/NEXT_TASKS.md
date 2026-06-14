@@ -9,8 +9,8 @@ This is the unified execution queue. PROJECT-CONTROL-0102 is complete; PROJECT-C
 4. TASK-0129 private vulnerability reporting verification - completed; `enabled: true` verified 2026-06-14.
 5. TASK-0130 security notification and recovery ownership - completed to verifiable boundary; backup/authority blockers recorded.
 6. TASK-0131 NuGet owner identity disposition - completed with bounded accepted risk.
-7. TASK-0132 signing, SBOM, and provenance implementation/decision - next.
-8. TASK-0133 next prerelease scope and version selection.
+7. TASK-0132 signing, SBOM, and provenance implementation/decision - completed locally; provenance hosted-pending next publish.
+8. TASK-0133 next prerelease scope and version selection - next.
 9. TASK-0134 conditional next prerelease preparation, publication, and verification.
 
 ## Active Alpha.2 Execution

@@ -14,6 +14,8 @@ TASK-0130 records `Cynrath` as primary security triage and recovery decision own
 
 TASK-0131 accepts the public `Cyranth` NuGet owner / `Cynrath` project persona difference for a bounded period. OIDC publication authority is verified; no owner mutation or shared-human-identity claim was made.
 
+TASK-0132 defers author signing/SBOM with dated accepted risk and adds future-release GitHub artifact provenance to the isolated publish job. The read-only verifier has no attestation permission.
+
 ## Architecture
 - CLI project: `src/AgentContextKit.Cli`
 - Core project: `src/AgentContextKit.Core`

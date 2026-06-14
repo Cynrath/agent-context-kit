@@ -45,6 +45,7 @@ $status = Read-RequiredFile "docs\PUBLISHED_SUPPLY_CHAIN_STATUS.md" "Published s
 $task = Read-RequiredFile "docs\tasks\TASK-0127-alpha2-supply-chain-evidence-refresh.md" "TASK-0127"
 $evidence = Read-RequiredFile "docs\SECURITY_SUPPLY_CHAIN_EVIDENCE.md" "Security/supply-chain evidence register"
 $policy = Read-RequiredFile "docs\SUPPLY_CHAIN_POLICY.md" "Supply-chain policy"
+$decisions = Read-RequiredFile "docs\SUPPLY_CHAIN_DECISIONS.md" "Supply-chain decisions"
 
 foreach ($marker in @(
     'NuGet package `AgentContextKit` `0.2.0-alpha.2`',
@@ -66,9 +67,14 @@ foreach ($marker in @(
 Require-Text $task "Signing, republishing" "Task remote-write boundary"
 Require-Text $evidence "VERIFIED PUBLISHED STATE" "Published-state evidence vocabulary"
 Require-Text $evidence "NuGet owner identity" "NuGet owner identity evidence row"
-Require-Text $evidence "Alpha.2 repository signature; no author signature observed" "Package signature evidence row"
-Require-Text $evidence "Not present in alpha.2 package or GitHub Release assets" "SBOM published-state evidence"
-Require-Text $evidence "No accessible GitHub attestation for alpha.2 package digest" "Provenance published-state evidence"
+Require-Text $evidence "Alpha.2 has a valid NuGet repository signature and no author signature" "Package signature published-state evidence"
+Require-Text $evidence "Alpha.2 has no SBOM" "SBOM published-state evidence"
+Require-Text $evidence "alpha.2 remains unattested" "Provenance published-state evidence"
+Require-Text $decisions "## Author Signing" "Author-signing decision section"
+Require-Text $decisions "## SBOM" "SBOM decision section"
+Require-Text $decisions "**Decision: DEFER / ACCEPTED RISK**" "Author-signing/SBOM accepted-risk decision"
+Require-Text $decisions "## GitHub Artifact Provenance" "Provenance decision section"
+Require-Text $decisions "**Decision: IMPLEMENT for the next published release.**" "Future provenance decision"
 Require-Text $policy "repository-signed by NuGet.org" "Repository-signing truth boundary"
 Require-Text $policy "must not be described as author-signed" "Author-signing truth boundary"
 

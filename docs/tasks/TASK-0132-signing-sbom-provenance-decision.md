@@ -37,7 +37,7 @@ Local generation/parse/hash, hosted workflow if added, and evidence/security gat
 Disable/revert optional workflow or remove unshipped generated artifacts; never falsify prior evidence.
 
 ## Completion Evidence
-Pending.
+Implemented locally on 2026-06-14. Author signing is deferred with bounded accepted risk because no trusted certificate lifecycle exists. SBOM publication is deferred with bounded accepted risk until deterministic .NET 10 generation, privacy, and lifecycle are validated. Future publish runs now download the exact GitHub Release nupkg, skip duplicate digest attestations, use `actions/attest@v4` only in the publish job, and verify the signer workflow with GitHub CLI. `verify-existing` remains read-only. Static positive/negative tests pass; hosted provenance evidence requires the next actual publish and is not claimed for alpha.2.
 
 ## Commit
 `security: add supply-chain evidence controls`

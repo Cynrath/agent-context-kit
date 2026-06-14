@@ -6,7 +6,9 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 
 ## [Unreleased]
 
-No changes have been recorded after the alpha.2 publication.
+### Security
+- Added least-privilege GitHub artifact provenance for exact future release nupkg assets, with idempotent digest detection and CLI verification.
+- Recorded bounded author-signing and SBOM deferrals without claiming controls that are not published.
 
 ## [0.2.0-alpha.2] - 2026-06-13
 

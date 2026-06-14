@@ -107,6 +107,7 @@ jobs:
           powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-security-supply-chain-evidence.ps1 -FailOnIssues
           powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-published-supply-chain-status.ps1 -FailOnIssues
           powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-public-release-gates.ps1 -FailOnIssues
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-supply-chain-workflow.ps1
           powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-workflow.ps1 -FailOnIssues
           powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-release-recovery.ps1
           powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-release.ps1 -Version "${{ inputs.version }}"
@@ -152,6 +153,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
+      attestations: write
 
     steps:
       - name: Checkout exact release commit
@@ -273,6 +275,41 @@ jobs:
           $tagCommit = (git rev-list -n 1 "v${{ inputs.version }}").Trim()
           if ($tagCommit -ne "${{ inputs.release_commit_sha }}") { throw "Published tag does not target the exact release commit." }
           gh release view "v${{ inputs.version }}" --repo "${{ github.repository }}" --json tagName,isPrerelease,assets | ConvertFrom-Json | Out-Null
+
+      - name: Inspect exact release asset provenance
+        id: provenance-state
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $false
+          $subjectRoot = Join-Path "${{ runner.temp }}" "ackit-attestation-subject"
+          Remove-Item $subjectRoot -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path $subjectRoot | Out-Null
+          gh release download "v${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "AgentContextKit.${{ inputs.version }}.nupkg" --dir $subjectRoot
+          if ($LASTEXITCODE -ne 0) { throw "Unable to download the exact GitHub Release package asset." }
+          $subject = Get-Item (Join-Path $subjectRoot "AgentContextKit.${{ inputs.version }}.nupkg")
+          $digest = (Get-FileHash -Algorithm SHA256 $subject.FullName).Hash.ToLowerInvariant()
+          gh api "repos/${{ github.repository }}/attestations/sha256:$digest" *> $null
+          $exists = $LASTEXITCODE -eq 0
+          "exists=$($exists.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Attest exact release package
+        if: steps.provenance-state.outputs.exists != 'true'
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ runner.temp }}/ackit-attestation-subject/AgentContextKit.${{ inputs.version }}.nupkg
+
+      - name: Verify exact release package attestation
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $subject = Join-Path "${{ runner.temp }}/ackit-attestation-subject" "AgentContextKit.${{ inputs.version }}.nupkg"
+          gh attestation verify $subject --repo "${{ github.repository }}" --signer-workflow "${{ github.repository }}/.github/workflows/release.yml"
 
   verify-existing:
     if: inputs.operation == 'verify-existing'

@@ -9,8 +9,8 @@
 | 64 | Completed | TASK-0129 private vulnerability reporting | P0 future release | Complete | security status/evidence/script | enabled boolean re-read and public entry check | Completed | Enabled and independently verified |
 | 65 | Completed to verifiable boundary | TASK-0130 notification/recovery ownership | P0/P1 | Backup and NuGet authority remain | security/recovery/decision docs | evidence structure/tabletop | No remote incident action | Truthful primary ownership/procedure and explicit blockers |
 | 66 | Completed | TASK-0131 NuGet identity disposition | P1 | Bounded accepted risk | NuGet/evidence/decision docs | public identity/OIDC review | No owner mutation | Dated exception through 2026-09-30 |
-| 67 | In progress | TASK-0132 signing/SBOM/provenance | P1 | Certificate/permissions | workflow/scripts/evidence | SBOM/privacy/digest/attestation gates | Possible isolated workflow | Implement/defer decisions recorded |
-| 68 | Queued | TASK-0133 next prerelease selection | P0 | Depends on decisions/evidence | scope/roadmap/changelog docs | contract/version gates | No | Smallest valid version selected/deferred |
+| 67 | Completed locally | TASK-0132 signing/SBOM/provenance | P1 | Provenance hosted-pending | workflow/scripts/evidence | permission/action tests plus future publish verification | Publish job only | Deferrals recorded; provenance implemented |
+| 68 | In progress | TASK-0133 next prerelease selection | P0 | Depends on decisions/evidence | scope/roadmap/changelog docs | contract/version gates | No | Smallest valid version selected/deferred |
 | 69 | Conditional | TASK-0134 next prerelease release | P0 | Requires exact GO packet | release/package/status files | full local/hosted/release gates | Yes if GO | Published and verified or evidence-backed NO-GO |
 
 ## Active Authorized Alpha.2 Track

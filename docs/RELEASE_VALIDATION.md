@@ -48,6 +48,7 @@ powershell -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1 -
 powershell -ExecutionPolicy Bypass -File scripts/test-local-markdown-links.ps1
 powershell -ExecutionPolicy Bypass -File scripts/check-local-markdown-links.ps1 -FailOnIssues
 powershell -ExecutionPolicy Bypass -File scripts/check-release-workflow.ps1 -FailOnIssues
+powershell -ExecutionPolicy Bypass -File scripts/test-supply-chain-workflow.ps1
 powershell -ExecutionPolicy Bypass -File scripts/test-release-recovery.ps1
 powershell -ExecutionPolicy Bypass -File scripts/prepare-release.ps1 -Version <version> -CommitSha <sha> -FailOnIssues
 powershell -ExecutionPolicy Bypass -File scripts/verify-published-package.ps1 -Version <published-version>
@@ -70,6 +71,8 @@ Repository-local Markdown targets are checked without network access by `scripts
 English/Turkish human output, known argument errors, exit decisions, and JSON semantic invariance are defined in [LOCALIZATION.md](LOCALIZATION.md) and validated by `tests/AgentContextKit.Tests/LocalizationParityTests.cs` plus `scripts/check-localization-parity.ps1`.
 
 Security reporting and supply-chain maintainer evidence fields are defined in [SECURITY_SUPPLY_CHAIN_EVIDENCE.md](SECURITY_SUPPLY_CHAIN_EVIDENCE.md) and [MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md](MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md), with local structure/dependency review through `scripts/check-security-supply-chain-evidence.ps1`. Remote private-reporting state can be rechecked separately through `scripts/check-private-vulnerability-reporting.ps1`; the local structure gate alone does not prove remote settings or artifact publication.
+
+Signing, SBOM, and provenance dispositions are recorded in [SUPPLY_CHAIN_DECISIONS.md](SUPPLY_CHAIN_DECISIONS.md). `scripts/test-supply-chain-workflow.ps1` verifies positive and negative permission/action boundaries. Provenance remains hosted-pending until a future publish run attests and verifies the exact release nupkg.
 
 The consolidated local RC decision is defined in [RC_LOCAL_READINESS.md](RC_LOCAL_READINESS.md). `scripts/check-rc-local-readiness.ps1` orchestrates the existing local evidence gates and intentionally reports `LOCAL READY / REMOTE NO-GO` while hosted and maintainer-only evidence remains open.
 

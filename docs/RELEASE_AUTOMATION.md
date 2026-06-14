@@ -17,10 +17,14 @@ The release job uses GitHub environment `nuget-release` and only that job receiv
 
 - `contents: write` for the exact tag and GitHub pre-release;
 - `id-token: write` for NuGet Trusted Publishing.
+- `attestations: write` for the exact GitHub Release `.nupkg` provenance record.
 
 `NuGet/login@v1` requests a short-lived NuGet credential for user `Cyranth`. The output is used only by `dotnet nuget push`; it is not printed, written to a file, committed, or stored as a repository secret. No API key or `NuGet.Config` credential is supported.
 
 The `verify-existing` job is separate from publication. It has only `contents: read`, does not use the `nuget-release` environment, does not request `id-token: write`, does not call `NuGet/login`, and cannot publish, tag, upload, or edit a GitHub Release.
+
+## Artifact Provenance
+After NuGet, tag, and GitHub Release verification, the publish job downloads the exact release `.nupkg`. If its SHA-256 already has a repository attestation, creation is skipped. Otherwise `actions/attest@v4` creates provenance, and `gh attestation verify` requires the `release.yml` signer workflow. This occurs only in the publish job; alpha.2 is not retrospectively attested.
 
 ## Idempotency And Partial Failure
 - Concurrency serializes runs for the same operation and version.
@@ -38,6 +42,7 @@ The `verify-existing` job is separate from publication. It has only `contents: r
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/prepare-release.ps1 -Version 0.2.0-alpha.2 -CommitSha (git rev-parse HEAD) -AllowDirty -FailOnIssues
 powershell -ExecutionPolicy Bypass -File scripts/check-release-workflow.ps1 -FailOnIssues
+powershell -ExecutionPolicy Bypass -File scripts/test-supply-chain-workflow.ps1
 powershell -ExecutionPolicy Bypass -File scripts/test-release-recovery.ps1
 powershell -ExecutionPolicy Bypass -File scripts/verify-published-package.ps1 -Version 0.2.0-alpha.2
 ```
