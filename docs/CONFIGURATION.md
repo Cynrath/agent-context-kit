@@ -136,6 +136,22 @@ Configuration never causes AgentContextKit to delete, overwrite, redact, upload,
 
 The validator reports attempts to suppress Critical rule `ACKIT001` as an error even though the runtime scanner already refuses to suppress Critical findings.
 
+## Diagnostic Cookbook
+`ackit config-check` emits sanitized diagnostics with stable `ACKITCFG###` codes. The most common codes and their one-line fixes are:
+
+| Code | Trigger | One-line fix |
+| --- | --- | --- |
+| `ACKITCFG001` | Unknown top-level key in `.ackit/config.yml` | Remove the key or rename it to a supported field. |
+| `ACKITCFG002` | Obsolete or legacy key (e.g. `allowedFindingIds`) | Migrate to the current key (`ignoredFindingIds`). |
+| `ACKITCFG003` | Duplicate top-level key | Delete the duplicate so the canonical key is read once. |
+| `ACKITCFG006` | Unmatched quote or malformed value | Re-type the value as a quoted string or list. |
+| `ACKITCFG008` | Invalid `ignoredPaths` entry (absolute or escaping the repo) | Use a repository-relative path like `samples/placeholders/`. |
+| `ACKITCFG010` | Invalid `ignoredFindingIds` entry (not a stable `ACKIT###` ID) | Use a stable ID from `docs/SCANNER_RULES.md` such as `ACKIT003`. |
+| `ACKITCFG011` | Attempt to suppress Critical `ACKIT001` | Remove the suppression; Critical findings cannot be silenced. |
+| `ACKITCFG013` | `ignoredPaths` entry is too broad (matches the whole repo) | Narrow the path so it covers only generated or fixture content. |
+
+Full code list and severity definitions live in `src/AgentContextKit.Core/ConfigurationValidation.cs` (`ConfigDiagnosticCodes`).
+
 Validate without changing the file:
 
 ```powershell
