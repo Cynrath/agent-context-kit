@@ -130,6 +130,7 @@ Copy-ready examples are available under `docs/examples/config/`:
 - `ci-config.yml`: CI-oriented non-Critical noise controls for safe documentation/fixture paths.
 - `brand-pii-starters.yml`: starter `brandKeywords` and `piiKeywords` placeholder set for a public repository.
 - `safe-domains-and-ignored-paths.yml`: starter `safeDomains` and `ignoredPaths` placeholder set for fixture/sample content.
+- `safe-domains-and-ignored-paths.yml`: starter `safeDomains` and `ignoredPaths` placeholder set for fixture/sample content.
 
 These examples do not contain real secrets and do not demonstrate Critical suppression. `safeDomains`, `ignoredPaths`, and `ignoredFindingIds` suppress only non-Critical findings; Critical findings remain reportable by design.
 
