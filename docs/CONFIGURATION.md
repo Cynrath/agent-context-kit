@@ -155,6 +155,10 @@ The validator reports attempts to suppress Critical rule `ACKIT001` as an error 
 
 Full code list and severity definitions live in `src/AgentContextKit.Core/ConfigurationValidation.cs` (`ConfigDiagnosticCodes`).
 
+## Actionable Examples
+- `with-warning.yml` triggers a single `ACKITCFG001` warning and no error.
+- `with-error.yml` triggers `ACKITCFG008` (path escapes the repo) and `ACKITCFG011` (Critical suppression attempt); the validator exits non-zero.
+
 Validate without changing the file:
 
 ```powershell

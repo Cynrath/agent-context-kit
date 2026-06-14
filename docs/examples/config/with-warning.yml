@@ -1,0 +1,14 @@
+# Example config that triggers a single warning and no error.
+# Intended for `ackit config-check` demo and cookbook.
+schemaVersion: 1
+defaultLanguage: en
+brandKeywords: []
+piiKeywords: []
+unknownFutureKey: example
+ignorePaths:
+  - .ackit/cache/
+riskExtensions:
+  - .bak
+safeDomains: []
+ignoredPaths: []
+ignoredFindingIds: []

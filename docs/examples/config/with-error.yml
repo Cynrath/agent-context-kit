@@ -1,0 +1,15 @@
+# Example config that triggers a single error and no Critical suppression.
+# Intended for `ackit config-check` demo and cookbook.
+schemaVersion: 1
+defaultLanguage: en
+brandKeywords: []
+piiKeywords: []
+ignorePaths:
+  - .ackit/cache/
+riskExtensions:
+  - .bak
+safeDomains: []
+ignoredPaths:
+  - ../outside-folder
+ignoredFindingIds:
+  - ACKIT001
