@@ -76,6 +76,8 @@ For example, if a secret-like value is detected, SARIF records the rule, severit
 | `ACKIT007` | `DocumentationGap` | Documentation gaps, stale guidance, and missing or unclear public documents. |
 | `ACKIT999` | `GeneralFinding` | General fallback finding. |
 
+The SARIF rule IDs above are derived from the Core `RiskRuleCatalog`; the catalog is the single source of truth.
+
 The rule catalog also provides default severity context and recommendation/help text. See [SCANNER_RULES.md](SCANNER_RULES.md) for the full catalog and config allowlist behavior.
 
 ## JSON Command Result
