@@ -1,0 +1,26 @@
+# Brand and PII keyword starter config.
+# Safe for most repositories that want a baseline of brand and PII keyword detection.
+# Replace the placeholder values with the brand names, customer names, or
+# internal product codes that should be reviewed before public release.
+schemaVersion: 1
+defaultLanguage: en
+brandKeywords:
+  - "Example Brand"
+  - "Example Subsidiary"
+piiKeywords:
+  - "internal customer"
+  - "internal employee"
+ignorePaths:
+  - .ackit/cache/
+  - .ackit/reports/
+  - .ackit/webui/
+  - .ackit/prompt-packs/
+  - .ackit/context-exports/
+riskExtensions:
+  - .bak
+  - .tmp
+  - .log
+  - .sql
+safeDomains: []
+ignoredPaths: []
+ignoredFindingIds: []
