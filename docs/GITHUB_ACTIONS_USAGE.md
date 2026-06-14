@@ -82,6 +82,8 @@ The active repository workflows are:
 - `.github/workflows/cross-platform-source-smoke.yml`: current branch/source package smoke.
 - `.github/workflows/release-candidate-evidence.yml`: manual-only predecessor upgrade, current-source config/baseline/SARIF, and performance evidence. It does not upload artifacts or SARIF.
 
+The baseline diff workflow runs `ackit scan --baseline <path> --ci` so new High or Critical findings fail CI while existing findings remain visible. See [BASELINE_MODEL.md](BASELINE_MODEL.md) for the existing-versus-new cookbook and CI behavior.
+
 See [RC_HOSTED_EVIDENCE.md](RC_HOSTED_EVIDENCE.md) before manually dispatching the RC workflow.
 
 ## Privacy Notes
