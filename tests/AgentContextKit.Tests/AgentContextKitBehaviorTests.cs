@@ -224,7 +224,7 @@ public sealed class RiskScannerTests
     {
         { ".env", RiskSeverity.Critical, RiskCategory.Secret, "ACKIT001" },
         { ".env.sample", RiskSeverity.Medium, RiskCategory.Configuration, "ACKIT005" },
-        { "config/appsettings.Production.json", RiskSeverity.High, RiskCategory.ProductionConfig, "ACKIT001" },
+        { "config/appsettings.Production.json", RiskSeverity.High, RiskCategory.ProductionConfig, "ACKIT006" },
         { "backups/export.txt", RiskSeverity.High, RiskCategory.RepositoryHygiene, "ACKIT005" },
         { "artifacts/source.zip", RiskSeverity.Medium, RiskCategory.BuildArtifact, "ACKIT003" },
         { "certs/signing.pfx", RiskSeverity.Critical, RiskCategory.Secret, "ACKIT001" }
@@ -863,6 +863,28 @@ public sealed class SarifReportWriterTests
         Assert.Equal("ACKIT003", RiskRuleCatalog.GetRuleId(new RiskFinding(RiskSeverity.Medium, RiskCategory.BuildArtifact, "artifact.zip", "artifact")));
         Assert.Equal("ACKIT004", RiskRuleCatalog.GetRuleId(new RiskFinding(RiskSeverity.Low, RiskCategory.LocalPath, "docs/path.md", "path")));
         Assert.Equal("ACKIT005", RiskRuleCatalog.GetRuleId(new RiskFinding(RiskSeverity.Medium, RiskCategory.Configuration, ".env.example", "config")));
+        Assert.Equal("ACKIT006", RiskRuleCatalog.GetRuleId(new RiskFinding(RiskSeverity.High, RiskCategory.ProductionConfig, "config/appsettings.Production.json", "production")));
+        Assert.Equal("ACKIT007", RiskRuleCatalog.GetRuleId(new RiskFinding(RiskSeverity.Medium, RiskCategory.Documentation, "docs/README.md", "stale")));
+    }
+
+    [Fact]
+    public void RiskRuleCatalogExposesNewProductionConfigAndDocumentationRules()
+    {
+        Assert.Contains(RiskRuleCatalog.All, rule => rule.Id == "ACKIT006" && rule.Category == RiskCategory.ProductionConfig);
+        Assert.Contains(RiskRuleCatalog.All, rule => rule.Id == "ACKIT007" && rule.Category == RiskCategory.Documentation);
+
+        var productionFinding = new RiskFinding(RiskSeverity.High, RiskCategory.ProductionConfig, "config/prod.json", "fixture");
+        var productionRule = RiskRuleCatalog.GetRule(productionFinding);
+        Assert.Equal("ACKIT006", productionRule.Id);
+        Assert.Equal(RiskSeverity.High, productionRule.DefaultSeverity);
+
+        var documentationFinding = new RiskFinding(RiskSeverity.Medium, RiskCategory.Documentation, "docs/missing.md", "fixture");
+        var documentationRule = RiskRuleCatalog.GetRule(documentationFinding);
+        Assert.Equal("ACKIT007", documentationRule.Id);
+        Assert.Equal(RiskSeverity.Medium, documentationRule.DefaultSeverity);
+
+        var suppression = new RiskSuppression("ACKIT006", RiskSeverity.High, RiskCategory.ProductionConfig, "config/prod.json", RiskSuppressionReason.IgnoredFindingId);
+        Assert.Equal("ACKIT006", suppression.RuleId);
     }
 
     [Fact]

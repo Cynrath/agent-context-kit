@@ -6,6 +6,9 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 
 ## [Unreleased]
 
+### Added
+- Added two new stable scanner rule IDs: `ACKIT006` `ProductionConfigLike` (High) for production configuration, environment-specific appsettings, and live-service connection strings, and `ACKIT007` `DocumentationGap` (Medium) for documentation gaps surfaced by the scanner. Existing `ACKIT001` and `ACKIT005` descriptions were narrowed to reflect the new dedicated rules.
+
 ### Security
 - Added least-privilege GitHub artifact provenance for exact future release nupkg assets, with idempotent digest detection and CLI verification.
 - Recorded bounded author-signing and SBOM deferrals without claiming controls that are not published.

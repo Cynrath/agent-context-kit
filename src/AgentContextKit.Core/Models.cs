@@ -144,6 +144,22 @@ public static class RiskRuleCatalog
         "Repository hygiene, configuration, documentation, or release readiness issue.",
         "Review the repository hygiene item before public release or generated context export.");
 
+    public static readonly RiskRule ProductionConfigLike = new(
+        "ACKIT006",
+        "ProductionConfigLike",
+        RiskCategory.ProductionConfig,
+        RiskSeverity.High,
+        "Production configuration, deployment manifest, environment template, or live-service connection string requiring review.",
+        "Replace production connection strings, environment names, and deployment-only settings with safe local or placeholder values before public release.");
+
+    public static readonly RiskRule DocumentationGap = new(
+        "ACKIT007",
+        "DocumentationGap",
+        RiskCategory.Documentation,
+        RiskSeverity.Medium,
+        "Documentation gap, stale guidance, missing required public document, or unclear wording requiring review.",
+        "Update or add the relevant public documentation so the next reader or AI agent receives accurate, current guidance.");
+
     public static readonly RiskRule GeneralFinding = new(
         "ACKIT999",
         "GeneralFinding",
@@ -159,6 +175,8 @@ public static class RiskRuleCatalog
         GeneratedOrBuildArtifact,
         LocalPathOrPrivateLocation,
         RepositoryHygiene,
+        ProductionConfigLike,
+        DocumentationGap,
         GeneralFinding
     ];
 
@@ -172,11 +190,13 @@ public static class RiskRuleCatalog
     {
         return finding.Category switch
         {
-            RiskCategory.Secret or RiskCategory.ProductionConfig => SecretLike.Id,
+            RiskCategory.Secret => SecretLike.Id,
+            RiskCategory.ProductionConfig => ProductionConfigLike.Id,
             RiskCategory.Pii or RiskCategory.Brand => PiiOrBrandLike.Id,
             RiskCategory.BuildArtifact => GeneratedOrBuildArtifact.Id,
             RiskCategory.LocalPath => LocalPathOrPrivateLocation.Id,
-            RiskCategory.RepositoryHygiene or RiskCategory.Documentation or RiskCategory.Configuration => RepositoryHygiene.Id,
+            RiskCategory.RepositoryHygiene or RiskCategory.Configuration => RepositoryHygiene.Id,
+            RiskCategory.Documentation => DocumentationGap.Id,
             _ => GeneralFinding.Id
         };
     }
