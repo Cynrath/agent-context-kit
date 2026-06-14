@@ -18,6 +18,7 @@ AgentContextKit runs locally against a repository path. The MVP does not upload 
 - ProductionConfig
 - BuildArtifact
 - RepositoryHygiene
+- Documentation
 
 ## Severity
 - Critical
@@ -59,7 +60,7 @@ Config allowlists are local-only, explicit, reviewable, and documented. They can
 
 Current source keeps config suppressions auditable through sanitized local scan output. Audit entries omit raw matches and messages, do not change exit codes, and are not added to SARIF. See `docs/SUPPRESSION_AUDIT.md`.
 
-The scanner rule catalog, configurable allowlist foundation, and expanded scanner patterns are part of the published `0.2.0-alpha.2` package and current source.
+The scanner rule catalog, configurable allowlist foundation, and expanded scanner patterns are part of the published `0.2.0-alpha.2` package and current source. Stable `ACKIT` rule IDs and their category mapping are documented in `docs/SCANNER_RULES.md`; the latest additions are `ACKIT006` (`ProductionConfigLike`, High) for production configuration and `ACKIT007` (`DocumentationGap`, Medium) for documentation gaps.
 
 Scanner regression fixtures are synthetic and assembled to avoid committed live-looking credentials. The fixture matrix in `docs/SCANNER_FIXTURES.md` verifies both detection and known-noise boundaries without weakening Critical findings.
 
