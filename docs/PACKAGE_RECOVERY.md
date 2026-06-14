@@ -5,10 +5,11 @@ Define immutable-package recovery for a compromised, vulnerable, or materially b
 
 ## Ownership
 - Decision owner: `Cynrath`, project/release maintainer.
-- NuGet execution authority: pending TASK-0131 verification because the public NuGet owner identity is `Cyranth` while project metadata uses `Cynrath`.
+- NuGet publication authority: verified by successful alpha.2 OIDC Trusted Publishing under configured user `Cyranth`.
+- NuGet unlist/deprecate/account-recovery authority: unverified and intentionally not tested destructively.
 - Backup recovery owner: not assigned.
 
-The procedure is accepted for project operations, but a future candidate remains NO-GO until execution authority and backup coverage have an owned disposition.
+The procedure is accepted for project operations, but a future candidate remains NO-GO until destructive recovery authority and backup coverage have an owned disposition.
 
 ## Activation Threshold
 Recovery may be activated for:
@@ -39,4 +40,3 @@ Documentation review on 2026-06-14 confirmed the procedure preserves immutable p
 
 ## Review Cadence
 Review before each release candidate and after any owner, publishing, recovery, or security-notification change.
-

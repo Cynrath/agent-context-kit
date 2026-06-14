@@ -37,7 +37,7 @@ dotnet list AgentContextKit.sln package --deprecated --include-transitive
 Record the candidate commit, date, reachable package sources, and result. A network/source failure is incomplete evidence, not a clean result.
 
 ## 3. NuGet Signing Decision
-Before choosing sign/defer, resolve or explicitly accept the NuGet owner-profile identity mismatch. Package metadata and the project persona use `Cynrath`; the current public NuGet owner profile is `Cyranth`.
+TASK-0131 records a bounded accepted-risk disposition for the NuGet owner-profile identity difference. Package metadata and the project persona use `Cynrath`; the current public NuGet owner profile is `Cyranth`. Recheck `docs/NUGET_OWNER_IDENTITY.md` before the next release candidate or 2026-09-30.
 
 Choose one path:
 

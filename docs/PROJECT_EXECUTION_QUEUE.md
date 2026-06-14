@@ -8,8 +8,8 @@
 | 63 | Completed | TASK-0128 hosted RC evidence hardening | P0 future release | Complete for reviewed alpha.2 state | RC workflow/gates/evidence | exact hosted matrix | Dispatch only | Run `27478635057` green on three OS |
 | 64 | Completed | TASK-0129 private vulnerability reporting | P0 future release | Complete | security status/evidence/script | enabled boolean re-read and public entry check | Completed | Enabled and independently verified |
 | 65 | Completed to verifiable boundary | TASK-0130 notification/recovery ownership | P0/P1 | Backup and NuGet authority remain | security/recovery/decision docs | evidence structure/tabletop | No remote incident action | Truthful primary ownership/procedure and explicit blockers |
-| 66 | In progress | TASK-0131 NuGet identity disposition | P1 | Human account action may block | NuGet/evidence/decision docs | public identity review | Possible, not automatic | Alignment or dated exception |
-| 67 | Queued | TASK-0132 signing/SBOM/provenance | P1 | Certificate/permissions | workflow/scripts/evidence | SBOM/privacy/digest/attestation gates | Possible isolated workflow | Implement/defer decisions recorded |
+| 66 | Completed | TASK-0131 NuGet identity disposition | P1 | Bounded accepted risk | NuGet/evidence/decision docs | public identity/OIDC review | No owner mutation | Dated exception through 2026-09-30 |
+| 67 | In progress | TASK-0132 signing/SBOM/provenance | P1 | Certificate/permissions | workflow/scripts/evidence | SBOM/privacy/digest/attestation gates | Possible isolated workflow | Implement/defer decisions recorded |
 | 68 | Queued | TASK-0133 next prerelease selection | P0 | Depends on decisions/evidence | scope/roadmap/changelog docs | contract/version gates | No | Smallest valid version selected/deferred |
 | 69 | Conditional | TASK-0134 next prerelease release | P0 | Requires exact GO packet | release/package/status files | full local/hosted/release gates | Yes if GO | Published and verified or evidence-backed NO-GO |
 

@@ -37,7 +37,7 @@ NuGet public metadata/profile inspection and cross-document review.
 Revert unsupported disposition text.
 
 ## Completion Evidence
-Pending.
+Completed on 2026-06-14. Public NuGet evidence confirms `Cyranth`; package metadata/repository persona remain `Cynrath`. Successful alpha.2 OIDC Trusted Publishing proves the configured publication boundary, but public evidence does not prove shared human identity or destructive recovery/account access. `docs/NUGET_OWNER_IDENTITY.md` records a bounded accepted risk through the next pre-release decision or 2026-09-30. No owner transfer, rename, credential handling, or package mutation occurred.
 
 ## Commit
 `docs: record NuGet owner identity disposition`

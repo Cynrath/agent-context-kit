@@ -26,7 +26,7 @@ This is published-state evidence. It is not approval to sign, republish, change 
 | Repository commit | `f540479a92cbe66097f6796553828ee49ddd5512` |
 | License | `MIT` |
 
-The NuGet repository signature reports owner `Cyranth`, while package metadata and the public project persona use `Cynrath`. This identity difference remains a maintainer decision; this audit does not modify the account or package owner list.
+The NuGet repository signature reports owner `Cyranth`, while package metadata and the public project persona use `Cynrath`. TASK-0131 records a dated, bounded accepted-risk disposition in `docs/NUGET_OWNER_IDENTITY.md`; no account or package owner list was modified.
 
 ## Signature Result
 `dotnet nuget verify --all --verbosity detailed` completed successfully for the NuGet-served package.
@@ -57,7 +57,7 @@ The authenticated GitHub artifact-attestation endpoint returned HTTP 404 for NuG
 ## Current Decision Boundary
 | Area | Verified published state | Follow-up |
 | --- | --- | --- |
-| NuGet owner identity | Repository signature owner `Cyranth`; project persona/author `Cynrath` | TASK-0131 records alignment or a dated disposition |
+| NuGet owner identity | Repository signature owner `Cyranth`; project persona/author `Cynrath` | Bounded accepted risk through next pre-release decision or 2026-09-30 |
 | Author signing | No author signature observed | TASK-0132 implements only with a trusted certificate; otherwise records dated deferral |
 | Repository signing | Valid NuGet.org repository signature | Preserve as repository evidence; never relabel as author signing |
 | SBOM | Not present in package or GitHub Release assets | TASK-0132 decides and, if safe, implements exact-artifact generation |

@@ -220,6 +220,7 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`
 - `docs/SECURITY_NOTIFICATION_OWNERSHIP.md`
 - `docs/PACKAGE_RECOVERY.md`
+- `docs/NUGET_OWNER_IDENTITY.md`
 - `docs/PUBLISHED_SUPPLY_CHAIN_STATUS.md`
 - `docs/UPGRADE_COMPATIBILITY.md`
 - `docs/PERFORMANCE_POLICY.md`
@@ -321,6 +322,7 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - Hosted validation status sync: `docs/tasks/TASK-0097-hosted-validation-status-sync.md` and `docs/HOSTED_VALIDATION_STATUS.md`; standard workflows are green while manual RC evidence remains pending.
 - Private vulnerability reporting status: `docs/tasks/TASK-0129-private-vulnerability-reporting-verification.md`, `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`, and `scripts/check-private-vulnerability-reporting.ps1`; enablement and the public entry point were verified on 2026-06-14.
 - Security/recovery ownership: `docs/tasks/TASK-0130-security-notification-recovery-ownership.md`, `docs/SECURITY_NOTIFICATION_OWNERSHIP.md`, and `docs/PACKAGE_RECOVERY.md`; primary ownership/procedure are recorded while backup and NuGet authority remain explicit blockers.
+- NuGet owner identity: `docs/tasks/TASK-0131-nuget-owner-identity-disposition.md` and `docs/NUGET_OWNER_IDENTITY.md`; the current spelling difference has a dated bounded disposition without claiming shared human identity.
 - Published supply-chain status audit: `docs/tasks/TASK-0099-published-supply-chain-status-audit.md`, `docs/PUBLISHED_SUPPLY_CHAIN_STATUS.md`, and `scripts/check-published-supply-chain-status.ps1`; read-only evidence distinguishes NuGet repository signing from author signing and records missing SBOM/provenance plus the NuGet owner-profile mismatch.
 - Offline OSS ecosystem catalog and roadmap reset: `docs/tasks/TASK-0100-offline-oss-ecosystem-catalog.md`, `docs/RELATED_PROJECTS.md`, `docs/OFFLINE_OSS_ECOSYSTEM.md`, `docs/EXTERNAL_TOOL_WORKFLOWS.md`, `docs/ECOSYSTEM_POSITIONING.md`, and `docs/INTEROPERABILITY_BACKLOG.md`; no external dependency or integration is added.
 - Local ecosystem/product intelligence continuation: `docs/tasks/TASK-0101-related-tools-comparison-matrix.md` through `docs/tasks/TASK-0115-v020-alpha2-candidate-planning-refresh.md`; evidence, workflows, design-only interoperability/commands/imports, privacy threats, offline policy, blocker visibility, and planning docs are complete locally without external execution or remote writes.

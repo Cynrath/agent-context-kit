@@ -15,6 +15,8 @@ Publication state:
 - NuGet publish is completed.
 - NuGet global tool install verification is completed.
 
+The public NuGet owner identity is `Cyranth`, while package metadata and repository persona use `Cynrath`. This intentional current-state disposition is documented in `docs/NUGET_OWNER_IDENTITY.md`; metadata remains `Cynrath` and no owner mutation is performed.
+
 This review follows Microsoft Learn NuGet package authoring guidance for package ID, version, authors, description, project URL, README, repository metadata, tags, release notes, and license expression:
 - https://learn.microsoft.com/nuget/create-packages/package-authoring-best-practices#package-metadata
 - https://learn.microsoft.com/nuget/reference/msbuild-targets#pack-target

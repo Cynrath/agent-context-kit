@@ -65,7 +65,7 @@ foreach ($marker in @(
     "VERIFIED REMOTE STATE",
     "VERIFIED PUBLISHED STATE",
     "Private vulnerability reporting | VERIFIED MAINTAINER: ENABLED on 2026-06-14",
-    "NuGet owner identity | VERIFIED REMOTE STATE: MISMATCH on 2026-06-13",
+    "NuGet owner identity | ACCEPTED RISK on 2026-06-14",
     "NuGet package signature | VERIFIED PUBLISHED STATE: Alpha.2 repository signature; no author signature observed",
     "SBOM | VERIFIED PUBLISHED STATE: Not present in alpha.2 package or GitHub Release assets",
     "Build/package provenance | VERIFIED PUBLISHED STATE: No accessible GitHub attestation for alpha.2 package digest",
@@ -103,8 +103,9 @@ Require-Text $notificationOwnership "Primary security triage owner" "Primary sec
 Require-Text $notificationOwnership "Backup security triage owner" "Backup security notification boundary"
 Require-Text $notificationOwnership "BLOCKER" "Unassigned backup blocker"
 Require-Text $packageRecovery 'Decision owner: `Cynrath`' "Package recovery decision owner"
-Require-Text $packageRecovery "NuGet execution authority: pending TASK-0131" "Package recovery authority blocker"
+Require-Text $packageRecovery "NuGet unlist/deprecate/account-recovery authority: unverified" "Package recovery authority blocker"
 Require-Text $packageRecovery "never overwrite or reuse the published version" "Immutable package recovery boundary"
+Require-Text (Read-RequiredFile "docs\NUGET_OWNER_IDENTITY.md" "NuGet owner identity disposition") "ACCEPTED RISK through the next pre-release decision or 2026-09-30" "Bounded NuGet identity disposition"
 Require-Text $privateReportingTask "No GitHub setting change" "Private-reporting task remote-write boundary"
 Require-Text $publishedSupplyChainStatus "No author signature was observed" "Published author-signature boundary"
 Require-Text $publishedSupplyChainStatus "no accessible GitHub artifact attestation" "Published provenance boundary"
