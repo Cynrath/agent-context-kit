@@ -38,6 +38,7 @@ AgentContextKit runs locally against a repository path. The MVP does not upload 
 - GitHub Code Scanning upload is not automatic; upload workflows remain maintainer-only and example-only unless explicitly enabled.
 
 ## Scanner Precision Notes
+- The full "User Action Per Severity" table lives in `docs/SCANNER_RULES.md`; this model defers to that table for operator guidance.
 - Real environment files such as `.env` and `.env.local` are Critical.
 - Sample environment files such as `.env.example`, `.env.sample`, `.env.template`, and `.env.dist` are review findings, not Critical by path alone.
 - Private key and key-store file names such as `id_rsa`, `id_ed25519`, `.pfx`, `.p12`, and `.key` are Critical.

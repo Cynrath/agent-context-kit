@@ -14,6 +14,15 @@ AgentContextKit scanner findings use a stable rule catalog. The same catalog dri
 | `ACKIT007` | DocumentationGap | Medium | `warning` | Documentation gaps, stale guidance, missing required public documents, and unclear wording surfaced by scanner rules. | Outdated or missing docs weaken onboarding, AI context quality, and public release clarity. | Update or add the relevant public documentation so the next reader receives accurate, current guidance. |
 | `ACKIT999` | GeneralFinding | Info | `note` | Fallback for scanner findings that do not map to a specific rule. | Keeps unknown future findings representable without breaking SARIF or JSON. | Review and decide whether a more specific rule is needed. |
 
+## User Action Per Severity
+| Severity | What to do |
+| --- | --- |
+| `Critical` | Stop and review before sharing or releasing. Rotate any real secret. |
+| `High` | Review before release or share. Replace placeholder values with safe local equivalents. |
+| `Medium` | Inspect before public release. Confirm the value is intentional or fix it. |
+| `Low` | Informational or hygiene. Tidy the path or wording when convenient. |
+| `Info` | Awareness only. No action is required unless the rule recommends otherwise. |
+
 ## Current Expansion Coverage
 - Private key and certificate indicators: private key file names, key-store extensions, signing key files, and private key header blocks.
 - Environment and production config: real environment files, environment-specific appsettings files, and local secrets config files.
