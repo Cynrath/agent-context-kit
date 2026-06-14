@@ -11,7 +11,7 @@
 | 66 | Completed | TASK-0131 NuGet identity disposition | P1 | Bounded accepted risk | NuGet/evidence/decision docs | public identity/OIDC review | No owner mutation | Dated exception through 2026-09-30 |
 | 67 | Completed locally | TASK-0132 signing/SBOM/provenance | P1 | Provenance hosted-pending | workflow/scripts/evidence | permission/action tests plus future publish verification | Publish job only | Deferrals recorded; provenance implemented |
 | 68 | Completed | TASK-0133 next prerelease selection | P0 | `0.2.0-alpha.3` selected; publication deferred | scope/roadmap/changelog docs | contract/version gates | No | Smallest valid version selected without metadata bump |
-| 69 | Next / NO-GO | TASK-0134 next prerelease release | P0 | Independent backup security owner and recovery authority remain unresolved | release/package/status files | full local/hosted/release gates | Yes only if GO | Evidence-backed NO-GO or published and verified after blockers close |
+| 69 | Completed to safe boundary / NO-GO | TASK-0134 next prerelease release | P0 | Independent backup security owner and recovery authority remain unresolved | release decision/status files | local gates plus planning-commit 8/8 | No release write performed | Evidence-backed NO-GO; resume conditions recorded |
 
 ## Active Authorized Alpha.2 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |

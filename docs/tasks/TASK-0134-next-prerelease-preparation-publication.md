@@ -4,7 +4,7 @@
 Prepare, publish, and verify the selected prerelease only if all exact-version/commit GO conditions are genuinely satisfied.
 
 ## Current State
-Blocked by default until TASK-0133 selects a version and all required P0/P1 decisions/evidence are recorded.
+TASK-0133 selected planning-only `0.2.0-alpha.3`. Preparation and publication remain blocked by independent backup security ownership and recovery authority/backup evidence.
 
 ## Scope
 Conditional version bump, changelog/release notes, pack/inspect/install smoke, exact-SHA checks, OIDC publish, exact tag/pre-release, post-publish sync and final hosted checks.
@@ -37,13 +37,13 @@ Exact SHA/tag/release/package/global install and Actions verification.
 Before publish, revert ordinary commits. After publish, fix forward with a new version; never move/replace immutable artifacts.
 
 ## Completion Evidence
-Pending.
+Completed to the safe boundary on 2026-06-14 with an evidence-backed NO-GO. `docs/V020_ALPHA3_RELEASE_DECISION.md` records the local/hosted evidence, unresolved `RB-003` and `RB-008` conditions, and exact resume sequence. TASK-0133 commit `eabbe6a` passed standard 8/8 hosted jobs. No metadata bump, package candidate, release-candidate dispatch, release workflow dispatch, NuGet publish, tag, GitHub Release, or immutable artifact mutation occurred.
 
 ## Commit
-Dedicated preparation and post-publish commits if GO; documentation-only blocker closure if NO-GO.
+`docs: record alpha3 release no-go`
 
 ## Push
-Normal push after validation.
+Normal documentation-only push after validation.
 
 ## Hosted Checks
-Exact candidate 8/8, release workflow, verify-existing recovery run, and final post-publish 8/8 when publication occurs.
+Planning commit standard 8/8 is required. Exact candidate/release/post-publish checks remain future work because no candidate was prepared.

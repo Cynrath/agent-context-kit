@@ -12,6 +12,7 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 
 ### Planning
 - Selected `0.2.0-alpha.3` as the smallest compatible next prerelease scope without changing package metadata or approving publication.
+- Recorded an evidence-backed alpha.3 NO-GO until independent backup security ownership and recovery authority/backup evidence are complete.
 
 ## [0.2.0-alpha.2] - 2026-06-13
 

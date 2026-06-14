@@ -18,6 +18,8 @@ TASK-0132 defers author signing/SBOM with dated accepted risk and adds future-re
 
 TASK-0133 selects `0.2.0-alpha.3` as a compatible planning scope only. Source/package metadata remains `0.2.0-alpha.2`; publication is NO-GO until independent backup security ownership and recovery authority/backup evidence are complete.
 
+TASK-0134 records the evidence-backed NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. Planning commit `eabbe6a` passed standard 8/8; there is no alpha.3 candidate commit, package, tag, release, or NuGet publication.
+
 ## Architecture
 - CLI project: `src/AgentContextKit.Cli`
 - Core project: `src/AgentContextKit.Core`

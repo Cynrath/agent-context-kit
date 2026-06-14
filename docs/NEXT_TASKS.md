@@ -11,7 +11,7 @@ This is the unified execution queue. PROJECT-CONTROL-0102 is complete; PROJECT-C
 6. TASK-0131 NuGet owner identity disposition - completed with bounded accepted risk.
 7. TASK-0132 signing, SBOM, and provenance implementation/decision - completed locally; provenance hosted-pending next publish.
 8. TASK-0133 next prerelease scope and version selection - completed; `0.2.0-alpha.3` selected without metadata changes.
-9. TASK-0134 conditional next prerelease preparation, publication, and verification - next; currently NO-GO on ownership/recovery blockers.
+9. TASK-0134 conditional next prerelease preparation, publication, and verification - completed to safe boundary with evidence-backed NO-GO; no candidate or publication was attempted.
 
 ## Active Alpha.2 Execution
 1. TASK-0116 documentation consistency and local Markdown-link audit.
@@ -75,7 +75,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- TASK-0134 evaluate the `0.2.0-alpha.3` GO packet. Do not bump or publish while the independent backup security owner remains unassigned.
+- PROJECT-CONTROL-0104 should begin only after an independent backup security notification owner and NuGet recovery authority/backup evidence are available. Until then, continue independent local product work without claiming release readiness.
 
 ## Execution Rule
 Continue TASK-0116 through TASK-0125 in order without per-task prompts. After successful validation, normal commit/push is automatic. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

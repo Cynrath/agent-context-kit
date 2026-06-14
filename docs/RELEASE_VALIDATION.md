@@ -1,5 +1,8 @@
 # Release Validation
 
+## Planned v0.2.0-alpha.3 Decision
+TASK-0134 records an evidence-backed NO-GO on 2026-06-14. Planning commit `eabbe6a` passed the standard 8/8 hosted jobs, but independent backup security ownership and NuGet recovery authority/backup evidence remain incomplete. Source/package metadata stays `0.2.0-alpha.2`; no alpha.3 package, tag, release, or publish action was attempted.
+
 This checklist validates local release readiness without publishing.
 
 ## PROJECT-CONTROL-0102 Pre-Version Evidence

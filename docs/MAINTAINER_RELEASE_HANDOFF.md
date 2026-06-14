@@ -11,6 +11,8 @@ TASK-0092 prepares a conditional local contract freeze in `docs/RELEASE_CANDIDAT
 
 TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. Metadata remains `0.2.0-alpha.2`; TASK-0134 must not prepare or publish the candidate until an independent backup security notification owner and the remaining recovery authority evidence are recorded.
 
+TASK-0134 evaluated the GO packet on 2026-06-14 and recorded NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. The planning commit passed standard 8/8, but no alpha.3 candidate was prepared and no release workflow was dispatched.
+
 ## Current Published State
 - GitHub repository public: yes, `https://github.com/Cynrath/agent-context-kit`.
 - `master` pushed: yes.
