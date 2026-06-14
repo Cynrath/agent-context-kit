@@ -22,6 +22,8 @@ TASK-0134 records the evidence-backed NO-GO in `docs/V020_ALPHA3_RELEASE_DECISIO
 
 PROJECT-CONTROL-0107 begins at `a5686aa` with 238/238 tests green and TASK-0159 through TASK-0167 queued. The control is docs-first; the planning commit lands before any implementation.
 
+PROJECT-CONTROL-0107 closed TASK-0159 through TASK-0167. Local validation is 257/257 green at the final commit.
+
 ## Architecture
 - CLI project: `src/AgentContextKit.Cli`
 - Core project: `src/AgentContextKit.Core`

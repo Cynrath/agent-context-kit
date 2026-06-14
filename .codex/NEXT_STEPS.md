@@ -3,13 +3,15 @@
 PROJECT-CONTROL-0103 closed TASK-0126 through TASK-0134 with an evidence-backed alpha.3 NO-GO. PROJECT-CONTROL-0104 is now active for TASK-0135 through TASK-0138 and continues independent local product, code-quality, test, documentation, and security work.
 
 1. Current published release: `v0.2.0-alpha.2` at exact package commit `f540479a92cbe66097f6796553828ee49ddd5512`.
-2. PROJECT-CONTROL-0106 is closed. The active control is now PROJECT-CONTROL-0107, which builds on the post-0106 work and the TASK-0156 through TASK-0158 starter-config and locale-guard batch.
-3. PROJECT-CONTROL-0106 closed TASK-0140 through TASK-0145: agent rule sync, queue/handoff consistency, scanner rule doc contract consistency, agent instruction surface consistency, next local product work selection, and final validation.
-4. TASK-0140 through TASK-0158 are complete on the current branch: 238/238 local tests are green, `ackit scan --ci` and `ackit doctor` are clean, the local Markdown link gate and the tracked-vs-untracked guard are clean.
-5. TASK-0156 added a starter `brandKeywords` and `piiKeywords` config plus a guard test.
-6. TASK-0157 added a starter `safeDomains` and `ignoredPaths` config plus a guard test.
-7. TASK-0158 added a Turkish CLI locale fallback guard test.
-8. A new `scripts/check-tracked-vs-untracked-md.ps1` guard plus a "Commit Completeness Hard Rule" in `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/rules/project.mdc`, and `docs/DEVELOPMENT_STANDARD.md` keep the working tree clean before any push.
-9. PROJECT-CONTROL-0107 begins with the post-0158 audit and state sync (TASK-0159) and runs through TASK-0167.
-10. Hosted evidence: every pushed commit on the current branch passed the standard 3/3 (CI, cross-platform smoke, cross-platform source smoke).
-11. `0.2.0-alpha.3` remains NO-GO because `RB-003` and `RB-008` are unresolved; no release write is performed.
+2. PROJECT-CONTROL-0107 is closed. The active control is now PROJECT-CONTROL-0108 (next planning commit) or the new independent local product/code-quality track.
+3. PROJECT-CONTROL-0107 closed TASK-0159 through TASK-0167: post-0158 audit and state sync; scanner severity guidance polish; actionable config-check examples; baseline diff documentation and tests; SARIF rule metadata completeness; offline report accessibility polish; prompt pack and context export redaction hardening; sample gallery coverage expansion; final validation and hosted check sync.
+4. TASK-0160 added a "User Action Per Severity" table to `docs/SCANNER_RULES.md` and a cross-reference from `docs/SECURITY_MODEL.md`, guarded by `ScannerSeverityGuidanceGuardTests`.
+5. TASK-0161 added two new example config files (`with-warning.yml`, `with-error.yml`) and `ActionableConfigCheckExamplesGuardTests`.
+6. TASK-0162 added a baseline diff cross-reference from `docs/GITHUB_ACTIONS_USAGE.md` and `docs/JSON_OUTPUT.md`, plus `BaselineSeverityEscalationRegressionTests`.
+7. TASK-0163 added `SarifRuleIdAlignmentGuardTests` that asserts the SARIF rule catalog matches the Core `RiskRuleCatalog` exactly.
+8. TASK-0164 added `ReportHtmlAccessibilityGuardTests` that asserts the generated HTML carries a `lang` attribute, an `<h1>`, and a `<main>` landmark, and is still offline-only.
+9. TASK-0165 added `PromptPackRedactionFreshMarkerTests` with a fresh synthetic marker for the prompt pack and the explicit-approve context export.
+10. TASK-0166 added `SampleGalleryFindingCountGuardTests` that asserts each safe sample stays within a documented finding count bound and produces no Critical findings.
+11. Local validation on 2026-06-15: `dotnet build` clean, 257/257 tests green, `ackit scan --ci` and `ackit doctor` clean, sample smoke clean, local Markdown link gate clean (229 targets), tracked-vs-untracked guard clean, `check-public-release-gates`, `check-release-workflow`, `check-cli-contract`, `check-config-generated-conventions`, `check-json-contract-assets`, `check-localization-parity`, `check-package-metadata`, and `check-private-vulnerability-reporting` all green.
+12. Hosted evidence: every pushed commit on the current branch passed the standard 3/3 (CI, cross-platform smoke, cross-platform source smoke).
+13. `0.2.0-alpha.3` remains NO-GO because `RB-003` and `RB-008` are unresolved; no release write is performed.
