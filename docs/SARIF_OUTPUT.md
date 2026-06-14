@@ -71,7 +71,9 @@ For example, if a secret-like value is detected, SARIF records the rule, severit
 | `ACKIT002` | `PiiOrBrandLike` | PII-like, brand-like, email-like, and domain-like review findings. |
 | `ACKIT003` | `GeneratedOrBuildArtifact` | Generated, build, package, backup, or artifact files requiring review. |
 | `ACKIT004` | `LocalPathOrPrivateLocation` | Local path or private machine location findings. |
-| `ACKIT005` | `RepositoryHygiene` | Repository hygiene, configuration, documentation, or release readiness findings. |
+| `ACKIT005` | `RepositoryHygiene` | Repository hygiene, configuration, and release readiness findings. |
+| `ACKIT006` | `ProductionConfigLike` | Production configuration, environment-specific appsettings, and live-service connection strings. |
+| `ACKIT007` | `DocumentationGap` | Documentation gaps, stale guidance, and missing or unclear public documents. |
 | `ACKIT999` | `GeneralFinding` | General fallback finding. |
 
 The rule catalog also provides default severity context and recommendation/help text. See [SCANNER_RULES.md](SCANNER_RULES.md) for the full catalog and config allowlist behavior.
