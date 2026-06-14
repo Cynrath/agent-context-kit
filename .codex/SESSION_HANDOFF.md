@@ -48,6 +48,7 @@ AgentContextKit is an offline-first, security-first, docs-first, task-first .NET
 - Full TASK-0094 validation passed: zero-warning build, 178/178 tests, clean Turkish scan/doctor/SARIF smoke, JSON/SARIF parse, sample smoke, clean dependency reviews, all contract/readiness/RC/release gates, clean hygiene, and a 3.171-second 2,000-file benchmark. Commit and post-commit public gate are next, followed by TASK-0095.
 - TASK-0094 committed as `c8c5e62 feat: add localization parity release gate`; post-commit public release gate passed.
 - TASK-0095 is complete locally. It adds a metadata-only maintainer evidence register, manual security/supply-chain handoff, dependency review, and integrated local gate without changing GitHub settings or producing/signing/publishing artifacts.
+- PROJECT-CONTROL-0107 begins at `a5686aa` with 238/238 tests green and TASK-0159 through TASK-0167 queued. The control is docs-first; the planning commit lands before any implementation.
 - Full TASK-0095 validation passed: zero-warning build, 178/178 tests, clean scan, doctor PASS, JSON/SARIF parse, sample smoke, clean dependency reviews, all contract/localization/security/readiness/RC/release gates, clean hygiene, local package verification, and a 3.368-second 2,000-file benchmark.
 - Remote private reporting, signing, SBOM, provenance, recovery acceptance, hosted evidence, and final RC approval remain pending maintainer actions.
 - TASK-0095 committed as `a828b0a docs: add security supply-chain evidence handoff`; post-commit public release gate passed.

@@ -1,23 +1,37 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 and PROJECT-CONTROL-0104 and PROJECT-CONTROL-0105 are closed; PROJECT-CONTROL-0106 now governs repo rules sync, queue/handoff consistency, scanner rule doc consistency, agent instruction surface alignment, and next local work selection while the alpha.3 release remains NO-GO.
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0106 are closed. PROJECT-CONTROL-0107 now governs docs-first local product continuation, severity guidance polish, config-check examples, baseline diff documentation, SARIF completeness, accessibility polish, redaction hardening, sample gallery expansion, and final validation while the alpha.3 release remains NO-GO.
+
+## Active PROJECT-CONTROL-0107
+1. TASK-0159 post-0158 audit and state sync.
+2. TASK-0160 scanner severity explanation polish.
+3. TASK-0161 config-check actionable diagnostics examples.
+4. TASK-0162 baseline diff documentation and tests.
+5. TASK-0163 SARIF rule metadata completeness.
+6. TASK-0164 report and WebUI accessibility and offline UX polish.
+7. TASK-0165 prompt pack and context export redaction hardening.
+8. TASK-0166 sample gallery coverage expansion.
+9. TASK-0167 final validation and hosted check sync.
 
 ## Active PROJECT-CONTROL-0106
 1. TASK-0140 repo rules commit and push policy sync - completed.
 2. TASK-0141 project queue and handoff consistency audit - completed.
 3. TASK-0142 scanner rule doc contract consistency - completed.
 4. TASK-0143 agent instruction surface consistency - completed.
-5. TASK-0144 next local product work selection.
-6. TASK-0145 final validation and hosted check sync.
+5. TASK-0144 next local product work selection - completed; seven TASK-0146 through TASK-0152 files created.
+6. TASK-0145 final validation and hosted check sync - completed.
 
 ## Independent Local Product/Code-Quality Track
-1. TASK-0146 scanner severity explanation polish.
-2. TASK-0147 config-check actionable diagnostics examples.
-3. TASK-0148 baseline diff documentation and tests.
-4. TASK-0149 SARIF rule metadata completeness.
-5. TASK-0150 report and Web UI accessibility and offline UX polish.
-6. TASK-0151 prompt pack and context export redaction hardening.
-7. TASK-0152 sample gallery test coverage expansion.
+1. TASK-0146 scanner severity explanation polish - completed.
+2. TASK-0147 config-check actionable diagnostics examples - completed.
+3. TASK-0148 baseline diff documentation and tests - completed.
+4. TASK-0149 SARIF rule metadata completeness - completed.
+5. TASK-0150 report and Web UI accessibility and offline UX polish - completed.
+6. TASK-0151 prompt pack and context export redaction hardening - completed.
+7. TASK-0152 sample gallery test coverage expansion - completed.
+8. TASK-0156 brand/PII keyword starter config - completed; 238/238 tests green.
+9. TASK-0157 safe domain and ignored paths starter config - completed.
+10. TASK-0158 Turkish CLI locale fallback guard - completed.
 
 ## Active PROJECT-CONTROL-0104
 1. TASK-0135 issue template version placeholder sync - completed.
@@ -102,7 +116,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- PROJECT-CONTROL-0106 continues independent local product, code-quality, test, documentation, and security work. It must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
+- PROJECT-CONTROL-0107 continues independent local product, code-quality, test, documentation, and security work. It must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
 
 ## Execution Rule
-Continue TASK-0140 through TASK-0145 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
+Continue TASK-0159 through TASK-0167 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

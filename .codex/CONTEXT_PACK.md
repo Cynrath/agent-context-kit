@@ -20,6 +20,8 @@ TASK-0133 selects `0.2.0-alpha.3` as a compatible planning scope only. Source/pa
 
 TASK-0134 records the evidence-backed NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. Planning commit `eabbe6a` passed standard 8/8; there is no alpha.3 candidate commit, package, tag, release, or NuGet publication.
 
+PROJECT-CONTROL-0107 begins at `a5686aa` with 238/238 tests green and TASK-0159 through TASK-0167 queued. The control is docs-first; the planning commit lands before any implementation.
+
 ## Architecture
 - CLI project: `src/AgentContextKit.Cli`
 - Core project: `src/AgentContextKit.Core`

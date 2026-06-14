@@ -240,3 +240,18 @@ The following candidates are safe local-only work that does not change the publi
 - `TASK-0152` sample gallery test coverage expansion (per-sample guard tests).
 
 This backlog is selection only. Implementation begins only after a future PROJECT-CONTROL task explicitly authorizes the next set. None of these candidates claim release readiness or close the alpha.3 `RB-003`/`RB-008` blockers.
+
+## PROJECT-CONTROL-0107 Docs-First Local Product Continuation
+PROJECT-CONTROL-0107 builds on the post-0106 work with a docs-first plan-then-execute flow:
+
+- `TASK-0159` post-0158 audit and state sync.
+- `TASK-0160` scanner severity explanation polish.
+- `TASK-0161` config-check actionable diagnostics examples.
+- `TASK-0162` baseline diff documentation and tests.
+- `TASK-0163` SARIF rule metadata completeness.
+- `TASK-0164` report and WebUI accessibility and offline UX polish.
+- `TASK-0165` prompt pack and context export redaction hardening.
+- `TASK-0166` sample gallery coverage expansion.
+- `TASK-0167` final validation and hosted check sync.
+
+This track is also safe local-only work that does not change the published `0.2.0-alpha.2` package, the default CLI, JSON schema, SARIF profile, or the alpha.3 NO-GO posture. It does not close `RB-003` or `RB-008` and does not claim release readiness.
