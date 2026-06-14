@@ -91,3 +91,26 @@ A baseline records prior review state; it does not declare a finding safe. Criti
 TASK-0087 extends the same validated classification to SARIF, HTML reports, and Web UI. SARIF result properties contain only status, fingerprint, and occurrence. Local HTML outputs add counts and status labels while keeping every finding visible. Migration and cross-platform package validation remain separate release-readiness work.
 
 Changing canonicalization or fingerprint inputs requires a new fingerprint algorithm ID and migration guidance. Existing fingerprints must never change silently.
+
+## Existing Versus New Cookbook
+`scan --baseline <path> --json` annotates every finding with a `baselineStatus`:
+
+- `existing`: the finding fingerprint already exists in the baseline manifest. Visible to the reviewer, suppressed from the opt-in CI gate.
+- `new`: the finding fingerprint is not in the baseline manifest. Visible to the reviewer and counted by the opt-in `scan --baseline <path> --ci` exit code when severity is High or Critical.
+
+### Copy-ready workflow
+
+```powershell
+# 1. Create the baseline from the current reviewable state.
+ackit baseline --output .ackit-baseline.json --json
+
+# 2. Edit a file. A new High or Critical finding now exists.
+
+# 3. Show the existing-versus-new classification without failing CI.
+dotnet run --project src/AgentContextKit.Cli -c Release --no-build -- scan --baseline .ackit-baseline.json --json | jq '.findings[] | {ruleId, severity, baselineStatus}'
+
+# 4. Fail CI only on new High or Critical findings.
+dotnet run --project src/AgentContextKit.Cli -c Release --no-build -- scan --baseline .ackit-baseline.json --ci
+```
+
+The baseline fingerprint is a deterministic SHA-256 of the rule ID, normalized repository-relative path, optional line and column, and the deterministic occurrence number. It does not encode raw matches, messages, or any user-supplied content.
