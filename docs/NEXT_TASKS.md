@@ -1,6 +1,12 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0102 is complete; PROJECT-CONTROL-0103 now governs release recovery, security/supply-chain evidence, and conditional next-prerelease work.
+This is the unified execution queue. PROJECT-CONTROL-0103 is closed; PROJECT-CONTROL-0104 now governs local audit, product, and documentation continuation while the alpha.3 release remains NO-GO.
+
+## Active PROJECT-CONTROL-0104
+1. TASK-0135 issue template version placeholder sync - completed.
+2. TASK-0136 active docs project control and test count refresh.
+3. TASK-0137 scanner rule catalog extension.
+4. TASK-0138 issue template guard test and final audit sync.
 
 ## Active PROJECT-CONTROL-0103
 1. TASK-0126 release recovery and idempotent verification - completed.
@@ -75,7 +81,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- PROJECT-CONTROL-0104 should begin only after an independent backup security notification owner and NuGet recovery authority/backup evidence are available. Until then, continue independent local product work without claiming release readiness.
+- PROJECT-CONTROL-0104 continues independent local product, code-quality, test, documentation, and security work. It must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
 
 ## Execution Rule
 Continue TASK-0116 through TASK-0125 in order without per-task prompts. After successful validation, normal commit/push is automatic. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

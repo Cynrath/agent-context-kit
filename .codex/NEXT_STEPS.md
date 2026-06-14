@@ -1,27 +1,12 @@
 # Next Steps
 
-PROJECT-CONTROL-0102 completed the authorized `v0.2.0-alpha.2` release sequence. PROJECT-CONTROL-0103 is active for TASK-0126 through TASK-0134.
+PROJECT-CONTROL-0103 closed TASK-0126 through TASK-0134 with an evidence-backed alpha.3 NO-GO. PROJECT-CONTROL-0104 is now active for TASK-0135 through TASK-0138 and continues independent local product, code-quality, test, documentation, and security work.
 
 1. Current published release: `v0.2.0-alpha.2` at exact package commit `f540479a92cbe66097f6796553828ee49ddd5512`.
-2. PROJECT-CONTROL-0103 started from aligned `master`/`origin/master` at `0cac249`; the task-set commit is `23595e2`.
-3. TASK-0101 through TASK-0115 are complete and pushed.
-4. TASK-0116 through TASK-0125 task files exist and must be executed in order without per-task prompts.
-5. After successful validation, normal commits and pushes are automatic for this control task.
-6. Exact release commit `f540479a92cbe66097f6796553828ee49ddd5512` passed 8/8; NuGet, tag, and GitHub pre-release publication are complete.
-7. Publication credentials must use GitHub OIDC Trusted Publishing only. Secret values must never be displayed, logged, persisted, or committed.
-8. Never force push, rewrite history, move an existing tag, overwrite an immutable NuGet version, or delete user changes.
-9. Keep generated `.ackit/`, SARIF/HTML, package, archive, `bin/`, `obj/`, `TestResults`, and coverage outputs untracked.
-10. TASK-0116 through TASK-0122 are complete locally with 186/186 tests and green contract/performance/package gates.
-11. TASK-0125 global alpha.2 verification, disposable full smoke, local gates, post-publish sync, and exact-commit 8/8 are complete.
-12. Published-package and source-package smoke are both pinned to `0.2.0-alpha.2` after publication.
-13. `docs/V100_GAP_ANALYSIS.md`, `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md`, and `docs/MAINTAINER_RC_DECISION.md` remain the historical 1.0/RC evidence boundary.
-14. TASK-0126 is complete: commit `2f68f14` passed 8/8 and recovery run `27478046088` is green with publish jobs skipped.
-15. TASK-0127 alpha.2 published supply-chain evidence is refreshed.
-16. TASK-0128 is complete: `4c4fa64` passed standard 8/8 and exact hosted RC run `27478635057` passed Windows, Ubuntu, and macOS with the unchanged 2,000-file/30-second tripwire.
-17. TASK-0129 completed: private reporting enabled, independent GET returned `enabled: true`, and the public report entry point is visible.
-18. TASK-0130 records `Cynrath` as primary security/recovery decision owner and accepts the immutable-package procedure. Independent backup ownership and NuGet execution authority remain explicit blockers.
-19. TASK-0131 records a bounded `Cyranth` NuGet owner / `Cynrath` project persona accepted risk through the next pre-release decision or 2026-09-30. No ownership mutation was attempted.
-20. TASK-0132 bounded-defers author signing/SBOM and implements exact GitHub Release nupkg provenance for the next publish job. Hosted attestation evidence is not claimed for alpha.2.
-21. TASK-0133 selected planning-only `0.2.0-alpha.3` without changing metadata. Publication remains NO-GO because the independent backup security owner and recovery authority/backup evidence are unresolved.
-22. TASK-0134 completed to the safe boundary with NO-GO. No alpha.3 metadata, candidate package, hosted candidate dispatch, tag, release, or NuGet publication exists.
-23. Resume release work only after an independent backup security owner and recovery authority/backup evidence are recorded; otherwise continue independent local product work.
+2. PROJECT-CONTROL-0104 is active; starting commit is `d104e02` (issue template placeholder sync).
+3. TASK-0135 issue template version placeholder sync is complete; the four `.github/ISSUE_TEMPLATE/*.yml` files now show `0.2.0-alpha.2` instead of `0.2.0-alpha.1`.
+4. TASK-0136 refreshes the active queue, `NEXT_TASKS.md`, and this file to point to PROJECT-CONTROL-0104 as the active control.
+5. TASK-0137 extends the scanner rule catalog with two new stable `ACKIT` IDs and focused tests.
+6. TASK-0138 adds an issue-template guard test and the final audit sync.
+7. Local validation on 2026-06-14: `dotnet build` clean, 186/186 tests, `ackit scan --ci` and `ackit doctor` clean, local Markdown link gate clean.
+8. `0.2.0-alpha.3` remains NO-GO because `RB-003` and `RB-008` are unresolved; no release write is performed.

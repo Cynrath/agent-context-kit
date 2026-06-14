@@ -1,5 +1,13 @@
 # Project Execution Queue
 
+## Active PROJECT-CONTROL-0104 Track
+| Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 70 | Completed | TASK-0135 issue template version placeholder sync | Low | None | four `.github/ISSUE_TEMPLATE/*.yml` | `git diff --check` and local gates | Push after validation | Templates show current `0.2.0-alpha.2` placeholder |
+| 71 | In progress | TASK-0136 active docs project control and test count refresh | Low | None | active queue, NEXT_TASKS, NEXT_STEPS | local Markdown link gate and `git diff --check` | Push after validation | Active control row points to PROJECT-CONTROL-0104 |
+| 72 | Pending | TASK-0137 scanner rule catalog extension | Low | None | Core catalog, focused tests, SCANNER_RULES.md | `dotnet test` 188+/188+ green, `ackit scan --ci` and `doctor` clean | Push after validation | Two new `ACKIT` IDs cataloged with positive + ruleId tests |
+| 73 | Pending | TASK-0138 issue template guard test and final audit sync | Low | None | new test, queue, NEXT_TASKS | `dotnet test` 189+/189+ green | Push after validation | CI guard against placeholder drift and final docs refresh |
+
 ## Active PROJECT-CONTROL-0103 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -67,3 +75,13 @@
 
 ## Guardrail
 Maintainer-gated work does not block local-only product/docs progress, but no local task may claim release-ready, 1.0-ready, active security controls, signing, SBOM, provenance, or hosted RC completion without exact evidence.
+
+## Local Validation
+Last verified locally on 2026-06-14 at commit `d104e02`:
+- `dotnet build AgentContextKit.sln -c Release` clean, 0 warnings, 0 errors.
+- `dotnet test AgentContextKit.sln -c Release --no-build` 186/186 green.
+- `ackit scan --ci` and `ackit doctor` clean.
+- `powershell -ExecutionPolicy Bypass -File scripts/check-local-markdown-links.ps1 -FailOnIssues` clean across 227 local targets.
+
+## Alpha.3 Status
+- `0.2.0-alpha.3` remains NO-GO. `RB-003` (independent backup security owner) and `RB-008` (destructive NuGet recovery authority) remain maintainer-gated blockers; see `docs/V020_ALPHA3_RELEASE_DECISION.md`, `docs/RELEASE_BLOCKER_BOARD.md`, and `docs/MAINTAINER_DECISION_REGISTER.md`.
