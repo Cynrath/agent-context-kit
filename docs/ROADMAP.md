@@ -32,6 +32,12 @@
 - Includes the alpha.1 SARIF/scanner catalog/config allowlist surface plus scanner precision hardening, sanitized suppression audit output, baseline-aware CI policy, config diagnostics, contract coverage, local Markdown-link validation, and exact-commit OIDC release automation.
 - Published install command is `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2`.
 
+## v0.2.0-alpha.3 Planning
+- Selected as the smallest compatible next prerelease for additive release recovery, hosted evidence, security ownership, and supply-chain automation work.
+- No CLI, config, JSON, baseline, SARIF, package ID, or offline-first behavior change is planned.
+- Source/package metadata remains `0.2.0-alpha.2` until TASK-0134 receives an exact-version and exact-commit GO decision.
+- Publication is NO-GO while independent backup security ownership remains unresolved; see `docs/V020_ALPHA3_PLAN.md`.
+
 ## v0.2.0-alpha.1
 - Published on GitHub and NuGet in TASK-0065.
 - Added `ackit sarif` as a published package command.

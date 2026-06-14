@@ -16,6 +16,8 @@ TASK-0131 accepts the public `Cyranth` NuGet owner / `Cynrath` project persona d
 
 TASK-0132 defers author signing/SBOM with dated accepted risk and adds future-release GitHub artifact provenance to the isolated publish job. The read-only verifier has no attestation permission.
 
+TASK-0133 selects `0.2.0-alpha.3` as a compatible planning scope only. Source/package metadata remains `0.2.0-alpha.2`; publication is NO-GO until independent backup security ownership and recovery authority/backup evidence are complete.
+
 ## Architecture
 - CLI project: `src/AgentContextKit.Cli`
 - Core project: `src/AgentContextKit.Core`

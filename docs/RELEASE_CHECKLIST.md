@@ -65,22 +65,25 @@
 ## Remaining Manual Actions
 - Review all generated files before future publishing.
 - For the next release, approve push, hosted CI/source smoke validation, tag, GitHub Release, NuGet publish, and NuGet install verification in a dedicated release task.
+- For planned `0.2.0-alpha.3`, assign and verify an independent backup security notification owner before metadata changes or publication.
+- Verify destructive NuGet recovery authority and backup coverage, then record the exact-version/exact-commit GO packet.
 
 ## Release Candidate Evidence Gate
 - `scripts/check-release-candidate-evidence.ps1 -FailOnIssues` passes.
 - Published-config and baseline-schema compatibility fixtures pass.
 - The synthetic scan benchmark passes its documented tripwire.
 - Vulnerability and deprecation reviews are dated and reviewed.
-- Private GitHub vulnerability reporting is enabled and tested by the maintainer.
-- [x] Read-only GitHub API status was checked on 2026-06-13 and returned disabled.
-- [ ] Enable private vulnerability reporting, verify `enabled: true`, and record primary/backup notification ownership.
+- Private GitHub vulnerability reporting is enabled and independently verified.
+- [x] Authenticated GitHub API status returned `enabled: true` on 2026-06-14 and the public report entry is visible.
+- [ ] Assign and verify an independent backup security notification owner; primary owner is `Cynrath`.
 - Hosted Windows, Ubuntu, and macOS upgrade/source-package smoke evidence is green.
 - [x] Standard `ci`, published-package smoke, and source-package smoke are green for commit `37d5220`; see `docs/HOSTED_VALIDATION_STATUS.md`.
-- [ ] The dedicated manual `release-candidate-evidence` workflow has a green Windows, Ubuntu, and macOS run for the selected candidate commit.
+- [x] The dedicated manual `release-candidate-evidence` workflow is green on Windows, Ubuntu, and macOS for reviewed commit `4c4fa64`; rerun for a future exact candidate.
 - [x] Published predecessor `0.2.0-alpha.1` package signature, package entries, release assets, and accessible attestations were audited read-only on 2026-06-13.
-- [ ] Repeat the read-only supply-chain audit for published `0.2.0-alpha.2` without changing package or release state.
-- [ ] Align or explicitly accept the NuGet owner profile `Cyranth` versus project persona/package author `Cynrath`.
-- [ ] Record author signing, SBOM, provenance, and bad-package recovery decisions for the exact candidate.
+- [x] Repeated the read-only supply-chain audit for published `0.2.0-alpha.2` without changing package or release state.
+- [x] Recorded a bounded accepted-risk disposition for NuGet owner `Cyranth` versus project persona/package author `Cynrath`.
+- [x] Recorded author-signing and SBOM deferrals plus future provenance implementation.
+- [ ] Verify destructive NuGet recovery authority and backup recovery ownership before release GO.
 - `scripts/check-release-candidate-workflow.ps1 -FailOnIssues` passes and the manual `release-candidate-evidence` workflow is green on all three OS runners.
 - [x] The `xunit` Legacy warning is resolved through the TASK-0091 xUnit v3 migration; 169/169 tests and clean dependency reviews are recorded.
 - [x] The conditional local contract freeze and NO-GO decision package are recorded in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and `docs/MAINTAINER_RC_DECISION.md`.

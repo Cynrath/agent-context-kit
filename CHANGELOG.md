@@ -10,6 +10,9 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 - Added least-privilege GitHub artifact provenance for exact future release nupkg assets, with idempotent digest detection and CLI verification.
 - Recorded bounded author-signing and SBOM deferrals without claiming controls that are not published.
 
+### Planning
+- Selected `0.2.0-alpha.3` as the smallest compatible next prerelease scope without changing package metadata or approving publication.
+
 ## [0.2.0-alpha.2] - 2026-06-13
 
 ### Added

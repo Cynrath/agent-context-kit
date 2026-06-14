@@ -10,8 +10,8 @@
 | 65 | Completed to verifiable boundary | TASK-0130 notification/recovery ownership | P0/P1 | Backup and NuGet authority remain | security/recovery/decision docs | evidence structure/tabletop | No remote incident action | Truthful primary ownership/procedure and explicit blockers |
 | 66 | Completed | TASK-0131 NuGet identity disposition | P1 | Bounded accepted risk | NuGet/evidence/decision docs | public identity/OIDC review | No owner mutation | Dated exception through 2026-09-30 |
 | 67 | Completed locally | TASK-0132 signing/SBOM/provenance | P1 | Provenance hosted-pending | workflow/scripts/evidence | permission/action tests plus future publish verification | Publish job only | Deferrals recorded; provenance implemented |
-| 68 | In progress | TASK-0133 next prerelease selection | P0 | Depends on decisions/evidence | scope/roadmap/changelog docs | contract/version gates | No | Smallest valid version selected/deferred |
-| 69 | Conditional | TASK-0134 next prerelease release | P0 | Requires exact GO packet | release/package/status files | full local/hosted/release gates | Yes if GO | Published and verified or evidence-backed NO-GO |
+| 68 | Completed | TASK-0133 next prerelease selection | P0 | `0.2.0-alpha.3` selected; publication deferred | scope/roadmap/changelog docs | contract/version gates | No | Smallest valid version selected without metadata bump |
+| 69 | Next / NO-GO | TASK-0134 next prerelease release | P0 | Independent backup security owner and recovery authority remain unresolved | release/package/status files | full local/hosted/release gates | Yes only if GO | Evidence-backed NO-GO or published and verified after blockers close |
 
 ## Active Authorized Alpha.2 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
@@ -36,13 +36,13 @@
 | Order | Status | Action | Priority | Blocking status | Expected evidence | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | M1 | Verified for alpha.2 state | Manual hosted RC evidence workflow | P0 | Rerun for a different final candidate | Run `27478635057`, exact `4c4fa64`, three-OS results | Hosted predecessor/config/baseline/SARIF/performance workflow | Yes | Green run recorded; future candidate must rerun |
-| M2 | Partially complete | Private vulnerability reporting and notification ownership | P0 | Ownership still blocks RC | Setting verified `enabled: true`; primary/backup notification owners remain | Read-only API/UI verification plus ownership record | Setting complete | Verified channel; response ownership pending |
-| M3 | Maintainer action required | NuGet owner identity alignment | P1 | Blocks RC unless explicitly accepted | `Cyranth`/`Cynrath` alignment or dated intentional exception | NuGet package/profile review | Yes | Public owner identity has an owned disposition |
-| M4 | Maintainer decision required | Author signing | P1 | Complete or accept risk | Sign/defer decision, evidence, lifecycle owner, review date | Exact package verification | Possibly | Author-signing control or dated accepted risk |
-| M5 | Maintainer decision required | SBOM publication | P1 | Complete or accept risk | Format, digest, privacy review, location, owner or defer record | Exact candidate/package review | Possibly | Published SBOM or dated accepted risk |
-| M6 | Maintainer decision required | Provenance/attestation | P1 | Complete or accept risk | Workflow, subject digest, verification, owner or defer record | Exact artifact attestation review | Yes if attesting | Verified attestation or dated accepted risk |
-| M7 | Maintainer decision required | Package recovery ownership | P1 | Required decision | Owner, threshold, communication, unlist/deprecate/successor procedure | Tabletop/document review | Yes only during incident/action | Accepted recovery procedure and review date |
-| M8 | Maintainer decision required | Candidate version and release approval | P0/P1 dependent | Waits for required evidence | Version, commit, metadata, notes, package diff, GO/NO-GO | Full local and hosted release gates | Yes | Dedicated approved release-preparation task |
+| M2 | Partially complete | Private vulnerability reporting and notification ownership | P0 | Independent backup still blocks RC | Setting `enabled: true`; primary `Cynrath`; backup unassigned | Read-only API/UI verification plus ownership record | Setting complete | Verified channel plus primary and backup coverage |
+| M3 | Accepted risk | NuGet owner identity alignment | P1 | Disposed through next prerelease decision or 2026-09-30 | `Cyranth`/`Cynrath` dated intentional exception | NuGet package/profile/OIDC review | No owner mutation | Recheck before expiry |
+| M4 | Accepted risk | Author signing | P1 | Deferred through next prerelease decision or 2026-09-30 | Repository signature plus dated controls/review | Exact package verification | No signing | Recheck before expiry |
+| M5 | Accepted risk | SBOM publication | P1 | Deferred through next prerelease decision or 2026-09-30 | Dependency/package controls plus dated review | Exact candidate/package review | No publication | Recheck before expiry |
+| M6 | Implemented locally | Provenance/attestation | P1 | Hosted evidence requires next publish | Exact release nupkg, signer workflow, CLI verification | Workflow static tests plus future hosted attestation | Publish job only | Verified attestation on next release |
+| M7 | Partially complete | Package recovery ownership | P1 | Authority and backup remain | Owner, threshold, communication, immutable successor procedure recorded | Tabletop/document review | Only during incident/action | Verify authority and backup coverage |
+| M8 | Selected / NO-GO | Candidate version and release approval | P0/P1 dependent | `0.2.0-alpha.3` selected; GO packet incomplete | Version scope plus future exact commit, metadata, notes, package diff, GO/NO-GO | Full local and hosted release gates | Yes only after GO | Dedicated approved release-preparation task |
 
 ## Local-Only Ecosystem/Product Intelligence Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |

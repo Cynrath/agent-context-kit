@@ -3,7 +3,7 @@
 ## Current Decision
 **NO-GO for release-candidate publication.**
 
-The local contract freeze, machine-readable schema assets, localization parity gate, security/supply-chain handoff, consolidated local-readiness gate, and reviewed alpha.2 hosted evidence are complete. Remote security settings, ownership/recovery, supply-chain decisions, final version scope, and release approval remain incomplete.
+The local contract freeze, machine-readable schema assets, localization parity gate, security/supply-chain handoff, consolidated local-readiness gate, reviewed alpha.2 hosted evidence, private reporting, and bounded supply-chain dispositions are complete. Independent backup security ownership, recovery authority/backup coverage, exact alpha.3 candidate evidence, and release approval remain incomplete.
 
 ## Decision Inputs
 | Area | Current State | Required For GO | Owner / Action |
@@ -18,7 +18,7 @@ The local contract freeze, machine-readable schema assets, localization parity g
 | NuGet ownership/signing | Owner identity difference and author signing have bounded accepted-risk dispositions through 2026-09-30; valid repository signature; destructive recovery authority remains unverified | Recheck dispositions and verify recovery authority | Maintainer NuGet/supply-chain decision |
 | SBOM/provenance | SBOM is bounded-deferred through 2026-09-30; provenance is implemented for the next exact GitHub Release nupkg but has no hosted publication evidence yet | Require attestation creation/verification in the next publish run | Release workflow |
 | Localization parity | TASK-0094 human/error/exit/JSON parity matrix and local gate complete | Rerun on final candidate and review intended stable technical tokens | Maintainer review |
-| Version and release | Not selected | Select version, update metadata, review package diff, approve release plan | Dedicated release task |
+| Version and release | `0.2.0-alpha.3` selected as planning scope; metadata unchanged | Close P0 ownership blocker, prepare exact commit/package diff, and approve release plan | TASK-0134 |
 
 ## GO Conditions
 A maintainer may record GO only when:

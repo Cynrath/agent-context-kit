@@ -13,6 +13,7 @@ AgentContextKit is an offline-first, security-first, docs-first, task-first .NET
 - TASK-0130 is complete to the verifiable boundary: `Cynrath` is primary triage/recovery decision owner; immutable successor recovery procedure and tabletop are documented. Independent backup and destructive NuGet recovery authority remain blockers.
 - TASK-0131 is complete: public NuGet owner `Cyranth` and project persona `Cynrath` remain intentionally distinct under a bounded accepted risk through the next pre-release decision or 2026-09-30. OIDC publication authority is proven; destructive recovery/account authority is not.
 - TASK-0132 is implemented locally: author signing and SBOM are bounded deferrals; future publish runs attest and verify the exact GitHub Release nupkg with `actions/attest@v4`. Alpha.2 remains truthfully unattested.
+- TASK-0132 commit `46be43f` passed standard hosted 8/8. TASK-0133 selected planning-only `0.2.0-alpha.3` with no metadata bump; TASK-0134 remains NO-GO on independent backup security ownership and recovery authority/backup evidence.
 - PROJECT-CONTROL-0102 completed the authorized alpha.2 implementation, publication, post-publish synchronization, and hosted validation sequence.
 - `v0.2.0-alpha.2` is published on GitHub and NuGet; exact tag `v0.2.0-alpha.2` points to package commit `f540479a92cbe66097f6796553828ee49ddd5512`.
 - Local `master` started aligned with `origin/master` at `0cac249`; task docs were committed as `23595e2`.

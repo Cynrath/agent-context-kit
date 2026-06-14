@@ -37,7 +37,7 @@ Diff review, contract gates, blocker/decision register review.
 Revert planning decision before release preparation.
 
 ## Completion Evidence
-Pending.
+Completed on 2026-06-14. `0.2.0-alpha.3` is selected as the smallest compatible next prerelease because the post-alpha.2 changes are additive release/security automation and documentation controls. `docs/V020_ALPHA3_PLAN.md` freezes the included/excluded scope and compatibility boundary. Publication remains NO-GO because the independent backup security notification owner and destructive NuGet recovery authority/backup coverage are unresolved. No source/package version, README install command, workflow package pin, tag, release, or NuGet state changed.
 
 ## Commit
 `docs: select next prerelease scope`

@@ -145,6 +145,7 @@
 - `docs/NUGET_METADATA.md`: NuGet package metadata review workflow.
 - `docs/V020_READINESS.md`: v0.2 local readiness review.
 - `docs/V020_ALPHA2_SCOPE.md`: compatibility-preserving alpha.2 package scope, exclusions, and release gates.
+- `docs/V020_ALPHA3_PLAN.md`: planning-only next prerelease scope, compatibility boundary, and publication blockers.
 - `docs/V030_READINESS.md`: v0.3 local readiness review.
 - `docs/V030_ROADMAP_DECISION.md`: next v0.3 product direction, compatibility rules, security boundaries, and candidate delivery sequence.
 - `docs/V040_READINESS.md`: v0.4 local readiness review.

@@ -12,7 +12,7 @@ This register records future maintainer decisions. It contains no approval yet.
 | MD-006 | RB-006 SBOM | Accepted risk | Defer | Deterministic .NET 10 output, privacy, and publication lifecycle are not validated | Cynrath | `docs/SUPPLY_CHAIN_DECISIONS.md` | Next pre-release planning | 2026-09-30 | No SBOM publication |
 | MD-007 | RB-007 provenance | Implemented locally | Attest next release asset | GitHub first-party attestation binds exact release nupkg to release workflow | Cynrath | `release.yml`, workflow tests, future run | Next published release | At next publish | Attestation write in publish job only |
 | MD-008 | RB-008 recovery | Partial | Procedure accepted; execution authority/backup pending | Immutable successor recovery is required, but NuGet identity and continuity remain unresolved | Cynrath decision owner | `docs/PACKAGE_RECOVERY.md`, tabletop 2026-06-14 | Package lifecycle | Before next RC | No package state changed |
-| MD-009 | RB-009 candidate | Pending maintainer | TBD | Candidate selection waits for prerequisite decisions | Release maintainer | Scope/version/commit/package diff | Next candidate | TBD | Later release writes |
+| MD-009 | RB-009 candidate | Selected / publication deferred | `0.2.0-alpha.3` | Additive release/security automation is the smallest compatible prerelease scope; metadata waits for GO | Cynrath release maintainer | `docs/V020_ALPHA3_PLAN.md` | Next candidate planning | Before metadata change or 2026-09-30 | No release write |
 | MD-010 | RB-010 approval | NO-GO | No release approval | Required P0/P1 evidence is incomplete | Release maintainer | Full decision packet | Exact future candidate | Until replaced | No remote write authorized |
 
 ## Recording A Decision

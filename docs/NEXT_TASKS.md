@@ -10,8 +10,8 @@ This is the unified execution queue. PROJECT-CONTROL-0102 is complete; PROJECT-C
 5. TASK-0130 security notification and recovery ownership - completed to verifiable boundary; backup/authority blockers recorded.
 6. TASK-0131 NuGet owner identity disposition - completed with bounded accepted risk.
 7. TASK-0132 signing, SBOM, and provenance implementation/decision - completed locally; provenance hosted-pending next publish.
-8. TASK-0133 next prerelease scope and version selection - next.
-9. TASK-0134 conditional next prerelease preparation, publication, and verification.
+8. TASK-0133 next prerelease scope and version selection - completed; `0.2.0-alpha.3` selected without metadata changes.
+9. TASK-0134 conditional next prerelease preparation, publication, and verification - next; currently NO-GO on ownership/recovery blockers.
 
 ## Active Alpha.2 Execution
 1. TASK-0116 documentation consistency and local Markdown-link audit.
@@ -36,13 +36,13 @@ This is the unified execution queue. PROJECT-CONTROL-0102 is complete; PROJECT-C
 These actions require explicit maintainer control and do not block safe local-only product/documentation work:
 
 1. Rerun the manual hosted RC evidence workflow only for a different selected final-candidate commit; alpha.2 evidence is green at `4c4fa64`.
-2. Enable and verify private vulnerability reporting and record primary/backup security notification ownership.
-3. Decide NuGet owner profile alignment: `Cyranth` versus public persona/package author `Cynrath`.
-4. Decide author signing or record dated accepted risk.
-5. Decide SBOM publication or record dated accepted risk.
-6. Decide GitHub provenance/attestation or record dated accepted risk.
-7. Accept package recovery ownership, thresholds, communication, and review date.
-8. Select the next candidate version only after the required P0/P1 decisions and hosted evidence.
+2. Keep private vulnerability reporting enabled and assign an independent backup security notification owner; primary ownership is recorded.
+3. Recheck the bounded `Cyranth`/`Cynrath` NuGet identity disposition before expiry or the next release.
+4. Recheck the bounded author-signing deferral before expiry or the next release.
+5. Recheck the bounded SBOM deferral before expiry or the next release.
+6. Obtain hosted provenance evidence only during the next authorized publish; the control is implemented locally.
+7. Verify destructive NuGet recovery authority and assign backup recovery ownership; procedure/tabletop are recorded.
+8. Keep the selected `0.2.0-alpha.3` scope planning-only until the remaining P0/P1 decisions and exact-candidate evidence are complete.
 
 ## Local-Only Ecosystem/Product Intelligence Track
 1. TASK-0100 offline OSS ecosystem catalog and roadmap reset - completed locally.
@@ -75,7 +75,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- TASK-0126 add and host-verify the read-only `verify-existing` release recovery operation.
+- TASK-0134 evaluate the `0.2.0-alpha.3` GO packet. Do not bump or publish while the independent backup security owner remains unassigned.
 
 ## Execution Rule
 Continue TASK-0116 through TASK-0125 in order without per-task prompts. After successful validation, normal commit/push is automatic. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

@@ -9,6 +9,8 @@ Future release sequences must not use API keys. Publication is allowed only thro
 ## Future Release-Candidate Decision
 TASK-0092 prepares a conditional local contract freeze in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and the authoritative GO/NO-GO checklist in `docs/MAINTAINER_RC_DECISION.md`. The current decision is NO-GO for RC publication until hosted evidence, remaining P0 gaps, private vulnerability reporting, schema assets, and supply-chain decisions are complete.
 
+TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. Metadata remains `0.2.0-alpha.2`; TASK-0134 must not prepare or publish the candidate until an independent backup security notification owner and the remaining recovery authority evidence are recorded.
+
 ## Current Published State
 - GitHub repository public: yes, `https://github.com/Cynrath/agent-context-kit`.
 - `master` pushed: yes.
