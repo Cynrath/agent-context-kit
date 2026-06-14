@@ -125,10 +125,11 @@
 - `scripts/prepare-release.ps1`: version, commit, source-smoke, verification, and tag-target consistency check.
 - `scripts/verify-published-package.ps1`: disposable NuGet/local-package install and full installed-tool smoke verification.
 - `scripts/check-security-supply-chain-evidence.ps1`: validates pending/verified evidence structure and optionally reruns dependency reviews.
+- `scripts/check-private-vulnerability-reporting.ps1`: performs metadata-only GitHub verification and can require `enabled: true`.
 - `docs/RC_LOCAL_READINESS.md`: consolidated local RC evidence with an explicit remote NO-GO boundary.
 - `scripts/check-rc-local-readiness.ps1`: read-only orchestration gate for final local RC evidence.
 - `docs/HOSTED_VALIDATION_STATUS.md`: exact standard Actions run evidence and the remaining manual RC workflow gap.
-- `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`: read-only GitHub setting evidence, disabled-state blocker, and maintainer enablement verification steps.
+- `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`: verified enablement metadata, public entry-point evidence, and repeatable read-only checks.
 - `docs/PUBLISHED_SUPPLY_CHAIN_STATUS.md`: exact published package signature, owner identity, SBOM, release asset, and provenance-attestation audit.
 - `scripts/check-published-supply-chain-status.ps1`: local structure gate for the published supply-chain truth boundary.
 - `scripts/test-samples.ps1`: local sample smoke validation helper.

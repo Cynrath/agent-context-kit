@@ -6,9 +6,9 @@ AgentContextKit is pre-release. Security fixes are prioritized for the latest pu
 ## Reporting A Vulnerability
 Do not open a public issue with secrets, private source code, production configuration, credentials, or customer data.
 
-Until a private security contact is published, report only non-sensitive reproduction steps publicly and mark the issue as a security concern. For sensitive details, wait for a maintainer-provided private channel.
+Use GitHub's private vulnerability reporting entry on this repository's Security page for sensitive reports. Do not include sensitive details in a public issue.
 
-Private GitHub vulnerability reporting was verified as disabled on 2026-06-13 and must be enabled and verified by the maintainer before a 1.0 release candidate. See `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`, `docs/SECURITY_RESPONSE_READINESS.md`, `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md`, and `docs/MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md` for the read-only evidence, response targets, and maintainer-only activation boundary.
+Private GitHub vulnerability reporting was enabled and verified on 2026-06-14. See `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`, `docs/SECURITY_RESPONSE_READINESS.md`, `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md`, and `docs/MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md` for metadata-only evidence and response targets.
 
 ## Security Model
 - The MVP is offline-first.

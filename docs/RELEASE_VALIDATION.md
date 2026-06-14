@@ -53,6 +53,7 @@ powershell -ExecutionPolicy Bypass -File scripts/prepare-release.ps1 -Version <v
 powershell -ExecutionPolicy Bypass -File scripts/verify-published-package.ps1 -Version <published-version>
 powershell -ExecutionPolicy Bypass -File scripts/verify-existing-release.ps1 -Version <published-version> -AutomationCommitSha <current-master-sha> -ReleaseCommitSha <exact-release-sha> -Prerelease true -OutputPath <temporary-json-path>
 powershell -ExecutionPolicy Bypass -File scripts/check-security-supply-chain-evidence.ps1 -RunDependencyReview -FailOnIssues
+powershell -ExecutionPolicy Bypass -File scripts/check-private-vulnerability-reporting.ps1 -RequireEnabled
 powershell -ExecutionPolicy Bypass -File scripts/check-rc-local-readiness.ps1 -RunDependencyReview -FailOnIssues
 ```
 
@@ -68,13 +69,13 @@ Repository-local Markdown targets are checked without network access by `scripts
 
 English/Turkish human output, known argument errors, exit decisions, and JSON semantic invariance are defined in [LOCALIZATION.md](LOCALIZATION.md) and validated by `tests/AgentContextKit.Tests/LocalizationParityTests.cs` plus `scripts/check-localization-parity.ps1`.
 
-Security reporting and supply-chain maintainer evidence fields are defined in [SECURITY_SUPPLY_CHAIN_EVIDENCE.md](SECURITY_SUPPLY_CHAIN_EVIDENCE.md) and [MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md](MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md), with local structure/dependency review through `scripts/check-security-supply-chain-evidence.ps1`. This gate does not prove remote settings or artifact publication.
+Security reporting and supply-chain maintainer evidence fields are defined in [SECURITY_SUPPLY_CHAIN_EVIDENCE.md](SECURITY_SUPPLY_CHAIN_EVIDENCE.md) and [MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md](MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md), with local structure/dependency review through `scripts/check-security-supply-chain-evidence.ps1`. Remote private-reporting state can be rechecked separately through `scripts/check-private-vulnerability-reporting.ps1`; the local structure gate alone does not prove remote settings or artifact publication.
 
 The consolidated local RC decision is defined in [RC_LOCAL_READINESS.md](RC_LOCAL_READINESS.md). `scripts/check-rc-local-readiness.ps1` orchestrates the existing local evidence gates and intentionally reports `LOCAL READY / REMOTE NO-GO` while hosted and maintainer-only evidence remains open.
 
 Hosted standard workflow evidence is recorded in [HOSTED_VALIDATION_STATUS.md](HOSTED_VALIDATION_STATUS.md). It proves current CI and source/published package smoke on commit `37d5220`; it does not substitute for the unrun manual RC evidence workflow.
 
-Private vulnerability reporting status is recorded in [PRIVATE_VULNERABILITY_REPORTING_STATUS.md](PRIVATE_VULNERABILITY_REPORTING_STATUS.md). The read-only GitHub endpoint returned disabled on 2026-06-13; enablement and notification ownership remain P0 maintainer actions.
+Private vulnerability reporting status is recorded in [PRIVATE_VULNERABILITY_REPORTING_STATUS.md](PRIVATE_VULNERABILITY_REPORTING_STATUS.md). Enablement and the public entry point were independently verified on 2026-06-14; primary and backup notification ownership remain a P0 operational action.
 
 Published package/release supply-chain status is recorded in [PUBLISHED_SUPPLY_CHAIN_STATUS.md](PUBLISHED_SUPPLY_CHAIN_STATUS.md). That dated audit covers the predecessor `0.2.0-alpha.1` package: valid NuGet.org repository signature, no observed author signature, no package/release SBOM, no accessible GitHub package attestation, and a NuGet owner profile that differs from the project persona. A matching alpha.2 supply-chain re-audit remains a follow-up rather than an inferred result.
 

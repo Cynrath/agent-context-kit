@@ -3,7 +3,7 @@
 ## Current State
 AgentContextKit is an offline-first pre-release tool. `SECURITY.md` warns users not to place secrets, private source, credentials, or customer data in public issues.
 
-The official read-only GitHub repository endpoint returned `enabled: false` for private vulnerability reporting on 2026-06-13. See `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`.
+Private vulnerability reporting was enabled on 2026-06-14. A separate GET returned `enabled: true`, and the public repository Security page exposed the private reporting entry point. See `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`.
 
 ## Supported Version
 Security fixes target the latest published pre-release. The immediately previous release may be used for rollback/upgrade verification but is not promised ongoing fixes.
@@ -22,10 +22,10 @@ These are maintainer targets, not contractual SLAs:
 - SARIF baseline metadata omits raw matches.
 - Hygiene and public release gates scan tracked source/artifacts.
 
-## Maintainer-Only Blocker
-A private vulnerability reporting channel must be enabled and verified on GitHub before a 1.0 release candidate. Do not request sensitive details through a public issue. Repository security settings are remote writes and are not changed by this task.
+## Remaining Operational Blocker
+The private channel is active. Do not request sensitive details through a public issue. Primary and backup security notification ownership must still be recorded and reviewed under TASK-0130 before a future release-candidate GO decision.
 
-The exact metadata-only evidence fields and manual verification steps are maintained in `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`, `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md`, and `docs/MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md`. The current state is verified remote disabled; a checklist or local gate is not proof that the GitHub setting is active.
+The exact metadata-only evidence is maintained in `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`, `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md`, and `docs/MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md`.
 
 ## Dependency Review
 Before an RC, run:

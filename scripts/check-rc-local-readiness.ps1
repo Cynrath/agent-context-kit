@@ -97,7 +97,7 @@ Require-Text -RelativePath "docs\MAINTAINER_RC_DECISION.md" -Needle "NO-GO for r
 Require-Text -RelativePath "docs\V100_GAP_ANALYSIS.md" -Needle "AgentContextKit is **not ready for 1.0 general availability**" -Description "1.0 GA blocker statement"
 Require-Text -RelativePath "docs\HOSTED_VALIDATION_STATUS.md" -Needle "4c4fa64ff34287dff01818d52f49b521efb3176d" -Description "Hosted evidence commit"
 Require-Text -RelativePath "docs\HOSTED_VALIDATION_STATUS.md" -Needle "27478635057" -Description "Successful manual RC workflow run"
-Require-Text -RelativePath "docs\PRIVATE_VULNERABILITY_REPORTING_STATUS.md" -Needle "enabled: false" -Description "Verified disabled private-reporting state"
+Require-Text -RelativePath "docs\PRIVATE_VULNERABILITY_REPORTING_STATUS.md" -Needle "enabled: true" -Description "Verified enabled private-reporting state"
 Require-Text -RelativePath "docs\PUBLISHED_SUPPLY_CHAIN_STATUS.md" -Needle "No author signature was observed" -Description "Published author-signature boundary"
 
 Push-Location $repoRoot

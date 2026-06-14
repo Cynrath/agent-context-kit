@@ -6,8 +6,8 @@ This is the unified execution queue. PROJECT-CONTROL-0102 is complete; PROJECT-C
 1. TASK-0126 release recovery and idempotent verification - completed.
 2. TASK-0127 alpha.2 supply-chain evidence refresh - completed.
 3. TASK-0128 hosted release-candidate evidence hardening - completed; run `27478635057` green on three operating systems.
-4. TASK-0129 private vulnerability reporting verification - next.
-5. TASK-0130 security notification and recovery ownership.
+4. TASK-0129 private vulnerability reporting verification - completed; `enabled: true` verified 2026-06-14.
+5. TASK-0130 security notification and recovery ownership - next.
 6. TASK-0131 NuGet owner identity disposition.
 7. TASK-0132 signing, SBOM, and provenance implementation/decision.
 8. TASK-0133 next prerelease scope and version selection.

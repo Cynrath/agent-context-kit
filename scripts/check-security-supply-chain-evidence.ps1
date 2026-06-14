@@ -53,6 +53,7 @@ $privateReportingStatus = Read-RequiredFile "docs\PRIVATE_VULNERABILITY_REPORTIN
 $privateReportingTask = Read-RequiredFile "docs\tasks\TASK-0098-private-vulnerability-reporting-status.md" "TASK-0098"
 $publishedSupplyChainStatus = Read-RequiredFile "docs\PUBLISHED_SUPPLY_CHAIN_STATUS.md" "Published supply-chain status"
 $publishedSupplyChainTask = Read-RequiredFile "docs\tasks\TASK-0127-alpha2-supply-chain-evidence-refresh.md" "TASK-0127"
+$privateReportingVerificationScript = Read-RequiredFile "scripts\check-private-vulnerability-reporting.ps1" "Private-reporting verification script"
 
 foreach ($marker in @(
     "Local evidence register prepared on 2026-06-12",
@@ -61,7 +62,7 @@ foreach ($marker in @(
     "ACCEPTED RISK",
     "VERIFIED REMOTE STATE",
     "VERIFIED PUBLISHED STATE",
-    "Private vulnerability reporting | VERIFIED REMOTE STATE: DISABLED on 2026-06-13",
+    "Private vulnerability reporting | VERIFIED MAINTAINER: ENABLED on 2026-06-14",
     "NuGet owner identity | VERIFIED REMOTE STATE: MISMATCH on 2026-06-13",
     "NuGet package signature | VERIFIED PUBLISHED STATE: Alpha.2 repository signature; no author signature observed",
     "SBOM | VERIFIED PUBLISHED STATE: Not present in alpha.2 package or GitHub Release assets",
@@ -86,15 +87,16 @@ foreach ($marker in @(
     Require-Text $handoff $marker "Maintainer handoff section $marker"
 }
 
-Require-Text $securityPolicy "must be enabled and verified by the maintainer" "Public security policy private-reporting blocker"
-Require-Text $responseReadiness "private vulnerability reporting channel must be enabled and verified" "Security response maintainer blocker"
+Require-Text $securityPolicy "Private GitHub vulnerability reporting was enabled and verified on 2026-06-14" "Public security policy private-reporting state"
+Require-Text $responseReadiness "Primary and backup security notification ownership must still be recorded" "Security response ownership blocker"
 Require-Text $supplyChain "repository-signed by NuGet.org" "Repository-signing truth boundary"
 Require-Text $supplyChain "must not be described as author-signed" "Author-signing truth boundary"
 Require-Text $maintainerDecision "NO-GO for release-candidate publication" "Maintainer NO-GO decision"
 Require-Text $task "does not approve an RC" "Task non-approval boundary"
-Require-Text $privateReportingStatus 'Result: `enabled: false`' "Verified disabled private-reporting state"
-Require-Text $privateReportingStatus "P0 blocker remains open" "Private-reporting P0 blocker"
+Require-Text $privateReportingStatus 'Result: `enabled: true`' "Verified enabled private-reporting state"
+Require-Text $privateReportingStatus "private-reporting P0 blocker closed" "Private-reporting blocker closure"
 Require-Text $privateReportingStatus "repos/Cynrath/agent-context-kit/private-vulnerability-reporting" "Private-reporting read-only endpoint"
+Require-Text $privateReportingVerificationScript "RequireEnabled" "Private-reporting enabled-state assertion"
 Require-Text $privateReportingTask "No GitHub setting change" "Private-reporting task remote-write boundary"
 Require-Text $publishedSupplyChainStatus "No author signature was observed" "Published author-signature boundary"
 Require-Text $publishedSupplyChainStatus "no accessible GitHub artifact attestation" "Published provenance boundary"

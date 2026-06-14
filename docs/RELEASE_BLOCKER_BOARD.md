@@ -1,11 +1,11 @@
 # Release Blocker Board
 
-Status date: 2026-06-13. Decision boundary: `LOCAL READY / REMOTE NO-GO` for the next release candidate. This board improves visibility and closes nothing.
+Status date: 2026-06-14. Decision boundary: `LOCAL READY / REMOTE NO-GO` for the next release candidate.
 
 | Blocker ID | Category | Priority | Current status | Owner role | Evidence required | Remote write? | Decision options / accepted risk | Review date | Release impact | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| RB-001 | Hosted RC evidence | P0 | Open: manual workflow has no reviewed candidate run | Release maintainer | Exact candidate commit, workflow URL, Windows/Ubuntu/macOS jobs, package/config/baseline/SARIF/performance results | Yes: push/dispatch | Run evidence workflow; no accepted-risk bypass for candidate publication | TBD | Blocks candidate | Green reviewed run for exact candidate |
-| RB-002 | Private vulnerability reporting | P0 | Open: verified disabled | Security maintainer | GitHub setting enabled, report entry visible, verification date | Yes | Enable; no public-only substitute for candidate | TBD | Blocks candidate | Read-only verification reports enabled |
+| RB-001 | Hosted RC evidence | P0 | Closed for reviewed alpha.2 state: run `27478635057` green on three OS | Release maintainer | Exact candidate commit, workflow URL, Windows/Ubuntu/macOS jobs, package/config/baseline/SARIF/performance results | Yes: push/dispatch | Rerun for a different final candidate | 2026-06-14 | Rerun-dependent | Green reviewed run for exact candidate |
+| RB-002 | Private vulnerability reporting | P0 | Closed: enabled and independently verified | Security maintainer | GitHub GET `enabled: true`, report entry visible, verification date/maintainer | Yes | Recheck before future RC | 2026-06-14 | Complete | Verified enabled state and report entry |
 | RB-003 | Security notification ownership | P0 | Open: primary/backup ownership not recorded | Security maintainer | Named roles/contact path, backup, response coverage, review date | Possibly | Assign roles; no unowned accepted-risk option | TBD | Blocks candidate | Tested private-report notification and ownership record |
 | RB-004 | NuGet owner identity | P1 | Open: public owner `Cyranth`, package/project persona `Cynrath` | Package maintainer | Alignment or dated intentional exception with recovery owner | Yes if changing ownership | Align; or accept documented mismatch with review date | TBD | Blocks unless accepted | Evidence and explicit disposition recorded |
 | RB-005 | Author signing | P1 | Open: repository signature observed; no author signature observed | Package/security maintainer | Sign/defer decision, certificate/identity lifecycle if selected, package verification | Yes if signing | Implement author signing; or dated accepted risk | TBD | Blocks unless accepted | Exact candidate verification or approved defer record |

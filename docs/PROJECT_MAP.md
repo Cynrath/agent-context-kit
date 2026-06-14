@@ -268,6 +268,7 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - `scripts/verify-existing-release.ps1`
 - `scripts/prepare-release.ps1`
 - `scripts/check-security-supply-chain-evidence.ps1`
+- `scripts/check-private-vulnerability-reporting.ps1`
 - `scripts/check-published-supply-chain-status.ps1`
 - `scripts/check-rc-local-readiness.ps1`
 - `scripts/check-release-blockers.ps1`
@@ -316,7 +317,7 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - Security/supply-chain maintainer evidence handoff: `docs/tasks/TASK-0095-security-supply-chain-maintainer-evidence.md`, `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md`, `docs/MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md`, and `scripts/check-security-supply-chain-evidence.ps1`.
 - Final RC local-readiness consolidation: `docs/tasks/TASK-0096-final-rc-local-readiness-consolidation.md`, `docs/RC_LOCAL_READINESS.md`, and `scripts/check-rc-local-readiness.ps1`; remote publication remains NO-GO.
 - Hosted validation status sync: `docs/tasks/TASK-0097-hosted-validation-status-sync.md` and `docs/HOSTED_VALIDATION_STATUS.md`; standard workflows are green while manual RC evidence remains pending.
-- Private vulnerability reporting status: `docs/tasks/TASK-0098-private-vulnerability-reporting-status.md` and `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`; read-only API evidence confirms the setting is disabled.
+- Private vulnerability reporting status: `docs/tasks/TASK-0129-private-vulnerability-reporting-verification.md`, `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`, and `scripts/check-private-vulnerability-reporting.ps1`; enablement and the public entry point were verified on 2026-06-14.
 - Published supply-chain status audit: `docs/tasks/TASK-0099-published-supply-chain-status-audit.md`, `docs/PUBLISHED_SUPPLY_CHAIN_STATUS.md`, and `scripts/check-published-supply-chain-status.ps1`; read-only evidence distinguishes NuGet repository signing from author signing and records missing SBOM/provenance plus the NuGet owner-profile mismatch.
 - Offline OSS ecosystem catalog and roadmap reset: `docs/tasks/TASK-0100-offline-oss-ecosystem-catalog.md`, `docs/RELATED_PROJECTS.md`, `docs/OFFLINE_OSS_ECOSYSTEM.md`, `docs/EXTERNAL_TOOL_WORKFLOWS.md`, `docs/ECOSYSTEM_POSITIONING.md`, and `docs/INTEROPERABILITY_BACKLOG.md`; no external dependency or integration is added.
 - Local ecosystem/product intelligence continuation: `docs/tasks/TASK-0101-related-tools-comparison-matrix.md` through `docs/tasks/TASK-0115-v020-alpha2-candidate-planning-refresh.md`; evidence, workflows, design-only interoperability/commands/imports, privacy threats, offline policy, blocker visibility, and planning docs are complete locally without external execution or remote writes.

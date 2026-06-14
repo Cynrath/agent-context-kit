@@ -3,21 +3,19 @@
 Use `docs/RELEASE_BLOCKER_BOARD.md` for current P0/P1 visibility and `docs/MAINTAINER_DECISION_REGISTER.md` to record explicit decisions. No board row is currently implicit approval.
 
 ## Boundary
-This is a manual maintainer procedure. It does not authorize an agent to change GitHub settings, handle certificates or credentials, enable attestations, upload SBOM/provenance, push, tag, publish NuGet, or create/edit releases.
+This is a maintainer procedure. PROJECT-CONTROL-0103 explicitly authorized private-reporting enablement and related security work; certificate/credential handling, fake signing evidence, API-key publishing, and unrelated remote changes remain prohibited.
 
 Use `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md` as the single evidence register. Keep records metadata-only.
 
 The published `0.2.0-alpha.1` starting state is recorded in `docs/PUBLISHED_SUPPLY_CHAIN_STATUS.md`: valid NuGet.org repository signature, no observed author signature, no package/release SBOM, no accessible GitHub package attestation, and a public owner-profile mismatch (`Cyranth` versus `Cynrath`).
 
 ## 1. Private Vulnerability Reporting
-Current read-only status on 2026-06-13: `enabled: false`. See `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`.
+Verified status on 2026-06-14: `enabled: true`. The public Security page exposes the private report entry point. See `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`.
 
-1. Review GitHub's current private vulnerability reporting instructions: <https://docs.github.com/code-security/security-advisories/working-with-repository-security-advisories/configuring-private-vulnerability-reporting-for-a-repository>.
-2. Enable private vulnerability reporting for `Cynrath/agent-context-kit` using a maintainer account.
-3. Confirm the public repository security surface offers a private report path. Do not submit a fake secret or real sensitive report merely to test the UI.
-4. Confirm the primary and backup maintainer receive repository security notifications.
-5. Record date, maintainer, repository/settings reference, and non-sensitive verification result in the evidence register.
-6. Update `SECURITY.md` only after the private path is verified. Do not publish a private email address unless intentionally selected and protected.
+1. Recheck the setting with the read-only script before a future RC.
+2. Confirm the public repository security surface still offers a private report path. Do not submit a fake or sensitive report merely to test the UI.
+3. Confirm and record primary and backup security notification owners under TASK-0130.
+4. Do not publish a private email address unless intentionally selected and protected.
 
 Read-only verification:
 
@@ -25,7 +23,7 @@ Read-only verification:
 gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" repos/Cynrath/agent-context-kit/private-vulnerability-reporting
 ```
 
-Do not treat `enabled: true` as complete operational readiness until primary and backup notification owners are recorded.
+The setting blocker is closed. Do not treat it as complete operational readiness until primary and backup notification owners are recorded.
 
 ## 2. Final-Candidate Dependency Review
 Run on the exact candidate commit:

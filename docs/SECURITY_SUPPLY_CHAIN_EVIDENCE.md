@@ -3,7 +3,7 @@
 Open decisions are consolidated in `docs/RELEASE_BLOCKER_BOARD.md` and `docs/MAINTAINER_DECISION_REGISTER.md`. Those summaries do not replace exact evidence in this file.
 
 ## Status
-Local evidence register prepared on 2026-06-12. Remote private-reporting and published `0.2.0-alpha.2` package/release state were checked on 2026-06-13. Private vulnerability reporting is **VERIFIED REMOTE STATE: DISABLED**. Alpha.2 is NuGet.org repository-signed, but no author signature, SBOM artifact, or accessible GitHub package attestation was found. Maintainer decisions remain open. This document is not release approval.
+Local evidence register prepared on 2026-06-12. Published `0.2.0-alpha.2` package/release state was checked on 2026-06-13. Private vulnerability reporting was enabled and independently verified on 2026-06-14. Alpha.2 is NuGet.org repository-signed, but no author signature, SBOM artifact, or accessible GitHub package attestation was found. Other maintainer decisions remain open. This document is not release approval.
 
 ## Status Vocabulary
 - `VERIFIED LOCAL`: reproduced from local source, tests, package inspection, or documented policy.
@@ -17,7 +17,7 @@ Local evidence register prepared on 2026-06-12. Remote private-reporting and pub
 ## Evidence Register
 | Area | Current Status | Local Evidence | Maintainer Evidence Required | RC Effect |
 | --- | --- | --- | --- | --- |
-| Private vulnerability reporting | VERIFIED REMOTE STATE: DISABLED on 2026-06-13 | GitHub GET endpoint returned `enabled: false`; `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md` records the public endpoint and safe query | Enable the repository setting; verify `enabled: true`, record date/maintainer/reference, and confirm the private report entry point is visible | P0 blocker |
+| Private vulnerability reporting | VERIFIED MAINTAINER: ENABLED on 2026-06-14 | Authenticated enablement, independent GET `enabled: true`, and public Security-page entry-point verification; no advisory was created | Recheck before a future RC and after material repository ownership/security-setting changes | Complete for current repository state |
 | Security notification ownership | PENDING MAINTAINER | Incident fields and response targets are documented | Record who receives repository security notifications and the backup owner; do not record reporter data | P0 blocker |
 | Dependency vulnerability/deprecation review | VERIFIED LOCAL on 2026-06-12 | Direct/transitive vulnerability and deprecation reviews were clean after xUnit v3 migration; full suite passes 178/178 | Rerun on final candidate date and record commands, date, commit, sources reached, and result | Required fresh evidence |
 | NuGet owner identity | VERIFIED REMOTE STATE: MISMATCH on 2026-06-13 | NuGet Gallery owner profile is `Cyranth`; package author/project persona is `Cynrath` | Align the owner profile/package ownership or record a dated intentional exception and account-recovery owner | P1 blocker before RC |
@@ -43,8 +43,8 @@ Candidate commit:
 Decision date:
 Maintainer: Cynrath
 
-Private vulnerability reporting: DISABLED (verified 2026-06-13) / ENABLED
-Verification URL or repository setting reference:
+Private vulnerability reporting: ENABLED (verified 2026-06-14)
+Verification reference: GitHub repository private-reporting GET plus public Security-page entry point
 Security notification primary/backup owner:
 
 Dependency review date and result:

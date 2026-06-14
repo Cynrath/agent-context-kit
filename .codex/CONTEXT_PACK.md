@@ -8,6 +8,8 @@ PROJECT-CONTROL-0103 executes TASK-0126 through TASK-0134: release recovery veri
 
 TASK-0126 is hosted-verified: automation commit `2f68f14` passed 8/8 and run `27478046088` verified immutable alpha.2 package/release evidence without write permissions or login. TASK-0127 records exact alpha.2 hashes, repository signature, missing author signature/SBOM/attestation, and owner identity difference. TASK-0128 is hosted-verified: commit `4c4fa64` passed standard 8/8 and run `27478635057` passed exact predecessor/config/baseline/SARIF/performance evidence on Windows, Ubuntu, and macOS.
 
+TASK-0129 enabled and independently verified GitHub private vulnerability reporting on 2026-06-14. The repository GET returns `enabled: true` and the public Security page exposes the report entry; notification ownership remains separate.
+
 ## Architecture
 - CLI project: `src/AgentContextKit.Cli`
 - Core project: `src/AgentContextKit.Core`
