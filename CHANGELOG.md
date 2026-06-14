@@ -10,6 +10,9 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 - Added two new stable scanner rule IDs: `ACKIT006` `ProductionConfigLike` (High) for production configuration, environment-specific appsettings, and live-service connection strings, and `ACKIT007` `DocumentationGap` (Medium) for documentation gaps surfaced by the scanner. Existing `ACKIT001` and `ACKIT005` descriptions were narrowed to reflect the new dedicated rules.
 - Added an `Ackit006Ackit007EndToEndTests` coverage class that exercises the Core `RepositoryScanner` on a synthetic `appsettings.Production.json` fixture, asserts the new `ACKIT006` ruleId flows into JSON and the redact-check filter, asserts the catalog mapping for `ACKIT007`, and asserts the SARIF rule catalog advertises the new ID.
 
+### Local-Only Extension Batch
+PROJECT-CONTROL-0106 and the independent local product/code-quality track delivered a small, additive batch: agent rule sync (`AGENTS.md`, `CLAUDE.md`, copilot, cursor, `DEVELOPMENT_STANDARD`); queue and handoff consistency; scanner rule doc and SARIF/JSON/SECURITY_MODEL contract alignment with two new consistency guard tests; agent instruction surface guard test; seven candidate task records (`TASK-0146` through `TASK-0152`) and a forward-looking roadmap note; catalog text guard; config-check diagnostics cookbook; baseline diff cookbook; SARIF rule metadata completeness guard; offline-only and accessibility guard for the HTML report; prompt pack and context export redaction guard; sample gallery coverage tests. All of these changes are local-only; the published `0.2.0-alpha.2` package, JSON schema, SARIF profile, and default CLI surface remain unchanged.
+
 ### Security
 - Added least-privilege GitHub artifact provenance for exact future release nupkg assets, with idempotent digest detection and CLI verification.
 - Recorded bounded author-signing and SBOM deferrals without claiming controls that are not published.
