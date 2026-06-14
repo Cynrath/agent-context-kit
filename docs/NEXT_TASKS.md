@@ -4,8 +4,8 @@ This is the unified execution queue. PROJECT-CONTROL-0103 is closed; PROJECT-CON
 
 ## Active PROJECT-CONTROL-0104
 1. TASK-0135 issue template version placeholder sync - completed.
-2. TASK-0136 active docs project control and test count refresh.
-3. TASK-0137 scanner rule catalog extension.
+2. TASK-0136 active docs project control and test count refresh - completed.
+3. TASK-0137 scanner rule catalog extension - completed; `ACKIT006` and `ACKIT007` added.
 4. TASK-0138 issue template guard test and final audit sync.
 
 ## Active PROJECT-CONTROL-0103
