@@ -13,6 +13,9 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 ### Local-Only Extension Batch
 PROJECT-CONTROL-0106 and the independent local product/code-quality track delivered a small, additive batch: agent rule sync (`AGENTS.md`, `CLAUDE.md`, copilot, cursor, `DEVELOPMENT_STANDARD`); queue and handoff consistency; scanner rule doc and SARIF/JSON/SECURITY_MODEL contract alignment with two new consistency guard tests; agent instruction surface guard test; seven candidate task records (`TASK-0146` through `TASK-0152`) and a forward-looking roadmap note; catalog text guard; config-check diagnostics cookbook; baseline diff cookbook; SARIF rule metadata completeness guard; offline-only and accessibility guard for the HTML report; prompt pack and context export redaction guard; sample gallery coverage tests. All of these changes are local-only; the published `0.2.0-alpha.2` package, JSON schema, SARIF profile, and default CLI surface remain unchanged.
 
+### Starter Config and Locale Guard Batch
+PROJECT-CONTROL-0107 planning commit `c249a13` opens with the post-0158 state sync and a new local-only batch: starter `brandKeywords` and `piiKeywords` config (`TASK-0156`); starter `safeDomains` and `ignoredPaths` config (`TASK-0157`); Turkish CLI locale fallback guard (`TASK-0158`); commit-completeness hard rule plus a new `scripts/check-tracked-vs-untracked-md.ps1` guard. Total tests are 238/238. No release, tag, or NuGet state change.
+
 ### Security
 - Added least-privilege GitHub artifact provenance for exact future release nupkg assets, with idempotent digest detection and CLI verification.
 - Recorded bounded author-signing and SBOM deferrals without claiming controls that are not published.
