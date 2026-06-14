@@ -63,3 +63,6 @@ When `--baseline` is supplied, JSON also includes the shared sanitize-only basel
 HTML reports are local artifacts for review. They do not approve public release, publish packages, push commits, create release tags, or replace release blocker checks. Treat generated reports as local-only artifacts, not public release artifacts.
 
 If report screenshots are later used in README or docs, sanitize them first using `docs/VISUAL_ASSETS.md`. Do not commit generated report HTML.
+
+## Accessibility
+The generated HTML report includes a `lang` attribute on the root element, an `<h1>` heading, and a `<main>` landmark so screen readers and keyboard navigation receive a sensible document outline. A focused guard test asserts these landmarks stay present.
