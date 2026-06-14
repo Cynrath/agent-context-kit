@@ -4,6 +4,23 @@
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 75 | In progress | PROJECT-CONTROL-0106 repo rules and continuation sync | Low | None | `docs/tasks/PROJECT-CONTROL-0106-...md` plus TASK-0140 through TASK-0145 task files; agent instruction surfaces; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Agent rule sync, queue/handoff consistency, scanner rule doc consistency, instruction surface alignment, next work selection, and final validation all complete |
+| 76 | In progress | TASK-0140 repo rules commit and push policy sync | Low | None | AGENTS, CLAUDE, copilot, cursor, DEVELOPMENT_STANDARD | local gates | Push after validation | Hard prohibitions plus new authorized-clause wording consistent across surfaces |
+| 77 | In progress | TASK-0141 project queue and handoff consistency audit | Low | None | NEXT_TASKS, PROJECT_EXECUTION_QUEUE, .codex/* | local gates | Push after validation | Queue and handoff reflect PROJECT-CONTROL-0106 active and 197/197 test count |
+| 78 | In progress | TASK-0142 scanner rule doc contract consistency | Low | None | JSON_OUTPUT, SECURITY_MODEL, SCANNER_RULES, SARIF_OUTPUT, new consistency test | `dotnet test` green | Push after validation | ACKIT006/007 referenced consistently in docs and Core catalog |
+| 79 | In progress | TASK-0143 agent instruction surface consistency | Low | None | AGENTS, CLAUDE, copilot, cursor, DEVELOPMENT_STANDARD plus new surface test | `dotnet test` green | Push after validation | Canonical phrases present across all five primary surfaces |
+| 80 | Planned | TASK-0144 next local product work selection | Low | None | NEXT_TASKS, PROJECT_EXECUTION_QUEUE, ROADMAP, .codex/*, seven TASK-0146 through TASK-0152 files | local gates | Push after validation | Seven candidate task files created and queued |
+| 81 | Planned | TASK-0145 final validation and hosted check sync | Low | None | handoff docs | full local validation suite, hosted 3/3 | Push after validation | Standard 3/3 green for final PROJECT-CONTROL-0106 HEAD |
+
+## Independent Local Product/Code-Quality Track
+| Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| C1 | Planned | TASK-0146 scanner severity explanation polish | Low | None | Core catalog text, guard test | `dotnet test` green | Push after validation | Each catalog rule has a clear, non-empty description and recommendation |
+| C2 | Planned | TASK-0147 config-check actionable diagnostics examples | Low | None | `docs/CONFIGURATION.md`, guard test | `dotnet test` green | Push after validation | Cookbook maps at least four `ACKITCFG` codes to one-line fixes |
+| C3 | Planned | TASK-0148 baseline diff documentation and tests | Low | None | `docs/BASELINE_MODEL.md`, guard test | `dotnet test` green | Push after validation | Existing-vs-new classification preserved in JSON output |
+| C4 | Planned | TASK-0149 SARIF rule metadata completeness | Low | None | `Sarif.cs` if needed, guard test | `dotnet test` green | Push after validation | Each SARIF rule carries `id`, `name`, `shortDescription`, `fullDescription`, `help` |
+| C5 | Planned | TASK-0150 report and Web UI accessibility and offline UX polish | Low | None | `docs/HTML_REPORTS.md`, guard test | `dotnet test` green | Push after validation | Generated HTML contains no external network references |
+| C6 | Planned | TASK-0151 prompt pack and context export redaction hardening | Low | None | guard test | `dotnet test` green | Push after validation | Synthetic raw value does not leak into prompt pack or context export |
+| C7 | Planned | TASK-0152 sample gallery test coverage expansion | Low | None | guard test | `dotnet test` green | Push after validation | Each safe sample is asserted against the Core scanner |
 
 ## Active PROJECT-CONTROL-0105 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |

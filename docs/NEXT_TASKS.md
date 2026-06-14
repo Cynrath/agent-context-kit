@@ -4,11 +4,20 @@ This is the unified execution queue. PROJECT-CONTROL-0103 and PROJECT-CONTROL-01
 
 ## Active PROJECT-CONTROL-0106
 1. TASK-0140 repo rules commit and push policy sync - completed.
-2. TASK-0141 project queue and handoff consistency audit.
-3. TASK-0142 scanner rule doc contract consistency.
-4. TASK-0143 agent instruction surface consistency.
+2. TASK-0141 project queue and handoff consistency audit - completed.
+3. TASK-0142 scanner rule doc contract consistency - completed.
+4. TASK-0143 agent instruction surface consistency - completed.
 5. TASK-0144 next local product work selection.
 6. TASK-0145 final validation and hosted check sync.
+
+## Independent Local Product/Code-Quality Track
+1. TASK-0146 scanner severity explanation polish.
+2. TASK-0147 config-check actionable diagnostics examples.
+3. TASK-0148 baseline diff documentation and tests.
+4. TASK-0149 SARIF rule metadata completeness.
+5. TASK-0150 report and Web UI accessibility and offline UX polish.
+6. TASK-0151 prompt pack and context export redaction hardening.
+7. TASK-0152 sample gallery test coverage expansion.
 
 ## Active PROJECT-CONTROL-0104
 1. TASK-0135 issue template version placeholder sync - completed.

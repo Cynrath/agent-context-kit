@@ -227,3 +227,16 @@ Historical note: TASK-0018 through TASK-0023 used the v0.3 label for CI mode, ex
 
 ## Post-v1.0
 - Optional sample stack reporting that lists `samples/*` stacks separately from the main repository stack.
+
+## Forward-Looking Candidate Backlog (Post-0106)
+The following candidates are safe local-only work that does not change the published `0.2.0-alpha.2` package, the default CLI, JSON schema, SARIF profile, or the alpha.3 NO-GO posture. Each is tracked as a separate `docs/tasks/TASK-0146` through `TASK-0152` record.
+
+- `TASK-0146` scanner severity explanation polish (Core catalog text and a guard test).
+- `TASK-0147` config-check actionable diagnostics examples (cookbook and a guard test).
+- `TASK-0148` baseline diff documentation and tests (existing-vs-new cookbook and a guard test).
+- `TASK-0149` SARIF rule metadata completeness (GitHub Code Scanning fields and a guard test).
+- `TASK-0150` report and Web UI accessibility and offline UX polish (offline-only guard test).
+- `TASK-0151` prompt pack and context export redaction hardening (redaction guard test).
+- `TASK-0152` sample gallery test coverage expansion (per-sample guard tests).
+
+This backlog is selection only. Implementation begins only after a future PROJECT-CONTROL task explicitly authorizes the next set. None of these candidates claim release readiness or close the alpha.3 `RB-003`/`RB-008` blockers.
