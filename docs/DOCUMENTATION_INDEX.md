@@ -130,6 +130,8 @@
 - `scripts/check-rc-local-readiness.ps1`: read-only orchestration gate for final local RC evidence.
 - `docs/HOSTED_VALIDATION_STATUS.md`: exact standard Actions run evidence and the remaining manual RC workflow gap.
 - `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`: verified enablement metadata, public entry-point evidence, and repeatable read-only checks.
+- `docs/SECURITY_NOTIFICATION_OWNERSHIP.md`: primary/backup notification ownership and continuity boundary.
+- `docs/PACKAGE_RECOVERY.md`: immutable-package recovery thresholds, ownership, communication, and tabletop evidence.
 - `docs/PUBLISHED_SUPPLY_CHAIN_STATUS.md`: exact published package signature, owner identity, SBOM, release asset, and provenance-attestation audit.
 - `scripts/check-published-supply-chain-status.ps1`: local structure gate for the published supply-chain truth boundary.
 - `scripts/test-samples.ps1`: local sample smoke validation helper.

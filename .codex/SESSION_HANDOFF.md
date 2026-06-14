@@ -10,6 +10,7 @@ AgentContextKit is an offline-first, security-first, docs-first, task-first .NET
 - TASK-0127 refreshed alpha.2 supply-chain evidence: NuGet/release hashes, exact metadata commit, NuGet.org repository signature, absent author signature/SBOM/attestation, and `Cyranth`/`Cynrath` identity disposition remain explicitly scoped.
 - TASK-0128 is complete. Commit `4c4fa64` passed standard 8/8 and hosted RC run `27478635057` passed Windows, Ubuntu, and macOS for exact commit/candidate/predecessor evidence. The 2,000-file benchmark passed in 1.265s/0.957s/0.684s without changing the 30-second threshold.
 - TASK-0129 is complete locally/remotely: private vulnerability reporting was enabled and independently verified as `enabled: true` on 2026-06-14; the public Security page exposes the report entry. Primary/backup notification ownership remains TASK-0130.
+- TASK-0130 is complete to the verifiable boundary: `Cynrath` is primary triage/recovery decision owner; immutable successor recovery procedure and tabletop are documented. Independent backup and NuGet execution authority remain blockers.
 - PROJECT-CONTROL-0102 completed the authorized alpha.2 implementation, publication, post-publish synchronization, and hosted validation sequence.
 - `v0.2.0-alpha.2` is published on GitHub and NuGet; exact tag `v0.2.0-alpha.2` points to package commit `f540479a92cbe66097f6796553828ee49ddd5512`.
 - Local `master` started aligned with `origin/master` at `0cac249`; task docs were committed as `23595e2`.

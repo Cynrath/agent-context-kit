@@ -54,6 +54,8 @@ $privateReportingTask = Read-RequiredFile "docs\tasks\TASK-0098-private-vulnerab
 $publishedSupplyChainStatus = Read-RequiredFile "docs\PUBLISHED_SUPPLY_CHAIN_STATUS.md" "Published supply-chain status"
 $publishedSupplyChainTask = Read-RequiredFile "docs\tasks\TASK-0127-alpha2-supply-chain-evidence-refresh.md" "TASK-0127"
 $privateReportingVerificationScript = Read-RequiredFile "scripts\check-private-vulnerability-reporting.ps1" "Private-reporting verification script"
+$notificationOwnership = Read-RequiredFile "docs\SECURITY_NOTIFICATION_OWNERSHIP.md" "Security notification ownership"
+$packageRecovery = Read-RequiredFile "docs\PACKAGE_RECOVERY.md" "Package recovery procedure"
 
 foreach ($marker in @(
     "Local evidence register prepared on 2026-06-12",
@@ -97,6 +99,12 @@ Require-Text $privateReportingStatus 'Result: `enabled: true`' "Verified enabled
 Require-Text $privateReportingStatus "private-reporting P0 blocker closed" "Private-reporting blocker closure"
 Require-Text $privateReportingStatus "repos/Cynrath/agent-context-kit/private-vulnerability-reporting" "Private-reporting read-only endpoint"
 Require-Text $privateReportingVerificationScript "RequireEnabled" "Private-reporting enabled-state assertion"
+Require-Text $notificationOwnership "Primary security triage owner" "Primary security notification owner"
+Require-Text $notificationOwnership "Backup security triage owner" "Backup security notification boundary"
+Require-Text $notificationOwnership "BLOCKER" "Unassigned backup blocker"
+Require-Text $packageRecovery 'Decision owner: `Cynrath`' "Package recovery decision owner"
+Require-Text $packageRecovery "NuGet execution authority: pending TASK-0131" "Package recovery authority blocker"
+Require-Text $packageRecovery "never overwrite or reuse the published version" "Immutable package recovery boundary"
 Require-Text $privateReportingTask "No GitHub setting change" "Private-reporting task remote-write boundary"
 Require-Text $publishedSupplyChainStatus "No author signature was observed" "Published author-signature boundary"
 Require-Text $publishedSupplyChainStatus "no accessible GitHub artifact attestation" "Published provenance boundary"

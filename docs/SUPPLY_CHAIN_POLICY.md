@@ -37,7 +37,7 @@ NuGet.org repository signing must not be described as author-signed. Before 1.0 
 
 These decisions may require remote credentials/services and remain maintainer-only blockers. This task does not sign, publish, or upload anything.
 
-TASK-0095 consolidates the decision fields. TASK-0127 refreshes the exact published package/release state for alpha.2. Private reporting activation, owner identity alignment, author signing, SBOM publication, provenance, and recovery ownership remain explicit follow-up tasks; no unverified control is claimed.
+TASK-0095 consolidates the decision fields. TASK-0127 refreshes the exact published package/release state for alpha.2. TASK-0129 verifies private reporting. TASK-0130 accepts the immutable-package recovery procedure while leaving NuGet execution authority and backup ownership explicit. Owner identity alignment, author signing, SBOM publication, and provenance remain follow-up tasks; no unverified control is claimed.
 
 ## Recovery
-If a bad package is published, stop recommending the version, document impact, publish a fixed successor rather than replacing immutable package content, and update release/install guidance. NuGet unlisting/deprecation is a maintainer remote action.
+If a bad package is published, stop recommending the version, document impact, publish a fixed successor rather than replacing immutable package content, and update release/install guidance. NuGet unlisting/deprecation is a maintainer remote action. Operational ownership, activation thresholds, communication, and the tabletop boundary are defined in `docs/PACKAGE_RECOVERY.md`.

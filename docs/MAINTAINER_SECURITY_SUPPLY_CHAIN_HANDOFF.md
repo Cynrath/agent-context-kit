@@ -76,7 +76,9 @@ Choose one path:
 - Record `Provenance decision: DEFER` with owner, reason, release scope, compensating package hash/content review, and next review date.
 
 ## 6. Bad-Package Recovery Acceptance
-Record the maintainer who can unlist/deprecate a package and the decision threshold. The accepted procedure must:
+The project procedure is accepted in `docs/PACKAGE_RECOVERY.md`. `Cynrath` owns the decision, but the public NuGet owner identity is `Cyranth`; TASK-0131 must verify or disposition execution authority. No backup recovery owner is assigned.
+
+The accepted procedure must:
 
 - stop recommending the affected version;
 - preserve immutable published package content;
@@ -84,6 +86,8 @@ Record the maintainer who can unlist/deprecate a package and the decision thresh
 - publish a fixed successor version;
 - update GitHub Release/install/security guidance;
 - record impact, remediation commit, package/tag actions, and post-incident review.
+
+Do not execute an unlist/deprecate action merely to test access.
 
 ## 7. Final Evidence Check
 Run locally:

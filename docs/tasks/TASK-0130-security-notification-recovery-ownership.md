@@ -37,7 +37,7 @@ Review decision register, blocker board, SECURITY, and recovery procedure togeth
 Revert inaccurate ownership records; preserve immutable package history.
 
 ## Completion Evidence
-Pending.
+Completed to the verifiable boundary on 2026-06-14. `Cynrath` is recorded as primary security triage and package-recovery decision owner. `docs/PACKAGE_RECOVERY.md` defines accepted immutable-package thresholds, successor/unlist/deprecate flow, communication, and tabletop evidence. No independent backup owner exists, notification delivery was not tested with a fake advisory, and NuGet execution authority for public owner `Cyranth` remains TASK-0131. RB-003 and RB-008 therefore remain partial blockers rather than false completion claims.
 
 ## Commit
 `docs: define security notification and recovery ownership`

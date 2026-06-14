@@ -27,6 +27,8 @@ The private channel is active. Do not request sensitive details through a public
 
 The exact metadata-only evidence is maintained in `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`, `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md`, and `docs/MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md`.
 
+TASK-0130 records `Cynrath` as primary security triage owner in `docs/SECURITY_NOTIFICATION_OWNERSHIP.md`. No independent backup owner is verified, so notification ownership remains a P0 operational blocker.
+
 ## Dependency Review
 Before an RC, run:
 

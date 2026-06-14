@@ -10,6 +10,8 @@ TASK-0126 is hosted-verified: automation commit `2f68f14` passed 8/8 and run `27
 
 TASK-0129 enabled and independently verified GitHub private vulnerability reporting on 2026-06-14. The repository GET returns `enabled: true` and the public Security page exposes the report entry; notification ownership remains separate.
 
+TASK-0130 records `Cynrath` as primary security triage and recovery decision owner, accepts an immutable-successor recovery procedure, and explicitly leaves independent backup ownership plus NuGet `Cyranth` execution authority unresolved.
+
 ## Architecture
 - CLI project: `src/AgentContextKit.Cli`
 - Core project: `src/AgentContextKit.Core`
