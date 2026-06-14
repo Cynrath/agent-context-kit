@@ -2,11 +2,13 @@
 
 ## Default Workflow
 - Read `README.md`, `docs/PRODUCT_SPEC.md`, `docs/ARCHITECTURE.md`, and the active task before changing code.
+- Use task-first workflow: every implementation change starts from a `docs/tasks/` record.
 - Do not code before a task file exists under `docs/tasks/`.
 - Continuous progress hard rule: when the user says to continue, do not ask whether to continue; proceed through the next documented task in order with task docs, implementation, verification, and commit.
 - Update `.codex/SESSION_HANDOFF.md` after major steps.
 - Run relevant tests before reporting completion.
 - Prefer safe, minimal, production-ready changes.
+- Do not commit generated `.ackit/`, SARIF, HTML, Web UI, prompt pack, context export, `bin/`, or `obj/` artifacts.
 
 ## Safety
 - Keep the MVP offline-first and local-only.
@@ -56,6 +58,7 @@
 
 ## Risk Summary
 - No risk findings in the latest local scan.
+- `0.2.0-alpha.3` is NO-GO. Do not bump version, tag, publish, or release.
 
 ## Recommended Checks
 - `dotnet build AgentContextKit.sln -c Release --no-restore`

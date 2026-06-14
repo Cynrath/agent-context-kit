@@ -5,6 +5,9 @@
 - Keep generated changes safe and reviewable.
 - Check repository health and risk summary before editing.
 - Keep push, tag, publish, remote creation, deletion, and automatic redaction maintainer-only unless the active project control task explicitly authorizes agent write access.
+- Do not commit generated `.ackit/`, SARIF, HTML, Web UI, prompt pack, context export, `bin/`, or `obj/` artifacts.
+- Do not include model name, generator, or AI authorship in commit messages.
+- `0.2.0-alpha.3` is NO-GO until `RB-003` and `RB-008` are resolved; do not prepare or publish alpha.3 packages, tags, or releases.
 
 ## Release Status
 - Current release: `v0.2.0-alpha.2` published on GitHub and NuGet as a pre-release.

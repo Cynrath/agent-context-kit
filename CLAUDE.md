@@ -2,6 +2,11 @@
 
 Use the same repository rules as AGENTS.md.
 
+## Workflow
+- Task-first: every implementation change starts from `docs/tasks/`.
+- Continuous progress: do not stop between documented tasks; proceed through them in order.
+- Do not commit generated `.ackit/`, SARIF, HTML, Web UI, prompt pack, context export, `bin/`, or `obj/` artifacts.
+
 ## Stack
 - .NET: .sln/.slnx/*proj/Program.cs
 - .NET CLI / .NET Tool: PackAsTool/ToolCommandName
@@ -25,6 +30,7 @@ Use the same repository rules as AGENTS.md.
 
 ## Risk Summary
 - No risk findings in the latest local scan.
+- `0.2.0-alpha.3` is NO-GO. Do not bump version, tag, publish, or release.
 
 ## Recommended Checks
 - `dotnet build AgentContextKit.sln -c Release --no-restore`
@@ -34,6 +40,6 @@ Use the same repository rules as AGENTS.md.
 - `powershell -ExecutionPolicy Bypass -File scripts/verify-release.ps1`
 
 ## Commit And Push Policy
-- Follow `AGENTS.md` for the full commit and push policy. Hard prohibitions (force push, history rewrite, tag movement, release/NuGet publish, secret exposure, user-file deletion) remain in force.
+- Follow `AGENTS.md` for the full commit and push policy. Hard prohibitions (force-push, history rewrite, tag movement, release/NuGet publish, secret exposure, user-file deletion) remain in force.
 - Normal `master` commit and push is allowed only when the active project control task explicitly authorizes agent write access and only after local validation passes. Tag, release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow.
 - Do not include model name, generator, or AI authorship in commit messages.

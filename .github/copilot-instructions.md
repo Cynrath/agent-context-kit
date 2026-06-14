@@ -2,6 +2,9 @@
 
 Prefer minimal, tested, secure changes that follow the project docs and task files.
 
+## Workflow
+- Task-first workflow is mandatory. Every implementation change starts from a `docs/tasks/` record before code is written.
+
 ## Repository Health
 - README: yes
 - LICENSE: yes
@@ -21,6 +24,7 @@ Prefer minimal, tested, secure changes that follow the project docs and task fil
 - Hard prohibitions: never force-push, never rewrite history, never move an existing tag, never create a remote, never publish a package, never create a release, never delete user changes, never expose secrets, never fabricate owner, identity, signature, or recovery evidence.
 - Normal `master` commit and push is allowed only when the active project control task explicitly authorizes agent write access and only after local validation passes. Tag, release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow.
 - Do not include model name, generator, or AI authorship in commit messages.
+- Do not commit generated `.ackit/`, SARIF, HTML, Web UI, prompt pack, context export, `bin/`, or `obj/` artifacts.
 
 ## Recommended Checks
 - `dotnet build AgentContextKit.sln -c Release --no-restore`

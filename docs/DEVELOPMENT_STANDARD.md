@@ -1,11 +1,13 @@
 # Development Standard
 
 ## Working Model
-- Start every change from a task document.
+- Start every change from a task document. Task-first workflow is mandatory.
 - Keep scope small and explicit.
 - Prefer safe defaults over surprise behavior.
 - Update docs when behavior changes.
 - Record assumptions in `docs/DECISIONS.md` or the active task.
+- Do not commit generated `.ackit/`, SARIF, HTML, Web UI, prompt pack, context export, `bin/`, or `obj/` artifacts.
+- `0.2.0-alpha.3` is NO-GO. Do not bump version, tag, publish, or release.
 
 ## Code
 - Use C# with nullable reference types enabled.
