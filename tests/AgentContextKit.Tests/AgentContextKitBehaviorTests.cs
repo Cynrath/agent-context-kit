@@ -2240,6 +2240,67 @@ public sealed class CliJsonAndMetadataTests
         Assert.Equal(expectedExitCode, json?["exitCode"]?.GetValue<int>());
     }
 
+    [Fact]
+    public void AgentGeneratorCreatesAnthropicTarget()
+    {
+        using var repo = TempRepository.Create();
+        var generator = new AgentInstructionGenerator(new PhysicalFileSystem(), new TemplateRenderer(), new FixedClock());
+        var scan = new ScanResult(repo.Path, ["AGENTS.md"], [new StackInfo(".NET", ".csproj")], [], true, false, false, false, false, false, false, false, false, true);
+
+        var results = generator.Generate(repo.Path, AgentTarget.Anthropic, LanguageCode.English, scan);
+
+        var anthropic = Assert.Single(results, r => r.Path == "ANTHROPIC.md");
+        Assert.Equal(GeneratedFileStatus.Created, anthropic.Status);
+        Assert.True(File.Exists(System.IO.Path.Combine(repo.Path, "ANTHROPIC.md")));
+    }
+
+    [Fact]
+    public void AgentGeneratorCreatesContinueTarget()
+    {
+        using var repo = TempRepository.Create();
+        var generator = new AgentInstructionGenerator(new PhysicalFileSystem(), new TemplateRenderer(), new FixedClock());
+        var scan = new ScanResult(repo.Path, ["AGENTS.md"], [new StackInfo(".NET", ".csproj")], [], true, false, false, false, false, false, false, false, false, true);
+
+        var results = generator.Generate(repo.Path, AgentTarget.Continue, LanguageCode.English, scan);
+
+        var cont = Assert.Single(results, r => r.Path == ".continue/config.json");
+        Assert.Equal(GeneratedFileStatus.Created, cont.Status);
+        var content = File.ReadAllText(System.IO.Path.Combine(repo.Path, ".continue", "config.json"));
+        Assert.Contains("\"name\": \"agent-context-kit\"", content);
+        Assert.Contains("\"systemPrompt\":", content);
+    }
+
+    [Fact]
+    public void AgentGeneratorAllTargetIncludesAnthropicAndContinue()
+    {
+        using var repo = TempRepository.Create();
+        var generator = new AgentInstructionGenerator(new PhysicalFileSystem(), new TemplateRenderer(), new FixedClock());
+        var scan = new ScanResult(repo.Path, ["AGENTS.md"], [new StackInfo(".NET", ".csproj")], [], true, false, false, false, false, false, false, false, false, true);
+
+        var results = generator.Generate(repo.Path, AgentTarget.All, LanguageCode.English, scan);
+
+        Assert.Contains(results, r => r.Path == "ANTHROPIC.md" && r.Status == GeneratedFileStatus.Created);
+        Assert.Contains(results, r => r.Path == ".continue/config.json" && r.Status == GeneratedFileStatus.Created);
+        Assert.Contains(results, r => r.Path == "CLAUDE.md");
+        Assert.Contains(results, r => r.Path == "AGENTS.md");
+    }
+
+    [Fact]
+    public void AgentGeneratorSkipsExistingAnthropicAndContinue()
+    {
+        using var repo = TempRepository.Create();
+        repo.Write("ANTHROPIC.md", "kept-anthropic");
+        repo.Write(".continue/config.json", "{\"kept\": true}");
+        var generator = new AgentInstructionGenerator(new PhysicalFileSystem(), new TemplateRenderer(), new FixedClock());
+        var scan = new ScanResult(repo.Path, ["AGENTS.md"], [new StackInfo(".NET", ".csproj")], [], true, false, false, false, false, false, false, false, false, true);
+
+        var results = generator.Generate(repo.Path, AgentTarget.Anthropic, LanguageCode.English, scan);
+        Assert.Contains(results, r => r.Path == "ANTHROPIC.md" && r.Status == GeneratedFileStatus.SkippedExisting);
+
+        results = generator.Generate(repo.Path, AgentTarget.Continue, LanguageCode.English, scan);
+        Assert.Contains(results, r => r.Path == ".continue/config.json" && r.Status == GeneratedFileStatus.SkippedExisting);
+    }
+
     private static string LocateRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

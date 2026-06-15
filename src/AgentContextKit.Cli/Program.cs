@@ -68,7 +68,7 @@ public static class Program
         Console.WriteLine("  ackit webui [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit prompt-pack [--output <repo-relative.md>] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit context-export --prompt-pack <repo-relative.md> --approve [--output <repo-relative.json>] [--lang en|tr] [--json]");
-        Console.WriteLine("  ackit generate [--target codex|claude|cursor|copilot|all] [--lang en|tr] [--json]");
+        Console.WriteLine("  ackit generate [--target codex|claude|Anthropic|cursor|copilot|continue|all] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit task \"<title>\" [--lang en|tr] [--json]");
         Console.WriteLine("  ackit redact-check [--profile public-release] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit doctor [--lang en|tr] [--json]");
@@ -1085,8 +1085,10 @@ public static class Program
         {
             "codex" => AgentTarget.Codex,
             "claude" => AgentTarget.Claude,
+            "Anthropic" => AgentTarget.Anthropic,
             "cursor" => AgentTarget.Cursor,
             "copilot" => AgentTarget.Copilot,
+            "continue" => AgentTarget.Continue,
             "all" or null or "" => AgentTarget.All,
             _ => AgentTarget.All
         };

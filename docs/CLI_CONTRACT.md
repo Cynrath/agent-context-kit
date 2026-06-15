@@ -39,7 +39,7 @@ ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [
 ackit webui [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]
 ackit prompt-pack [--output <repo-relative.md>] [--lang en|tr] [--json]
 ackit context-export --prompt-pack <repo-relative.md> --approve [--output <repo-relative.json>] [--lang en|tr] [--json]
-ackit generate [--target codex|claude|cursor|copilot|all] [--lang en|tr] [--json]
+ackit generate [--target codex|claude|Anthropic|cursor|copilot|continue|all] [--lang en|tr] [--json]
 ackit task "<title>" [--lang en|tr] [--json]
 ackit redact-check [--profile public-release] [--lang en|tr] [--json]
 ackit doctor [--lang en|tr] [--json]

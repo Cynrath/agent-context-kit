@@ -411,6 +411,70 @@ public static class TemplateCatalog
             {{RecommendedChecks}}
             """
         },
+        ["ANTHROPIC"] = new()
+        {
+            ["en"] = """
+            # Anthropic CLI Instructions
+
+            Prefer minimal, tested, secure changes that follow the project docs and task files. Honor AGENTS.md first; this file adds Anthropic CLI-specific guidance.
+
+            Repository health:
+            {{HealthSummary}}
+
+            Recommended checks:
+            {{RecommendedChecks}}
+            """,
+            ["tr"] = """
+            # Anthropic CLI Yonergeleri
+
+            Proje dokumanlari ve task dosyalarina uyan minimal, testli ve guvenli degisiklikleri tercih et. Once AGENTS.md'yi, sonra bu dosyayi dikkate al.
+
+            Repository sagligi:
+            {{HealthSummary}}
+
+            Onerilen kontroller:
+            {{RecommendedChecks}}
+            """
+        },
+        ["CONTINUE"] = new()
+        {
+            ["en"] = """
+            {
+              "name": "agent-context-kit",
+              "version": "0.2.0-alpha.2",
+              "schema": "v1",
+              "models": [],
+              "tabAutocompleteModel": null,
+              "embeddingsProvider": null,
+              "contextProviders": [
+                {
+                  "name": "code",
+                  "params": {}
+                }
+              ],
+              "systemPrompt": "{{SystemPrompt}}",
+              "docs": []
+            }
+            """,
+            ["tr"] = """
+            {
+              "name": "agent-context-kit",
+              "version": "0.2.0-alpha.2",
+              "schema": "v1",
+              "models": [],
+              "tabAutocompleteModel": null,
+              "embeddingsProvider": null,
+              "contextProviders": [
+                {
+                  "name": "code",
+                  "params": {}
+                }
+              ],
+              "systemPrompt": "{{SystemPrompt}}",
+              "docs": []
+            }
+            """
+        },
         ["PROJECT_MAP"] = new()
         {
             ["en"] = """

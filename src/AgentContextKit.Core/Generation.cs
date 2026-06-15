@@ -67,7 +67,8 @@ public sealed class AgentInstructionGenerator : IAgentInstructionGenerator
             ["FileList"] = visibleFiles.Count == 0 ? "- No files detected" : string.Join(Environment.NewLine, visibleFiles),
             ["HealthSummary"] = BuildHealthSummary(scanResult),
             ["RiskSummary"] = BuildRiskSummary(scanResult),
-            ["RecommendedChecks"] = BuildRecommendedChecks(scanResult)
+            ["RecommendedChecks"] = BuildRecommendedChecks(scanResult),
+            ["SystemPrompt"] = BuildContinueSystemPrompt(scanResult)
         };
     }
 
@@ -100,6 +101,18 @@ public sealed class AgentInstructionGenerator : IAgentInstructionGenerator
             $"- Medium: {scanResult.Findings.Count(finding => finding.Severity == RiskSeverity.Medium)}",
             $"- Low: {scanResult.Findings.Count(finding => finding.Severity == RiskSeverity.Low)}",
             $"- Info: {scanResult.Findings.Count(finding => finding.Severity == RiskSeverity.Info)}"
+        });
+    }
+
+    private static string BuildContinueSystemPrompt(ScanResult scanResult)
+    {
+        return string.Join(Environment.NewLine, new[]
+        {
+            "You are an offline-first coding assistant. Prefer minimal, tested, secure changes.",
+            $"Repository stacks: {scanResult.Stacks.Count}",
+            $"Risk findings: {scanResult.Findings.Count} (Critical: {scanResult.Findings.Count(f => f.Severity == RiskSeverity.Critical)}, High: {scanResult.Findings.Count(f => f.Severity == RiskSeverity.High)})",
+            "Run ackit scan, ackit doctor, and ackit redact-check before changes.",
+            "Honor AGENTS.md and existing task files first."
         });
     }
 
@@ -144,6 +157,11 @@ public sealed class AgentInstructionGenerator : IAgentInstructionGenerator
             outputs.Add(("CLAUDE.md", "CLAUDE"));
         }
 
+        if (target is AgentTarget.Anthropic or AgentTarget.All)
+        {
+            outputs.Add(("ANTHROPIC.md", "ANTHROPIC"));
+        }
+
         if (target is AgentTarget.Cursor or AgentTarget.All)
         {
             outputs.Add((".cursor/rules/project.mdc", "CURSOR"));
@@ -152,6 +170,11 @@ public sealed class AgentInstructionGenerator : IAgentInstructionGenerator
         if (target is AgentTarget.Copilot or AgentTarget.All)
         {
             outputs.Add((".github/copilot-instructions.md", "COPILOT"));
+        }
+
+        if (target is AgentTarget.Continue or AgentTarget.All)
+        {
+            outputs.Add((".continue/config.json", "CONTINUE"));
         }
 
         if (target == AgentTarget.All)

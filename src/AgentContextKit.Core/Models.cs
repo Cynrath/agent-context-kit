@@ -26,8 +26,10 @@ public enum AgentTarget
 {
     Codex,
     Claude,
+    Anthropic,
     Cursor,
     Copilot,
+    Continue,
     All
 }
 
