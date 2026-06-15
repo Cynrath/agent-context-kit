@@ -44,6 +44,7 @@ public static class Program
                 "doctor" => RunDoctor(repositoryPath, config, language, json, services),
                 "hooks" => RunHooks(args, repositoryPath, language, json, services),
                 "diff" => RunDiff(args, repositoryPath, language, json, services),
+                "trim" => RunTrim(args, repositoryPath, language, json, services),
                 _ => RunUnknown(command, language, services.TextProvider)
             };
         }
@@ -76,6 +77,7 @@ public static class Program
         Console.WriteLine("  ackit doctor [--lang en|tr] [--json]");
         Console.WriteLine("  ackit hooks [--shell pwsh|sh] [--install] [--output <repo-relative-dir>] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]");
+        Console.WriteLine("  ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]");
         Console.WriteLine("  ackit version");
         return ExitSuccess;
     }
@@ -844,6 +846,110 @@ public static class Program
             }
             return ExitError;
         }
+    }
+
+    private static int RunTrim(string[] args, string repositoryPath, LanguageCode language, bool json, Services services)
+    {
+        var input = GetOption(args, "--input");
+        var output = GetOption(args, "--output");
+        var maxCharsStr = GetOption(args, "--max-chars");
+
+        if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(output) || string.IsNullOrWhiteSpace(maxCharsStr))
+        {
+            if (json)
+            {
+                WriteJson(new { schemaVersion = JsonSchemaVersion, command = "trim", exitCode = ExitError, error = "Missing --input, --output, or --max-chars" });
+            }
+            else
+            {
+                Console.Error.WriteLine("ackit trim requires --input, --output, and --max-chars <N>.");
+            }
+            return ExitError;
+        }
+
+        if (!int.TryParse(maxCharsStr, out var maxChars) || maxChars <= 0)
+        {
+            if (json)
+            {
+                WriteJson(new { schemaVersion = JsonSchemaVersion, command = "trim", exitCode = ExitError, error = "Invalid --max-chars" });
+            }
+            else
+            {
+                Console.Error.WriteLine("--max-chars must be a positive integer.");
+            }
+            return ExitError;
+        }
+
+        var inputFull = Path.Combine(repositoryPath, input.Replace('/', Path.DirectorySeparatorChar));
+        var outputFull = Path.Combine(repositoryPath, output.Replace('/', Path.DirectorySeparatorChar));
+        if (string.Equals(Path.GetFullPath(inputFull), Path.GetFullPath(outputFull), StringComparison.OrdinalIgnoreCase))
+        {
+            if (json)
+            {
+                WriteJson(new { schemaVersion = JsonSchemaVersion, command = "trim", exitCode = ExitError, error = "Input and output must differ" });
+            }
+            else
+            {
+                Console.Error.WriteLine("Input and output paths must differ. Refusing to overwrite input.");
+            }
+            return ExitError;
+        }
+
+        try
+        {
+            if (!File.Exists(inputFull))
+            {
+                if (json) WriteJson(new { schemaVersion = JsonSchemaVersion, command = "trim", exitCode = ExitError, error = "Input file not found" });
+                else Console.Error.WriteLine("Input file not found.");
+                return ExitError;
+            }
+            var content = File.ReadAllText(inputFull);
+            var originalChars = content.Length;
+            var trimmed = TrimContent(content, maxChars);
+            Directory.CreateDirectory(Path.GetDirectoryName(outputFull)!);
+            File.WriteAllText(outputFull, trimmed);
+
+            if (json)
+            {
+                WriteJson(new
+                {
+                    schemaVersion = JsonSchemaVersion,
+                    command = "trim",
+                    exitCode = ExitSuccess,
+                    input,
+                    output,
+                    maxChars,
+                    originalChars,
+                    trimmedChars = trimmed.Length
+                });
+            }
+            else
+            {
+                Console.WriteLine($"original: {originalChars}");
+                Console.WriteLine($"trimmed: {trimmed.Length}");
+                Console.WriteLine($"max-chars: {maxChars}");
+            }
+            return ExitSuccess;
+        }
+        catch (Exception ex)
+        {
+            if (json) WriteJson(new { schemaVersion = JsonSchemaVersion, command = "trim", exitCode = ExitError, error = ex.Message });
+            else Console.Error.WriteLine($"ackit trim failed: {ex.Message}");
+            return ExitError;
+        }
+    }
+
+    private static string TrimContent(string content, int maxChars)
+    {
+        if (content.Length <= maxChars) return content;
+        const string header = "# Trimmed by ackit trim";
+        const string note = "\n<!-- trimmed: content exceeded max-chars; body truncated deterministically. -->\n";
+        if (maxChars <= header.Length + note.Length)
+        {
+            return header + note;
+        }
+        var bodyBudget = maxChars - header.Length - note.Length;
+        return header + note + content.Substring(0, bodyBudget);
     }
 
     private static int RunUnknown(string command, LanguageCode language, ITextProvider textProvider)
