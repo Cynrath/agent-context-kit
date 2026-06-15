@@ -223,6 +223,26 @@ public sealed class TextProvider : ITextProvider
         {
             ["en"] = "Suggested action: check repository permissions and run `ackit --help`.",
             ["tr"] = "Önerilen işlem: repository izinlerini kontrol edin ve `ackit --help` çalıştırın."
+        },
+        ["hooksPreview"] = new()
+        {
+            ["en"] = "Preview only. Pass --install to write the following files:",
+            ["tr"] = "Yalnızca önizleme. Aşağıdaki dosyaları yazmak için --install kullanın:"
+        },
+        ["hooksInstalled"] = new()
+        {
+            ["en"] = "Installed",
+            ["tr"] = "Yüklendi"
+        },
+        ["hooksSkipped"] = new()
+        {
+            ["en"] = "Skipped (already exists)",
+            ["tr"] = "Atlandı (zaten var)"
+        },
+        ["hooksNotGitRepo"] = new()
+        {
+            ["en"] = "Not a Git repository. Run from inside a repository or pass --output.",
+            ["tr"] = "Git repository değil. Bir repository içinden çalıştırın veya --output kullanın."
         }
     };
 

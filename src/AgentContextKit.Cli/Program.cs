@@ -42,6 +42,7 @@ public static class Program
                 "task" => RunTask(args, repositoryPath, language, json, services),
                 "redact-check" => RunRedactCheck(args, repositoryPath, config, language, json, services),
                 "doctor" => RunDoctor(repositoryPath, config, language, json, services),
+                "hooks" => RunHooks(args, repositoryPath, language, json, services),
                 _ => RunUnknown(command, language, services.TextProvider)
             };
         }
@@ -72,6 +73,7 @@ public static class Program
         Console.WriteLine("  ackit task \"<title>\" [--lang en|tr] [--json]");
         Console.WriteLine("  ackit redact-check [--profile public-release] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit doctor [--lang en|tr] [--json]");
+        Console.WriteLine("  ackit hooks [--shell pwsh|sh] [--install] [--output <repo-relative-dir>] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit version");
         return ExitSuccess;
     }
@@ -667,6 +669,101 @@ public static class Program
         }
 
         return exitCode;
+    }
+
+    private static int RunHooks(string[] args, string repositoryPath, LanguageCode language, bool json, Services services)
+    {
+        var install = HasFlag(args, "--install");
+        var shell = GetOption(args, "--shell")?.Trim().ToLowerInvariant() ?? "sh";
+        var output = GetOption(args, "--output");
+        var textProvider = services.TextProvider;
+
+        if (shell is not ("pwsh" or "sh"))
+        {
+            Console.Error.WriteLine($"--shell must be pwsh or sh. Got: {shell}");
+            return ExitError;
+        }
+
+        var targets = new List<(string Path, string Content)>();
+        if (shell == "pwsh")
+        {
+            targets.Add(($".git/hooks/pre-commit", "ackit scan --ci\r\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\r\n"));
+            targets.Add(($".git/hooks/pre-push", "ackit scan --ci\r\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\r\n"));
+        }
+        else
+        {
+            targets.Add(($".git/hooks/pre-commit", "#!/usr/bin/env sh\nackit scan --ci || exit $?\n"));
+            targets.Add(($".git/hooks/pre-push", "#!/usr/bin/env sh\nackit scan --ci || exit $?\n"));
+        }
+
+        var isGitRepo = Directory.Exists(Path.Combine(repositoryPath, ".git"));
+        if (!isGitRepo && output is null)
+        {
+            if (json)
+            {
+                WriteJson(new { schemaVersion = JsonSchemaVersion, command = "hooks", exitCode = ExitError, error = textProvider.Get("hooksNotGitRepo", language) });
+            }
+            else
+            {
+                Console.Error.WriteLine(textProvider.Get("hooksNotGitRepo", language));
+            }
+            return ExitError;
+        }
+
+        var baseDir = output is null
+            ? repositoryPath
+            : Path.Combine(repositoryPath, output.Replace('/', Path.DirectorySeparatorChar));
+
+        var items = new List<object>();
+        foreach (var (relPath, content) in targets)
+        {
+            var writePath = output is null ? relPath : relPath.Replace(".git/hooks/", string.Empty, StringComparison.Ordinal);
+            var fullPath = Path.Combine(baseDir, writePath.Replace('/', Path.DirectorySeparatorChar));
+            var exists = File.Exists(fullPath);
+            string status;
+            if (install && !exists)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+                File.WriteAllText(fullPath, content);
+                if (shell == "sh")
+                {
+                    try { File.SetUnixFileMode(fullPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherExecute); } catch { }
+                }
+                status = textProvider.Get("hooksInstalled", language);
+            }
+            else if (exists)
+            {
+                status = textProvider.Get("hooksSkipped", language);
+            }
+            else
+            {
+                status = textProvider.Get("no", language);
+            }
+            items.Add(new { path = writePath, status });
+        }
+
+        if (json)
+        {
+            WriteJson(new { schemaVersion = JsonSchemaVersion, command = "hooks", install, shell, mode = install ? "install" : "preview", exitCode = ExitSuccess, files = items });
+        }
+        else if (!install)
+        {
+            Console.WriteLine(textProvider.Get("hooksPreview", language));
+            foreach (var item in items)
+            {
+                var dyn = (dynamic)item;
+                Console.WriteLine($"  {dyn.path}: {dyn.status}");
+            }
+        }
+        else
+        {
+            foreach (var item in items)
+            {
+                var dyn = (dynamic)item;
+                Console.WriteLine($"  {dyn.path}: {dyn.status}");
+            }
+        }
+        return ExitSuccess;
     }
 
     private static int RunUnknown(string command, LanguageCode language, ITextProvider textProvider)
