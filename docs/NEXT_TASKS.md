@@ -1,17 +1,28 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0106 are closed. PROJECT-CONTROL-0107 now governs docs-first local product continuation, severity guidance polish, config-check examples, baseline diff documentation, SARIF completeness, accessibility polish, redaction hardening, sample gallery expansion, and final validation while the alpha.3 release remains NO-GO.
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0107 are closed. PROJECT-CONTROL-0108 now governs vibe-feature local product continuation, post-0107 audit, Anthropic/Continue generate targets, safe `ackit hooks`, baseline diff, deterministic trim, watch mode, entropy guard, MCP stdio design, and final validation while the alpha.3 release remains NO-GO.
+
+## Active PROJECT-CONTROL-0108
+1. TASK-0168 post-0107 audit and state sync.
+2. TASK-0169 add `generate` targets for Anthropic and Continue.
+3. TASK-0170 safe `ackit hooks` command design and implementation.
+4. TASK-0171 `ackit diff` for baselines.
+5. TASK-0172 `ackit trim` design and minimal safe implementation.
+6. TASK-0173 `ackit watch` design and local implementation plan.
+7. TASK-0174 entropy scanner rule research and guard tests.
+8. TASK-0175 MCP stdio design-only.
+9. TASK-0176 final validation and hosted check sync.
 
 ## Active PROJECT-CONTROL-0107
-1. TASK-0159 post-0158 audit and state sync.
-2. TASK-0160 scanner severity explanation polish.
-3. TASK-0161 config-check actionable diagnostics examples.
-4. TASK-0162 baseline diff documentation and tests.
-5. TASK-0163 SARIF rule metadata completeness.
-6. TASK-0164 report and WebUI accessibility and offline UX polish.
-7. TASK-0165 prompt pack and context export redaction hardening.
-8. TASK-0166 sample gallery coverage expansion.
-9. TASK-0167 final validation and hosted check sync.
+1. TASK-0159 post-0158 audit and state sync - completed.
+2. TASK-0160 scanner severity explanation polish - completed.
+3. TASK-0161 config-check actionable diagnostics examples - completed.
+4. TASK-0162 baseline diff documentation and tests - completed.
+5. TASK-0163 SARIF rule metadata completeness - completed.
+6. TASK-0164 report and WebUI accessibility and offline UX polish - completed.
+7. TASK-0165 prompt pack and context export redaction hardening - completed.
+8. TASK-0166 sample gallery coverage expansion - completed.
+9. TASK-0167 final validation and hosted check sync - completed; 257/257 tests green.
 
 ## Active PROJECT-CONTROL-0106
 1. TASK-0140 repo rules commit and push policy sync - completed.
@@ -116,7 +127,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- PROJECT-CONTROL-0107 continues independent local product, code-quality, test, documentation, and security work. It must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
+- PROJECT-CONTROL-0108 continues independent local product, code-quality, test, documentation, and security work. It must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
 
 ## Execution Rule
-Continue TASK-0159 through TASK-0167 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
+Continue TASK-0168 through TASK-0176 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

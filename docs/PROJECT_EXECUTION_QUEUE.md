@@ -1,9 +1,14 @@
 # Project Execution Queue
 
+## Active PROJECT-CONTROL-0108 Track
+| Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 83 | In progress | PROJECT-CONTROL-0108 vibe-feature local product continuation | Low | None | `docs/tasks/PROJECT-CONTROL-0108-...md` plus TASK-0168 through TASK-0176 task files; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Post-0107 audit, Anthropic/Continue generate targets, safe `ackit hooks`, baseline diff, deterministic trim, watch mode, entropy guard, MCP stdio design, and final validation all complete |
+
 ## Active PROJECT-CONTROL-0107 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 82 | In progress | PROJECT-CONTROL-0107 docs-first local product continuation | Low | None | `docs/tasks/PROJECT-CONTROL-0107-...md` plus TASK-0159 through TASK-0167 task files; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Audit, severity guidance, config-check examples, baseline diff, SARIF completeness, accessibility polish, redaction hardening, sample gallery expansion, and final validation all complete |
+| 82 | Completed | PROJECT-CONTROL-0107 docs-first local product continuation | Low | None | `docs/tasks/PROJECT-CONTROL-0107-...md` plus TASK-0159 through TASK-0167 task files; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Audit, severity guidance, config-check examples, baseline diff, SARIF completeness, accessibility polish, redaction hardening, sample gallery expansion, and final validation all complete |
 
 ## Active PROJECT-CONTROL-0106 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
