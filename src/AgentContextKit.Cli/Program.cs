@@ -43,6 +43,7 @@ public static class Program
                 "redact-check" => RunRedactCheck(args, repositoryPath, config, language, json, services),
                 "doctor" => RunDoctor(repositoryPath, config, language, json, services),
                 "hooks" => RunHooks(args, repositoryPath, language, json, services),
+                "diff" => RunDiff(args, repositoryPath, language, json, services),
                 _ => RunUnknown(command, language, services.TextProvider)
             };
         }
@@ -74,6 +75,7 @@ public static class Program
         Console.WriteLine("  ackit redact-check [--profile public-release] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit doctor [--lang en|tr] [--json]");
         Console.WriteLine("  ackit hooks [--shell pwsh|sh] [--install] [--output <repo-relative-dir>] [--lang en|tr] [--json]");
+        Console.WriteLine("  ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]");
         Console.WriteLine("  ackit version");
         return ExitSuccess;
     }
@@ -764,6 +766,84 @@ public static class Program
             }
         }
         return ExitSuccess;
+    }
+
+    private static int RunDiff(string[] args, string repositoryPath, LanguageCode language, bool json, Services services)
+    {
+        var from = GetOption(args, "--from");
+        var to = GetOption(args, "--to");
+        if (string.IsNullOrWhiteSpace(from) || string.IsNullOrWhiteSpace(to))
+        {
+            if (json)
+            {
+                WriteJson(new { schemaVersion = JsonSchemaVersion, command = "diff", exitCode = ExitError, error = "Missing --from or --to" });
+            }
+            else
+            {
+                Console.Error.WriteLine("ackit diff requires --from and --to <repo-relative.json>.");
+            }
+            return ExitError;
+        }
+
+        try
+        {
+            var fromPath = Path.Combine(repositoryPath, from.Replace('/', Path.DirectorySeparatorChar));
+            var toPath = Path.Combine(repositoryPath, to.Replace('/', Path.DirectorySeparatorChar));
+            if (!File.Exists(fromPath) || !File.Exists(toPath))
+            {
+                if (json)
+                {
+                    WriteJson(new { schemaVersion = JsonSchemaVersion, command = "diff", exitCode = ExitError, error = "Baseline file not found" });
+                }
+                else
+                {
+                    Console.Error.WriteLine("Baseline file not found.");
+                }
+                return ExitError;
+            }
+
+            var fromJson = File.ReadAllText(fromPath);
+            var toJson = File.ReadAllText(toPath);
+            var fromManifest = BaselineSerializer.Deserialize(fromJson);
+            var toManifest = BaselineSerializer.Deserialize(toJson);
+            var diff = BaselineDiffCalculator.Compare(fromManifest, toManifest);
+
+            if (json)
+            {
+                WriteJson(new
+                {
+                    schemaVersion = JsonSchemaVersion,
+                    command = "diff",
+                    exitCode = ExitSuccess,
+                    fromBaseline = from,
+                    toBaseline = to,
+                    addedCount = diff.Added.Count,
+                    removedCount = diff.Removed.Count,
+                    unchangedCount = diff.Unchanged.Count,
+                    severityChangedCount = diff.SeverityChanged.Count
+                });
+            }
+            else
+            {
+                Console.WriteLine($"added: {diff.Added.Count}");
+                Console.WriteLine($"removed: {diff.Removed.Count}");
+                Console.WriteLine($"unchanged: {diff.Unchanged.Count}");
+                Console.WriteLine($"severityChanged: {diff.SeverityChanged.Count}");
+            }
+            return ExitSuccess;
+        }
+        catch (Exception ex)
+        {
+            if (json)
+            {
+                WriteJson(new { schemaVersion = JsonSchemaVersion, command = "diff", exitCode = ExitError, error = ex.Message });
+            }
+            else
+            {
+                Console.Error.WriteLine($"ackit diff failed: {ex.Message}");
+            }
+            return ExitError;
+        }
     }
 
     private static int RunUnknown(string command, LanguageCode language, ITextProvider textProvider)

@@ -115,6 +115,94 @@ public sealed record BaselineManifest
     public IReadOnlyList<BaselineEntry> Entries { get; }
 }
 
+public sealed record BaselineDiff
+{
+    public BaselineDiff(
+        IReadOnlyList<BaselineEntry> added,
+        IReadOnlyList<BaselineEntry> removed,
+        IReadOnlyList<BaselineEntry> unchanged,
+        IReadOnlyList<BaselineDiffChange> severityChanged)
+    {
+        Added = added;
+        Removed = removed;
+        Unchanged = unchanged;
+        SeverityChanged = severityChanged;
+    }
+
+    public IReadOnlyList<BaselineEntry> Added { get; }
+    public IReadOnlyList<BaselineEntry> Removed { get; }
+    public IReadOnlyList<BaselineEntry> Unchanged { get; }
+    public IReadOnlyList<BaselineDiffChange> SeverityChanged { get; }
+}
+
+public sealed record BaselineDiffChange(BaselineEntry From, BaselineEntry To);
+
+public static class BaselineDiffCalculator
+{
+    public static BaselineDiff Compare(BaselineManifest from, BaselineManifest to)
+    {
+        ArgumentNullException.ThrowIfNull(from);
+        ArgumentNullException.ThrowIfNull(to);
+
+        var fromByFp = from.Entries.ToDictionary(e => e.Fingerprint, StringComparer.Ordinal);
+        var toByFp = to.Entries.ToDictionary(e => e.Fingerprint, StringComparer.Ordinal);
+
+        var added = to.Entries.Where(e => !fromByFp.ContainsKey(e.Fingerprint)).ToArray();
+        var removed = from.Entries.Where(e => !toByFp.ContainsKey(e.Fingerprint)).ToArray();
+        var unchanged = new List<BaselineEntry>();
+        var severityChanged = new List<BaselineDiffChange>();
+        foreach (var e in to.Entries)
+        {
+            if (!fromByFp.TryGetValue(e.Fingerprint, out var f)) continue;
+            if (f.Severity == e.Severity) unchanged.Add(e);
+            else severityChanged.Add(new BaselineDiffChange(f, e));
+        }
+
+        return new BaselineDiff(added, removed, unchanged, severityChanged);
+    }
+}
+
+public static class BaselineSerializer
+{
+    public static BaselineManifest Deserialize(string json)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(json);
+        using var document = System.Text.Json.JsonDocument.Parse(json);
+        var root = document.RootElement;
+        var schema = root.TryGetProperty("schemaVersion", out var sv) ? sv.GetInt32() : 0;
+        if (schema != BaselineSchema.CurrentVersion)
+        {
+            throw new InvalidOperationException($"Unsupported baseline schema version: {schema}");
+        }
+        if (!root.TryGetProperty("entries", out var entries) || entries.ValueKind != System.Text.Json.JsonValueKind.Array)
+        {
+            return new BaselineManifest(Array.Empty<BaselineEntry>());
+        }
+        var list = new List<BaselineEntry>();
+        foreach (var el in entries.EnumerateArray())
+        {
+            var ruleId = el.TryGetProperty("ruleId", out var rid) ? rid.GetString() ?? "" : "";
+            var path = el.TryGetProperty("path", out var pp) ? pp.GetString() ?? "" : "";
+            var severity = el.TryGetProperty("severity", out var sevEl) ? ParseSeverity(sevEl.GetString()) : RiskSeverity.Info;
+            int? sl = el.TryGetProperty("startLine", out var sLine) && sLine.ValueKind == System.Text.Json.JsonValueKind.Number ? sLine.GetInt32() : null;
+            int? sc = el.TryGetProperty("startColumn", out var sCol) && sCol.ValueKind == System.Text.Json.JsonValueKind.Number ? sCol.GetInt32() : null;
+            int? occ = el.TryGetProperty("occurrence", out var occEl) && occEl.ValueKind == System.Text.Json.JsonValueKind.Number ? occEl.GetInt32() : null;
+            var loc = (sl.HasValue || sc.HasValue || occ.HasValue) ? new BaselineLocation(sl, sc, occ) : null;
+            list.Add(new BaselineEntry(ruleId, path, severity, loc));
+        }
+        return new BaselineManifest(list);
+    }
+
+    private static RiskSeverity ParseSeverity(string? value) => value?.Trim().ToLowerInvariant() switch
+    {
+        "critical" => RiskSeverity.Critical,
+        "high" => RiskSeverity.High,
+        "medium" => RiskSeverity.Medium,
+        "low" => RiskSeverity.Low,
+        _ => RiskSeverity.Info
+    };
+}
+
 public static partial class BaselineFingerprint
 {
     public static string Create(string ruleId, string relativePath, BaselineLocation? location = null)
