@@ -74,6 +74,7 @@ For example, if a secret-like value is detected, SARIF records the rule, severit
 | `ACKIT005` | `RepositoryHygiene` | Repository hygiene, configuration, and release readiness findings. |
 | `ACKIT006` | `ProductionConfigLike` | Production configuration, environment-specific appsettings, and live-service connection strings. |
 | `ACKIT007` | `DocumentationGap` | Documentation gaps, stale guidance, and missing or unclear public documents. |
+| `ACKIT008` | `HighEntropyString` | Long high-entropy strings that may indicate an embedded secret, signing key, or signing token. |
 | `ACKIT999` | `GeneralFinding` | General fallback finding. |
 
 The SARIF rule IDs above are derived from the Core `RiskRuleCatalog`; the catalog is the single source of truth.

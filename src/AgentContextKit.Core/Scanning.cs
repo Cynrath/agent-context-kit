@@ -452,12 +452,14 @@ public sealed class RiskScanner : IRiskScanner
     private readonly IFileSystem _fileSystem;
     private readonly ISecretScanner _secretScanner;
     private readonly IBrandPiiScanner _brandPiiScanner;
+    private readonly IHighEntropyScanner _highEntropyScanner;
 
-    public RiskScanner(IFileSystem fileSystem, ISecretScanner secretScanner, IBrandPiiScanner brandPiiScanner)
+    public RiskScanner(IFileSystem fileSystem, ISecretScanner secretScanner, IBrandPiiScanner brandPiiScanner, IHighEntropyScanner? highEntropyScanner = null)
     {
         _fileSystem = fileSystem;
         _secretScanner = secretScanner;
         _brandPiiScanner = brandPiiScanner;
+        _highEntropyScanner = highEntropyScanner ?? new HighEntropyScanner();
     }
 
     public IReadOnlyList<RiskFinding> Scan(string repositoryPath, IReadOnlyList<string> relativeFiles, AckitConfig config)
@@ -498,6 +500,7 @@ public sealed class RiskScanner : IRiskScanner
             var brandPiiScan = _brandPiiScanner.ScanTextWithAudit(relativeFile, content, config);
             findings.AddRange(brandPiiScan.Findings);
             suppressions.AddRange(brandPiiScan.Suppressions);
+            findings.AddRange(_highEntropyScanner.ScanText(relativeFile, content));
         }
 
         var visibleFindings = new List<RiskFinding>();
@@ -1118,5 +1121,123 @@ public sealed class RiskReporter : IRiskReporter
         }
 
         return string.Join(Environment.NewLine, lines);
+    }
+}
+
+public sealed class HighEntropyScanner : IHighEntropyScanner
+{
+    private const int MinTokenLength = 40;
+    private const double MinShannonEntropy = 4.5;
+    private static readonly Regex TokenRegex = new(@"[A-Za-z0-9+/=_\-]{40}", RegexOptions.Compiled);
+
+    public IReadOnlyList<RiskFinding> ScanText(string relativePath, string content)
+    {
+        if (string.IsNullOrEmpty(content))
+        {
+            return Array.Empty<RiskFinding>();
+        }
+
+        var findings = new List<RiskFinding>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (Match match in TokenRegex.Matches(content))
+        {
+            var token = match.Value;
+            if (token.Length < MinTokenLength)
+            {
+                continue;
+            }
+
+            if (!LooksLikeRandomToken(token))
+            {
+                continue;
+            }
+
+            if (ShannonEntropy(token) < MinShannonEntropy)
+            {
+                continue;
+            }
+
+            // Suppress UUIDs and SHA-1/256-like hex digests: those are typically content hashes,
+            // not credentials. The fingerprint that matters is the high-entropy base64/secret shape.
+            if (IsLikelyHexDigest(token))
+            {
+                continue;
+            }
+
+            var truncated = token.Length <= 48 ? token : token[..24] + "..." + token[^8..];
+            var key = $"{relativePath}|{truncated}";
+            if (!seen.Add(key))
+            {
+                continue;
+            }
+
+            findings.Add(new RiskFinding(
+                RiskSeverity.High,
+                RiskCategory.RepositoryHygiene,
+                relativePath,
+                "High-entropy string detected; review for embedded secret or signing key.",
+                truncated));
+        }
+
+        return findings;
+    }
+
+    private static bool LooksLikeRandomToken(string token)
+    {
+        var letterCount = 0;
+        var digitCount = 0;
+        var symbolCount = 0;
+        foreach (var ch in token)
+        {
+            if (char.IsLetter(ch)) letterCount++;
+            else if (char.IsDigit(ch)) digitCount++;
+            else symbolCount++;
+        }
+
+        // Reject pure-digits (timestamps), and tokens dominated by one character class.
+        if (letterCount == 0 || digitCount == 0)
+        {
+            return false;
+        }
+
+        var total = letterCount + digitCount + symbolCount;
+        return letterCount >= total / 4 && digitCount >= total / 6;
+    }
+
+    private static bool IsLikelyHexDigest(string token)
+    {
+        foreach (var ch in token)
+        {
+            if (!(char.IsDigit(ch) || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F')))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static double ShannonEntropy(string value)
+    {
+        Span<int> counts = stackalloc int[256];
+        foreach (var ch in value)
+        {
+            counts[(byte)ch]++;
+        }
+
+        var total = value.Length;
+        var entropy = 0.0;
+        for (var i = 0; i < counts.Length; i++)
+        {
+            if (counts[i] == 0)
+            {
+                continue;
+            }
+
+            var p = (double)counts[i] / total;
+            entropy -= p * Math.Log2(p);
+        }
+
+        return entropy;
     }
 }

@@ -40,6 +40,11 @@ public interface IBrandPiiScanner
     }
 }
 
+public interface IHighEntropyScanner
+{
+    IReadOnlyList<RiskFinding> ScanText(string relativePath, string content);
+}
+
 public interface IRiskReporter
 {
     string Render(IReadOnlyList<RiskFinding> findings);

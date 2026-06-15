@@ -170,6 +170,14 @@ public static class RiskRuleCatalog
         "General AgentContextKit scanner finding.",
         "Review the finding and decide whether it should remain in the repository.");
 
+    public static readonly RiskRule HighEntropyString = new(
+        "ACKIT008",
+        "HighEntropyString",
+        RiskCategory.RepositoryHygiene,
+        RiskSeverity.High,
+        "Long high-entropy string detected that may indicate an embedded secret, signing key, or signing token.",
+        "Confirm the value is intentionally public; if it is a credential, remove it from source, rotate it, and move it to a safe local secret store.");
+
     public static IReadOnlyList<RiskRule> All { get; } =
     [
         SecretLike,
@@ -179,6 +187,7 @@ public static class RiskRuleCatalog
         RepositoryHygiene,
         ProductionConfigLike,
         DocumentationGap,
+        HighEntropyString,
         GeneralFinding
     ];
 
@@ -190,6 +199,14 @@ public static class RiskRuleCatalog
 
     public static string GetRuleId(RiskFinding finding)
     {
+        // HighEntropyString findings are emitted with the message "High-entropy string detected";
+        // route them to ACKIT008 instead of the default RepositoryHygiene rule.
+        if (finding.Category == RiskCategory.RepositoryHygiene &&
+            finding.Message.StartsWith("High-entropy", StringComparison.Ordinal))
+        {
+            return HighEntropyString.Id;
+        }
+
         return finding.Category switch
         {
             RiskCategory.Secret => SecretLike.Id,
