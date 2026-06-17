@@ -1,9 +1,14 @@
 # Project Execution Queue
 
+## Active PROJECT-CONTROL-0109 Track
+| Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 84 | In progress | PROJECT-CONTROL-0109 scan/export/hooks hardening + MCP prototype step 1 | Low | None | `docs/tasks/PROJECT-CONTROL-0109-...md` plus TASK-0177 through TASK-0186 task files; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Hook expansion, MCP transport prototype step 1, WebUI no-build polish, hosted check status reporter, SARIF roundtrip regression, prompt pack edge cases, catalog rule id stability, scan include/exclude glob filters, nightly local check workflow, and final validation all complete |
+
 ## Active PROJECT-CONTROL-0108 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 83 | In progress | PROJECT-CONTROL-0108 vibe-feature local product continuation | Low | None | `docs/tasks/PROJECT-CONTROL-0108-...md` plus TASK-0168 through TASK-0176 task files; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Post-0107 audit, Anthropic/Continue generate targets, safe `ackit hooks`, baseline diff, deterministic trim, watch mode, entropy guard, MCP stdio design, and final validation all complete |
+| 83 | Completed | PROJECT-CONTROL-0108 vibe-feature local product continuation | Low | None | `docs/tasks/PROJECT-CONTROL-0108-...md` plus TASK-0168 through TASK-0176 task files; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Post-0107 audit, Anthropic/Continue generate targets, safe `ackit hooks`, baseline diff, deterministic trim, watch mode, entropy guard, MCP stdio design, and final validation all complete |
 
 ## Active PROJECT-CONTROL-0107 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |

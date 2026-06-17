@@ -109,10 +109,20 @@ New user-facing CLI strings must be localized in English and Turkish via the exi
 - Revert ordinary commits; never rewrite published packages or move existing tags.
 
 ## Completion Evidence
-Pending. Will be filled after the audit, validation, and any audit-driven fixes.
+- Post-0107 state sync: docs/CHANGELOG.md, docs/NEXT_TASKS.md, docs/PROJECT_EXECUTION_QUEUE.md, .codex/{NEXT_STEPS,SESSION_HANDOFF,CONTEXT_PACK}.md updated at commit `a18eb3a`.
+- Generate targets `Anthropic` and `continue` added with skip-existing semantics, offline-only, JSON schema 2 preserved, EN/TR strings present (commit `7437896`).
+- `ackit hooks` command with dry-run default, explicit `--install`, existing-hook skip, JSON output schema 2, EN/TR strings (commit `fb89143`).
+- `ackit diff` for two baselines, deterministic classification, JSON additive (commit `41ee9bf`).
+- `ackit trim` deterministic char-budget trim, JSON size reports, no tokenizer dependency (commit `a9c49ad`).
+- `ackit watch` design-only: docs/WATCH_MODE.md, no implementation (commit `0390694`).
+- ACKIT008 HighEntropyString rule added with conservative thresholds, synthetic fixtures, path-based self-scan guard (commit `6a1d8b5`).
+- MCP stdio design-only: docs/MCP_STDIO_DESIGN.md, no dependency, no implementation, no network (commit `bdae7ad`).
+- Local final validation at `b224c20`: 270/270 tests green after CA1416 + fixture-path filter fix; `ackit scan --ci` exit 0; `ackit doctor` 13/13 PASS; tracked-vs-untracked clean; local Markdown links clean; CLI contract gate green after Anthropic/Continue/hooks/diff/trim additions.
+- 0.2.0-alpha.3 remains NO-GO; RB-003 and RB-008 remain unresolved.
+- Project control moves to PROJECT-CONTROL-0109 for hardening + MCP prototype step 1 (commit `b224c20`).
 
 ## Commit
-- Logical, narrow commits per task; no generated `.ackit/` or `bin/`/`obj/` artifacts.
+- Logical, narrow commits per task; no generated `.ackit/` or `bin/`/`obj/` artifacts. Each implementation task (TASK-0169 through TASK-0174) landed in a single commit per feature; the post-0108 CI gate fix landed separately as a focused fix.
 
 ## Push
 - Normal `master` pushes after validation.

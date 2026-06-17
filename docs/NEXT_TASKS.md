@@ -1,17 +1,29 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0107 are closed. PROJECT-CONTROL-0108 now governs vibe-feature local product continuation, post-0107 audit, Anthropic/Continue generate targets, safe `ackit hooks`, baseline diff, deterministic trim, watch mode, entropy guard, MCP stdio design, and final validation while the alpha.3 release remains NO-GO.
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0108 are closed. PROJECT-CONTROL-0109 now governs scan/export/hooks hardening plus MCP transport prototype step 1 while the alpha.3 release remains NO-GO.
+
+## Active PROJECT-CONTROL-0109
+1. TASK-0177 hook expansion (Anthropic + Continue targets, dry-run preview).
+2. TASK-0178 MCP transport prototype step 1 (Core interface + JSON-RPC plumbing, no process spawn).
+3. TASK-0179 webui no-build static polish.
+4. TASK-0180 hosted check status reporter script.
+5. TASK-0181 SARIF roundtrip regression test.
+6. TASK-0182 prompt pack edge cases (empty repo, single-file repo, docs-only repo, secret-bearing fixture).
+7. TASK-0183 catalog rule id and severity stability test.
+8. TASK-0184 scan `--include` / `--exclude` glob filters.
+9. TASK-0185 nightly local check workflow (`.github/workflows`).
+10. TASK-0186 final validation and hosted check sync.
 
 ## Active PROJECT-CONTROL-0108
-1. TASK-0168 post-0107 audit and state sync.
-2. TASK-0169 add `generate` targets for Anthropic and Continue.
-3. TASK-0170 safe `ackit hooks` command design and implementation.
-4. TASK-0171 `ackit diff` for baselines.
-5. TASK-0172 `ackit trim` design and minimal safe implementation.
-6. TASK-0173 `ackit watch` design and local implementation plan.
-7. TASK-0174 entropy scanner rule research and guard tests.
-8. TASK-0175 MCP stdio design-only.
-9. TASK-0176 final validation and hosted check sync.
+1. TASK-0168 post-0107 audit and state sync - completed.
+2. TASK-0169 add `generate` targets for Anthropic and Continue - completed.
+3. TASK-0170 safe `ackit hooks` command design and implementation - completed.
+4. TASK-0171 `ackit diff` for baselines - completed.
+5. TASK-0172 `ackit trim` design and minimal safe implementation - completed.
+6. TASK-0173 `ackit watch` design and local implementation plan - completed (design-only).
+7. TASK-0174 entropy scanner rule research and guard tests - completed.
+8. TASK-0175 MCP stdio design-only - completed.
+9. TASK-0176 final validation and hosted check sync - completed; 270/270 tests green.
 
 ## Active PROJECT-CONTROL-0107
 1. TASK-0159 post-0158 audit and state sync - completed.
