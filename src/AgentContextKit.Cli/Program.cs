@@ -729,7 +729,7 @@ public static class Program
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
                 File.WriteAllText(fullPath, content);
-                if (shell == "sh")
+                if (shell == "sh" && (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
                 {
                     try { File.SetUnixFileMode(fullPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherExecute); } catch { }
                 }

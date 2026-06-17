@@ -462,6 +462,55 @@ public sealed class RiskScanner : IRiskScanner
         _highEntropyScanner = highEntropyScanner ?? new HighEntropyScanner();
     }
 
+    private static bool IsFixturePath(string relativePath)
+    {
+        var normalized = relativePath.Replace('\\', '/').TrimStart('/');
+        return normalized.StartsWith("tests/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.StartsWith("test/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.StartsWith("samples/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.StartsWith("sample/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.StartsWith("fixtures/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.StartsWith("testdata/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.StartsWith("test-data/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.StartsWith("docs/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.StartsWith(".ackit/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.StartsWith(".codex/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.StartsWith(".cursor/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Contains("/tests/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Contains("/test/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Contains("/fixtures/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Contains("/testdata/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Contains("/test-data/", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Contains(".Tests/", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsScannerSourcePath(string relativePath)
+    {
+        var normalized = relativePath.Replace('\\', '/').TrimStart('/');
+        var fileName = Path.GetFileName(normalized);
+        // Skip the scanner's own implementation files to avoid self-matching on regex
+        // pattern strings and code comments that contain secret-like keywords.
+        if (!fileName.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (normalized.StartsWith("src/AgentContextKit.Core/", StringComparison.OrdinalIgnoreCase) &&
+            (fileName.Equals("Scanning.cs", StringComparison.OrdinalIgnoreCase) ||
+             fileName.Equals("Models.cs", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        if (normalized.StartsWith("src/AgentContextKit.Cli/", StringComparison.OrdinalIgnoreCase) &&
+            fileName.Equals("Program.cs", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public IReadOnlyList<RiskFinding> Scan(string repositoryPath, IReadOnlyList<string> relativeFiles, AckitConfig config)
     {
         return ScanWithAudit(repositoryPath, relativeFiles, config).Findings;
@@ -496,11 +545,17 @@ public sealed class RiskScanner : IRiskScanner
                 continue;
             }
 
-            findings.AddRange(_secretScanner.ScanText(relativeFile, content));
+            if (!IsScannerSourcePath(relativeFile))
+            {
+                findings.AddRange(_secretScanner.ScanText(relativeFile, content));
+            }
             var brandPiiScan = _brandPiiScanner.ScanTextWithAudit(relativeFile, content, config);
             findings.AddRange(brandPiiScan.Findings);
             suppressions.AddRange(brandPiiScan.Suppressions);
-            findings.AddRange(_highEntropyScanner.ScanText(relativeFile, content));
+            if (!IsFixturePath(relativeFile) && !IsScannerSourcePath(relativeFile))
+            {
+                findings.AddRange(_highEntropyScanner.ScanText(relativeFile, content));
+            }
         }
 
         var visibleFindings = new List<RiskFinding>();

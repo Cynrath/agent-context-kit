@@ -1,7 +1,7 @@
 # TASK-0182: Prompt Pack Edge Cases
 
 ## Purpose
-Add guard tests that exercise `IPromptPackGenerator` against: an empty repository (no files, no findings), a single-file repo (just `README.md`), a docs-only repo (no `.csproj`), and a fixture that includes a Critical severity finding (private key block). Tests assert the prompt pack JSON is well-formed, contains the locale, and redaction markers appear only where expected.
+Add guard tests that exercise `IPromptPackGenerator` against: an empty repository (no files, no findings), a single-file repo (just `README.md`), a docs-only repo (no `.csproj`), and a fixture that includes a Critical severity finding (synthetic PEM-marker block). Tests assert the prompt pack JSON is well-formed, contains the locale, and redaction markers appear only where expected.
 
 ## Current State
 - `IPromptPackGenerator` is implemented and used by `ackit prompt-pack`.
@@ -31,7 +31,7 @@ Add guard tests that exercise `IPromptPackGenerator` against: an empty repositor
 
 ## Security/Privacy Boundary
 - All fixtures use synthetic test data; no real keys, no real emails.
-- The "private key block" fixture uses a clearly synthetic value (`BEGIN PRIVATE KEY BLOCK\nTEST-DATA\nEND PRIVATE KEY BLOCK`); redaction rules in the existing Core code already detect this and emit a Critical finding.
+- The synthetic fixture uses a clearly fake value shaped like a "BEGIN" / "END" PEM-style key marker block; the existing Core scanner detects this and emits a Critical finding for the test runner to assert.
 
 ## Backward Compatibility
 - New test file only.

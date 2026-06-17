@@ -135,10 +135,13 @@ $helpLines = @(
     "ackit webui [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]",
     "ackit prompt-pack [--output <repo-relative.md>] [--lang en|tr] [--json]",
     "ackit context-export --prompt-pack <repo-relative.md> --approve [--output <repo-relative.json>] [--lang en|tr] [--json]",
-    "ackit generate [--target codex|claude|cursor|copilot|all] [--lang en|tr] [--json]",
+    "ackit generate [--target codex|claude|Anthropic|cursor|copilot|continue|all] [--lang en|tr] [--json]",
     'ackit task "<title>" [--lang en|tr] [--json]',
     "ackit redact-check [--profile public-release] [--lang en|tr] [--json]",
     "ackit doctor [--lang en|tr] [--json]",
+    "ackit hooks [--shell pwsh|sh] [--install] [--output <repo-relative-dir>] [--lang en|tr] [--json]",
+    "ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]",
+    "ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]",
     "ackit version"
 )
 

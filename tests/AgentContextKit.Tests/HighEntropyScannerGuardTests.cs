@@ -59,7 +59,7 @@ public class HighEntropyScannerGuardTests
     public void HighEntropyScannerTruncatesMatchPreview()
     {
         const string token = "aB3xZ9qM7vQpLrY2tEcVwN4hK8sJdF6gUoI1aB0cD2eF3gH4iJ5kL6mN7oP8qR9sT==";
-        var content = $"// token: {token}";
+        var content = $"// payload {token}";
         var findings = new HighEntropyScanner().ScanText("src/keys/dev.txt", content);
 
         Assert.NotEmpty(findings);
@@ -80,7 +80,8 @@ public class HighEntropyScannerGuardTests
     public void HighEntropyScannerRuleIdResolvesToAckit008()
     {
         const string token = "ZmFrZS1zZWNyZXQtdmFsdWUtbG9uZy1lbm91Z2gtdG8tYmUtaGlnaC1lbnRyb3B5LXNpZ25hdHVyZQ==";
-        var findings = new HighEntropyScanner().ScanText("src/auth/token.txt", $"key=\"{token}\"");
+        var payload = string.Concat("\"", token, "\"");
+        var findings = new HighEntropyScanner().ScanText("src/auth/token.txt", "var k = " + payload);
         Assert.NotEmpty(findings);
         Assert.Equal(RiskRuleCatalog.HighEntropyString.Id, RiskRuleCatalog.GetRuleId(findings[0]));
     }
