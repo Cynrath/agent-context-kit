@@ -190,6 +190,62 @@ public sealed class AgentInstructionGenerator : IAgentInstructionGenerator
     }
 }
 
+public static class HookFileBuilder
+{
+    public static IReadOnlyList<HookFileSpec> Build(AgentTarget target, string shell)
+    {
+        return target switch
+        {
+            AgentTarget.Anthropic => BuildAnthropicHooks(shell),
+            AgentTarget.Continue => BuildContinueHooks(),
+            AgentTarget.All => BuildAllHooks(shell),
+            _ => BuildGitHooks(shell)
+        };
+    }
+
+    public static IReadOnlyList<HookFileSpec> BuildAnthropicHooks(string shell)
+    {
+        return
+        [
+            new(".anthropic/hooks/installed.txt", RenderHookTemplate("HOOK_ANTHROPIC_MARKER")),
+            new(shell == "pwsh" ? ".anthropic/hooks/pre-commit-reminder.ps1" : ".anthropic/hooks/pre-commit-reminder.sh",
+                RenderHookTemplate(shell == "pwsh" ? "HOOK_ANTHROPIC_PWSH" : "HOOK_ANTHROPIC_SH"))
+        ];
+    }
+
+    public static IReadOnlyList<HookFileSpec> BuildContinueHooks()
+    {
+        return
+        [
+            new(".continue/hooks/installed.txt", RenderHookTemplate("HOOK_CONTINUE_MARKER")),
+            new(".continue/hooks/hooks.json", RenderHookTemplate("HOOK_CONTINUE_JSON"))
+        ];
+    }
+
+    private static IReadOnlyList<HookFileSpec> BuildAllHooks(string shell)
+    {
+        return BuildGitHooks(shell)
+            .Concat(BuildAnthropicHooks(shell))
+            .Concat(BuildContinueHooks())
+            .ToArray();
+    }
+
+    private static IReadOnlyList<HookFileSpec> BuildGitHooks(string shell)
+    {
+        var content = RenderHookTemplate(shell == "pwsh" ? "HOOK_GIT_PWSH" : "HOOK_GIT_SH");
+        return
+        [
+            new(".git/hooks/pre-commit", content),
+            new(".git/hooks/pre-push", content)
+        ];
+    }
+
+    private static string RenderHookTemplate(string templateId)
+    {
+        return TemplateCatalog.Get(templateId, LanguageCode.English).TrimEnd() + "\n";
+    }
+}
+
 public sealed class HtmlReportGenerator : IHtmlReportGenerator
 {
     private const string DefaultOutputPath = ".ackit/reports/scan-report.html";

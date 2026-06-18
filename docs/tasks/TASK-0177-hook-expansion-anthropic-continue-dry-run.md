@@ -82,9 +82,12 @@ Extend `ackit hooks` to support Anthropic and Continue targets, and add a dry-ru
 Single `git revert <sha>` removes all TASK-0177 changes; no other task depends on it.
 
 ## Completion Evidence
-- File list: above.
-- Commit hash(es): planning + implementation.
-- Test count: 276+.
+- Implemented hook target expansion for `codex`, `claude`, `anthropic`, and `continue`.
+- Added dry-run precedence over `--install`; dry-run reports planned paths and content lengths without writing files.
+- Added six focused `HookExpansionTests`; focused run passed 6/6 and full test suite passed 276/276.
+- Validation on 2026-06-18: Release build 0 warnings/0 errors; source `scan --ci` exit 0 with existing Medium `.remember` log findings only; `doctor` 13/13 PASS; `scripts/verify-release.ps1` passed; CLI contract and localization parity gates passed.
+- Commit hash(es): planning `b224c20`; state-sync `d9b9a5d`; implementation is recorded in this commit and the final hash is reported by `git`.
+- Test count: 276.
 
 ## Push
 - `git push origin master` only.

@@ -239,6 +239,16 @@ public sealed class TextProvider : ITextProvider
             ["en"] = "Skipped (already exists)",
             ["tr"] = "Atlandı (zaten var)"
         },
+        ["hooksDryRun"] = new()
+        {
+            ["en"] = "Dry run",
+            ["tr"] = "Dry-run"
+        },
+        ["hooksWouldWrite"] = new()
+        {
+            ["en"] = "Would write",
+            ["tr"] = "Yazılacak"
+        },
         ["hooksNotGitRepo"] = new()
         {
             ["en"] = "Not a Git repository. Run from inside a repository or pass --output.",
@@ -492,6 +502,97 @@ public static class TemplateCatalog
               ],
               "systemPrompt": "{{SystemPrompt}}",
               "docs": []
+            }
+            """
+        },
+        ["HOOK_GIT_PWSH"] = new()
+        {
+            ["en"] = """
+            ackit scan --ci
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            """,
+            ["tr"] = """
+            ackit scan --ci
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            """
+        },
+        ["HOOK_GIT_SH"] = new()
+        {
+            ["en"] = """
+            #!/usr/bin/env sh
+            ackit scan --ci || exit $?
+            """,
+            ["tr"] = """
+            #!/usr/bin/env sh
+            ackit scan --ci || exit $?
+            """
+        },
+        ["HOOK_ANTHROPIC_MARKER"] = new()
+        {
+            ["en"] = """
+            AgentContextKit hooks installed for the Anthropic target.
+            Local reminder only; no remote registration was performed.
+            """,
+            ["tr"] = """
+            AgentContextKit hooks installed for the Anthropic target.
+            Local reminder only; no remote registration was performed.
+            """
+        },
+        ["HOOK_ANTHROPIC_PWSH"] = new()
+        {
+            ["en"] = """
+            Write-Output "AgentContextKit reminder: run ackit scan --ci before sharing repository context."
+            """,
+            ["tr"] = """
+            Write-Output "AgentContextKit reminder: run ackit scan --ci before sharing repository context."
+            """
+        },
+        ["HOOK_ANTHROPIC_SH"] = new()
+        {
+            ["en"] = """
+            #!/usr/bin/env sh
+            printf '%s\n' 'AgentContextKit reminder: run ackit scan --ci before sharing repository context.'
+            """,
+            ["tr"] = """
+            #!/usr/bin/env sh
+            printf '%s\n' 'AgentContextKit reminder: run ackit scan --ci before sharing repository context.'
+            """
+        },
+        ["HOOK_CONTINUE_MARKER"] = new()
+        {
+            ["en"] = """
+            AgentContextKit hooks installed for the Continue target.
+            Local reminder only; no remote registration was performed.
+            """,
+            ["tr"] = """
+            AgentContextKit hooks installed for the Continue target.
+            Local reminder only; no remote registration was performed.
+            """
+        },
+        ["HOOK_CONTINUE_JSON"] = new()
+        {
+            ["en"] = """
+            {
+              "hooks": [
+                {
+                  "name": "ackit-pre-prompt-reminder",
+                  "event": "pre-prompt",
+                  "action": "print",
+                  "message": "AgentContextKit reminder: run ackit scan --ci before sharing repository context."
+                }
+              ]
+            }
+            """,
+            ["tr"] = """
+            {
+              "hooks": [
+                {
+                  "name": "ackit-pre-prompt-reminder",
+                  "event": "pre-prompt",
+                  "action": "print",
+                  "message": "AgentContextKit reminder: run ackit scan --ci before sharing repository context."
+                }
+              ]
             }
             """
         },

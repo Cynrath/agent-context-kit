@@ -250,6 +250,8 @@ public sealed record GeneratedFileResult(
     public bool Created => Status == GeneratedFileStatus.Created;
 }
 
+public readonly record struct HookFileSpec(string Path, string Content);
+
 public sealed record TaskSpec(string Title, LanguageCode Language);
 
 public sealed record ContextExportSpec(

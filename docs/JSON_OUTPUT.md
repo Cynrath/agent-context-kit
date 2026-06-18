@@ -19,6 +19,7 @@ Supported commands:
 - `ackit task "<title>" --json`
 - `ackit redact-check --json`
 - `ackit doctor --json`
+- `ackit hooks --json`
 
 ## Common Fields
 JSON responses include:
@@ -65,6 +66,7 @@ Schema version `2` adds:
 - `suppressionSummary` and sanitized `suppressions` on current-source `scan` output. These are additive and are not present in the published `0.2.0-alpha.2` package.
 - `baseline` on current-source `baseline --json` and opt-in `scan --baseline <path> --json` output. The existing-versus-new classification is documented in [BASELINE_MODEL.md](BASELINE_MODEL.md).
 - `config`, `diagnosticSummary`, and sanitized `diagnostics` on current-source `config-check --json` output.
+- `target`, `install`, `dryRun`, `shell`, `mode`, and planned hook `files` with sanitized `contentLength` on current-source `hooks --json` output.
 
 ## Exit Codes
 Human output and JSON output use the same exit code strategy.
@@ -264,3 +266,14 @@ The same additive `baseline` object is returned by `sarif`, `report`, and `webui
   "message": "Context export manifest created."
 }
 ```
+
+`hooks` file item:
+```json
+{
+  "path": ".anthropic/hooks/installed.txt",
+  "status": "Dry run",
+  "contentLength": 111
+}
+```
+
+`hooks --dry-run --json` reports planned repository-relative paths and content lengths only; it does not write files even when `--install` is also present.

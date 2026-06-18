@@ -197,15 +197,44 @@ Generates agent context/workflow files. Existing files are skipped.
 
 ```powershell
 ackit generate --target codex --lang en
+ackit generate --target anthropic --lang en
+ackit generate --target continue --lang en
 ackit generate --target all --lang en --json
 ```
 
 Targets:
 - `codex`
 - `claude`
+- `anthropic`
 - `cursor`
 - `copilot`
+- `continue`
 - `all`
+
+### `ackit hooks`
+Previews or installs local hook reminder files. Existing files are skipped.
+
+```powershell
+ackit hooks --target codex --shell pwsh --dry-run
+ackit hooks --target codex --shell pwsh --install
+ackit hooks --target anthropic --shell pwsh --dry-run --json
+ackit hooks --target continue --shell sh --install
+ackit hooks --target codex --shell sh --install --output .ackit/hook-preview
+```
+
+Targets:
+- `codex`: writes `.git/hooks/pre-commit` and `.git/hooks/pre-push`.
+- `claude`: keeps the same Git hook behavior as `codex` for compatibility.
+- `anthropic`: writes `.anthropic/hooks/installed.txt` and a local reminder script.
+- `continue`: writes `.continue/hooks/installed.txt` and `.continue/hooks/hooks.json`.
+
+Safety behavior:
+- Dry-run mode lists planned paths and content lengths without writing files.
+- `--dry-run` takes precedence over `--install`.
+- `--shell` accepts only `pwsh` or `sh`; Continue output is shell-agnostic.
+- Without `--output`, Git hook targets must run inside a Git repository.
+- `--output` must be repository-relative. Existing `.git/hooks` output compatibility is preserved by writing `pre-commit` and `pre-push` directly under the output directory.
+- The command does not register real-time listeners, perform HTTP calls, upload repository content, or store secrets.
 
 ### `ackit task`
 Creates a structured task file under `docs/tasks`.

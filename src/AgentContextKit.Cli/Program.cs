@@ -71,11 +71,11 @@ public static class Program
         Console.WriteLine("  ackit webui [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit prompt-pack [--output <repo-relative.md>] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit context-export --prompt-pack <repo-relative.md> --approve [--output <repo-relative.json>] [--lang en|tr] [--json]");
-        Console.WriteLine("  ackit generate [--target codex|claude|Anthropic|cursor|copilot|continue|all] [--lang en|tr] [--json]");
+        Console.WriteLine("  ackit generate [--target codex|claude|anthropic|cursor|copilot|continue|all] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit task \"<title>\" [--lang en|tr] [--json]");
         Console.WriteLine("  ackit redact-check [--profile public-release] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit doctor [--lang en|tr] [--json]");
-        Console.WriteLine("  ackit hooks [--shell pwsh|sh] [--install] [--output <repo-relative-dir>] [--lang en|tr] [--json]");
+        Console.WriteLine("  ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--install|--dry-run] [--output <repo-relative-dir>] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]");
         Console.WriteLine("  ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]");
         Console.WriteLine("  ackit version");
@@ -678,34 +678,52 @@ public static class Program
     private static int RunHooks(string[] args, string repositoryPath, LanguageCode language, bool json, Services services)
     {
         var install = HasFlag(args, "--install");
+        var dryRun = HasFlag(args, "--dry-run");
         var shell = GetOption(args, "--shell")?.Trim().ToLowerInvariant() ?? "sh";
         var output = GetOption(args, "--output");
+        var target = ParseHookTarget(GetOption(args, "--target"));
         var textProvider = services.TextProvider;
 
         if (shell is not ("pwsh" or "sh"))
         {
-            Console.Error.WriteLine($"--shell must be pwsh or sh. Got: {shell}");
+            var message = $"--shell must be pwsh or sh. Got: {shell}";
+            if (json)
+            {
+                WriteJson(new { schemaVersion = JsonSchemaVersion, toolVersion = Version, generatedAtUtc = services.Clock.UtcNow, command = "hooks", exitCode = ExitError, error = message });
+            }
+            else
+            {
+                Console.Error.WriteLine(message);
+            }
+
             return ExitError;
         }
 
-        var targets = new List<(string Path, string Content)>();
-        if (shell == "pwsh")
+        if (target == AgentTarget.Anthropic &&
+            shell == "sh" &&
+            OperatingSystem.IsWindows() &&
+            !CommandExistsOnPath("sh"))
         {
-            targets.Add(($".git/hooks/pre-commit", "ackit scan --ci\r\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\r\n"));
-            targets.Add(($".git/hooks/pre-push", "ackit scan --ci\r\nif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }\r\n"));
-        }
-        else
-        {
-            targets.Add(($".git/hooks/pre-commit", "#!/usr/bin/env sh\nackit scan --ci || exit $?\n"));
-            targets.Add(($".git/hooks/pre-push", "#!/usr/bin/env sh\nackit scan --ci || exit $?\n"));
+            const string message = "--target anthropic with --shell sh requires sh to be available on PATH on Windows. Use --shell pwsh or install sh.";
+            if (json)
+            {
+                WriteJson(new { schemaVersion = JsonSchemaVersion, toolVersion = Version, generatedAtUtc = services.Clock.UtcNow, command = "hooks", exitCode = ExitError, error = message });
+            }
+            else
+            {
+                Console.Error.WriteLine(message);
+            }
+
+            return ExitError;
         }
 
+        var targets = HookFileBuilder.Build(target, shell);
         var isGitRepo = Directory.Exists(Path.Combine(repositoryPath, ".git"));
-        if (!isGitRepo && output is null)
+        if (!isGitRepo && output is null && targets.Any(file => file.Path.StartsWith(".git/hooks/", StringComparison.Ordinal)))
         {
             if (json)
             {
-                WriteJson(new { schemaVersion = JsonSchemaVersion, command = "hooks", exitCode = ExitError, error = textProvider.Get("hooksNotGitRepo", language) });
+                WriteJson(new { schemaVersion = JsonSchemaVersion, toolVersion = Version, generatedAtUtc = services.Clock.UtcNow, command = "hooks", exitCode = ExitError, error = textProvider.Get("hooksNotGitRepo", language) });
             }
             else
             {
@@ -714,22 +732,41 @@ public static class Program
             return ExitError;
         }
 
-        var baseDir = output is null
-            ? repositoryPath
-            : Path.Combine(repositoryPath, output.Replace('/', Path.DirectorySeparatorChar));
+        string baseDir;
+        try
+        {
+            baseDir = GetHookBaseDirectory(repositoryPath, output);
+        }
+        catch (InvalidOperationException ex)
+        {
+            if (json)
+            {
+                WriteJson(new { schemaVersion = JsonSchemaVersion, toolVersion = Version, generatedAtUtc = services.Clock.UtcNow, command = "hooks", exitCode = ExitError, error = ex.Message });
+            }
+            else
+            {
+                Console.Error.WriteLine(ex.Message);
+            }
+
+            return ExitError;
+        }
 
         var items = new List<object>();
         foreach (var (relPath, content) in targets)
         {
-            var writePath = output is null ? relPath : relPath.Replace(".git/hooks/", string.Empty, StringComparison.Ordinal);
+            var writePath = GetHookWritePath(output, relPath);
             var fullPath = Path.Combine(baseDir, writePath.Replace('/', Path.DirectorySeparatorChar));
             var exists = File.Exists(fullPath);
             string status;
-            if (install && !exists)
+            if (dryRun)
+            {
+                status = textProvider.Get("hooksDryRun", language);
+            }
+            else if (install && !exists)
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
                 File.WriteAllText(fullPath, content);
-                if (shell == "sh" && (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
+                if (ShouldSetExecutable(shell, relPath) && (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
                 {
                     try { File.SetUnixFileMode(fullPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherExecute); } catch { }
                 }
@@ -741,22 +778,23 @@ public static class Program
             }
             else
             {
-                status = textProvider.Get("no", language);
+                status = textProvider.Get("hooksWouldWrite", language);
             }
-            items.Add(new { path = writePath, status });
+
+            items.Add(new { path = writePath, status, contentLength = content.Length });
         }
 
         if (json)
         {
-            WriteJson(new { schemaVersion = JsonSchemaVersion, command = "hooks", install, shell, mode = install ? "install" : "preview", exitCode = ExitSuccess, files = items });
+            WriteJson(new { schemaVersion = JsonSchemaVersion, toolVersion = Version, generatedAtUtc = services.Clock.UtcNow, command = "hooks", target = target.ToString(), install, dryRun, shell, mode = dryRun ? "dry-run" : install ? "install" : "preview", exitCode = ExitSuccess, files = items });
         }
-        else if (!install)
+        else if (dryRun || !install)
         {
             Console.WriteLine(textProvider.Get("hooksPreview", language));
             foreach (var item in items)
             {
                 var dyn = (dynamic)item;
-                Console.WriteLine($"  {dyn.path}: {dyn.status}");
+                Console.WriteLine($"  {dyn.path}: {dyn.status} ({dyn.contentLength} chars)");
             }
         }
         else
@@ -764,10 +802,60 @@ public static class Program
             foreach (var item in items)
             {
                 var dyn = (dynamic)item;
-                Console.WriteLine($"  {dyn.path}: {dyn.status}");
+                Console.WriteLine($"  {dyn.path}: {dyn.status} ({dyn.contentLength} chars)");
             }
         }
         return ExitSuccess;
+    }
+
+    private static string GetHookBaseDirectory(string repositoryPath, string? output)
+    {
+        if (string.IsNullOrWhiteSpace(output))
+        {
+            return repositoryPath;
+        }
+
+        var normalized = output.Trim().Replace('\\', '/');
+        if (Path.IsPathRooted(normalized))
+        {
+            throw new InvalidOperationException("Hooks output path must be repository-relative.");
+        }
+
+        var segments = normalized.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Length == 0 || segments.Any(segment => segment is "." or ".."))
+        {
+            throw new InvalidOperationException("Hooks output path must stay inside the repository.");
+        }
+
+        var repositoryFullPath = Path.GetFullPath(repositoryPath);
+        var outputFullPath = Path.GetFullPath(Path.Combine(repositoryFullPath, normalized.Replace('/', Path.DirectorySeparatorChar)));
+        var repositoryPrefix = repositoryFullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+
+        if (!outputFullPath.StartsWith(repositoryPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("Hooks output path must stay inside the repository.");
+        }
+
+        return outputFullPath;
+    }
+
+    private static string GetHookWritePath(string? output, string relativePath)
+    {
+        if (output is null)
+        {
+            return relativePath;
+        }
+
+        return relativePath.StartsWith(".git/hooks/", StringComparison.Ordinal)
+            ? relativePath.Replace(".git/hooks/", string.Empty, StringComparison.Ordinal)
+            : relativePath;
+    }
+
+    private static bool ShouldSetExecutable(string shell, string relativePath)
+    {
+        return shell == "sh" &&
+               (relativePath.StartsWith(".git/hooks/", StringComparison.Ordinal) ||
+                relativePath.EndsWith(".sh", StringComparison.OrdinalIgnoreCase));
     }
 
     private static int RunDiff(string[] args, string repositoryPath, LanguageCode language, bool json, Services services)
@@ -1368,13 +1456,53 @@ public static class Program
         {
             "codex" => AgentTarget.Codex,
             "claude" => AgentTarget.Claude,
-            "Anthropic" => AgentTarget.Anthropic,
+            "anthropic" => AgentTarget.Anthropic,
             "cursor" => AgentTarget.Cursor,
             "copilot" => AgentTarget.Copilot,
             "continue" => AgentTarget.Continue,
             "all" or null or "" => AgentTarget.All,
             _ => AgentTarget.All
         };
+    }
+
+    private static AgentTarget ParseHookTarget(string? value)
+    {
+        return value?.Trim().ToLowerInvariant() switch
+        {
+            "claude" => AgentTarget.Claude,
+            "anthropic" => AgentTarget.Anthropic,
+            "continue" => AgentTarget.Continue,
+            "all" => AgentTarget.All,
+            "codex" or null or "" => AgentTarget.Codex,
+            _ => AgentTarget.Codex
+        };
+    }
+
+    private static bool CommandExistsOnPath(string command)
+    {
+        var path = Environment.GetEnvironmentVariable("PATH");
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return false;
+        }
+
+        var extensions = OperatingSystem.IsWindows()
+            ? new[] { ".exe", ".cmd", ".bat", string.Empty }
+            : new[] { string.Empty };
+
+        foreach (var directory in path.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
+        {
+            foreach (var extension in extensions)
+            {
+                var candidate = Path.Combine(directory.Trim(), command + extension);
+                if (File.Exists(candidate))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static string? GetOption(string[] args, string name)

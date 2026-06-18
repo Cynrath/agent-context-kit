@@ -39,10 +39,13 @@ ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [
 ackit webui [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]
 ackit prompt-pack [--output <repo-relative.md>] [--lang en|tr] [--json]
 ackit context-export --prompt-pack <repo-relative.md> --approve [--output <repo-relative.json>] [--lang en|tr] [--json]
-ackit generate [--target codex|claude|Anthropic|cursor|copilot|continue|all] [--lang en|tr] [--json]
+ackit generate [--target codex|claude|anthropic|cursor|copilot|continue|all] [--lang en|tr] [--json]
 ackit task "<title>" [--lang en|tr] [--json]
 ackit redact-check [--profile public-release] [--lang en|tr] [--json]
 ackit doctor [--lang en|tr] [--json]
+ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--install|--dry-run] [--output <repo-relative-dir>] [--lang en|tr] [--json]
+ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]
+ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]
 ackit version
 ackit help
 ```
@@ -65,6 +68,9 @@ ackit help
 - `--ci`: applies only to `scan`; default mode evaluates every finding, while explicit baseline mode evaluates only new High/Critical findings.
 - `--baseline <repo-relative.json>`: opts `scan` into baseline classification/new-finding CI policy and adds the same classification metadata to `sarif`, `report`, or `webui` output.
 - `--update`: permits explicit replacement only for `ackit baseline`.
+- `--target`: selects the generator or hooks target where supported. Current hooks targets are `codex`, `claude`, `anthropic`, and `continue`.
+- `--shell pwsh|sh`: selects hook script syntax where hooks need a script. Continue hooks are shell-agnostic, but only these two shell values are accepted.
+- `--dry-run`: for `ackit hooks`, lists planned hook files and content lengths without writing to disk, even if `--install` is also present.
 
 ## Output Paths
 Generated local artifacts must stay repository-relative:
