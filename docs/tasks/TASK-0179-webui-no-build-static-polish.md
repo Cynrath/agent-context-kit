@@ -95,4 +95,7 @@ Single `git revert <sha>`.
 - `git push origin master` only.
 
 ## Hosted Checks
-- Local gates only; CI runs on push.
+- Pushed HEAD `6ad0c8d21dce671d8ce8362c693a8fcb3f31ffd9` completed successfully on 2026-06-18:
+  - `ci` run `27769326188`.
+  - `cross-platform-smoke` run `27769326618`.
+  - `cross-platform-source-smoke` run `27769326168`.
