@@ -144,10 +144,25 @@ git revert <task-0180-implementation-sha>
 If a separate evidence sync commit exists, revert that commit first.
 
 ## Completion Evidence
-- Planning commit: pending.
-- Implementation commit: pending.
-- Local test count: pending.
-- Hosted run IDs: pending after push.
+- Planning commit: `8a65723`.
+- Implementation commit: `1bc0019`.
+- Local validation on 2026-06-18:
+  - `dotnet build AgentContextKit.sln -c Release --no-restore` passed with 0 warnings and 0 errors.
+  - Focused `HostedChecksSummaryScriptTests` passed 6/6.
+  - Full `dotnet test AgentContextKit.sln -c Release --no-build` passed 293/293.
+  - Source `scan --ci` exited 0 with existing `.remember` Medium log findings only.
+  - Source `doctor` passed 13/13.
+  - `git diff --check` passed.
+  - `scripts/verify-release.ps1` passed; its release blocker review reported the expected dirty-tree warning before the implementation commit.
+  - `scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` passed after commit.
+- Real read-only smoke:
+  - `scripts/hosted-checks-summary.ps1 --count 1` printed one recent hosted run row.
+  - `scripts/hosted-checks-summary.ps1 --workflow ci.yml --count 1` printed one `ci` row.
+- Hosted evidence for pushed HEAD `1bc0019f599b15d34debbfa79bf6e572e5d53666` on 2026-06-18:
+  - `ci` run `27782907605` completed `success`.
+  - `cross-platform-smoke` run `27782907712` completed `success`.
+  - `cross-platform-source-smoke` run `27782907825` completed `success`.
+- Screenshot/deployment diagnosis: `nuget-release` red entries are historical 2026-06-13 release-environment deployment statuses tied to runs `27470495270` and `27470659578`; no environment/release/deployment write was performed in TASK-0180.
 
 ## Push
 Normal `git push origin master` only after local validation. No force push, tag, release, version bump, NuGet publish, or deployment write.
