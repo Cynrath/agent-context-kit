@@ -52,6 +52,10 @@ This list describes current source and the published `0.2.0-alpha.2` package. Th
 - `task`
 - `redact-check`
 - `doctor`
+- `hooks`
+- `mcp` (Core-only JSON-RPC prototype; no real stdio loop yet)
+- `diff`
+- `trim`
 - `version`
 - `help`
 

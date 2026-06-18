@@ -29,6 +29,7 @@ AgentContextKit uses small, automation-friendly exit codes.
 | `ackit task` without a title | `1` |
 | `ackit redact-check` | `0` with no findings, `1` with non-critical findings, `2` with critical findings |
 | `ackit doctor` | `0` with no failed high/critical checks, `1` with failed high/critical checks |
+| `ackit mcp` | `0` when the provided JSON-RPC request is routed or written, `1` when `--stdio` is missing or `--output` is invalid. JSON-RPC tool errors are returned in the response body and do not change the process exit code in this prototype. |
 | Unknown command | `1` |
 | Unhandled runtime error | `1` |
 

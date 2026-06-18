@@ -236,6 +236,24 @@ Safety behavior:
 - `--output` must be repository-relative. Existing `.git/hooks` output compatibility is preserved by writing `pre-commit` and `pre-push` directly under the output directory.
 - The command does not register real-time listeners, perform HTTP calls, upload repository content, or store secrets.
 
+### `ackit mcp`
+Routes one provided JSON-RPC request string through the local Core MCP prototype. This is not a real stdio server yet.
+
+```powershell
+ackit mcp --help
+ackit mcp --stdio '{"jsonrpc":"2.0","id":"1","method":"initialize","params":{}}'
+ackit mcp --stdio '{"jsonrpc":"2.0","id":"2","method":"tools/list","params":{}}' --output .ackit/mcp/tools.jsonl
+```
+
+Prototype behavior:
+- No child process is spawned.
+- No `Console.In` read loop is started.
+- No network, HTTP, telemetry, remote provider call, or repository upload is performed.
+- `--stdio` receives the JSON-RPC request as an argument string.
+- `--output`, when provided, must be repository-relative and end in `.json`, `.jsonl`, or `.txt`.
+- Tool calls require a local `repoPath` argument inside JSON-RPC params.
+- Initial tools are `ackit.scan`, `ackit.findings`, `ackit.context`, and `ackit.health`.
+
 ### `ackit task`
 Creates a structured task file under `docs/tasks`.
 

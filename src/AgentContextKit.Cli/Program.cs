@@ -43,6 +43,7 @@ public static class Program
                 "redact-check" => RunRedactCheck(args, repositoryPath, config, language, json, services),
                 "doctor" => RunDoctor(repositoryPath, config, language, json, services),
                 "hooks" => RunHooks(args, repositoryPath, language, json, services),
+                "mcp" => RunMcp(args, repositoryPath, language, services),
                 "diff" => RunDiff(args, repositoryPath, language, json, services),
                 "trim" => RunTrim(args, repositoryPath, language, json, services),
                 _ => RunUnknown(command, language, services.TextProvider)
@@ -76,6 +77,7 @@ public static class Program
         Console.WriteLine("  ackit redact-check [--profile public-release] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit doctor [--lang en|tr] [--json]");
         Console.WriteLine("  ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--install|--dry-run] [--output <repo-relative-dir>] [--lang en|tr] [--json]");
+        Console.WriteLine("  ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]");
         Console.WriteLine("  ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]");
         Console.WriteLine("  ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]");
         Console.WriteLine("  ackit version");
@@ -858,6 +860,86 @@ public static class Program
                 relativePath.EndsWith(".sh", StringComparison.OrdinalIgnoreCase));
     }
 
+    private static int RunMcp(string[] args, string repositoryPath, LanguageCode language, Services services)
+    {
+        if (HasFlag(args, "--help") || HasFlag(args, "-h"))
+        {
+            Console.WriteLine("AgentContextKit MCP stdio prototype");
+            Console.WriteLine("Local JSON-RPC routing only; no real stdin/stdout loop and no child process.");
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]");
+            Console.WriteLine("Tools:");
+            Console.WriteLine("  ackit.scan");
+            Console.WriteLine("  ackit.findings");
+            Console.WriteLine("  ackit.context");
+            Console.WriteLine("  ackit.health");
+            return ExitSuccess;
+        }
+
+        var input = GetOption(args, "--stdio");
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            Console.Error.WriteLine("ackit mcp requires --stdio <json-request>.");
+            return ExitError;
+        }
+
+        var response = services.McpServer.HandleJson(input);
+        var output = GetOption(args, "--output");
+        if (string.IsNullOrWhiteSpace(output))
+        {
+            Console.WriteLine(response);
+            return ExitSuccess;
+        }
+
+        try
+        {
+            var outputPath = NormalizeMcpOutputPath(repositoryPath, output);
+            services.FileSystem.WriteAllText(outputPath, response.TrimEnd() + Environment.NewLine);
+            Console.WriteLine(language.Value == "tr"
+                ? "MCP yaniti yazildi."
+                : "MCP response written.");
+            return ExitSuccess;
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+            return ExitError;
+        }
+    }
+
+    private static string NormalizeMcpOutputPath(string repositoryPath, string output)
+    {
+        var normalized = output.Trim().Replace('\\', '/');
+        if (Path.IsPathRooted(normalized))
+        {
+            throw new InvalidOperationException("MCP output path must be repository-relative.");
+        }
+
+        var segments = normalized.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Length == 0 || segments.Any(segment => segment is "." or ".."))
+        {
+            throw new InvalidOperationException("MCP output path must stay inside the repository.");
+        }
+
+        if (!normalized.EndsWith(".json", StringComparison.OrdinalIgnoreCase) &&
+            !normalized.EndsWith(".jsonl", StringComparison.OrdinalIgnoreCase) &&
+            !normalized.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("MCP output path must end with .json, .jsonl, or .txt.");
+        }
+
+        var repositoryFullPath = Path.GetFullPath(repositoryPath);
+        var outputFullPath = Path.GetFullPath(Path.Combine(repositoryFullPath, normalized.Replace('/', Path.DirectorySeparatorChar)));
+        var repositoryPrefix = repositoryFullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+
+        if (!outputFullPath.StartsWith(repositoryPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("MCP output path must stay inside the repository.");
+        }
+
+        return outputFullPath;
+    }
+
     private static int RunDiff(string[] args, string repositoryPath, LanguageCode language, bool json, Services services)
     {
         var from = GetOption(args, "--from");
@@ -1559,6 +1641,7 @@ public static class Program
                string.Equals(option, "--profile", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--baseline", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--prompt-pack", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(option, "--stdio", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--output", StringComparison.OrdinalIgnoreCase);
     }
 
@@ -1573,10 +1656,18 @@ public static class Program
         var templateRenderer = new TemplateRenderer();
         var textProvider = new TextProvider();
         var clock = new SystemClock();
+        var configReader = new AckitConfigReader(fileSystem);
+        var doctor = new RepositoryDoctor(fileSystem);
+        var mcpServer = new McpRouter(
+            fileSystem,
+            configReader,
+            repositoryScanner,
+            new RepositoryDoctorHealthProbe(doctor),
+            Version);
 
         return new Services(
             fileSystem,
-            new AckitConfigReader(fileSystem),
+            configReader,
             new AckitConfigValidator(),
             new AckitConfigWriter(fileSystem),
             new BaselineStore(fileSystem),
@@ -1589,7 +1680,8 @@ public static class Program
             new ContextExportManifestGenerator(fileSystem, clock),
             new SarifReportWriter(fileSystem),
             new TaskFileGenerator(fileSystem, templateRenderer),
-            new RepositoryDoctor(fileSystem),
+            doctor,
+            mcpServer,
             clock,
             textProvider);
     }
@@ -1610,6 +1702,7 @@ public static class Program
         ISarifReportWriter SarifReportWriter,
         ITaskFileGenerator TaskFileGenerator,
         RepositoryDoctor Doctor,
+        IMcpServer McpServer,
         IClock Clock,
         ITextProvider TextProvider);
 }

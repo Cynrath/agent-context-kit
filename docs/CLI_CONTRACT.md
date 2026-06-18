@@ -44,6 +44,7 @@ ackit task "<title>" [--lang en|tr] [--json]
 ackit redact-check [--profile public-release] [--lang en|tr] [--json]
 ackit doctor [--lang en|tr] [--json]
 ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--install|--dry-run] [--output <repo-relative-dir>] [--lang en|tr] [--json]
+ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]
 ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]
 ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]
 ackit version
@@ -71,6 +72,7 @@ ackit help
 - `--target`: selects the generator or hooks target where supported. Current hooks targets are `codex`, `claude`, `anthropic`, and `continue`.
 - `--shell pwsh|sh`: selects hook script syntax where hooks need a script. Continue hooks are shell-agnostic, but only these two shell values are accepted.
 - `--dry-run`: for `ackit hooks`, lists planned hook files and content lengths without writing to disk, even if `--install` is also present.
+- `--stdio <json-request>`: for the current `ackit mcp` prototype only, supplies one JSON-RPC request string as an argument. It is not a real stdin read loop.
 
 ## Output Paths
 Generated local artifacts must stay repository-relative:
@@ -108,6 +110,8 @@ Stable expectations:
 - Repository-scoped JSON output includes repository metadata.
 - Human output and JSON output use the same process exit code.
 - JSON schema can still be revised before v1.0; v1.0 should freeze or explicitly version any breaking changes.
+
+`ackit mcp` is intentionally outside the command-output schema v2 envelope. It returns JSON-RPC 2.0 responses for the local MCP prototype instead of `--json` command output.
 
 ## Safety Boundary
 The stable CLI contract does not include:

@@ -1,7 +1,7 @@
-# MCP Stdio Transport Design (Design-Only)
+# MCP Stdio Transport Design
 
 ## Purpose
-Sketch a local-only MCP (Model Context Protocol) stdio transport for `ackit`, so an editor or agent that speaks MCP can request a scan report without any HTTP, network, or cloud dependency. **This document is design-only.** No implementation is committed in the current task. Implementation will be queued in a follow-up project control task and will be subject to the same no-network, offline-first, and redaction policies as the rest of `ackit`.
+Sketch a local-only MCP (Model Context Protocol) stdio transport for `ackit`, so an editor or agent that speaks MCP can request a scan report without any HTTP, network, or cloud dependency. This document began as a design-only artifact in TASK-0175. TASK-0178 adds the first Core-only prototype described in the implementation plan below; real stdio process handling remains out of scope.
 
 ## Why Stdout JSON-RPC, Not HTTP
 
@@ -53,7 +53,7 @@ The reported `version` is the local `AssemblyInformationalVersion` of the runnin
 
 | Tool | Description | Key Arguments |
 | --- | --- | --- |
-| `ackit.scan` | Run a scan and return a compact summary. | `repoPath: string`, `lang?: "en"\|"tr"`, `format: "summary"\|"json"\|"sarif"` |
+| `ackit.scan` | Run a scan and return a compact summary. | `repoPath: string`, `lang?: "en"\|"tr"`, `format?: "summary"` |
 | `ackit.findings` | Return full risk findings, filtered by severity. | `repoPath: string`, `minSeverity?: "info"\|"low"\|"medium"\|"high"\|"critical"`, `lang?: "en"\|"tr"` |
 | `ackit.context` | Build a context pack for a given target. | `repoPath: string`, `target: "codex"\|"claude"\|"anthropic"\|"cursor"\|"copilot"\|"continue"\|"all"`, `lang?: "en"\|"tr"` |
 | `ackit.health` | Return a structured health snapshot (doctor). | `repoPath: string`, `lang?: "en"\|"tr"` |
@@ -111,5 +111,18 @@ Each tool argument is validated; unknown or missing required arguments return a 
 ## Testability and Implementation Plan
 
 - The transport is wrapped behind an interface in `AgentContextKit.Core` so unit tests can drive it without spawning a real process.
-- End-to-end tests launch the server as a child process with redirected stdio and assert on JSON-RPC round-trips.
-- A new task (`ackit mcp`) will be queued under a future project control document and will not be picked up automatically.
+- Future end-to-end tests should launch the real stdio server as a child process with redirected stdio and assert on JSON-RPC round-trips.
+- Step 1 is intentionally limited to Core routing and a CLI string-input stub; real stdio remains a later task.
+
+## Implementation Plan: Step 1
+
+TASK-0178 implements only the safe, local prototype boundary:
+
+- Core contracts live under `src/AgentContextKit.Core/Mcp/` with `McpRequest`, `McpResponse`, `McpToolDefinition`, `McpServerInfo`, `McpCapabilities`, and `IMcpServer`.
+- `McpRouter` parses a provided JSON-RPC string, routes `initialize`, `tools/list`, and `tools/call`, and serializes deterministic JSON-RPC responses.
+- The initial tool order is fixed: `ackit.scan`, `ackit.findings`, `ackit.context`, `ackit.health`.
+- `repoPath` must be an existing local directory. URLs, `file:` URIs, and UNC-style remote paths are rejected as `-32602 Invalid params`.
+- Tool responses are read-only and sanitize scanner matches by returning `match: null`, matching the existing SARIF/JSON privacy posture.
+- `ackit.context` returns a write-free context preview; it does not call the agent instruction generator's file-writing path.
+- The CLI stub is `ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>]`. It does not read `Console.In`, does not create a long-lived server, and does not spawn a child process.
+- Real redirected stdio, notifications lifecycle, shutdown behavior, process supervision, and end-to-end editor integration remain future work.

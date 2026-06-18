@@ -237,6 +237,7 @@ ackit task "<title>" [--lang en|tr] [--json]
 ackit redact-check [--profile public-release] [--lang en|tr] [--json]
 ackit doctor [--lang en|tr] [--json]
 ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--install|--dry-run] [--output <repo-relative-dir>] [--lang en|tr] [--json]
+ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]
 ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]
 ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]
 ackit version

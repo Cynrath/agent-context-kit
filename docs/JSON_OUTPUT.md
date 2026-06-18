@@ -21,6 +21,8 @@ Supported commands:
 - `ackit doctor --json`
 - `ackit hooks --json`
 
+`ackit mcp` is intentionally outside this command-output schema. It returns JSON-RPC 2.0 responses from the Core-only MCP prototype and does not use `--json`.
+
 ## Common Fields
 JSON responses include:
 

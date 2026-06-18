@@ -16,13 +16,20 @@ Implement the first concrete step of the MCP stdio transport described in `docs/
 - Add Core records: `McpRequest`, `McpResponse`, `McpToolDefinition`, `McpServerInfo`, `McpCapabilities`.
 - Add Core interface: `IMcpServer` with `Initialize`, `ListTools`, `CallTool`, and a `McpRouter` that wires the four tools to existing Core services.
 - Add a CLI subcommand stub `ackit mcp` that, on `--stdio`, reads from a provided input string and writes to a provided output string (no real stdin/stdout). On `--help`, prints the design summary and exits 0.
-- Tests: at least 6 covering initialize, list tools, call each of the four tools, and an unknown tool error path.
+- Tests: at least 7 covering initialize, list tools, call the four initial tools, and an unknown tool error path.
 
 ## Out of Scope
 - Real stdio piping (read from `Console.In`, write to `Console.Out`).
 - Process spawn.
 - HTTP transport, SSE, or streamable HTTP.
 - Authentication, authorization, rate limiting, or multi-tenant routing.
+
+## Impact Review
+- DB impact: none; no database, migration, schema, or persisted state change.
+- Admin impact: none; no admin UI or privileged action surface is added.
+- Permission impact: none; the prototype is explicit local CLI/Core routing only and does not add authentication, authorization, remote calls, or multi-tenant access.
+- SEO/i18n impact: no SEO impact; user-facing docs and help are updated, and machine-readable JSON-RPC fields remain stable English technical identifiers.
+- Audit/security impact: local-only, no process spawn, no real stdio loop, no network path, no automatic file export except explicit repo-relative `--output`; scan findings keep raw matches out of tool responses.
 
 ## Affected Files
 - `src/AgentContextKit.Core/Mcp/McpContracts.cs` — new.
@@ -37,12 +44,13 @@ Implement the first concrete step of the MCP stdio transport described in `docs/
 2. Add `McpContracts.cs` with records and the `IMcpServer` interface.
 3. Add `McpRouter.cs` that depends on `IRepositoryScanner`, `IRiskScanner`, `IAgentInstructionGenerator`, and `IDoctor` (or the closest existing abstraction; doctor currently has `IDoctorCheck` and `RunDoctor`; for this task, use a small `IAckitHealthProbe` interface in the same file).
 4. Add `RunMcp` in `Program.cs` with `--stdio <input> --output <output>` flags; the route logic is in Core.
-5. Add 6 tests:
+5. Add 7 tests:
    - Initialize returns the expected `serverInfo` and capabilities.
    - ListTools returns exactly the four tools in the documented order.
    - CallTool `ackit.scan` returns a non-empty summary.
    - CallTool `ackit.findings` with min severity filter returns the expected subset.
    - CallTool `ackit.context` with target `codex` returns a non-empty prompt fragment.
+   - CallTool `ackit.health` returns a structured doctor snapshot.
    - CallTool of an unknown tool returns `-32602 Invalid params`.
 6. Update `docs/MCP_STDIO_DESIGN.md` with "Implementation Plan: Step 1".
 7. Implementation commit.
@@ -62,28 +70,34 @@ Implement the first concrete step of the MCP stdio transport described in `docs/
 ## Acceptance Criteria
 - All four tools can be invoked through `IMcpServer` and return deterministic, redaction-passed results.
 - Unknown tools return a JSON-RPC `-32602` error.
-- 6 new tests pass; total >= 282.
+- 7 new tests pass; total >= 283.
 
 ## Tests
-- McpRouterTests (6 new).
+- McpRouterTests (7 new).
 - Existing tests stay green.
 
 ## Validation
-- `dotnet build` — 0 errors.
-- `dotnet test` — 282+ / 0 / 0.
-- `ackit scan --ci` — exit 0.
-- `ackit doctor` — 14/14 PASS.
-- `scripts/verify-release.ps1` — pass.
-- `scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` — clean.
-- `git status` — clean.
+- `dotnet restore AgentContextKit.sln` — passed.
+- `dotnet build AgentContextKit.sln -c Release --no-restore` — 0 warnings, 0 errors.
+- `dotnet test tests/AgentContextKit.Tests/AgentContextKit.Tests.csproj -c Release --no-build --filter "FullyQualifiedName~McpRouterTests"` — 7/7 passed.
+- `dotnet test AgentContextKit.sln -c Release --no-build` — 283/283 passed.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- mcp --help` — passed.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci` — exit 0; existing `.remember` Medium log findings only.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- doctor` — 13/13 PASS.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-cli-contract.ps1 -FailOnIssues` — passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1 -FailOnIssues` — passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-release.ps1` — passed; dirty-tree blocker was expected before commit.
+- `scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` — run after staging/commit.
+- `git status` — clean after commit/push.
 
 ## Rollback
 Single `git revert <sha>`. No other task depends on TASK-0178.
 
 ## Completion Evidence
 - File list: above.
-- Commit hash(es): planning + implementation.
-- Test count: 282+.
+- Commit hash(es): pending implementation commit.
+- Test count: 283/283.
+- Local risk: no Critical/High findings in source `scan --ci`; existing `.remember` Medium log findings remain.
 
 ## Push
 - `git push origin master` only.

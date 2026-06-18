@@ -38,6 +38,7 @@ tests/
 - `IWebUiGenerator`
 - `ISarifReportWriter`
 - `ILLMProvider`
+- `IMcpServer`
 - `IFileSystem`
 - `IClock`
 - `IAckitConfigReader`
@@ -72,6 +73,8 @@ These SARIF, rule catalog, and config allowlist capabilities are part of current
 For main repository stack detection, `StackDetector` ignores sample, docs, generated output, template, and fixture-style paths such as `samples/`, `docs/`, `.ackit/`, `.codex/`, `.cursor/`, `templates/`, `fixtures/`, and test data folders. Those files can still be scanned by `RiskScanner`; the exclusion only prevents sample projects from being reported as the main repository stack. .NET global tool projects are reported as `.NET CLI / .NET Tool` when tool packaging metadata such as `PackAsTool` or `ToolCommandName` is present.
 
 Optional future LLM integration is documented in `docs/LLM_INTEGRATION_ARCHITECTURE.md`. `ILLMProvider` defines the provider-neutral Core boundary, but no provider adapter or live provider call exists today. Future provider implementations should stay behind Core interfaces, use dependency injection, require explicit user consent before export, and keep the CLI limited to argument parsing and output mapping.
+
+`IMcpServer` and `McpRouter` implement the first Core-only MCP JSON-RPC prototype. The router handles provided JSON strings for `initialize`, `tools/list`, and `tools/call`, exposes `ackit.scan`, `ackit.findings`, `ackit.context`, and `ackit.health`, and keeps real stdio process handling, HTTP transports, remote calls, and child-process spawning out of scope.
 
 Release readiness tooling lives in repository scripts and documentation rather than Core runtime services. Package metadata gates, public release audits, source archive hygiene, and maintainer handoff steps are local-only release checks and do not push, tag-push, publish, upload content, or call remote providers.
 
