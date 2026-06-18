@@ -15,6 +15,7 @@ In scope for this control document:
 - Scan `--include` / `--exclude` glob filters.
 - Nightly local check workflow (`.github/workflows`).
 - Final validation and hosted check sync.
+- User-prioritized TASK-0187 hotfix before TASK-0181: audit all three historical failed `nuget-release` deployment entries and harden release verification scripts without release/tag/NuGet/deployment mutation.
 
 Out of scope:
 - Force-push, history rewrite, tag movement, GitHub Release creation, NuGet publish.
@@ -42,12 +43,13 @@ Sequential; do not parallelize across tasks. Each task follows the existing task
 2. TASK-0178 MCP transport prototype (Core, no process).
 3. TASK-0179 webui no-build static polish.
 4. TASK-0180 hosted check status reporter script.
-5. TASK-0181 SARIF roundtrip regression test.
-6. TASK-0182 prompt pack edge cases.
-7. TASK-0183 catalog rule id and severity stability test.
-8. TASK-0184 scan `--include` / `--exclude` glob filters.
-9. TASK-0185 nightly local check workflow.
-10. TASK-0186 final validation and hosted check sync.
+5. TASK-0187 release deployment failure audit and script hardening.
+6. TASK-0181 SARIF roundtrip regression test.
+7. TASK-0182 prompt pack edge cases.
+8. TASK-0183 catalog rule id and severity stability test.
+9. TASK-0184 scan `--include` / `--exclude` glob filters.
+10. TASK-0185 nightly local check workflow.
+11. TASK-0186 final validation and hosted check sync.
 
 ## Validation
 - `dotnet build AgentContextKit.sln -c Release --no-restore` — 0 errors.
