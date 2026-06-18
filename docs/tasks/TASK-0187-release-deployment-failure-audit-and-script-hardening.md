@@ -62,9 +62,10 @@ Observed read-only deployment entries:
 | `5047180313` | release #4 / `27470495270` | `81200598792` | `ed9bf78c193381646cec583d079a22c952ab020c` | Ubuntu publish job invoked `powershell`; executable missing. |
 | `5047227343` | release #5 / `27470659578` | `81201079722` | `f540479a92cbe66097f6796553828ee49ddd5512` | Published package verification failed with null `Path`. |
 | `5047239131` | release #5 / `27470659578` | `81201198341` | `f540479a92cbe66097f6796553828ee49ddd5512` | Repeated published package verification failed with null `Path`. |
+| `5114441984` | release #4 attempt 2 / `27470495270` | `82217924071` | `ed9bf78c193381646cec583d079a22c952ab020c` | Delayed failed-job rerun could not download expired validated package artifact `7611911273`. |
 
 Additional rerun audit:
-- release #4 attempt 2 reran only the failed `publish and create release` job as job `82217924071` on 2026-06-18.
+- release #4 attempt 2 created deployment `5114441984` and reran only the failed `publish and create release` job as job `82217924071` on 2026-06-18.
 - The publish job failed at `Download validated package` because artifact `7611911273` (`AgentContextKit-0.2.0-alpha.2`) expired at `2026-06-14T15:12:39Z`.
 - The Node 20 deprecation and `punycode` warnings were non-blocking; the blocking failure was the missing expired artifact.
 
@@ -122,7 +123,7 @@ Read-only deployment audit:
 - `5047180313` maps to release #4 run `27470495270`, job `81200598792`, commit `ed9bf78c193381646cec583d079a22c952ab020c`; failure was Ubuntu `publish and create release` invoking Windows-only `powershell`.
 - `5047227343` maps to release #5 run `27470659578`, job `81201079722`, commit `f540479a92cbe66097f6796553828ee49ddd5512`; failure was published-package verification with null `Path`.
 - `5047239131` maps to release #5 run `27470659578`, job `81201198341`, commit `f540479a92cbe66097f6796553828ee49ddd5512`; failure repeated the published-package verification null `Path`.
-- release #4 attempt 2 job `82217924071` failed at `Download validated package` because artifact `7611911273` expired on 2026-06-14 after the original one-day retention window.
+- `5114441984` maps to release #4 attempt 2 run `27470495270`, job `82217924071`, commit `ed9bf78c193381646cec583d079a22c952ab020c`; failure was `Download validated package` because artifact `7611911273` expired on 2026-06-14 after the original one-day retention window.
 
 Implementation:
 - `scripts/verify-published-package.ps1` now resolves temp roots through a writable lazy helper: `RUNNER_TEMP`, `TEMP`, `TMPDIR`, then guarded `.NET` temp fallback.
