@@ -4,7 +4,7 @@
 AgentContextKit (`ackit`) is an offline-first .NET 10 CLI for AI-assisted repository context generation, task-first workflow docs, and secret/PII/brand leakage risk reporting.
 
 ## Active Control
-PROJECT-CONTROL-0108 is now active for TASK-0168 through TASK-0176: post-0107 audit and state sync, additive `generate` targets for Anthropic CLI and Continue, safe local `ackit hooks`, read-only `ackit diff` for baselines, deterministic `ackit trim --max-chars`, design-driven `ackit watch` mode, conservative high-entropy scanner rule research, design-only `ackit mcp --stdio`, and final validation plus hosted 3/3. No release, tag, NuGet publication, secret, or model-name disclosure is part of this control.
+PROJECT-CONTROL-0109 is now active for TASK-0177 through TASK-0186: hook expansion with Anthropic and Continue targets plus dry-run preview, MCP transport prototype step 1, WebUI no-build polish, hosted check status reporting, SARIF roundtrip coverage, prompt pack edge cases, catalog rule stability, scan include/exclude filters, nightly local checks, and final validation plus hosted check sync. No release, tag, NuGet publication, secret, or model-name disclosure is part of this control.
 
 TASK-0126 is hosted-verified: automation commit `2f68f14` passed 8/8 and run `27478046088` verified immutable alpha.2 package/release evidence without write permissions or login. TASK-0127 records exact alpha.2 hashes, repository signature, missing author signature/SBOM/attestation, and owner identity difference. TASK-0128 is hosted-verified: commit `4c4fa64` passed standard 8/8 and run `27478635057` passed exact predecessor/config/baseline/SARIF/performance evidence on Windows, Ubuntu, and macOS.
 
@@ -25,6 +25,8 @@ PROJECT-CONTROL-0107 begins at `a5686aa` with 238/238 tests green and TASK-0159 
 PROJECT-CONTROL-0107 closed TASK-0159 through TASK-0167. Local validation is 257/257 green at the final commit.
 
 PROJECT-CONTROL-0108 begins at `08442c0` with 257/257 tests green and TASK-0168 through TASK-0176 queued. The control is docs-first; the planning commit lands before any implementation.
+
+PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 planning begins at `b224c20` with TASK-0177 through TASK-0186 queued, and current `master`/`origin/master` is aligned at `cf22fd1`.
 
 ## Architecture
 - CLI project: `src/AgentContextKit.Cli`

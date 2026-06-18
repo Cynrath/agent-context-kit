@@ -139,7 +139,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- PROJECT-CONTROL-0108 continues independent local product, code-quality, test, documentation, and security work. It must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
+- PROJECT-CONTROL-0109 continues independent local product, code-quality, test, documentation, and security work. Start with TASK-0177 hook expansion and dry-run preview. It must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
 
 ## Execution Rule
-Continue TASK-0168 through TASK-0176 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
+Continue TASK-0177 through TASK-0186 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

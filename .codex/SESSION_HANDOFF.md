@@ -4,8 +4,8 @@
 AgentContextKit is an offline-first, security-first, docs-first, task-first .NET CLI for developers who use AI coding agents. It analyzes repositories, detects stacks and hygiene gaps, generates safe context/workflow files for multiple agents, and reports secret/PII/brand leakage risks before public release or AI context export.
 
 ## Current Task
-- PROJECT-CONTROL-0108 is now active for TASK-0168 through TASK-0176. Normal commits/pushes are allowed; force/history/tag movement/version reuse/API-key publication remain prohibited.
-- TASK-0168 must close the post-PROJECT-CONTROL-0107 audit, point active queue/handoff docs at PROJECT-CONTROL-0108, and record 257/257 as the last verified local test count.
+- PROJECT-CONTROL-0109 is now active for TASK-0177 through TASK-0186. Normal commits/pushes are allowed after local validation; force/history/tag movement/version reuse/API-key publication remain prohibited.
+- TASK-0177 is the next task: extend `ackit hooks` for Anthropic and Continue targets, add dry-run preview, keep existing Codex/Claude behavior compatible, and update focused tests/docs. PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green.
 - TASK-0126 is complete. Commit `2f68f14` passed 8/8 and read-only recovery run `27478046088` verified immutable alpha.2 package/tag/release/assets without publish permissions or OIDC login.
 - TASK-0127 refreshed alpha.2 supply-chain evidence: NuGet/release hashes, exact metadata commit, NuGet.org repository signature, absent author signature/SBOM/attestation, and `Cyranth`/`Cynrath` identity disposition remain explicitly scoped.
 - TASK-0128 is complete. Commit `4c4fa64` passed standard 8/8 and hosted RC run `27478635057` passed Windows, Ubuntu, and macOS for exact commit/candidate/predecessor evidence. The 2,000-file benchmark passed in 1.265s/0.957s/0.684s without changing the 30-second threshold.
@@ -548,4 +548,4 @@ AgentContextKit is an offline-first, security-first, docs-first, task-first .NET
 - Update task/docs before and after implementation.
 
 ## Context Compaction Resume Point
-If context is compacted, continue from this file. PROJECT-CONTROL-0001 is creating the central queue and completing TASK-0066 through TASK-0069 locally. Continue without asking, run the requested validation gates before commit, and do not push, create GitHub releases, publish NuGet packages, create remotes, call remote LLM APIs, handle API keys, upload SARIF/content, create issues/labels/settings, or automatically redact without explicit maintainer instruction.
+If context is compacted, continue from this file. PROJECT-CONTROL-0109 is active; continue TASK-0177 through TASK-0186 in order without asking. For TASK-0177, implement hook expansion and dry-run preview only after confirming the task file and current implementation. Run the requested validation gates before commit/push, and do not force-push, rewrite history, move tags, create GitHub releases, publish NuGet packages, create remotes, call remote LLM APIs, handle API keys, upload SARIF/content, create issues/labels/settings, or automatically redact without explicit maintainer instruction.
