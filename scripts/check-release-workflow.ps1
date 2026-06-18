@@ -79,6 +79,10 @@ foreach ($marker in @("if: inputs.operation == 'publish'", "environment: nuget-r
     if (-not $publishBlock.Contains($marker)) { $issues.Add("Publish permission/operation marker missing: $marker") | Out-Null }
 }
 
+if ([regex]::IsMatch($publishBlock, "(?m)^\s*powershell(\s|$)")) {
+    $issues.Add("Publish job must not call Windows-only powershell; use pwsh on Ubuntu release jobs.") | Out-Null
+}
+
 foreach ($marker in @("if: inputs.operation == 'verify-existing'", "contents: read", "scripts/verify-existing-release.ps1", "inputs.automation_commit_sha", "inputs.release_commit_sha")) {
     if (-not $verifyBlock.Contains($marker)) { $issues.Add("Read-only verification marker missing: $marker") | Out-Null }
 }
@@ -119,6 +123,11 @@ foreach ($tempMarker in @('$env:TEMP', '$env:TMPDIR', '$env:RUNNER_TEMP', '[Syst
     if (-not $publishedVerifier.Contains($tempMarker)) {
         $issues.Add("Published-package verifier temp fallback missing: $tempMarker") | Out-Null
     }
+}
+
+if (-not $publishedVerifier.Contains("TempResolutionSelfTest") -or
+    -not $publishedVerifier.Contains("Resolve-VerificationTempBase")) {
+    $issues.Add("Published-package verifier must expose local temp resolution self-test coverage.") | Out-Null
 }
 
 if ($issues.Count -eq 0) {

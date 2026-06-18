@@ -26,6 +26,48 @@ function Test-Sha256 {
     return (Get-StringValue $Value) -match "^[0-9a-fA-F]{64}$"
 }
 
+function Resolve-VerificationTempBase {
+    $environmentCandidates = @(
+        $env:RUNNER_TEMP,
+        $env:TEMP,
+        $env:TMPDIR
+    )
+
+    foreach ($candidate in $environmentCandidates) {
+        if ([string]::IsNullOrWhiteSpace($candidate)) { continue }
+
+        try {
+            $fullPath = [System.IO.Path]::GetFullPath($candidate)
+            New-Item -ItemType Directory -Force -Path $fullPath | Out-Null
+
+            $probePath = Join-Path $fullPath ("ackit-temp-probe-" + [Guid]::NewGuid().ToString("N"))
+            [System.IO.File]::WriteAllText($probePath, "ok", [System.Text.UTF8Encoding]::new($false))
+            Remove-Item -LiteralPath $probePath -Force
+            return $fullPath
+        }
+        catch {
+            continue
+        }
+    }
+
+    try {
+        $dotnetTemp = [System.IO.Path]::GetTempPath()
+        if (-not [string]::IsNullOrWhiteSpace($dotnetTemp)) {
+            $fullPath = [System.IO.Path]::GetFullPath($dotnetTemp)
+            New-Item -ItemType Directory -Force -Path $fullPath | Out-Null
+
+            $probePath = Join-Path $fullPath ("ackit-temp-probe-" + [Guid]::NewGuid().ToString("N"))
+            [System.IO.File]::WriteAllText($probePath, "ok", [System.Text.UTF8Encoding]::new($false))
+            Remove-Item -LiteralPath $probePath -Force
+            return $fullPath
+        }
+    }
+    catch {
+    }
+
+    throw "No writable temporary directory is available."
+}
+
 function Test-ReleaseEvidence {
     param(
         [Parameter(Mandatory = $true)]
@@ -136,10 +178,7 @@ try {
             $release = gh release view $tagName --repo $Repository --json tagName,targetCommitish,isPrerelease,assets,url,publishedAt | ConvertFrom-Json
             if ($LASTEXITCODE -ne 0) { throw "GitHub Release is not accessible: $tagName" }
 
-            $tempBase = @($env:TEMP, $env:TMPDIR, $env:RUNNER_TEMP, [System.IO.Path]::GetTempPath()) |
-                Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
-                Select-Object -First 1
-            if ([string]::IsNullOrWhiteSpace($tempBase)) { throw "No temporary directory is available." }
+            $tempBase = Resolve-VerificationTempBase
             $temporaryRoot = Join-Path $tempBase ("ackit-existing-release-" + [Guid]::NewGuid().ToString("N"))
             $releaseAssetRoot = Join-Path $temporaryRoot "release"
             New-Item -ItemType Directory -Force -Path $releaseAssetRoot | Out-Null

@@ -4,19 +4,62 @@ param(
     [string]$PackageSource,
     [int]$MaxAttempts = 30,
     [int]$DelaySeconds = 10,
+    [switch]$TempResolutionSelfTest,
     [switch]$KeepTemporaryFiles
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$stamp = Get-Date -Format "yyyyMMddHHmmssfff"
-$tempBase = @($env:TEMP, $env:TMPDIR, $env:RUNNER_TEMP, [System.IO.Path]::GetTempPath()) |
-    Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
-    Select-Object -First 1
-if ([string]::IsNullOrWhiteSpace($tempBase)) {
-    throw "No temporary directory is available for package verification."
+function Resolve-VerificationTempBase {
+    $environmentCandidates = @(
+        $env:RUNNER_TEMP,
+        $env:TEMP,
+        $env:TMPDIR
+    )
+
+    foreach ($candidate in $environmentCandidates) {
+        if ([string]::IsNullOrWhiteSpace($candidate)) { continue }
+
+        try {
+            $fullPath = [System.IO.Path]::GetFullPath($candidate)
+            New-Item -ItemType Directory -Force -Path $fullPath | Out-Null
+
+            $probePath = Join-Path $fullPath ("ackit-temp-probe-" + [Guid]::NewGuid().ToString("N"))
+            [System.IO.File]::WriteAllText($probePath, "ok", [System.Text.UTF8Encoding]::new($false))
+            Remove-Item -LiteralPath $probePath -Force
+            return $fullPath
+        }
+        catch {
+            continue
+        }
+    }
+
+    try {
+        $dotnetTemp = [System.IO.Path]::GetTempPath()
+        if (-not [string]::IsNullOrWhiteSpace($dotnetTemp)) {
+            $fullPath = [System.IO.Path]::GetFullPath($dotnetTemp)
+            New-Item -ItemType Directory -Force -Path $fullPath | Out-Null
+
+            $probePath = Join-Path $fullPath ("ackit-temp-probe-" + [Guid]::NewGuid().ToString("N"))
+            [System.IO.File]::WriteAllText($probePath, "ok", [System.Text.UTF8Encoding]::new($false))
+            Remove-Item -LiteralPath $probePath -Force
+            return $fullPath
+        }
+    }
+    catch {
+    }
+
+    throw "No writable temporary directory is available for package verification."
 }
+
+if ($TempResolutionSelfTest) {
+    Write-Host ("Temporary directory: " + (Resolve-VerificationTempBase))
+    exit 0
+}
+
+$stamp = Get-Date -Format "yyyyMMddHHmmssfff"
+$tempBase = Resolve-VerificationTempBase
 $root = Join-Path $tempBase "ackit-package-verification-$stamp"
 $toolRoot = Join-Path $root "tool"
 $smokeRoot = Join-Path $root "smoke"
