@@ -116,6 +116,7 @@ Completed locally on 2026-06-18.
 Commits:
 - Planning: `fa45c0b` (`docs: plan release deployment failure hotfix`).
 - Implementation: `7a0e1f8` (`test: guard release deployment verification`).
+- Artifact retention follow-up: `1df8c40` (`ci: extend release package artifact retention`).
 
 Read-only deployment audit:
 - `5047180313` maps to release #4 run `27470495270`, job `81200598792`, commit `ed9bf78c193381646cec583d079a22c952ab020c`; failure was Ubuntu `publish and create release` invoking Windows-only `powershell`.
@@ -147,4 +148,7 @@ Validation:
 Remote note:
 - Historical `nuget-release` failed deployment records remain visible because this task did not mutate deployments, releases, tags, or NuGet state.
 - Pushed HEAD `85a14d9b9b47a832761befced80399617f56c573` passed hosted `master` workflows before the artifact-retention follow-up: `ci` run `27784382934`, `cross-platform-source-smoke` run `27784382902`, and `cross-platform-smoke` run `27784382871`.
-- Hosted verification for the artifact-retention follow-up is pending push.
+- Pushed HEAD `1df8c40a8656d93e2442c7cb45b75af9ce4a2ce9` passed hosted `master` workflows after the artifact-retention follow-up:
+  - `ci` run `27785141250` — success.
+  - `cross-platform-smoke` run `27785141441` — success.
+  - `cross-platform-source-smoke` run `27785141497` — success.
