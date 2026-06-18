@@ -100,4 +100,37 @@ Minimum:
 - No database, package, tag, deployment, or release rollback is required because the task performs no remote write.
 
 ## Completion Notes
-Pending implementation.
+Completed locally on 2026-06-18.
+
+Commits:
+- Planning: `fa45c0b` (`docs: plan release deployment failure hotfix`).
+- Implementation: `7a0e1f8` (`test: guard release deployment verification`).
+
+Read-only deployment audit:
+- `5047180313` maps to release #4 run `27470495270`, job `81200598792`, commit `ed9bf78c193381646cec583d079a22c952ab020c`; failure was Ubuntu `publish and create release` invoking Windows-only `powershell`.
+- `5047227343` maps to release #5 run `27470659578`, job `81201079722`, commit `f540479a92cbe66097f6796553828ee49ddd5512`; failure was published-package verification with null `Path`.
+- `5047239131` maps to release #5 run `27470659578`, job `81201198341`, commit `f540479a92cbe66097f6796553828ee49ddd5512`; failure repeated the published-package verification null `Path`.
+
+Implementation:
+- `scripts/verify-published-package.ps1` now resolves temp roots through a writable lazy helper: `RUNNER_TEMP`, `TEMP`, `TMPDIR`, then guarded `.NET` temp fallback.
+- `scripts/verify-published-package.ps1` exposes `-TempResolutionSelfTest` for local non-network regression coverage.
+- `scripts/verify-existing-release.ps1` uses the same lazy writable temp helper for release asset verification.
+- `scripts/check-release-workflow.ps1` rejects Windows-only `powershell` calls inside the Ubuntu publish job and requires verifier temp self-test coverage.
+- `ReleaseDeploymentFailureGuardTests` covers runner-temp fallback with `TEMP`/`TMPDIR` cleared and a negative workflow mutation containing `powershell` in the publish job.
+
+Validation:
+- `dotnet build AgentContextKit.sln -c Release --no-restore` — passed, 0 warnings, 0 errors.
+- Focused `ReleaseDeploymentFailureGuardTests` — passed, 2/2.
+- `dotnet test AgentContextKit.sln -c Release --no-build` — passed, 295/295.
+- Source `ackit scan --ci` — exit 0; existing `.remember` Medium findings only.
+- Source `ackit doctor` — 13/13 PASS.
+- `scripts/check-release-workflow.ps1 -FailOnIssues` — passed.
+- `scripts/verify-published-package.ps1 -Version 0.0.0-test -TempResolutionSelfTest` — passed.
+- `scripts/test-release-recovery.ps1` — passed.
+- `scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` — passed after implementation commit.
+- `git diff --check` — passed.
+- `scripts/verify-release.ps1` — passed.
+
+Remote note:
+- Historical `nuget-release` failed deployment records remain visible because this task did not mutate deployments, releases, tags, or NuGet state.
+- Hosted `master` workflow verification is pending push.

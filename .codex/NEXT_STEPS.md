@@ -1,6 +1,6 @@
 # Next Steps
 
-PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 is now active for TASK-0181 through TASK-0186 after completing TASK-0177 through TASK-0180.
+PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 completed TASK-0177 through TASK-0180, then inserted user-prioritized TASK-0187 before TASK-0181 to audit and harden the visible `nuget-release` failed deployments without release/tag/NuGet/deployment mutation.
 
 1. Current published release: `v0.2.0-alpha.2` at exact package commit `f540479a92cbe66097f6796553828ee49ddd5512`.
 2. PROJECT-CONTROL-0109 planning commit `b224c20` is the active entry point; TASK-0177 is hosted-verified and TASK-0178 implementation commit `336c3ee` plus evidence commit `90928f1` are pushed.
@@ -14,4 +14,5 @@ PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green
 10. Local TASK-0180 validation on 2026-06-18: planning commit `8a65723`, implementation commit `1bc0019`; `dotnet build` clean (0 warnings, 0 errors), focused hosted-check script tests 6/6 green, full suite 293/293 green, source `ackit scan --ci` exit 0 with existing Medium `.remember` log findings only, `ackit doctor` 13/13 PASS, `git diff --check` passed, `verify-release.ps1` passed, and `check-tracked-vs-untracked-md` passed after commit.
 11. Hosted evidence for pushed TASK-0180 HEAD `1bc0019`: `ci` run `27782907605`, `cross-platform-smoke` run `27782907712`, and `cross-platform-source-smoke` run `27782907825` all completed successfully on 2026-06-18.
 12. Screenshot/deployment note: the visible `nuget-release` red deployments are historical 2026-06-13 release-environment deployment status entries for old release workflow runs; TASK-0180 added read-only hosted check inspection and did not perform release, deployment, tag, or NuGet writes.
-13. `0.2.0-alpha.3` remains NO-GO because `RB-003` (independent backup security owner) and `RB-008` (destructive NuGet recovery authority) remain unresolved; no release write is performed.
+13. TASK-0187 local implementation on 2026-06-18: planning commit `fa45c0b`; implementation commit `7a0e1f8`; all three failed deployments were mapped (`5047180313`, `5047227343`, `5047239131`). `verify-published-package.ps1` and `verify-existing-release.ps1` now use lazy writable temp resolution; `check-release-workflow.ps1` rejects Windows-only `powershell` in the Ubuntu publish job; focused tests passed 2/2 and full tests passed 295/295. Source `scan --ci`, `doctor`, `check-release-workflow`, `test-release-recovery`, `check-tracked-vs-untracked-md`, `git diff --check`, and `verify-release.ps1` passed locally. Hosted verification is pending push.
+14. `0.2.0-alpha.3` remains NO-GO because `RB-003` (independent backup security owner) and `RB-008` (destructive NuGet recovery authority) remain unresolved; no release write is performed.
