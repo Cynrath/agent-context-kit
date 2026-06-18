@@ -28,7 +28,7 @@ PROJECT-CONTROL-0108 begins at `08442c0` with 257/257 tests green and TASK-0168 
 
 PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 planning begins at `b224c20` with TASK-0177 through TASK-0186 queued, and current `master`/`origin/master` is aligned at `cf22fd1`.
 
-TASK-0177 is implemented locally: hook targets now cover Codex, Claude, Anthropic, and Continue; dry-run reports planned paths plus content lengths without writing; focused hook tests passed 6/6 and the full suite passed 276/276. TASK-0178 MCP transport prototype step 1 is next after commit/push.
+TASK-0177 is implemented and hosted-verified: hook targets now cover Codex, Claude, Anthropic, and Continue; dry-run reports planned paths plus content lengths without writing; focused hook tests passed 6/6 and the full suite passed 276/276. Hosted runs for commit `5ef0b8e` passed on 2026-06-18: `ci` 27765668325, `cross-platform-smoke` 27765669068, and `cross-platform-source-smoke` 27765668177. TASK-0178 MCP transport prototype step 1 is next.
 
 ## Architecture
 - CLI project: `src/AgentContextKit.Cli`

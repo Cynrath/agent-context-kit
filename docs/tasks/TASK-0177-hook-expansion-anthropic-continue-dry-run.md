@@ -86,6 +86,7 @@ Single `git revert <sha>` removes all TASK-0177 changes; no other task depends o
 - Added dry-run precedence over `--install`; dry-run reports planned paths and content lengths without writing files.
 - Added six focused `HookExpansionTests`; focused run passed 6/6 and full test suite passed 276/276.
 - Validation on 2026-06-18: Release build 0 warnings/0 errors; source `scan --ci` exit 0 with existing Medium `.remember` log findings only; `doctor` 13/13 PASS; `scripts/verify-release.ps1` passed; CLI contract and localization parity gates passed.
+- Hosted checks for implementation commit `5ef0b8e` passed on 2026-06-18: `ci` run `27765668325`, `cross-platform-smoke` run `27765669068`, and `cross-platform-source-smoke` run `27765668177`.
 - Commit hash(es): planning `b224c20`; state-sync `d9b9a5d`; implementation is recorded in this commit and the final hash is reported by `git`.
 - Test count: 276.
 
