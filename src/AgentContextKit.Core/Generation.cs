@@ -613,13 +613,16 @@ public sealed class WebUiGenerator : IWebUiGenerator
         builder.AppendLine("<head>");
         builder.AppendLine("  <meta charset=\"utf-8\">");
         builder.AppendLine("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
+        builder.AppendLine("  <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self'; style-src 'unsafe-inline'; script-src 'self'; img-src 'self' data:; connect-src 'none'\">");
+        builder.AppendLine("  <meta name=\"robots\" content=\"noindex,nofollow\">");
+        builder.AppendLine("  <link rel=\"icon\" href=\"data:,\">");
         builder.AppendLine("  <title>" + E(projectName) + " - AgentContextKit Web UI</title>");
         builder.AppendLine("  <style>");
         builder.AppendLine("    :root{color-scheme:light;--ink:#1d2633;--muted:#617086;--line:#d7e0ea;--panel:#f6f8fb;--panel2:#eef4f8;--accent:#1b6ca8;--ok:#1f7a4d;--warn:#a35f00;--bad:#b3262d;--info:#5c4d9b;}");
         builder.AppendLine("    *{box-sizing:border-box;} body{margin:0;font-family:Segoe UI,Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.5;} a{color:var(--accent);text-decoration:none;} a:hover{text-decoration:underline;}");
         builder.AppendLine("    header{border-bottom:1px solid var(--line);background:var(--panel);padding:24px 20px;} main{max-width:1180px;margin:0 auto;padding:24px 20px 52px;} .top{max-width:1180px;margin:0 auto;}");
         builder.AppendLine("    h1{font-size:30px;margin:0 0 6px;} h2{font-size:20px;margin:28px 0 10px;} h3{font-size:16px;margin:0 0 6px;} p{margin:0 0 10px;color:var(--muted);} code{background:#fff;border:1px solid var(--line);border-radius:4px;padding:1px 4px;}");
-        builder.AppendLine("    nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;} nav a{border:1px solid var(--line);border-radius:8px;background:#fff;padding:7px 10px;font-size:14px;}");
+        builder.AppendLine("    nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;} nav a{border:1px solid var(--line);border-radius:8px;background:#fff;padding:7px 10px;font-size:14px;} nav a[aria-current=\"page\"]{border-color:var(--accent);font-weight:700;}");
         builder.AppendLine("    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:18px 0;} .metric{border:1px solid var(--line);background:#fff;border-radius:8px;padding:12px;min-height:82px;} .metric strong{display:block;font-size:24px;} .metric span{display:block;color:var(--muted);font-size:13px;}");
         builder.AppendLine("    .band{border-top:1px solid var(--line);padding-top:18px;} .split{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;} .tile{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:12px;}");
         builder.AppendLine("    table{border-collapse:collapse;width:100%;font-size:14px;} th,td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top;} th{background:var(--panel2);} .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:8px;} .tablewrap table{border:0;} .tablewrap th:first-child,.tablewrap td:first-child{border-left:0;} .tablewrap th:last-child,.tablewrap td:last-child{border-right:0;}");
@@ -627,12 +630,12 @@ public sealed class WebUiGenerator : IWebUiGenerator
         builder.AppendLine("    .status{font-weight:700;} .ok,.baseline-existing{color:var(--ok);} .fail,.baseline-new{color:var(--bad);} .severity-Critical{color:var(--bad);font-weight:700;} .severity-High{color:var(--warn);font-weight:700;} .severity-Medium{color:var(--info);font-weight:700;} .baseline-existing,.baseline-new{font-weight:700;} .muted{color:var(--muted);} @media(max-width:700px){h1{font-size:24px;} main{padding:18px 14px 40px;} header{padding:20px 14px;} nav a{flex:1 1 150px;text-align:center;}}");
         builder.AppendLine("  </style>");
         builder.AppendLine("</head>");
-        builder.AppendLine("<body>");
+        builder.AppendLine("<body data-no-network=\"true\">");
         builder.AppendLine("<header><div class=\"top\">");
         builder.AppendLine("  <h1>" + E(Label(language, "AgentContextKit Web UI", "AgentContextKit Web UI")) + "</h1>");
         builder.AppendLine("  <p>" + E(projectName) + " | " + E(generatedAt) + "</p>");
         builder.AppendLine("  <p><code>" + E(scanResult.RepositoryPath) + "</code></p>");
-        builder.AppendLine("  <nav aria-label=\"" + E(Label(language, "Sections", "Bolumler")) + "\"><a href=\"#dashboard\">" + E(Label(language, "Dashboard", "Panel")) + "</a><a href=\"#health\">" + E(Label(language, "Health", "Saglik")) + "</a><a href=\"#findings\">" + E(Label(language, "Findings", "Bulgular")) + "</a><a href=\"#context\">" + E(Label(language, "Context Files", "Context Dosyalari")) + "</a><a href=\"#tasks\">" + E(Label(language, "Tasks", "Tasklar")) + "</a></nav>");
+        builder.AppendLine("  <nav aria-label=\"" + E(Label(language, "Sections", "Bolumler")) + "\"><a href=\"#dashboard\" aria-current=\"page\">" + E(Label(language, "Dashboard", "Panel")) + "</a><a href=\"#health\">" + E(Label(language, "Health", "Saglik")) + "</a><a href=\"#findings\">" + E(Label(language, "Findings", "Bulgular")) + "</a><a href=\"#context\">" + E(Label(language, "Context Files", "Context Dosyalari")) + "</a><a href=\"#tasks\">" + E(Label(language, "Tasks", "Tasklar")) + "</a></nav>");
         builder.AppendLine("</div></header>");
         builder.AppendLine("<main>");
 

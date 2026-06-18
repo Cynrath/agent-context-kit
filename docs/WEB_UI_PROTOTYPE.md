@@ -43,6 +43,9 @@ ackit webui --output .ackit/webui/baseline.html --baseline .ackit-baseline.json
 - Generated Web UI files can include local repository paths and local audit context. Keep them local; do not attach them to public GitHub Releases or NuGet packages.
 - Baseline mode adds existing/new dashboard metrics and a Baseline column in the finding browser; all findings remain visible.
 
+## No-Network Contract
+Generated Web UI files are no-build, single-file HTML artifacts. They include inline CSS, a self-only Content Security Policy, `connect-src 'none'`, `data-no-network="true"` on the document body, `noindex,nofollow` robots metadata, and a `data:` favicon to avoid browser default `/favicon.ico` fetches. The generated page must not reference external scripts, stylesheets, fonts, analytics, or remote API endpoints.
+
 ## JSON Output
 `ackit webui --json` returns generated file metadata and a risk summary:
 

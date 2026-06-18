@@ -77,6 +77,7 @@ agent-context-kit.rar
 agent-context-kit.zip
 
 # Playwright MCP browser artifacts
+.playwright-cli/
 .playwright-mcp/
 
 # Local screenshots and ephemeral test artifacts

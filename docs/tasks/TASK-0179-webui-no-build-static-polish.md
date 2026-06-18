@@ -10,8 +10,8 @@ Replace the current WebUI generated file with a slim no-build viewer: a single H
 
 ## Evidence
 - `src/AgentContextKit.Cli/Program.cs` `RunWebUi` (existing).
-- `docs/WEBUI.md` (existing).
-- `docs/PLAYWRIGHT_VERIFICATION.md` (existing).
+- `docs/WEB_UI_PROTOTYPE.md` (existing).
+- Previous browser verification evidence is recorded in the handoff/history docs; there is no current `docs/PLAYWRIGHT_VERIFICATION.md` file in this repository.
 
 ## Scope
 - Add a `data-no-network="true"` attribute to the WebUI root to make the no-network contract self-describing.
@@ -25,9 +25,18 @@ Replace the current WebUI generated file with a slim no-build viewer: a single H
 - Adding new sections, fields, or content.
 - Changing the data model.
 
+## Impact Review
+- DB impact: none; no database, migration, schema, or persisted state change.
+- Admin impact: none; no admin UI or privileged action is added.
+- Permission impact: none; generated output remains local-only and requires explicit `ackit webui` invocation.
+- SEO/i18n impact: generated local Web UI now includes `noindex,nofollow`; existing English/Turkish labels remain unchanged.
+- Audit/security impact: CSP, `connect-src 'none'`, and `data-no-network="true"` make the offline/no-network contract explicit; no external resource, telemetry, or remote call is introduced.
+
 ## Affected Files
-- `src/AgentContextKit.Core/Templates.cs` — `WebUi` template (or whatever the current key is; check first).
-- `docs/WEBUI.md` — add a "No-Network Contract" subsection.
+- `src/AgentContextKit.Core/Generation.cs` — `WebUiGenerator` HTML output.
+- `docs/WEB_UI_PROTOTYPE.md` — add a "No-Network Contract" subsection.
+- `tests/AgentContextKit.Tests/WebUiNoBuildStaticGuardTests.cs` — new.
+- `.gitignore` — ignore Playwright CLI verification artifacts.
 
 ## Implementation Steps
 1. Planning commit.
@@ -62,21 +71,25 @@ Replace the current WebUI generated file with a slim no-build viewer: a single H
 - WebUiNoBuildStaticGuardTests (4 new).
 
 ## Validation
-- `dotnet build` — 0 errors.
-- `dotnet test` — 286+ / 0 / 0.
-- `ackit scan --ci` — exit 0.
-- `ackit doctor` — 14/14 PASS.
-- `scripts/verify-release.ps1` — pass.
-- `scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` — clean.
-- `git status` — clean.
+- `dotnet build AgentContextKit.sln -c Release --no-restore` — 0 warnings, 0 errors.
+- `dotnet test tests/AgentContextKit.Tests/AgentContextKit.Tests.csproj -c Release --no-build --filter "FullyQualifiedName~WebUiNoBuildStaticGuardTests"` — 4/4 passed.
+- `dotnet test AgentContextKit.sln -c Release --no-build` — 287/287 passed.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- webui --output .ackit/webui/task-0179-validation-2.html --json` — created ignored local Web UI.
+- `Invoke-WebRequest http://127.0.0.1:8765/.ackit/webui/task-0179-validation-2.html` — 200; verified 5 nav links, CSP, robots, `data-no-network`, data favicon, and no external script/link references.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci` — exit 0; existing `.remember` Medium log findings only.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- doctor` — 13/13 PASS.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-release.ps1` — passed; dirty-tree blocker was expected before commit.
+- `scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` — run after staging/commit.
+- `git status` — clean after commit/push.
 
 ## Rollback
 Single `git revert <sha>`.
 
 ## Completion Evidence
 - File list: above.
-- Commit hash(es): planning + implementation.
-- Test count: 286+.
+- Commit hash(es): pending implementation commit.
+- Test count: 287/287.
+- Browser note: Playwright CLI loaded the page and confirmed the page title/snapshot, but the local Kaspersky browser integration injected `me.kis...` requests and a CSP console warning outside the generated HTML. The deterministic verification for this task is the IWR/static HTML gate above plus the new no-build guard tests.
 
 ## Push
 - `git push origin master` only.
