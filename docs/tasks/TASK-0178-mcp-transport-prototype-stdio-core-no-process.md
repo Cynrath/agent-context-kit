@@ -95,7 +95,7 @@ Single `git revert <sha>`. No other task depends on TASK-0178.
 
 ## Completion Evidence
 - File list: above.
-- Commit hash(es): pending implementation commit.
+- Commit hash(es): `336c3eee1aa7453d439708ce3c9805dc8d0c0302` (`feat: add local rpc router prototype`).
 - Test count: 283/283.
 - Local risk: no Critical/High findings in source `scan --ci`; existing `.remember` Medium log findings remain.
 
