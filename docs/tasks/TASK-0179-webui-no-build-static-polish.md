@@ -87,7 +87,7 @@ Single `git revert <sha>`.
 
 ## Completion Evidence
 - File list: above.
-- Commit hash(es): pending implementation commit.
+- Commit hash(es): `e4108ee1109a2845b437c0abfe4042517cef6326` (`feat: harden static webui output`).
 - Test count: 287/287.
 - Browser note: Playwright CLI loaded the page and confirmed the page title/snapshot, but the local Kaspersky browser integration injected `me.kis...` requests and a CSP console warning outside the generated HTML. The deterministic verification for this task is the IWR/static HTML gate above plus the new no-build guard tests.
 
