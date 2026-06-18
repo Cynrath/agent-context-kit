@@ -75,6 +75,17 @@ if (-not $validateBlock.Contains('pwsh -NoProfile -File scripts/test-local-markd
     $issues.Add("Markdown link gates must run in isolated pwsh child processes.") | Out-Null
 }
 
+$artifactRetention = [regex]::Match($validateBlock, "(?m)^\s+retention-days:\s*(?<days>\d+)\s*$")
+if (-not $artifactRetention.Success) {
+    $issues.Add("Validated package artifact retention must be declared.") | Out-Null
+}
+else {
+    $retentionDays = [int]$artifactRetention.Groups["days"].Value
+    if ($retentionDays -lt 14) {
+        $issues.Add("Validated package artifact retention must be at least 14 days for delayed publish reruns.") | Out-Null
+    }
+}
+
 foreach ($marker in @("if: inputs.operation == 'publish'", "environment: nuget-release", "contents: write", "id-token: write", "attestations: write", "NuGet/login@v1", "user: Cyranth", "steps.login.outputs.NUGET_API_KEY", "dotnet nuget push", "gh release create", "actions/attest@v4", "gh attestation verify", "ackit-attestation-subject")) {
     if (-not $publishBlock.Contains($marker)) { $issues.Add("Publish permission/operation marker missing: $marker") | Out-Null }
 }

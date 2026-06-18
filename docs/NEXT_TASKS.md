@@ -7,7 +7,7 @@ This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTRO
 2. TASK-0178 MCP transport prototype step 1 (Core interface + JSON-RPC plumbing, no process spawn) - hosted-verified; 283/283 tests green.
 3. TASK-0179 webui no-build static polish - hosted-verified; 287/287 tests green.
 4. TASK-0180 hosted check status reporter script - hosted-verified; 293/293 tests green.
-5. TASK-0187 release deployment failure audit and script hardening - implemented locally; hosted verification pending; no release/tag/NuGet/deployment mutation.
+5. TASK-0187 release deployment failure audit and script hardening - implemented locally; artifact-retention hosted verification pending; no release/tag/NuGet/deployment mutation.
 6. TASK-0181 SARIF roundtrip regression test - next after TASK-0187 hosted sync.
 7. TASK-0182 prompt pack edge cases (empty repo, single-file repo, docs-only repo, secret-bearing fixture).
 8. TASK-0183 catalog rule id and severity stability test.

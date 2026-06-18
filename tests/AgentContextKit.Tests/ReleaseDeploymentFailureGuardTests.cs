@@ -48,6 +48,28 @@ public sealed class ReleaseDeploymentFailureGuardTests
         Assert.Contains("Publish job must not call Windows-only powershell", result.Output);
     }
 
+    [Fact]
+    public void ReleaseWorkflowCheckRejectsShortValidatedPackageArtifactRetention()
+    {
+        using var repo = TempRepository.Create();
+        var root = LocateRepositoryRoot();
+        var originalWorkflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "release.yml"));
+        var mutatedWorkflow = originalWorkflow.Replace(
+            "retention-days: 14",
+            "retention-days: 1",
+            StringComparison.Ordinal);
+
+        var workflowPath = Path.Combine(repo.Path, "release.yml");
+        File.WriteAllText(workflowPath, mutatedWorkflow);
+
+        var result = RunPowerShellScript(
+            Path.Combine(root, "scripts", "check-release-workflow.ps1"),
+            ["-WorkflowPath", workflowPath, "-FailOnIssues"]);
+
+        Assert.Equal(1, result.ExitCode);
+        Assert.Contains("Validated package artifact retention must be at least 14 days", result.Output);
+    }
+
     private static (int ExitCode, string Output, string Error) RunPowerShellScript(
         string scriptPath,
         string[] args,

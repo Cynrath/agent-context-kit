@@ -142,7 +142,7 @@ jobs:
           name: AgentContextKit-${{ inputs.version }}
           path: ${{ runner.temp }}/ackit-release-package/*.*nupkg
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 14
 
   publish:
     if: inputs.operation == 'publish'
