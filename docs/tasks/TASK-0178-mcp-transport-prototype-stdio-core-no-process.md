@@ -103,4 +103,7 @@ Single `git revert <sha>`. No other task depends on TASK-0178.
 - `git push origin master` only.
 
 ## Hosted Checks
-- Local gates only; CI runs on push.
+- Pushed HEAD `90928f12b83a26d3a4d66bff4ba3e403a3215fe8` completed successfully on 2026-06-18:
+  - `ci` run `27767741917`.
+  - `cross-platform-smoke` run `27767741926`.
+  - `cross-platform-source-smoke` run `27767741935`.
