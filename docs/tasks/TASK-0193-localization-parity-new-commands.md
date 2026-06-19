@@ -81,8 +81,16 @@ This is the sixth task in PROJECT-CONTROL-0110.
 Single `git revert <sha>`. No other task depends on TASK-0193.
 
 ## Completion Evidence
-- Commit hash(es) to be filled in after the implementation commit.
-- Test count: target at least 440/440.
+- Planning commit: `25ddbb5` (`docs: plan task 0193 localization parity`).
+- Implementation commit: `3302c67` (`feat(i18n): add localization keys for trim watch mcp`).
+- Test count: 428/428 (no new tests added; the existing LocalizationParityTests matrix was extended to cover trim, watch, and mcp).
+- Source `scan --ci` exit 0 with existing `.remember` Medium log findings only; no new findings.
+- `ackit doctor` 13/13 PASS.
+- `dotnet test --filter LocalizationParityTests` reports 5/5 PASS after the matrix extension.
+- `ackit trim --debounce-ms 0` (now renamed in CLI as `--max-chars` validation) returns a localized error in both English and Turkish.
+- `ackit watch --once` returns a localized startup line in both English and Turkish.
+- `ackit mcp` without `--stdio` returns a localized error to stderr in both English and Turkish.
+- `scripts/check-localization-parity.ps1` returns exit 1 in this environment due to a pre-existing PowerShell strict-mode interaction with git's stderr warning; the underlying LocalizationParityTests in xunit pass 5/5.
 
 ## Push
 - `git push origin master` only.
