@@ -30,7 +30,7 @@ public sealed class McpRouterTests
             .ToArray() ?? [];
 
         Assert.Equal(
-            ["ackit.scan", "ackit.findings", "ackit.context", "ackit.health"],
+            ["ackit.scan", "ackit.findings", "ackit.context", "ackit.rules", "ackit.health"],
             tools);
     }
 
@@ -120,6 +120,76 @@ public sealed class McpRouterTests
         Assert.True(summary?["total"]?.GetValue<int>() > 0);
         Assert.True(summary?["passed"]?.GetValue<int>() > 0);
         Assert.NotEmpty(response["result"]?["structuredContent"]?["checks"]?.AsArray() ?? []);
+    }
+
+    [Fact]
+    public void RulesToolReturnsCatalogInAscendingIdOrder()
+    {
+        var router = CreateRouter();
+        var response = InvokeTool(router, "ackit.rules", new JsonObject());
+
+        var rules = response["result"]?["structuredContent"]?["rules"]?.AsArray()
+            ?? throw new InvalidOperationException("rules array missing.");
+        var ids = rules.Select(node => node?["id"]?.GetValue<string>() ?? string.Empty).ToArray();
+
+        Assert.Null(response["error"]);
+        Assert.NotEmpty(rules);
+        Assert.Equal(ids.OrderBy(id => id, StringComparer.Ordinal).ToArray(), ids);
+    }
+
+    [Fact]
+    public void RulesToolReturnsStableRuleShape()
+    {
+        var router = CreateRouter();
+        var response = InvokeTool(router, "ackit.rules", new JsonObject());
+        var rules = response["result"]?["structuredContent"]?["rules"]?.AsArray()
+            ?? throw new InvalidOperationException("rules array missing.");
+
+        Assert.All(rules, rule =>
+        {
+            Assert.NotNull(rule?["id"]?.GetValue<string>());
+            Assert.NotNull(rule?["name"]?.GetValue<string>());
+            Assert.NotNull(rule?["category"]?.GetValue<string>());
+            Assert.NotNull(rule?["defaultSeverity"]?.GetValue<string>());
+            Assert.NotNull(rule?["description"]?.GetValue<string>());
+            Assert.NotNull(rule?["recommendation"]?.GetValue<string>());
+        });
+    }
+
+    [Fact]
+    public void RulesToolReturnsServerVersionInPayload()
+    {
+        var router = CreateRouter();
+        var response = InvokeTool(router, "ackit.rules", new JsonObject());
+
+        Assert.Equal("0.2.0-alpha.2-test", response["result"]?["structuredContent"]?["version"]?.GetValue<string>());
+        Assert.Equal(response["result"]?["structuredContent"]?["count"]?.GetValue<int>(),
+            response["result"]?["structuredContent"]?["rules"]?.AsArray()?.Count);
+    }
+
+    [Fact]
+    public void RulesToolIsDeterministic()
+    {
+        var router = CreateRouter();
+        var first = InvokeTool(router, "ackit.rules", new JsonObject());
+        var second = InvokeTool(router, "ackit.rules", new JsonObject());
+
+        var firstJson = first.ToJsonString();
+        var secondJson = second.ToJsonString();
+        Assert.Equal(firstJson, secondJson);
+    }
+
+    [Fact]
+    public void RulesToolIgnoresArguments()
+    {
+        var router = CreateRouter();
+        var response = InvokeTool(router, "ackit.rules", new JsonObject
+        {
+            ["repoPath"] = "https://example.com"
+        });
+
+        Assert.Null(response["error"]);
+        Assert.NotNull(response["result"]);
     }
 
     [Fact]

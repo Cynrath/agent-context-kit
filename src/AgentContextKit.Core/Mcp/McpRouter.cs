@@ -60,6 +60,7 @@ public sealed class McpRouter : IMcpServer
         Tool("ackit.scan", "Run a local AgentContextKit scan and return a compact summary.", "repoPath", "lang", "format"),
         Tool("ackit.findings", "Return local risk findings filtered by minimum severity.", "repoPath", "minSeverity", "lang"),
         Tool("ackit.context", "Return a local, write-free agent context preview for a target.", "repoPath", "target", "lang"),
+        Tool("ackit.rules", "Return the local AgentContextKit risk rule catalog as a read-only metadata snapshot.", "lang"),
         Tool("ackit.health", "Return a local repository health snapshot.", "repoPath", "lang")
     ];
 
@@ -122,6 +123,7 @@ public sealed class McpRouter : IMcpServer
             "ackit.scan" => CallScan(request.Id, arguments),
             "ackit.findings" => CallFindings(request.Id, arguments),
             "ackit.context" => CallContext(request.Id, arguments),
+            "ackit.rules" => CallRules(request.Id, arguments),
             "ackit.health" => CallHealth(request.Id, arguments),
             _ => InvalidParams(request.Id, $"Unknown tool: {name}.")
         };
@@ -280,6 +282,30 @@ public sealed class McpRouter : IMcpServer
                 passed = check.Passed,
                 message = check.Message
             }).ToArray()
+        }));
+    }
+
+    private McpResponse CallRules(string? id, JsonObject arguments)
+    {
+        var rules = RiskRuleCatalog.All
+            .OrderBy(rule => rule.Id, StringComparer.Ordinal)
+            .Select(rule => new
+            {
+                id = rule.Id,
+                name = rule.Name,
+                category = rule.Category.ToString(),
+                defaultSeverity = rule.DefaultSeverity.ToString(),
+                description = rule.Description,
+                recommendation = rule.Recommendation
+            })
+            .ToArray();
+
+        var text = $"ackit rules: {rules.Length} rules in catalog";
+        return Success(id, ToolResult(text, new
+        {
+            version = _serverVersion,
+            count = rules.Length,
+            rules
         }));
     }
 

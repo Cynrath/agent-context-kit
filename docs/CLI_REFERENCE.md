@@ -259,7 +259,7 @@ Modes:
 
 Tool behavior (both modes):
 - Tool calls require a local `repoPath` argument inside JSON-RPC params, or a `--repo <path>` default in `--stdio-server` mode. URLs, `file:` URIs, UNC paths, and traversal attempts return `-32602 Invalid params`. The error message never echoes the supplied path.
-- Initial tools are `ackit.scan`, `ackit.findings`, `ackit.context`, and `ackit.health`.
+- Initial tools are `ackit.scan`, `ackit.findings`, `ackit.context`, `ackit.rules`, and `ackit.health`. `ackit.rules` returns the read-only risk rule catalog snapshot and accepts no arguments.
 - Tool responses are sanitized: `match` is always `null` in `ackit.findings` entries; absolute local paths never appear; the human-readable text references only the repository basename.
 - `repoPath` validation, scanner invocation, and result shaping are shared between the legacy one-shot path and the real stdio server; both routes go through the same `McpRouter`.
 

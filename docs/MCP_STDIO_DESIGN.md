@@ -57,6 +57,7 @@ The reported `version` is the local `AssemblyInformationalVersion` of the runnin
 | `ackit.findings` | Return full risk findings, filtered by severity. | `repoPath: string`, `minSeverity?: "info"\|"low"\|"medium"\|"high"\|"critical"`, `lang?: "en"\|"tr"` |
 | `ackit.context` | Build a context pack for a given target. | `repoPath: string`, `target: "codex"\|"claude"\|"anthropic"\|"cursor"\|"copilot"\|"continue"\|"all"`, `lang?: "en"\|"tr"` |
 | `ackit.health` | Return a structured health snapshot (doctor). | `repoPath: string`, `lang?: "en"\|"tr"` |
+| `ackit.rules` | Return the local read-only risk rule catalog snapshot. | none (catalog is global; arguments are ignored) |
 
 Each tool argument is validated; unknown or missing required arguments return a JSON-RPC `-32602 Invalid params` error.
 

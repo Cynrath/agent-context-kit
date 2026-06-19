@@ -33,7 +33,7 @@ public sealed class McpStdioTransportTests
             .ToArray() ?? [];
 
         Assert.Equal(
-            ["ackit.scan", "ackit.findings", "ackit.context", "ackit.health"],
+            ["ackit.scan", "ackit.findings", "ackit.context", "ackit.rules", "ackit.health"],
             tools);
     }
 
@@ -262,6 +262,20 @@ public sealed class McpStdioTransportTests
 
         Assert.Equal(0, exit);
         Assert.Equal(string.Empty, stdout.ToString());
+    }
+
+    [Fact]
+    public async Task RulesToolIsReachableThroughTransport()
+    {
+        var (transport, output) = MakeToolCall("ackit.rules", "");
+
+        await transport.RunAsync();
+        var response = ParseSingleResponse(output.ToString());
+        var rules = response["result"]?["structuredContent"]?["rules"]?.AsArray()
+            ?? throw new InvalidOperationException("rules array missing.");
+
+        Assert.Null(response["error"]);
+        Assert.NotEmpty(rules);
     }
 
     [Fact]
