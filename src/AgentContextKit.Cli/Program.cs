@@ -1210,7 +1210,7 @@ public static class Program
             }
             var content = File.ReadAllText(inputFull);
             var originalChars = content.Length;
-            var trimmed = TrimContent(content, maxChars);
+            var trimmed = TextTrimmer.Trim(content, maxChars);
             Directory.CreateDirectory(Path.GetDirectoryName(outputFull)!);
             File.WriteAllText(outputFull, trimmed);
 
@@ -1242,19 +1242,6 @@ public static class Program
             else Console.Error.WriteLine($"ackit trim failed: {ex.Message}");
             return ExitError;
         }
-    }
-
-    private static string TrimContent(string content, int maxChars)
-    {
-        if (content.Length <= maxChars) return content;
-        const string header = "# Trimmed by ackit trim";
-        const string note = "\n<!-- trimmed: content exceeded max-chars; body truncated deterministically. -->\n";
-        if (maxChars <= header.Length + note.Length)
-        {
-            return header + note;
-        }
-        var bodyBudget = maxChars - header.Length - note.Length;
-        return header + note + content.Substring(0, bodyBudget);
     }
 
     private static int RunWatch(string[] args, string repositoryPath, AckitConfig config, LanguageCode language, bool json, Services services)
