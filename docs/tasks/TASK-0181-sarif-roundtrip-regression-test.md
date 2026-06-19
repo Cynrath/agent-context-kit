@@ -75,14 +75,19 @@ Single `git revert <sha>` (or revert the two commits in reverse order).
 - Commit hashes:
   - State sync: `f63f7a6` (`docs: sync task 0181 handoff state`).
   - Implementation: `52399d5` (`test: add sarif roundtrip regression`).
+  - Evidence: `59c1217` (`docs: record task 0181 validation`).
 - Test count: 299/299 (3 new: `SarifRoundtripMapsEveryFindingToExpectedRule`, `SarifRoundtripHandlesEmptyFindings`, `SarifRoundtripWriterDoesNotSerializeSuppressions`).
 - Hosted checks for pushed HEAD `52399d5`:
   - `ci` run `27823838324` — success.
   - `cross-platform-smoke` run `27823838358` — success.
   - `cross-platform-source-smoke` run `27823838341` — success.
+- Hosted checks for evidence commit `59c1217`:
+  - `ci` run `27824183780` — success.
+  - `cross-platform-smoke` run `27824183648` — success.
+  - `cross-platform-source-smoke` run `27824183739` — success.
 
 ## Push
 - `git push origin master` only.
 
 ## Hosted Checks
-- All three standard `master` workflows passed for pushed HEAD `52399d5`.
+- All three standard `master` workflows passed for both pushed HEAD `52399d5` and evidence commit `59c1217`.
