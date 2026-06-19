@@ -70,15 +70,19 @@ Single `git revert <sha>`.
 
 ## Completion Evidence
 - File list: `tests/AgentContextKit.Tests/PromptPackEdgeCaseTests.cs` (new).
-- Commit hash(es): implementation `8fc1361`.
+- Commit hash(es): implementation `8fc1361`; evidence `b57a292`.
 - Test count: 303/303 (4 new).
 - Hosted checks for pushed HEAD `8fc1361`:
   - `ci` run `27825503005` — success.
   - `cross-platform-smoke` run `27825502983` — success.
   - `cross-platform-source-smoke` run `27825502972` — success.
+- Hosted checks for evidence commit `b57a292`:
+  - `ci` run `27825767286` — success.
+  - `cross-platform-smoke` run `27825767260` — success.
+  - `cross-platform-source-smoke` run `27825767256` — success.
 
 ## Push
 - `git push origin master` only.
 
 ## Hosted Checks
-- All three standard `master` workflows passed for pushed HEAD `8fc1361`.
+- All three standard `master` workflows passed for both pushed HEAD `8fc1361` and evidence commit `b57a292`.
