@@ -2,7 +2,11 @@ namespace AgentContextKit.Core;
 
 public interface IRepositoryScanner
 {
-    ScanResult Scan(string repositoryPath, AckitConfig? config = null);
+    ScanResult Scan(
+        string repositoryPath,
+        AckitConfig? config = null,
+        IReadOnlyList<string>? includeGlobs = null,
+        IReadOnlyList<string>? excludeGlobs = null);
 }
 
 public interface IStackDetector

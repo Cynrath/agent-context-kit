@@ -32,7 +32,7 @@ The v1.0 target command surface is:
 ```text
 ackit init [--lang en|tr] [--json]
 ackit config-check [--lang en|tr] [--json]
-ackit scan [--baseline <repo-relative.json>] [--lang en|tr] [--json] [--ci]
+ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
 ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]
 ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]
 ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]
@@ -68,6 +68,8 @@ ackit help
 - `--json`: emits machine-readable JSON where supported.
 - `--ci`: applies only to `scan`; default mode evaluates every finding, while explicit baseline mode evaluates only new High/Critical findings.
 - `--baseline <repo-relative.json>`: opts `scan` into baseline classification/new-finding CI policy and adds the same classification metadata to `sarif`, `report`, or `webui` output.
+- `--include <glob>` (repeatable, `scan` only): restrict `scan` to relative paths matching at least one glob. Globs support `*` (single segment), `**` (any depth), and `?` (single character). If no `--include` is set, every file is considered. Empty or whitespace-only globs are rejected and return exit `1` with an "Invalid argument" error.
+- `--exclude <glob>` (repeatable, `scan` only): drop relative paths matching any glob. Same glob syntax as `--include`. Applied after `--include`. Empty or whitespace-only globs are rejected and return exit `1`.
 - `--update`: permits explicit replacement only for `ackit baseline`.
 - `--target`: selects the generator or hooks target where supported. Current hooks targets are `codex`, `claude`, `anthropic`, and `continue`.
 - `--shell pwsh|sh`: selects hook script syntax where hooks need a script. Continue hooks are shell-agnostic, but only these two shell values are accepted.

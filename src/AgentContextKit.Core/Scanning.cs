@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AgentContextKit.Core;
@@ -29,7 +30,11 @@ public sealed class RepositoryScanner : IRepositoryScanner
         _riskScanner = riskScanner;
     }
 
-    public ScanResult Scan(string repositoryPath, AckitConfig? config = null)
+    public ScanResult Scan(
+        string repositoryPath,
+        AckitConfig? config = null,
+        IReadOnlyList<string>? includeGlobs = null,
+        IReadOnlyList<string>? excludeGlobs = null)
     {
         var root = Path.GetFullPath(repositoryPath);
         var activeConfig = config ?? AckitConfig.Default;
@@ -37,6 +42,8 @@ public sealed class RepositoryScanner : IRepositoryScanner
             .EnumerateFiles(root, IgnoredDirectoryNames)
             .Select(file => ToRelativePath(root, file))
             .Where(file => !IsIgnoredByConfig(file, activeConfig))
+            .Where(file => MatchesAnyGlob(file, includeGlobs, defaultWhenEmpty: true))
+            .Where(file => !MatchesAnyGlob(file, excludeGlobs, defaultWhenEmpty: false))
             .OrderBy(file => file, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -62,6 +69,24 @@ public sealed class RepositoryScanner : IRepositoryScanner
         {
             Suppressions = riskScan.Suppressions
         };
+    }
+
+    private static bool MatchesAnyGlob(string relativePath, IReadOnlyList<string>? globs, bool defaultWhenEmpty)
+    {
+        if (globs is null || globs.Count == 0)
+        {
+            return defaultWhenEmpty;
+        }
+
+        foreach (var glob in globs)
+        {
+            if (GlobMatcher.IsMatch(relativePath, glob))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     internal static string ToRelativePath(string root, string path)
@@ -1294,5 +1319,68 @@ public sealed class HighEntropyScanner : IHighEntropyScanner
         }
 
         return entropy;
+    }
+}
+
+public static class GlobMatcher
+{
+    private static readonly TimeSpan RegexTimeout = TimeSpan.FromSeconds(1);
+
+    public static bool IsMatch(string relativePath, string glob)
+    {
+        if (string.IsNullOrWhiteSpace(glob))
+        {
+            throw new ArgumentException("Glob pattern must not be empty or whitespace.", nameof(glob));
+        }
+
+        var regex = GlobToRegex(glob);
+        return Regex.IsMatch(relativePath, regex, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, RegexTimeout);
+    }
+
+    internal static string GlobToRegex(string glob)
+    {
+        var builder = new StringBuilder("^");
+        var index = 0;
+        while (index < glob.Length)
+        {
+            var current = glob[index];
+            if (current == '*')
+            {
+                if (index + 1 < glob.Length && glob[index + 1] == '*')
+                {
+                    builder.Append(".*");
+                    index += 2;
+                    if (index < glob.Length && glob[index] == '/')
+                    {
+                        index++;
+                    }
+                    continue;
+                }
+
+                builder.Append("[^/]*");
+                index++;
+                continue;
+            }
+
+            if (current == '?')
+            {
+                builder.Append("[^/]");
+                index++;
+                continue;
+            }
+
+            if (current == '.' || current == '(' || current == ')' || current == '+' ||
+                current == '|' || current == '^' || current == '$' || current == '{' ||
+                current == '}' || current == '[' || current == ']' || current == '\\')
+            {
+                builder.Append('\\');
+            }
+
+            builder.Append(current);
+            index++;
+        }
+
+        builder.Append('$');
+        return builder.ToString();
     }
 }

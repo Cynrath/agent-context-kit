@@ -174,6 +174,11 @@ public sealed class TextProvider : ITextProvider
             ["en"] = "Unknown command",
             ["tr"] = "Bilinmeyen komut"
         },
+        ["invalidArgument"] = new()
+        {
+            ["en"] = "Invalid argument",
+            ["tr"] = "Geçersiz bağımsız değişken"
+        },
         ["baselineClassification"] = new()
         {
             ["en"] = "Baseline classification:",

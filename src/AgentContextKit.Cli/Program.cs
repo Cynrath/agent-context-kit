@@ -65,7 +65,7 @@ public static class Program
         Console.WriteLine(textProvider.Get("usage", language));
         Console.WriteLine("  ackit init [--lang en|tr] [--json]");
         Console.WriteLine("  ackit config-check [--lang en|tr] [--json]");
-        Console.WriteLine("  ackit scan [--baseline <repo-relative.json>] [--lang en|tr] [--json] [--ci]");
+        Console.WriteLine("  ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]");
         Console.WriteLine("  ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]");
@@ -262,7 +262,19 @@ public static class Program
 
     private static int RunScan(string[] args, string repositoryPath, AckitConfig config, LanguageCode language, bool json, bool ci, Services services)
     {
-        var scan = services.RepositoryScanner.Scan(repositoryPath, config);
+        IReadOnlyList<string> includeGlobs;
+        IReadOnlyList<string> excludeGlobs;
+        try
+        {
+            includeGlobs = ParseGlobList(args, "--include");
+            excludeGlobs = ParseGlobList(args, "--exclude");
+        }
+        catch (ArgumentException ex)
+        {
+            return WriteInvalidArgumentError("scan", ex.Message, json, language, services);
+        }
+
+        var scan = services.RepositoryScanner.Scan(repositoryPath, config, includeGlobs, excludeGlobs);
         string? baselinePath;
         BaselineEvaluation? baseline;
         try
@@ -290,6 +302,62 @@ public static class Program
         }
 
         return exitCode;
+    }
+
+    private static IReadOnlyList<string> ParseGlobList(string[] args, string name)
+    {
+        var values = new List<string>();
+        for (var index = 0; index < args.Length; index++)
+        {
+            var current = args[index];
+            string? value = null;
+            if (current.StartsWith(name + "=", StringComparison.OrdinalIgnoreCase))
+            {
+                value = current[(name.Length + 1)..];
+            }
+            else if (string.Equals(current, name, StringComparison.OrdinalIgnoreCase) && index + 1 < args.Length)
+            {
+                value = args[index + 1];
+                index++;
+            }
+
+            if (value is null)
+            {
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException($"{name} glob must not be empty or whitespace.");
+            }
+
+            values.Add(value.Trim());
+        }
+
+        return values;
+    }
+
+    private static int WriteInvalidArgumentError(string command, string message, bool json, LanguageCode language, Services services)
+    {
+        if (json)
+        {
+            WriteJson(new
+            {
+                schemaVersion = JsonSchemaVersion,
+                toolVersion = Version,
+                generatedAtUtc = services.Clock.UtcNow,
+                command,
+                error = "InvalidArgument",
+                message
+            });
+        }
+        else
+        {
+            var localized = services.TextProvider.Get("invalidArgument", language);
+            Console.Error.WriteLine($"{localized}: {message}");
+        }
+
+        return ExitError;
     }
 
     private static int RunBaseline(
@@ -1642,7 +1710,9 @@ public static class Program
                string.Equals(option, "--baseline", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--prompt-pack", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--stdio", StringComparison.OrdinalIgnoreCase) ||
-               string.Equals(option, "--output", StringComparison.OrdinalIgnoreCase);
+               string.Equals(option, "--output", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(option, "--include", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(option, "--exclude", StringComparison.OrdinalIgnoreCase);
     }
 
     private static Services CreateServices()

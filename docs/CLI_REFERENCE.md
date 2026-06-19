@@ -63,7 +63,13 @@ ackit scan --ci
 ackit scan --json
 ackit scan --ci --json
 ackit scan --baseline .ackit-baseline.json --ci
+ackit scan --include 'src/**' --exclude '**/*.bak' --ci
 ```
+
+Ad-hoc glob filters:
+- `--include <glob>` keeps only matching relative paths (repeatable). Globs support `*` (single segment), `**` (any depth), and `?` (single character). If no `--include` is set, every path is considered.
+- `--exclude <glob>` drops matching relative paths (repeatable). Applied after `--include`.
+- Empty or whitespace-only globs return exit code `1` with an "Invalid argument" error.
 
 Stack signals include .NET, ASP.NET Core, Razor/Razor Pages, Blazor WebAssembly, .NET Worker Service, ASP.NET Core Minimal API, Node, npm, pnpm, Yarn, Bun, TypeScript, Vite, Next.js, Nuxt, Angular, Tailwind CSS, Python, PHP/Laravel, Docker, GitHub Actions, and database/migration files when matching local files are present.
 
