@@ -100,8 +100,8 @@ Single `git revert <sha>`. No other task depends on TASK-0197.
 ## Completion Evidence
 
 - Planning commit: `d7aae06` — `docs: plan task 0197 post 0110 state cleanup`.
-- Implementation commit: to be recorded after `docs(state): sync post 0110 handoff`.
-- Final pushed HEAD (expected): `b073c3d` until the implementation commit lands.
+- Implementation commit: `6ce32c8` — `docs(state): sync post 0110 handoff`.
+- Final pushed HEAD (before push): `6ce32c8`.
 - Cumulative test count: 428/428 green.
 - `dotnet build AgentContextKit.sln -c Release --no-restore` — 0 warnings, 0 errors.
 - `dotnet test AgentContextKit.sln -c Release --no-build` — 428/428 green (`AgentContextKit.Tests.dll`, net10.0).
