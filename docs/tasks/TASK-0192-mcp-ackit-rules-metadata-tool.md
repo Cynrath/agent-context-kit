@@ -83,8 +83,12 @@ This is the fifth task in PROJECT-CONTROL-0110.
 Single `git revert <sha>`. No other task depends on TASK-0192.
 
 ## Completion Evidence
-- Commit hash(es) to be filled in after the implementation commit.
-- Test count: target at least 435/435.
+- Planning commit: `2effa0f` (`docs: plan task 0192 ackit.rules metadata tool`).
+- Implementation commit: `02a89a2` (`feat(mcp): add ackit.rules metadata tool`).
+- Test count: 428/428 (422 baseline + 6 new tests across McpRouterTests and McpStdioTransportTests).
+- Source `scan --ci` exit 0 with existing `.remember` Medium log findings only; no new findings.
+- `ackit doctor` 13/13 PASS.
+- `ackit mcp --help` exits 0 with the documented surface; `tools/list` returns the five tools in the documented order; `tools/call` with `name=ackit.rules` returns the catalog snapshot.
 
 ## Push
 - `git push origin master` only.
