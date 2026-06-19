@@ -1,6 +1,17 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0108 are closed. PROJECT-CONTROL-0109 (TASK-0177 through TASK-0186) is closed with 315/315 tests green and all standard hosted checks green for the final pushed HEAD. PROJECT-CONTROL-0110 is a placeholder; it is not started and no version bump is implied. The alpha.3 release remains NO-GO.
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0108 are closed. PROJECT-CONTROL-0109 (TASK-0177 through TASK-0186) is closed with 315/315 tests green and all standard hosted checks green for the final pushed HEAD. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is now active as the next local product/code-quality/test/documentation/security pass; no version bump is implied and `0.2.0-alpha.3` remains NO-GO until `RB-003` and `RB-008` are independently resolved.
+
+## Active PROJECT-CONTROL-0110
+1. TASK-0188 MCP transport step 2 (real stdio loop with redaction + safety bounds) - planning only.
+2. TASK-0189 `ackit watch` local implementation (FileSystemWatcher, debounce, ignore list, cancellation) - planning only.
+3. TASK-0190 `ackit watch` debounce + ignore-list + cancellation unit tests - planning only.
+4. TASK-0191 trim edge case tests (binary input, large files, UTF-8 boundary) - planning only.
+5. TASK-0192 MCP tool surface extension (`ackit.rules` read-only metadata tool) - planning only.
+6. TASK-0193 localization parity for new commands and MCP step 2 error surface - planning only.
+7. TASK-0194 docs update (MCP_STDIO_DESIGN Step 2, WATCH_MODE implementation notes, CLI_REFERENCE) - planning only.
+8. TASK-0195 docs-first local audit + state sync - planning only.
+9. TASK-0196 final validation and hosted check sync - planning only.
 
 ## Active PROJECT-CONTROL-0109
 1. TASK-0177 hook expansion (Anthropic + Continue targets, dry-run preview) - hosted-verified.
@@ -140,7 +151,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- PROJECT-CONTROL-0109 closed at TASK-0186. PROJECT-CONTROL-0110 is a placeholder for the next local product/code-quality/test/documentation/security pass; it is not started yet and must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
+- PROJECT-CONTROL-0110 is now active for TASK-0188 through TASK-0196. Each task follows the task-first flow: planning commit first, implementation commit, push, then advance. PROJECT-CONTROL-0110 must not start work that depends on closing `RB-003` or `RB-008`, must not bump `0.2.0-alpha.3`, and must not claim release readiness.
 
 ## Execution Rule
-Continue TASK-0178 through TASK-0186 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
+Continue TASK-0188 through TASK-0196 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
