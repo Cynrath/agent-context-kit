@@ -73,8 +73,12 @@ This is the fourth task in PROJECT-CONTROL-0110.
 Single `git revert <sha>`. No other task depends on TASK-0191.
 
 ## Completion Evidence
-- Commit hash(es) to be filled in after the implementation commit.
-- Test count: target at least 420/420.
+- Planning commit: `6a11056` (`docs: plan task 0191 trim edge case tests`).
+- Implementation commit: `353ea7f` (`feat(core): add TextTrimmer and trim edge case tests`).
+- Test count: 422/422 (407 baseline + 15 new TextTrimmer tests).
+- Source `scan --ci` exit 0 with existing `.remember` Medium log findings only; no new findings.
+- `ackit doctor` 13/13 PASS.
+- `ackit trim --help` exits 0 with the documented surface.
 
 ## Push
 - `git push origin master` only.
