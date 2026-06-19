@@ -74,7 +74,10 @@ This is the seventh task in PROJECT-CONTROL-0110. Most of the docs were updated 
 Single `git revert <sha>`. No other task depends on TASK-0194.
 
 ## Completion Evidence
-- Commit hash(es) to be filled in after the implementation commit.
+- Planning commit: `9771253` (`docs: plan task 0194 docs update`).
+- Implementation commit: `d20a908` (`docs: clarify ack-it watch --json stderr routing`).
+- Test count: 428/428 unchanged.
+- `ackit scan --ci` exit 0; `ackit doctor` 13/13 PASS; `ackit mcp --help` exits 0; `ackit watch --help` exits 0.
 
 ## Push
 - `git push origin master` only.
