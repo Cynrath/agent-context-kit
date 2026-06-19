@@ -8,7 +8,7 @@ This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTRO
 3. TASK-0179 webui no-build static polish - hosted-verified; 287/287 tests green.
 4. TASK-0180 hosted check status reporter script - hosted-verified; 293/293 tests green.
 5. TASK-0187 release deployment failure audit and script hardening - hosted-verified; 296/296 tests green; no release/tag/NuGet/deployment mutation.
-6. TASK-0181 SARIF roundtrip regression test - next.
+6. TASK-0181 SARIF roundtrip regression test - hosted-verified; 299/299 tests green; pushed HEAD `52399d5`; no production code change.
 7. TASK-0182 prompt pack edge cases (empty repo, single-file repo, docs-only repo, secret-bearing fixture).
 8. TASK-0183 catalog rule id and severity stability test.
 9. TASK-0184 scan `--include` / `--exclude` glob filters.
