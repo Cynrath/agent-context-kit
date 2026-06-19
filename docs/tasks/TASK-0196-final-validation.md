@@ -75,7 +75,13 @@ This is the ninth and last task in PROJECT-CONTROL-0110.
 Single `git revert <sha>`. No other task depends on TASK-0196.
 
 ## Completion Evidence
-- Commit hash(es) to be filled in after the implementation commit.
+- Planning commit: `1290b56` (`docs: plan task 0196 final validation`).
+- Closeout commit: `2a60b0c` (`docs(state): close PROJECT-CONTROL-0110`).
+- Final pushed HEAD: `2a60b0c`.
+- Test count: 428/428 unchanged.
+- Source `scan --ci` exit 0; `ackit doctor` 13/13 PASS; `ackit mcp --help`, `ackit watch --help`, `ackit trim --help`, `ackit watch --once`, and `ackit trim --input .gitignore --output .ackit/cache/trim-out.md --max-chars 200 --lang en` all return the expected exit codes (0, 0, 1, 0, 0 respectively).
+- `git status` clean; `git diff --check` clean before the closeout commit.
+- PROJECT-CONTROL-0110 is closed. 0.2.0-alpha.3 remains NO-GO; RB-003 and RB-008 remain open.
 
 ## Push
 - `git push origin master` only.
