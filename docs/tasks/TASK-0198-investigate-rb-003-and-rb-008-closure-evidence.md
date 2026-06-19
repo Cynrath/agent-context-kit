@@ -100,13 +100,13 @@ Docs-only audit trail improvement. No logs, private notification payloads, or ex
 Single `git revert <sha>` for each TASK-0198 commit. No source/runtime migration is involved.
 
 ## Validation checklist
-- [ ] Task plan committed.
-- [ ] Blocker docs updated without claiming closure.
-- [ ] Handoff docs synced.
-- [ ] Restore/build/test complete.
-- [ ] `ackit scan --ci` and `ackit doctor` recorded.
-- [ ] Targeted scripts recorded.
-- [ ] `git diff --check` clean.
+- [x] Task plan committed.
+- [x] Blocker docs updated without claiming closure.
+- [x] Handoff docs synced.
+- [x] Restore/build/test complete.
+- [x] `ackit scan --ci` and `ackit doctor` recorded.
+- [x] Targeted scripts recorded.
+- [x] `git diff --check` clean.
 - [ ] Working tree clean.
 - [ ] Push completed only after validation.
 
@@ -114,9 +114,29 @@ Single `git revert <sha>` for each TASK-0198 commit. No source/runtime migration
 - Current local and origin HEAD at takeover: `194480a`.
 - `docs/SECURITY_NOTIFICATION_OWNERSHIP.md` says backup security triage owner is not assigned and notification delivery is unverified.
 - `docs/PACKAGE_RECOVERY.md` says NuGet unlist/deprecate/account-recovery authority and backup recovery owner are unverified.
+- Plan commit: `d8bc79b` (`docs: plan task 0198 blocker evidence`).
+- Implementation/sync commit: `b58ec92` (`docs: clarify blocker evidence requirements`).
+- `docs/RELEASE_BLOCKER_BOARD.md` now lists `RB-003` and `RB-008` as `Open/partial` and adds a TASK-0198 evidence boundary.
+- `docs/V020_ALPHA3_RELEASE_DECISION.md` still records `NO-GO` and now names the exact closure evidence needed for `RB-003` and `RB-008`.
+- `docs/MAINTAINER_DECISION_REGISTER.md` keeps `MD-003` and `MD-008` as `Partial`.
+- Handoff docs record TASK-0198 as independent docs-only investigation, not a new project control.
+
+## Validation results
+- `dotnet restore` — exit 1 at repository root because both `AgentContextKit.sln` and `AgentContextKit.slnx` exist and MSBuild requires an explicit solution.
+- `dotnet restore AgentContextKit.sln` — exit 0.
+- `dotnet build AgentContextKit.sln -c Release --no-restore` — exit 0; direct run printed existing xUnit analyzer warnings in test files (`xUnit1051`, `xUnit2013`), no errors.
+- `dotnet test AgentContextKit.sln -c Release --no-build` — exit 0, 428/428 passed.
+- `ackit scan --ci` using installed global `AgentContextKit 0.2.0-alpha.2` — exit 1. Same High/Medium/Low classes were observed before TASK-0198 edits during takeover; current-source scan below passes.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci` — exit 0 with existing `.remember` Medium findings and Low local-path findings only.
+- `ackit doctor` — exit 0, all checks PASS.
+- `git diff --check` — exit 0; printed CRLF normalization warnings for touched docs only.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1` — exit 0.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-cli-contract.ps1` — exit 0; warning: working tree has uncommitted changes.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1` — exit 0; warning: working tree has uncommitted changes; localization xUnit matrix passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/verify-release.ps1` — exit 1 at the nested release blocker review step because Windows PowerShell treats the pre-existing `git status --short` stderr warning (`could not open directory`) as a native command error. TASK-0197 previously records the same environment issue; direct build/test/source scan/doctor and targeted CLI/localization gates passed.
 
 ## Final status
-Planned. No blocker is closed by this plan.
+Completed investigation. `RB-003` and `RB-008` remain open/partial. `0.2.0-alpha.3` remains NO-GO. No release, tag, GitHub Release, NuGet publish, workflow dispatch, version bump, security-setting change, owner mutation, or destructive NuGet action occurred.
 
 ## Completion notes
-Pending implementation and validation.
+This file records the final TASK-0198 evidence. The resulting final commit hash and post-commit clean working tree are reported in the completion response.
