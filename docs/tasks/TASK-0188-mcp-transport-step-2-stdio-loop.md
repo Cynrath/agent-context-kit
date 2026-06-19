@@ -150,8 +150,15 @@ This is the first task in PROJECT-CONTROL-0110 and the gate for the `ackit watch
 Single `git revert <sha>`. No other task depends on TASK-0188.
 
 ## Completion Evidence
-- Commit hash(es) to be filled in after the implementation commit.
-- Test count: target at least 330/330.
+- Planning commit: `ea2f681` (`docs: plan mcp stdio transport step 2`).
+- Implementation commit: `6eb7102` (`feat(mcp): add real stdio transport loop`).
+- Test count: 345/345 (315 baseline + 30 new). All McpStdioTransportTests pass; existing McpRouterTests still pass after the absolute-path sanitizer change.
+- Source `scan --ci` exit 0 with existing `.remember` Medium log findings only; no new findings.
+- `ackit doctor` 13/13 PASS.
+- `ackit mcp --help`, `ackit mcp --stdio-server`, and the legacy `ackit mcp --stdio <json-request>` all return exit 0.
+- Manual stdio server smoke (PowerShell pipe into `dotnet run -- mcp --stdio-server`) returned valid `initialize`, `tools/list`, and `ping` responses in order and exited 0 on `notifications/exit`.
+- `scripts/check-cli-contract.ps1 -FailOnIssues`, `scripts/check-localization-parity.ps1 -FailOnIssues`, and `scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` return exit 0 in this environment. The git stderr warning about an unreadable directory is pre-existing on this Windows host (transient `8037~1` short-name entries); the cleanup did not surface any contract content gap.
+- DIAG-001 (broken `mcp__plugin_*` transport in this environment) is independent of the local stdio loop; this task does not close DIAG-001 and does not claim to.
 - Local risk: no Critical/High findings in source `scan --ci`; existing `.remember` Medium log findings remain.
 - DIAG-001 (broken `mcp__plugin_*` transport in this environment) is independent of the local stdio loop; this task does not close DIAG-001 and does not claim to.
 
