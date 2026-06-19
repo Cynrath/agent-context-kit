@@ -73,7 +73,7 @@ Extend `ackit hooks` to support Anthropic and Continue targets, and add a dry-ru
 - `dotnet build` — 0 errors.
 - `dotnet test` — 276+ / 0 / 0.
 - `ackit scan --ci` — exit 0.
-- `ackit doctor` — 14/14 PASS.
+- `ackit doctor` — 13/13 PASS (current actual count; the task file's "14/14" wording is stale).
 - `scripts/verify-release.ps1` — pass.
 - `scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` — clean.
 - `git status` — clean.

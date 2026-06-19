@@ -55,7 +55,7 @@ Sequential; do not parallelize across tasks. Each task follows the existing task
 - `dotnet build AgentContextKit.sln -c Release --no-restore` — 0 errors.
 - `dotnet test AgentContextKit.sln -c Release --no-build` — all green.
 - `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci` — exit 0.
-- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- doctor` — 14/14 PASS.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- doctor` — 13/13 PASS (current actual count; the task file's "14/14" wording is stale).
 - `powershell -ExecutionPolicy Bypass -File scripts/verify-release.ps1` — pass.
 - `powershell -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` — clean.
 - `git status` clean; `master` aligned with `origin/master`.
