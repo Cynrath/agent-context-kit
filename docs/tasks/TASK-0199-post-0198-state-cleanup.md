@@ -17,6 +17,12 @@ TASK-0198 completed and pushed, but `docs/NEXT_TASKS.md` still marks it in progr
 - Sync `.codex` handoff docs only if they still imply TASK-0198 is active/in progress.
 - Keep all edits docs-only and minimal.
 
+## Plan
+- Record this TASK-0199 plan before state-sync edits.
+- Apply minimal docs edits for TASK-0198 completion/push evidence and stale handoff wording.
+- Run required validation and targeted docs/release guard scripts.
+- Commit final TASK-0199 evidence and push only after validation.
+
 ## Out of scope
 - Starting a new project control.
 - Reopening or expanding TASK-0198 scope.
@@ -76,5 +82,40 @@ Improves the local audit trail by recording final TASK-0198 commit/push evidence
 ## Rollback plan
 Single `git revert <sha>` for each TASK-0199 commit. No source/runtime migration is involved.
 
+## Evidence
+- Takeover verification: local HEAD `533b64a`, origin HEAD `533b64a`, raw porcelain clean.
+- Plan commit: `73f7b3e` (`docs: plan task 0199 post 0198 cleanup`).
+- Implementation/sync commit: `b9655fc` (`docs: sync task 0198 final state`).
+- TASK-0198 is now marked completed and pushed at `533b64a` in `docs/NEXT_TASKS.md`.
+- TASK-0198 checklist now marks working tree clean and push completed.
+- TASK-0198 task file records final commit `533b64a`, final local HEAD `533b64a`, final origin HEAD `533b64a`, raw porcelain clean state, and push completion.
+- `.codex` handoff docs no longer describe TASK-0198 as current/in progress.
+- `RB-003` remains open/partial.
+- `RB-008` remains open/partial.
+- `0.2.0-alpha.3` remains NO-GO.
+
+## Validation results
+- `ackit --help` — exit 0 before inspection.
+- `git fetch origin` — exit 0.
+- `git status --short` — exit 0 with the known unreadable-directory warning and no listed changes at takeover.
+- `git rev-parse --short HEAD` — `533b64a` at takeover.
+- `git rev-parse --short origin/master` — `533b64a` at takeover.
+- `git log --oneline -n 10` — confirmed TASK-0198 commits at the top.
+- `ackit doctor` — exit 0, all checks PASS.
+- Global installed `ackit scan --ci` — exit 1 with the known published `0.2.0-alpha.2` scanner behavior; current-source scan below passed.
+- `dotnet restore` — exit 1 at repository root because both `.sln` and `.slnx` exist.
+- `dotnet restore AgentContextKit.sln` — exit 0.
+- `dotnet build AgentContextKit.sln -c Release --no-restore` — exit 0; existing xUnit analyzer warnings in test files, no errors.
+- `dotnet test AgentContextKit.sln -c Release --no-build` — exit 0, 428/428 passed.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci` — exit 0 with existing `.remember` Medium findings and Low local-path findings only.
+- `git diff --check` — exit 0; printed CRLF normalization warnings for touched docs only.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1` — exit 0.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-cli-contract.ps1` — exit 0; warning: working tree has uncommitted changes.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1` — exit 0; warning: working tree has uncommitted changes.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/verify-release.ps1` — exit 1 at the nested release blocker review step because Windows PowerShell treats the pre-existing `git status --short` unreadable-directory stderr warning as a native command error. The internal restore/build/test/current-source scan/doctor steps passed.
+
 ## Completion notes
-Pending implementation and validation.
+Completed docs-only cleanup. No release, tag, GitHub Release, NuGet publish, workflow dispatch, version bump, security-setting change, owner/account/recovery change, force push, or unrelated docs rewrite occurred.
+
+## Final status
+Completed.
