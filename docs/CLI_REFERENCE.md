@@ -320,6 +320,7 @@ Options:
 
 Watcher behavior:
 - Subscribes to `Created`, `Changed`, `Renamed`, and `Deleted` events through `System.IO.FileSystemWatcher` rooted at the repository, with subdirectories included.
+- With `--json`, the startup line is written to `Console.Error` so that `Console.Out` contains only valid JSON envelopes (one per change) and can be piped into a JSON consumer without mixing human-readable text.
 - Filters out paths in the always-ignored set (e.g. `.git`, `bin`, `obj`, `node_modules`, generated `.ackit/*` outputs, editor swap files, and `*.html`/`*.sarif`/`*.jsonl` at the repo root). `.ackit/config.yml` is intentionally watched so config edits trigger a re-scan.
 - Coalesces bursts of events inside `--debounce-ms`.
 - Re-runs the same scan pipeline used by `ackit scan` and writes one human line or `--json` envelope per change.
