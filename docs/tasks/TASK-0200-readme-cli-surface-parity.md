@@ -98,5 +98,37 @@ Adds a task evidence trail for README/current-source CLI surface parity.
 ## Rollback plan
 Single `git revert <sha>` for each TASK-0200 commit. Docs-only changes; no migration or generated artifact cleanup required.
 
+## Evidence
+- Initial tool discovery: global installed `ackit --help` exited `0` and showed the older published-tool command surface, confirming the need to distinguish current source from published NuGet package behavior.
+- Takeover verification: `git fetch origin` exited `0`; local HEAD and `origin/master` were both `0aad858`; `git status --short` printed only the known unreadable-directory warning and raw porcelain with stderr suppressed was empty.
+- Current-source `--help` exited `0` and listed `ackit scan [--include <glob>] [--exclude <glob>]`, `ackit mcp --stdio-server`, `ackit mcp --stdio`, `ackit diff`, `ackit trim`, and `ackit watch`.
+- Compared `src/AgentContextKit.Cli/Program.cs`, `docs/CLI_CONTRACT.md`, `docs/CLI_REFERENCE.md`, `README.md`, `README.tr.md`, `docs/NEXT_TASKS.md`, `.codex/SESSION_HANDOFF.md`, `.codex/CONTEXT_PACK.md`, and `.codex/NEXT_STEPS.md`.
+- Plan commit: `76611ee` (`docs: plan task 0200 readme cli parity`).
+- Implementation commit: `33d5c69` (`docs: sync readme cli command surface`).
+- `README.md` command map now includes current-source `scan --include/--exclude`, `mcp --stdio-server`, `mcp --stdio`, `diff`, `trim`, and `watch`.
+- `README.tr.md` command map now includes the same current-source command surface.
+- README feature/workflow text now mentions scan glob filters plus current-source MCP, diff, trim, and watch behavior.
+- README wording keeps the published NuGet package at `0.2.0-alpha.2` and does not claim these current-source additions are newly published.
+- Stale TASK-0199 active/started handoff wording was updated; TASK-0199 is recorded as completed and pushed at `0aad858`.
+- `RB-003` remains open/partial.
+- `RB-008` remains open/partial.
+- `0.2.0-alpha.3` remains NO-GO.
+
+## Validation results
+- `dotnet restore AgentContextKit.sln` — exit `0`.
+- `dotnet build AgentContextKit.sln -c Release --no-restore` — exit `0`; existing xUnit analyzer warnings only, no errors.
+- `dotnet test AgentContextKit.sln -c Release --no-build` — exit `0`, 428/428 passed.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- --help` — exit `0`; confirmed current-source command surface.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci` — exit `0`; existing `.remember` Medium findings and Low local-path findings only.
+- `ackit doctor` — exit `0`, all checks PASS.
+- `git diff --check` — exit `0`; printed CRLF normalization warnings for touched docs only.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1` — exit `0`.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-cli-contract.ps1` — exit `0`; warning: working tree has uncommitted changes.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1` — exit `0`; warning: working tree has uncommitted changes.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/verify-release.ps1` — exit `1` at release blocker review because Windows PowerShell treats the pre-existing `git status --short` unreadable-directory stderr warning as a native command error. Its internal restore/build/test/current-source scan/doctor steps passed before that failure.
+
 ## Completion notes
-Pending implementation and validation.
+Completed docs-only README/current-source CLI surface parity cleanup. No source code, version bump, package metadata change, tag, GitHub Release, NuGet publish, workflow dispatch, security-setting change, owner/account/recovery change, blocker closure, release GO decision, force push, or unrelated rewrite occurred.
+
+## Final status
+Completed.

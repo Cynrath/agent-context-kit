@@ -10,7 +10,9 @@ PROJECT-CONTROL-0110 closed at TASK-0196 (`b073c3d`) on 2026-06-19 with cumulati
 Not yet selected / pending maintainer direction. `0.2.0-alpha.3` remains NO-GO because `RB-003` (independent backup security owner) and `RB-008` (destructive NuGet recovery authority) remain unresolved. No release, tag, GitHub Release, NuGet publish, or version bump is authorized. Any future control must be explicitly authorized through a planning commit before implementation.
 
 ## Last Independent Task
-TASK-0199 completed and pushed at `0aad858`. It was a tiny docs-only state cleanup after TASK-0198, marking TASK-0198 consistently completed and recording final clean-tree/push evidence. TASK-0200 is the current docs-only README/current-source CLI surface parity cleanup.
+TASK-0200 completed the docs-only README/current-source CLI surface parity cleanup. It updated README command maps and short feature/workflow text for `scan --include/--exclude`, `mcp --stdio-server`, `mcp --stdio`, `diff`, `trim`, and `watch`, while keeping the published NuGet package at `0.2.0-alpha.2` and the alpha.3 release status at NO-GO.
+
+TASK-0199 completed and pushed at `0aad858`. It was a tiny docs-only state cleanup after TASK-0198, marking TASK-0198 consistently completed and recording final clean-tree/push evidence.
 
 TASK-0198 completed and pushed at `533b64a`. It was a docs-only investigation of the exact evidence still needed to close `RB-003` and `RB-008`. It updated blocker/decision/handoff docs, but it did not create a new project control, close either blocker, change `0.2.0-alpha.2` metadata, or authorize a release/tag/NuGet/workflow/security-setting action.
 

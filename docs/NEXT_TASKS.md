@@ -1,10 +1,10 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. TASK-0198 is an independent docs-only blocker evidence investigation, not a new project control. TASK-0199 completed the post-0198 state cleanup at `0aad858`. TASK-0200 is the current docs-only README/current-source CLI parity cleanup. No version bump is implied and `0.2.0-alpha.3` remains NO-GO until `RB-003` and `RB-008` are independently resolved. No next project control has been selected; the next entry is "not yet selected / pending maintainer direction".
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. TASK-0198 is an independent docs-only blocker evidence investigation, not a new project control. TASK-0199 completed the post-0198 state cleanup at `0aad858`. TASK-0200 completed the docs-only README/current-source CLI parity cleanup. No version bump is implied and `0.2.0-alpha.3` remains NO-GO until `RB-003` and `RB-008` are independently resolved. No next project control has been selected; the next entry is "not yet selected / pending maintainer direction".
 
-## Current Independent README Parity Task
+## Completed Independent README Parity Task
 
-1. TASK-0200 sync README CLI command surface with current-source `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`; docs-only; no release/tag/NuGet/version/workflow/security-setting mutation; `0.2.0-alpha.3` remains NO-GO.
+1. TASK-0200 sync README CLI command surface with current-source `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md` - completed; docs-only; no release/tag/NuGet/version/workflow/security-setting mutation; `0.2.0-alpha.3` remains NO-GO.
 
 ## Completed Independent State Cleanup
 
@@ -166,7 +166,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- TASK-0200 is the current docs-only README/current-source CLI surface parity task. PROJECT-CONTROL-0110 is closed at TASK-0196 (2026-06-19) with 428/428 tests green and the final pushed HEAD at `b073c3d`. TASK-0198 is completed and pushed at `533b64a`; TASK-0199 is completed and pushed at `0aad858`. `0.2.0-alpha.3` remains NO-GO. No release, tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate dispatch, security-setting change, or version bump is part of this state. The next project control remains "not yet selected / pending maintainer direction"; any new control task must be explicitly authorized through a planning commit before implementation.
+- No next project control has been selected. PROJECT-CONTROL-0110 is closed at TASK-0196 (2026-06-19) with 428/428 tests green and the final pushed HEAD at `b073c3d`. TASK-0198 is completed and pushed at `533b64a`; TASK-0199 is completed and pushed at `0aad858`; TASK-0200 completed the docs-only README/current-source CLI surface parity cleanup. `0.2.0-alpha.3` remains NO-GO. No release, tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate dispatch, security-setting change, or version bump is part of this state. The next project control remains "not yet selected / pending maintainer direction"; any new control task must be explicitly authorized through a planning commit before implementation.
 
 ## Execution Rule
 After the closure of PROJECT-CONTROL-0110, the queue is in pause: no automatic commit or push is authorized without an explicitly active project control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations. RB-003 and RB-008 are independent of this control and remain open.
