@@ -9,7 +9,7 @@ This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTRO
 4. TASK-0180 hosted check status reporter script - hosted-verified; 293/293 tests green.
 5. TASK-0187 release deployment failure audit and script hardening - hosted-verified; 296/296 tests green; no release/tag/NuGet/deployment mutation.
 6. TASK-0181 SARIF roundtrip regression test - hosted-verified; 299/299 tests green; pushed HEAD `52399d5`; no production code change.
-7. TASK-0182 prompt pack edge cases (empty repo, single-file repo, docs-only repo, secret-bearing fixture).
+7. TASK-0182 prompt pack edge cases (empty repo, single-file repo, docs-only repo, secret-bearing fixture) - hosted-verified; 303/303 tests green; pushed HEAD `8fc1361`.
 8. TASK-0183 catalog rule id and severity stability test.
 9. TASK-0184 scan `--include` / `--exclude` glob filters.
 10. TASK-0185 nightly local check workflow (`.github/workflows`).
@@ -140,7 +140,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- PROJECT-CONTROL-0109 continues independent local product, code-quality, test, documentation, and security work. TASK-0181 SARIF roundtrip regression test is next. It must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
+- PROJECT-CONTROL-0109 continues independent local product, code-quality, test, documentation, and security work. TASK-0183 catalog rule id and severity stability test is next. It must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
 
 ## Execution Rule
 Continue TASK-0178 through TASK-0186 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
