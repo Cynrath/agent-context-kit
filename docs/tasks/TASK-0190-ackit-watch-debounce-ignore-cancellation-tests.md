@@ -81,8 +81,9 @@ Add tests to the existing test files (no new test files; this keeps the suite su
 Single `git revert <sha>`. No runtime change.
 
 ## Completion Evidence
-- Commit hash(es) to be filled in after the implementation commit.
-- Test count: target at least 407/407.
+- Planning commit: `7349fc7` (`docs: plan task 0190 watch edge case tests`).
+- Implementation commit: `8b6d4d5` (`test: add watch edge case tests`).
+- Test count: 407/407 (397 baseline + 10 new edge case tests across WatchDebouncerTests, WatchIgnoreFilterTests, WatchCommandTests).
 
 ## Push
 - `git push origin master` only.
