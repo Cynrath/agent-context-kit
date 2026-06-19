@@ -64,15 +64,21 @@ Single `git revert <sha>` for the docs commit; no production changes.
 
 ## Completion Evidence
 - File list: above.
-- Commit hash(es): see session.
+- Commit hash(es): documentation `753fc8a` (TASK-0186 closeout docs on top of final HEAD `a1151c7`).
 - Test count: 315/315.
 - Hosted checks for final pushed HEAD `a1151c7`:
   - `ci` run `27831342159` — success.
   - `cross-platform-smoke` run `27831342158` — success.
   - `cross-platform-source-smoke` run `27831342189` — success.
+- Hosted checks for evidence commit `753fc8a`:
+  - `ci` run `27831947146` — success.
+  - `cross-platform-smoke` run `27831947153` — success.
+  - `cross-platform-source-smoke` run `27831947151` — success.
 
 ## Push
 - `git push origin master` only.
 
 ## Hosted Checks
-- All three standard `master` workflows passed for final HEAD `a1151c7`.
+- All three standard `master` workflows passed for both final HEAD `a1151c7` and evidence commit `753fc8a`.
+- `master == origin/master` at `753fc8a563dc88ce06a20876fb74285b992a172a`.
+- PROJECT-CONTROL-0109 closed. PROJECT-CONTROL-0110 placeholder; not started.
