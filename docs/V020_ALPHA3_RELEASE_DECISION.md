@@ -32,6 +32,15 @@ TASK-0198 rechecked repository-local evidence for `RB-003` and `RB-008` on 2026-
 - `docs/PACKAGE_RECOVERY.md` still records the recovery procedure/tabletop as accepted, but NuGet unlist/deprecate/account-recovery authority and backup recovery owner as unverified.
 - This investigation does not authorize a version bump, release-candidate workflow dispatch, release workflow dispatch, tag, GitHub Release, NuGet publish, owner mutation, security-setting change, or destructive NuGet action.
 
+## TASK-0201 Closure Preflight
+
+TASK-0201 rechecked whether repository-local evidence is now sufficient to close `RB-003` or `RB-008`. It is not.
+
+- `RB-003` closure criteria remain incomplete: primary owner exists, but the independent backup human owner is missing, notification delivery/backup coverage is unverified, and no exact-candidate GO scope exists.
+- `RB-008` closure criteria remain incomplete: recovery trigger criteria and successor/unlist/deprecate procedure steps exist, but destructive NuGet unlist/deprecate/account-recovery authority and backup recovery owner remain unverified.
+- Maintainer-provided closure evidence must update the ownership/recovery docs, blocker board, and decision register with review date and effective release scope before this decision can change.
+- `0.2.0-alpha.3` remains `NO-GO`; there is still no alpha.3 candidate commit, package, tag, GitHub Release, NuGet publication, release-candidate dispatch, or release workflow dispatch.
+
 ## Actions Not Performed
 - no source/package version bump;
 - no README or published-package workflow version change;

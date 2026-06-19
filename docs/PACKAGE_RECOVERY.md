@@ -40,3 +40,28 @@ Documentation review on 2026-06-14 confirmed the procedure preserves immutable p
 
 ## Review Cadence
 Review before each release candidate and after any owner, publishing, recovery, or security-notification change.
+
+## TASK-0201 Closure Preflight
+
+2026-06-20 preflight result: `RB-008` remains open/partial.
+
+Found evidence:
+- decision owner: `Cynrath`;
+- normal NuGet publication authority: successful alpha.2 OIDC Trusted Publishing under configured user `Cyranth`;
+- recovery activation thresholds;
+- successor/unlist/deprecate procedure steps;
+- tabletop review date: 2026-06-14.
+
+Missing closure evidence:
+- maintainer-verifiable NuGet unlist/deprecate/account-recovery authority;
+- backup recovery owner or role;
+- owner-linked trigger criteria, unlist/deprecate/successor steps, and communication path coverage;
+- review date for the completed authority/backup record;
+- effective release scope for the completed recovery authority record.
+
+Maintainer handoff checklist:
+- record non-destructive evidence that the maintainer has NuGet unlist/deprecate/account-recovery authority, or record an explicit bounded accepted-risk decision;
+- record the backup recovery owner or role without storing credentials, recovery secrets, or private account data;
+- link the verified owner and backup roles to the trigger, unlist/deprecate, successor-release, and communication procedure;
+- update `docs/RELEASE_BLOCKER_BOARD.md` and `docs/MAINTAINER_DECISION_REGISTER.md` with the same evidence and review scope;
+- only then consider closing `RB-008`.

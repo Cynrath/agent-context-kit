@@ -29,3 +29,42 @@ TASK-0198 rechecked the repository-local evidence for `RB-003` and `RB-008` with
 - `RB-008` has an accepted immutable-package recovery procedure and tabletop note, but no verified destructive NuGet unlist/deprecate/account-recovery authority and no backup recovery owner.
 - The existing docs, tests, release scripts, successful OIDC publish, and package recovery procedure are useful supporting evidence but do not close either blocker by themselves.
 - `0.2.0-alpha.3` remains `NO-GO` until the missing ownership/authority evidence is recorded and a new exact release decision replaces the current NO-GO.
+
+## TASK-0201 Closure Preflight
+
+TASK-0201 rechecked repository-local closure evidence on 2026-06-20. No blocker can be closed from the current repository evidence.
+
+### RB-003 Security Notification Ownership
+
+| Criterion | Preflight result | Evidence |
+| --- | --- | --- |
+| Primary security owner | Found | `docs/SECURITY_NOTIFICATION_OWNERSHIP.md` records `Cynrath` as primary security triage owner. |
+| Independent backup human owner | Missing | Backup security triage owner remains `Not assigned`; no second verified human maintainer is recorded. |
+| Notification coverage path | Partial / insufficient | GitHub private vulnerability reporting is verified, but notification delivery remains unverified and no backup coverage path is recorded. |
+| Review date | Partial / insufficient | Existing ownership status date is 2026-06-14; this 2026-06-20 preflight did not add closure evidence. |
+| Exact release scope | Partial / insufficient | The planned scope is `0.2.0-alpha.3`, but no exact candidate or GO decision exists. |
+
+Maintainer evidence required to close `RB-003`:
+- record the second verified human backup owner or role;
+- record a non-secret notification coverage path for primary and backup review;
+- record non-secret evidence that notifications reach the covered owner path;
+- record the review date and effective release scope;
+- update `docs/SECURITY_NOTIFICATION_OWNERSHIP.md`, this board, and `docs/MAINTAINER_DECISION_REGISTER.md` without storing private contact details or advisory content.
+
+### RB-008 Package Recovery
+
+| Criterion | Preflight result | Evidence |
+| --- | --- | --- |
+| Destructive NuGet unlist/deprecate/account-recovery authority | Missing | `docs/PACKAGE_RECOVERY.md` records publication authority from alpha.2 OIDC but destructive recovery authority remains unverified and intentionally untested. |
+| Backup recovery owner | Missing | `docs/PACKAGE_RECOVERY.md` records no backup recovery owner. |
+| Recovery trigger criteria | Found | `docs/PACKAGE_RECOVERY.md` defines activation thresholds. |
+| Successor/unlist/deprecate steps | Found | `docs/PACKAGE_RECOVERY.md` defines successor, deprecate, and unlist procedure steps. |
+| Review date | Partial / insufficient | Tabletop review was recorded on 2026-06-14; this 2026-06-20 preflight did not add authority or backup evidence. |
+| Exact release scope | Partial / insufficient | The package lifecycle blocker applies before the next release candidate; no exact alpha.3 candidate or GO decision exists. |
+
+Maintainer evidence required to close `RB-008`:
+- record maintainer-verifiable NuGet unlist/deprecate/account-recovery authority without executing a destructive action solely for testing;
+- record the backup recovery owner or role;
+- link trigger criteria, unlist/deprecate/successor steps, and communication path to the verified owner/backup roles;
+- record the review date and effective release scope;
+- update `docs/PACKAGE_RECOVERY.md`, this board, and `docs/MAINTAINER_DECISION_REGISTER.md`, or record an explicit bounded accepted-risk decision if the maintainer chooses that path.

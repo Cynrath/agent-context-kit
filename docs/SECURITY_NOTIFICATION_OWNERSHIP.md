@@ -28,3 +28,24 @@ No private email address, reporter identity, advisory content, notification endp
 ## Completion Boundary
 Private reporting is enabled, but `RB-003` remains open until a second verified human owner and notification coverage are recorded. A fake advisory must not be created solely to test notification delivery.
 
+## TASK-0201 Closure Preflight
+
+2026-06-20 preflight result: `RB-003` remains open/partial.
+
+Found evidence:
+- primary security triage owner: `Cynrath`;
+- private disclosure channel: GitHub private vulnerability reporting, previously verified enabled;
+- existing review status date: 2026-06-14.
+
+Missing closure evidence:
+- second verified human backup security triage owner or role;
+- non-secret notification coverage path covering primary and backup review;
+- non-secret notification coverage evidence;
+- review date for the completed primary/backup coverage record;
+- effective release scope for the completed ownership record.
+
+Maintainer handoff checklist:
+- record the backup owner or role without storing private contact details;
+- record how security notifications reach the primary and backup coverage path without storing private endpoints or advisory content;
+- update `docs/RELEASE_BLOCKER_BOARD.md` and `docs/MAINTAINER_DECISION_REGISTER.md` with the same evidence and review scope;
+- only then consider closing `RB-003`.

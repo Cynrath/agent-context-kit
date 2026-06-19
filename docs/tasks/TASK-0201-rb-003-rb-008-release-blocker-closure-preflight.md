@@ -112,5 +112,45 @@ Adds a task-first audit record for `RB-003`/`RB-008` closure preflight and exact
 ## Rollback plan
 Single `git revert <sha>` for each TASK-0201 commit. Docs-only changes; no source/runtime migration or generated artifact cleanup required.
 
+## Preflight findings
+
+### RB-003
+Status after implementation preflight: open/partial.
+
+Found:
+- primary security owner: `Cynrath`;
+- private disclosure channel: GitHub private vulnerability reporting, previously verified enabled;
+- existing status/review date: 2026-06-14;
+- applicable planning scope: repository / planned `0.2.0-alpha.3`, with no exact candidate prepared.
+
+Missing:
+- second verified human backup security owner or role;
+- non-secret notification coverage path for primary and backup review;
+- notification coverage evidence;
+- completed-coverage review date;
+- exact release scope tied to completed backup/coverage evidence.
+
+Closure conclusion: insufficient evidence to close `RB-003`.
+
+### RB-008
+Status after implementation preflight: open/partial.
+
+Found:
+- decision owner: `Cynrath`;
+- successful alpha.2 OIDC Trusted Publishing as normal publication evidence;
+- recovery activation trigger criteria;
+- successor, unlist, and deprecate procedure steps;
+- tabletop/review date: 2026-06-14;
+- applicable planning scope: package lifecycle / planned `0.2.0-alpha.3`, with no exact candidate prepared.
+
+Missing:
+- maintainer-verifiable NuGet unlist/deprecate/account-recovery authority;
+- backup recovery owner or role;
+- owner-linked recovery trigger, unlist/deprecate, successor-release, and communication coverage;
+- completed authority/backup review date;
+- exact release scope tied to completed recovery authority evidence.
+
+Closure conclusion: insufficient evidence to close `RB-008`.
+
 ## Completion notes
 Pending implementation and validation.
