@@ -962,13 +962,13 @@ public static class Program
 
         if (HasFlag(args, "--stdio-server"))
         {
-            return RunMcpStdioServer(args, repositoryPath, services);
+            return RunMcpStdioServer(args, repositoryPath, language, services);
         }
 
         var input = GetOption(args, "--stdio");
         if (string.IsNullOrWhiteSpace(input))
         {
-            Console.Error.WriteLine("ackit mcp requires --stdio <json-request> or --stdio-server.");
+            Console.Error.WriteLine(services.TextProvider.Get("mcpRequiresStdio", language));
             return ExitError;
         }
 
@@ -996,7 +996,7 @@ public static class Program
         }
     }
 
-    private static int RunMcpStdioServer(string[] args, string repositoryPath, Services services)
+    private static int RunMcpStdioServer(string[] args, string repositoryPath, LanguageCode language, Services services)
     {
         var defaultRepo = repositoryPath;
         var repoOverride = GetOption(args, "--repo");
@@ -1008,7 +1008,7 @@ public static class Program
                 trimmed.StartsWith(@"\\", StringComparison.Ordinal) ||
                 trimmed.StartsWith("//", StringComparison.Ordinal))
             {
-                Console.Error.WriteLine("--repo must be a local directory path, not a URL or remote path.");
+                Console.Error.WriteLine(services.TextProvider.Get("mcpInvalidRepo", language));
                 return ExitCritical;
             }
             try
@@ -1016,14 +1016,14 @@ public static class Program
                 var fullPath = Path.GetFullPath(trimmed);
                 if (!services.FileSystem.DirectoryExists(fullPath))
                 {
-                    Console.Error.WriteLine("--repo must point to an existing local directory.");
+                    Console.Error.WriteLine(services.TextProvider.Get("mcpRepoNotDirectory", language));
                     return ExitCritical;
                 }
                 defaultRepo = fullPath;
             }
             catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
             {
-                Console.Error.WriteLine("--repo must be a valid local directory path.");
+                Console.Error.WriteLine(services.TextProvider.Get("mcpInvalidRepoPath", language));
                 return ExitCritical;
             }
         }
@@ -1037,7 +1037,7 @@ public static class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"ackit mcp --stdio-server crashed: {ex.GetType().Name}");
+            Console.Error.WriteLine(services.TextProvider.Get("mcpServerCrashed", language).Replace("{kind}", ex.GetType().Name));
             return ExitError;
         }
     }
@@ -1167,7 +1167,7 @@ public static class Program
             }
             else
             {
-                Console.Error.WriteLine("ackit trim requires --input, --output, and --max-chars <N>.");
+                Console.Error.WriteLine(services.TextProvider.Get("trimRequiresArgs", language));
             }
             return ExitError;
         }
@@ -1180,7 +1180,7 @@ public static class Program
             }
             else
             {
-                Console.Error.WriteLine("--max-chars must be a positive integer.");
+                Console.Error.WriteLine(services.TextProvider.Get("trimInvalidMaxChars", language));
             }
             return ExitError;
         }
@@ -1195,7 +1195,7 @@ public static class Program
             }
             else
             {
-                Console.Error.WriteLine("Input and output paths must differ. Refusing to overwrite input.");
+                Console.Error.WriteLine(services.TextProvider.Get("trimInputOutputMustDiffer", language));
             }
             return ExitError;
         }
@@ -1205,7 +1205,7 @@ public static class Program
             if (!File.Exists(inputFull))
             {
                 if (json) WriteJson(new { schemaVersion = JsonSchemaVersion, command = "trim", exitCode = ExitError, error = "Input file not found" });
-                else Console.Error.WriteLine("Input file not found.");
+                else Console.Error.WriteLine(services.TextProvider.Get("trimInputNotFound", language));
                 return ExitError;
             }
             var content = File.ReadAllText(inputFull);
@@ -1260,10 +1260,17 @@ public static class Program
             return WriteInvalidArgumentError("watch", ex.Message, json, language, services);
         }
 
-        var startupMessage = language.Value == "tr"
-            ? $"ackit watch: izleniyor {GetRepositoryName(repositoryPath)} (debounce {debounceMs} ms)"
-            : $"ackit watch: watching {GetRepositoryName(repositoryPath)} (debounce {debounceMs} ms)";
-        Console.WriteLine(startupMessage);
+        var startupMessage = services.TextProvider.Get("watchWatching", language)
+            .Replace("{repo}", GetRepositoryName(repositoryPath))
+            .Replace("{ms}", debounceMs.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        if (json)
+        {
+            Console.Error.WriteLine(startupMessage);
+        }
+        else
+        {
+            Console.WriteLine(startupMessage);
+        }
 
         var options = new WatchOptions(
             Debounce: TimeSpan.FromMilliseconds(debounceMs),
@@ -1314,7 +1321,7 @@ public static class Program
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("ackit watch report failed: " + ex.GetType().Name);
+                Console.Error.WriteLine(services.TextProvider.Get("watchReportFailed", language).Replace("{kind}", ex.GetType().Name));
             }
         }
 

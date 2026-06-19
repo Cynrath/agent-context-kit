@@ -258,7 +258,77 @@ public sealed class TextProvider : ITextProvider
         {
             ["en"] = "Not a Git repository. Run from inside a repository or pass --output.",
             ["tr"] = "Git repository değil. Bir repository içinden çalıştırın veya --output kullanın."
-        }
+        },
+        ["trimRequiresArgs"] = new()
+        {
+            ["en"] = "ackit trim requires --input, --output, and --max-chars <N>.",
+            ["tr"] = "ackit trim --input, --output ve --max-chars <N> gerektirir."
+        },
+        ["trimInvalidMaxChars"] = new()
+        {
+            ["en"] = "--max-chars must be a positive integer.",
+            ["tr"] = "--max-chars pozitif bir tam sayi olmalidir."
+        },
+        ["trimInputOutputMustDiffer"] = new()
+        {
+            ["en"] = "Input and output paths must differ. Refusing to overwrite input.",
+            ["tr"] = "Girdi ve cikti yollari farkli olmalidir. Girdinin uzerine yazilmasi reddedildi."
+        },
+        ["trimInputNotFound"] = new()
+        {
+            ["en"] = "Input file not found.",
+            ["tr"] = "Girdi dosyasi bulunamadi."
+        },
+        ["trimFailed"] = new()
+        {
+            ["en"] = "ackit trim failed: {message}",
+            ["tr"] = "ackit trim basarisiz: {message}"
+        },
+        ["watchWatching"] = new()
+        {
+            ["en"] = "ackit watch: watching {repo} (debounce {ms} ms)",
+            ["tr"] = "ackit watch: izleniyor {repo} (debounce {ms} ms)"
+        },
+        ["watchChange"] = new()
+        {
+            ["en"] = "change",
+            ["tr"] = "degisiklik"
+        },
+        ["watchScanFailed"] = new()
+        {
+            ["en"] = "ackit watch scan failed: {kind}",
+            ["tr"] = "ackit watch tarama basarisiz: {kind}"
+        },
+        ["watchReportFailed"] = new()
+        {
+            ["en"] = "ackit watch report failed: {kind}",
+            ["tr"] = "ackit watch rapor basarisiz: {kind}"
+        },
+        ["mcpRequiresStdio"] = new()
+        {
+            ["en"] = "ackit mcp requires --stdio <json-request> or --stdio-server.",
+            ["tr"] = "ackit mcp --stdio <json-request> veya --stdio-server gerektirir."
+        },
+        ["mcpServerCrashed"] = new()
+        {
+            ["en"] = "ackit mcp --stdio-server crashed: {kind}",
+            ["tr"] = "ackit mcp --stdio-server coktu: {kind}"
+        },
+        ["mcpInvalidRepo"] = new()
+        {
+            ["en"] = "--repo must be a local directory path, not a URL or remote path.",
+            ["tr"] = "--repo URL veya uzak yol degil, yerel bir dizin yolu olmalidir."
+        },
+        ["mcpRepoNotDirectory"] = new()
+        {
+            ["en"] = "--repo must point to an existing local directory.",
+            ["tr"] = "--repo var olan bir yerel dizini gostermelidir."
+        },
+        ["mcpInvalidRepoPath"] = new()
+        {
+            ["en"] = "--repo must be a valid local directory path.",
+            ["tr"] = "--repo gecerli bir yerel dizin yolu olmalidir."
+        },
     };
 
     public string Get(string key, LanguageCode language)

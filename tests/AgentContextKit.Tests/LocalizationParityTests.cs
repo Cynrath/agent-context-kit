@@ -18,7 +18,9 @@ public sealed class LocalizationParityTests
         new("generate", ["generate", "--target", "codex"]),
         new("task", ["task", "Localization parity task"]),
         new("redact-check", ["redact-check"]),
-        new("doctor", ["doctor"])
+        new("doctor", ["doctor"]),
+        new("trim", ["trim", "--lang", "en", "--json"]),
+        new("watch", ["watch", "--once", "--lang", "en", "--json"]),
     ];
 
     private static readonly HumanCommandCase[] HumanCommandCases =
@@ -35,7 +37,9 @@ public sealed class LocalizationParityTests
         new("generate", ["generate", "--target", "codex"], "created", "oluşturuldu"),
         new("task", ["task", "Localization parity task"], "created", "oluşturuldu"),
         new("redact-check", ["redact-check"], "No risk findings.", "Risk bulgusu yok."),
-        new("doctor", ["doctor"], "Doctor checks", "Sağlık kontrolleri")
+        new("doctor", ["doctor"], "Doctor checks", "Sağlık kontrolleri"),
+        new("trim-success", ["trim", "--input", "README.md", "--output", ".ackit/cache/trim-out.md", "--max-chars", "10000", "--lang", "en"], "original", "original"),
+        new("watch", ["watch", "--once"], "watching", "izleniyor"),
     ];
 
     [Fact]
@@ -69,6 +73,12 @@ public sealed class LocalizationParityTests
             var english = RunCli(englishRepository.Path, [.. commandCase.Arguments, "--lang", "en"]);
             var turkish = RunCli(turkishRepository.Path, [.. commandCase.Arguments, "--lang", "tr"]);
 
+            if (commandCase.Command.StartsWith("watch", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.Error.WriteLine("DEBUG watch english: " + english.Output.Substring(0, Math.Min(200, english.Output.Length)));
+                Console.Error.WriteLine("DEBUG watch turkish: " + turkish.Output.Substring(0, Math.Min(200, turkish.Output.Length)));
+            }
+
             Assert.Equal(english.ExitCode, turkish.ExitCode);
             Assert.Contains(commandCase.EnglishMarker, english.Output, StringComparison.Ordinal);
             Assert.Contains(commandCase.TurkishMarker, turkish.Output, StringComparison.Ordinal);
@@ -84,7 +94,11 @@ public sealed class LocalizationParityTests
             new ErrorCase(["context-export"], "requires explicit --approve", "açık bir --approve onayı gerektirir"),
             new ErrorCase(["context-export", "--approve"], "requires --prompt-pack", "--prompt-pack <repo-relative.md> gerektirir"),
             new ErrorCase(["task"], "requires a title", "bir başlık gerektirir"),
-            new ErrorCase(["unknown-command"], "Unknown command", "Bilinmeyen komut")
+            new ErrorCase(["unknown-command"], "Unknown command", "Bilinmeyen komut"),
+            new ErrorCase(["trim"], "requires --input", "--input"),
+            new ErrorCase(["trim", "--input", "a.md", "--output", "b.md", "--max-chars", "abc"], "positive integer", "pozitif"),
+            new ErrorCase(["trim", "--input", "a.md", "--output", "a.md", "--max-chars", "10"], "must differ", "farkli"),
+            new ErrorCase(["mcp"], "ackit mcp requires", "gerektirir")
         };
 
         foreach (var errorCase in cases)
