@@ -59,15 +59,19 @@ Single `git revert <sha>`.
 
 ## Completion Evidence
 - File list: `tests/AgentContextKit.Tests/CatalogRuleStabilityTests.cs` (new).
-- Commit hash(es): implementation `4aaa157`.
+- Commit hash(es): implementation `4aaa157`; evidence `d150901`.
 - Test count: 305/305 (2 new).
 - Hosted checks for pushed HEAD `4aaa157`:
   - `ci` run `27826714694` — success.
   - `cross-platform-smoke` run `27826714743` — success.
   - `cross-platform-source-smoke` run `27826714656` — success.
+- Hosted checks for evidence commit `d150901`:
+  - `ci` run `27827017845` — success.
+  - `cross-platform-smoke` run `27827017855` — success.
+  - `cross-platform-source-smoke` run `27827017866` — success.
 
 ## Push
 - `git push origin master` only.
 
 ## Hosted Checks
-- All three standard `master` workflows passed for pushed HEAD `4aaa157`.
+- All three standard `master` workflows passed for both pushed HEAD `4aaa157` and evidence commit `d150901`.
