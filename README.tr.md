@@ -64,6 +64,7 @@ MVP uzak AI API cagrisi yapmaz ve repository icerigini yuklemez. Bu yaklasim pri
 - `ackit init`: `.ackit/config.yml` olusturur, var olan config'i ezmez.
 - `ackit config-check`: config dosyasini degistirmeden sanitize edilmis tani ve gecis rehberi verir.
 - `ackit scan`: stack, docs, test, CI, Docker, agent dosyalari ve riskli yolları tespit eder.
+- `ackit scan --include <glob> --exclude <glob>`: mevcut source icin odakli ad-hoc tarama filtreleri uygular.
 - `ackit scan --ci`: high veya critical risk bulgularinda otomasyon kontrollerini basarisiz yapar.
 - `ackit baseline`: incelenmis bulgular icin sanitize edilmis lokal baseline olusturur; baseline modu sadece yeni High/Critical bulgulari CI blocker yapar.
 - Stabil scanner rule ID'leri ve safe technical domain, bilinen non-Critical path ve kabul edilen non-Critical rule ID'leri icin dar config allowlist destegi.
@@ -76,6 +77,10 @@ MVP uzak AI API cagrisi yapmaz ve repository icerigini yuklemez. Bu yaklasim pri
 - `ackit task`: `docs/tasks` altinda yapilandirilmis task dosyasi olusturur.
 - `ackit redact-check`: secret/PII/marka/local path risklerini raporlar.
 - `ackit doctor`: OSS ve repository saglik kontrollerini raporlar.
+- `ackit mcp --stdio-server`: mevcut source icin local-only JSON-RPC stdio MCP tasimasi calistirir.
+- `ackit diff`: mevcut source icin sanitize edilmis baseline farki uretir.
+- `ackit trim`: mevcut source icin Markdown/JSON context ciktisini boyuta gore kisaltir.
+- `ackit watch`: mevcut source icin debounced lokal degisiklik izleme ve scan yenileme saglar.
 - `--json`: otomasyon uyumlu machine-readable JSON cikti uretir.
 - English ve Turkish output/template temeli.
 
@@ -138,10 +143,13 @@ dotnet test AgentContextKit.sln -c Release --no-build
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- --help
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --json
+dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --include 'src/**' --exclude '**/*.bak' --ci
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
 ```
 
 Yayinlanmis `0.2.0-alpha.2` paketi human/JSON scan ciktisina sanitized suppression audit alanlari ekler.
+
+Mevcut source ayrica scan glob filtreleri ve local-only `mcp`, `diff`, `trim`, `watch` komutlarini icerir. Bu current-source komut haritasi yeni bir NuGet release iddiasi degildir.
 
 Kurulu tool icin hizli dogrulama:
 
@@ -185,11 +193,12 @@ Daha fazla rehberli ornek icin [Sample Gallery](docs/SAMPLE_GALLERY.md) ve [Demo
 
 ## CLI Komutlari
 `ackit sarif`, yayinlanmis `0.2.0-alpha.2` NuGet global tool ve mevcut source icinde vardir.
+Asagidaki harita current-source `--help`, `docs/CLI_CONTRACT.md` ve `docs/CLI_REFERENCE.md` ile uyumludur. Yayinlanmis NuGet paketi `0.2.0-alpha.2` olarak kalir.
 
 ```text
 ackit init [--lang en|tr] [--json]
 ackit config-check [--lang en|tr] [--json]
-ackit scan [--baseline <repo-relative.json>] [--lang en|tr] [--json] [--ci]
+ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
 ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]
 ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]
 ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]
@@ -201,9 +210,11 @@ ackit task "<baslik>" [--lang en|tr] [--json]
 ackit redact-check [--profile public-release] [--lang en|tr] [--json]
 ackit doctor [--lang en|tr] [--json]
 ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--install|--dry-run] [--output <repo-relative-dir>] [--lang en|tr] [--json]
+ackit mcp --stdio-server [--repo <path>] [--lang en|tr]
 ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]
 ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]
 ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]
+ackit watch [--debounce-ms <N>] [--once] [--max-runtime-ms <N>] [--json] [--lang en|tr]
 ackit version
 ackit --help
 ```

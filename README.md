@@ -95,6 +95,7 @@ AgentContextKit gives teams a repeatable local workflow before they hand a repos
 | Initialize config | `ackit init` | `.ackit/config.yml` |
 | Validate config | `ackit config-check` | Read-only sanitized diagnostics and migration guidance |
 | Scan repository | `ackit scan` | Stack, docs, tests, CI, Docker, agent files, risky paths |
+| Filter scan scope | `ackit scan --include <glob> --exclude <glob>` | Current-source ad-hoc include/exclude filters |
 | Fail CI on risk | `ackit scan --ci` | Non-zero exit on high or critical findings |
 | Record reviewed findings | `ackit baseline` | Sanitized local baseline for opt-in new-finding CI policy |
 | Generate SARIF | `ackit sarif` | Privacy-first SARIF 2.1.0 report from the published package or current source |
@@ -106,6 +107,10 @@ AgentContextKit gives teams a repeatable local workflow before they hand a repos
 | Create task docs | `ackit task` | Structured task Markdown files |
 | Check sensitive content | `ackit redact-check` | Secret/PII/brand/local-path risk report |
 | Check repository health | `ackit doctor` | OSS and repo hygiene diagnostics |
+| Run local MCP transport | `ackit mcp --stdio-server` | Current-source local JSON-RPC stdio loop |
+| Compare baselines | `ackit diff` | Current-source sanitized baseline diff |
+| Trim context artifacts | `ackit trim` | Current-source size-bounded Markdown/JSON trimming |
+| Watch local changes | `ackit watch` | Current-source debounced local scan watcher |
 
 ---
 
@@ -173,10 +178,13 @@ dotnet test AgentContextKit.sln -c Release --no-build
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- --help
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --json
+dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --include 'src/**' --exclude '**/*.bak' --ci
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
 ```
 
 The published `0.2.0-alpha.2` package adds sanitized suppression audit fields to human/JSON scan output.
+
+Current source also includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands. These current-source command map entries do not imply a new NuGet release.
 
 ### Try it on a sample
 
@@ -221,11 +229,12 @@ Pop-Location
 ---
 
 ## CLI Command Map
+This map follows current-source `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`. The published NuGet package remains `0.2.0-alpha.2`; see the reference docs for per-command availability notes.
 
 ```text
 ackit init [--lang en|tr] [--json]
 ackit config-check [--lang en|tr] [--json]
-ackit scan [--baseline <repo-relative.json>] [--lang en|tr] [--json] [--ci]
+ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
 ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]
 ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]
 ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]
@@ -237,9 +246,11 @@ ackit task "<title>" [--lang en|tr] [--json]
 ackit redact-check [--profile public-release] [--lang en|tr] [--json]
 ackit doctor [--lang en|tr] [--json]
 ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--install|--dry-run] [--output <repo-relative-dir>] [--lang en|tr] [--json]
+ackit mcp --stdio-server [--repo <path>] [--lang en|tr]
 ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]
 ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]
 ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]
+ackit watch [--debounce-ms <N>] [--once] [--max-runtime-ms <N>] [--json] [--lang en|tr]
 ackit version
 ackit --help
 ```
