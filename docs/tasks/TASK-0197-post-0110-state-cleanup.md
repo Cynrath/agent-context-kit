@@ -98,8 +98,19 @@ These four files are the only ones that still claim PROJECT-CONTROL-0110 is acti
 Single `git revert <sha>`. No other task depends on TASK-0197.
 
 ## Completion Evidence
-- Commit hash(es) to be filled in after the implementation commit.
-- Final pushed HEAD and cumulative test count.
+
+- Planning commit: `d7aae06` — `docs: plan task 0197 post 0110 state cleanup`.
+- Implementation commit: to be recorded after `docs(state): sync post 0110 handoff`.
+- Final pushed HEAD (expected): `b073c3d` until the implementation commit lands.
+- Cumulative test count: 428/428 green.
+- `dotnet build AgentContextKit.sln -c Release --no-restore` — 0 warnings, 0 errors.
+- `dotnet test AgentContextKit.sln -c Release --no-build` — 428/428 green (`AgentContextKit.Tests.dll`, net10.0).
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci` — exit 0 (existing `.remember` Medium log findings only).
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- doctor` — 13/13 PASS (CLI Contract, Localization Parity, Memory, Tools, Web UI, CHANGELOG, Tests, CI, Sourcelink, Packaging, README, SECURITY, Repository Health).
+- `git diff --check` — clean.
+- PowerShell scripts `check-tracked-vs-untracked-md.ps1`, `check-cli-contract.ps1`, `check-localization-parity.ps1`, `verify-release.ps1` exit 1 in this environment due to a pre-existing PowerShell strict-mode interaction with `git`'s stderr warning for a transient non-UTF-8 directory created during earlier test runs; the xunit matrix `LocalizationParityTests` and `CliContractTests` covered by the same checks pass. Pre-existing environment issue, recorded in `docs/tasks/TASK-0193-post-0193-context.md` and earlier; not caused by TASK-0197.
+- Release remained NO-GO: `0.2.0-alpha.3` NO-GO because RB-003 (independent backup security owner) and RB-008 (destructive NuGet recovery authority) remain unresolved.
+- No tag, GitHub Release, NuGet publish, or version bump. RB-003 and RB-008 are not closed by this task.
 
 ## Push
 - `git push origin master` only.

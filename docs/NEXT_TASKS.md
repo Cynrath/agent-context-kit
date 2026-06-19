@@ -1,6 +1,6 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0108 are closed. PROJECT-CONTROL-0109 (TASK-0177 through TASK-0186) is closed with 315/315 tests green and all standard hosted checks green for the final pushed HEAD. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is now active as the next local product/code-quality/test/documentation/security pass; no version bump is implied and `0.2.0-alpha.3` remains NO-GO until `RB-003` and `RB-008` are independently resolved.
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. No version bump is implied and `0.2.0-alpha.3` remains NO-GO until `RB-003` and `RB-008` are independently resolved. No next project control has been selected; the next entry is "not yet selected / pending maintainer direction".
 
 ## Closed PROJECT-CONTROL-0110 (2026-06-19)
 
@@ -154,7 +154,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- PROJECT-CONTROL-0110 is now active for TASK-0188 through TASK-0196. Each task follows the task-first flow: planning commit first, implementation commit, push, then advance. PROJECT-CONTROL-0110 must not start work that depends on closing `RB-003` or `RB-008`, must not bump `0.2.0-alpha.3`, and must not claim release readiness.
+- No next project control has been selected. PROJECT-CONTROL-0110 is closed at TASK-0196 (2026-06-19) with 428/428 tests green and the final pushed HEAD at `b073c3d`. `0.2.0-alpha.3` remains NO-GO because `RB-003` (independent backup security owner) and `RB-008` (destructive NuGet recovery authority) remain unresolved. No release, tag, GitHub Release, NuGet publish, or version bump is part of this state. The next entry is "not yet selected / pending maintainer direction"; any new control task must be explicitly authorized through a planning commit before implementation.
 
 ## Execution Rule
-Continue TASK-0188 through TASK-0196 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
+After the closure of PROJECT-CONTROL-0110, the queue is in pause: no automatic commit or push is authorized without an explicitly active project control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations. RB-003 and RB-008 are independent of this control and remain open.
