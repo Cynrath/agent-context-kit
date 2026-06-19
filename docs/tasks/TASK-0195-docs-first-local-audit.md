@@ -76,7 +76,11 @@ This is the eighth task in PROJECT-CONTROL-0110.
 Single `git revert <sha>`. No other task depends on TASK-0195.
 
 ## Completion Evidence
-- Commit hash(es) to be filled in after the implementation commit.
+- Planning commit: `01a241f` (`docs: plan task 0195 docs first local audit`).
+- Implementation commit: `0c60db8` (`docs(state): sync task 0195 docs`).
+- Test count: 428/428 unchanged.
+- Source `scan --ci` exit 0; `ackit doctor` 13/13 PASS.
+- `docs/NEXT_TASKS.md`, `.codex/SESSION_HANDOFF.md`, `.codex/CONTEXT_PACK.md`, and `.codex/NEXT_STEPS.md` now reference TASK-0188 through TASK-0194 outcomes, the 428/428 test count, and the same alpha.3 NO-GO and RB-003 / RB-008 notes.
 
 ## Push
 - `git push origin master` only.
