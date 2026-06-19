@@ -225,6 +225,46 @@ public sealed class WatchCommandTests
             HasAgentInstructions: false);
     }
 
+    [Fact]
+    public void DisposedFakeFileWatcherIsIdempotent()
+    {
+        var watcher = new FakeFileWatcher();
+        watcher.Dispose();
+        watcher.Dispose();
+    }
+
+    [Fact]
+    public void FakeFileWatcherRecordsRaiseAfterStop()
+    {
+        var watcher = new FakeFileWatcher();
+        watcher.Start();
+        watcher.Stop();
+        watcher.Raise("src/Program.cs", FileWatcherChangeKind.Changed);
+
+        Assert.Single(watcher.Raised);
+    }
+
+    [Fact]
+    public void InitialScanFailureProducesZeroScansButDoesNotThrow()
+    {
+        var watcher = new FakeFileWatcher();
+        var scanner = new ThrowingRepositoryScanner();
+        var options = new WatchOptions(
+            Debounce: TimeSpan.FromMilliseconds(0),
+            MaxRuntime: TimeSpan.Zero,
+            OneShot: true,
+            Language: LanguageCode.English,
+            EmitJson: false,
+            RepositoryPath: "/repo",
+            Config: AckitConfig.Default,
+            Clock: () => DateTimeOffset.UtcNow);
+
+        var result = WatchRunner.Run(watcher, scanner, options);
+
+        Assert.Equal(0, result.ScansRun);
+        Assert.Null(result.LastReport);
+    }
+
     private sealed class FakeRepositoryScanner : IRepositoryScanner
     {
         private int _scanCallCount;

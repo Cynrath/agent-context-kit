@@ -72,4 +72,28 @@ public sealed class WatchIgnoreFilterTests
     {
         Assert.True(WatchIgnoreFilter.IsIgnored(relativePath));
     }
+
+    [Fact]
+    public void AckitCachePrefixWithoutTrailingSlashIsIgnored()
+    {
+        Assert.True(WatchIgnoreFilter.IsIgnored(".ackit/cache"));
+    }
+
+    [Fact]
+    public void AckitConfigYmlIsNotIgnored()
+    {
+        Assert.False(WatchIgnoreFilter.IsIgnored(".ackit/config.yml"));
+    }
+
+    [Fact]
+    public void AckitReportsPrefixIsIgnoredCaseInsensitively()
+    {
+        Assert.True(WatchIgnoreFilter.IsIgnored(".ACKIT/REPORTS/report.html"));
+    }
+
+    [Fact]
+    public void EditorSwapPatternMatchesDotPrefixLock()
+    {
+        Assert.True(WatchIgnoreFilter.IsIgnored(".#lockfile"));
+    }
 }

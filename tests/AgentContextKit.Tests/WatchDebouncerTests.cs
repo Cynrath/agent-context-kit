@@ -46,6 +46,40 @@ public sealed class WatchDebouncerTests
     }
 
     [Fact]
+    public void MonotonicallyIncreasingTimestampsWithZeroWindowAreAllAccepted()
+    {
+        var debouncer = new WatchDebouncer(TimeSpan.Zero);
+        var t0 = new DateTimeOffset(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
+
+        for (var i = 0; i < 100; i++)
+        {
+            Assert.True(debouncer.TryAccept(t0.AddMilliseconds(i)));
+        }
+    }
+
+    [Fact]
+    public void EqualTimestampsInsideWindowAreRejected()
+    {
+        var debouncer = new WatchDebouncer(TimeSpan.FromMilliseconds(500));
+        var t0 = new DateTimeOffset(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
+
+        Assert.True(debouncer.TryAccept(t0));
+        Assert.False(debouncer.TryAccept(t0));
+        Assert.False(debouncer.TryAccept(t0));
+    }
+
+    [Fact]
+    public void WindowBoundaryIsInclusiveAtExactEdge()
+    {
+        var debouncer = new WatchDebouncer(TimeSpan.FromMilliseconds(500));
+        var t0 = new DateTimeOffset(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
+
+        Assert.True(debouncer.TryAccept(t0));
+        Assert.False(debouncer.TryAccept(t0.AddMilliseconds(499)));
+        Assert.True(debouncer.TryAccept(t0.AddMilliseconds(500)));
+    }
+
+    [Fact]
     public void NegativeWindowIsRejected()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new WatchDebouncer(TimeSpan.FromMilliseconds(-1)));
