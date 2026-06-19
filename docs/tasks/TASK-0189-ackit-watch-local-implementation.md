@@ -144,7 +144,7 @@ Single `git revert <sha>`. No other task depends on TASK-0189.
 
 ## Completion Evidence
 - Planning commit: `b481a0e` (`docs: plan ackit watch local implementation`).
-- Implementation commit: `\<impl-sha\>` (`feat: add ackit watch local implementation`).
+- Implementation commit: `447a76a` (`feat: add ackit watch local implementation`).
 - Test count: 397/397 (345 baseline + 52 new watch tests across WatchDebouncerTests, WatchIgnoreFilterTests, WatchCommandTests).
 - Source `scan --ci` exit 0 with existing `.remember` Medium log findings only; no new findings.
 - `ackit doctor` 13/13 PASS.
