@@ -184,7 +184,6 @@ public sealed class McpRouter : IMcpServer
         var text = BuildScanSummary(scan, language, format);
         return Success(id, ToolResult(text, new
         {
-            repositoryPath = scan.RepositoryPath,
             repositoryName = GetRepositoryName(scan.RepositoryPath),
             format,
             fileCount = scan.Files.Count,
@@ -218,7 +217,7 @@ public sealed class McpRouter : IMcpServer
         var text = $"Findings: {findings.Length} (minimum severity: {minSeverity})";
         return Success(id, ToolResult(text, new
         {
-            repositoryPath = scan.RepositoryPath,
+            repositoryName = GetRepositoryName(scan.RepositoryPath),
             minSeverity = minSeverity.ToString(),
             findingCount = findings.Length,
             findings
@@ -244,7 +243,7 @@ public sealed class McpRouter : IMcpServer
 
         return Success(id, ToolResult(text, new
         {
-            repositoryPath = scan.RepositoryPath,
+            repositoryName = GetRepositoryName(scan.RepositoryPath),
             target = ToTargetToken(target),
             fileCount = scan.Files.Count,
             stackCount = scan.Stacks.Count,
@@ -266,7 +265,7 @@ public sealed class McpRouter : IMcpServer
 
         return Success(id, ToolResult(text, new
         {
-            repositoryPath = scan.RepositoryPath,
+            repositoryName = GetRepositoryName(scan.RepositoryPath),
             checkSummary = new
             {
                 total = result.Checks.Count,
@@ -450,7 +449,7 @@ public sealed class McpRouter : IMcpServer
         return string.Join(Environment.NewLine, new[]
         {
             title,
-            $"- Repository: {scan.RepositoryPath}",
+            $"- Repository: {GetRepositoryName(scan.RepositoryPath)}",
             $"- Format: {format}",
             $"- Files: {scan.Files.Count}",
             $"- Stacks: {scan.Stacks.Count}",

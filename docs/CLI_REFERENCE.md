@@ -243,22 +243,31 @@ Safety behavior:
 - The command does not register real-time listeners, perform HTTP calls, upload repository content, or store secrets.
 
 ### `ackit mcp`
-Routes one provided JSON-RPC request string through the local Core MCP prototype. This is not a real stdio server yet.
+Runs the local Core MCP transport. The `ackit mcp` subcommand supports a real local stdio loop (`--stdio-server`) and a one-shot JSON-RPC test seam (`--stdio <json-request>`). The transport is local-only: no network, no telemetry, no source mutation, no child process spawn.
 
 ```powershell
 ackit mcp --help
+ackit mcp --stdio-server
+ackit mcp --stdio-server --repo C:\path\to\repo
 ackit mcp --stdio '{"jsonrpc":"2.0","id":"1","method":"initialize","params":{}}'
 ackit mcp --stdio '{"jsonrpc":"2.0","id":"2","method":"tools/list","params":{}}' --output .ackit/mcp/tools.jsonl
 ```
 
-Prototype behavior:
-- No child process is spawned.
-- No `Console.In` read loop is started.
-- No network, HTTP, telemetry, remote provider call, or repository upload is performed.
-- `--stdio` receives the JSON-RPC request as an argument string.
-- `--output`, when provided, must be repository-relative and end in `.json`, `.jsonl`, or `.txt`.
-- Tool calls require a local `repoPath` argument inside JSON-RPC params.
+Modes:
+- `--stdio-server [--repo <path>] [--lang en|tr]` activates the real long-lived loop. Reads line-delimited JSON-RPC 2.0 messages from `Console.In` and writes one JSON-RPC response per request to `Console.Out`. Diagnostics go to `Console.Error`. Exits `0` on EOF, `notifications/exit`, or `notifications/shutdown`. The server writes no banner, version, or help line to `Console.Out`. Maximum input line is 1 MiB; oversized input returns a JSON-RPC parse error and the loop continues. The per-request timeout is 30 seconds.
+- `--stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]` is the one-shot test seam. It does not read `Console.In`, does not create a long-lived server, and does not spawn a child process. `--output`, when provided, must be repository-relative and end in `.json`, `.jsonl`, or `.txt`.
+
+Tool behavior (both modes):
+- Tool calls require a local `repoPath` argument inside JSON-RPC params, or a `--repo <path>` default in `--stdio-server` mode. URLs, `file:` URIs, UNC paths, and traversal attempts return `-32602 Invalid params`. The error message never echoes the supplied path.
 - Initial tools are `ackit.scan`, `ackit.findings`, `ackit.context`, and `ackit.health`.
+- Tool responses are sanitized: `match` is always `null` in `ackit.findings` entries; absolute local paths never appear; the human-readable text references only the repository basename.
+- `repoPath` validation, scanner invocation, and result shaping are shared between the legacy one-shot path and the real stdio server; both routes go through the same `McpRouter`.
+
+Privacy and safety:
+- The server only writes to `Console.Out` and reads from `Console.In`. There is no HTTP, SSE, or streamable HTTP transport.
+- The server does not write raw scanner match text, absolute local paths, usernames, machine names, or secret values to `Console.Out`.
+- The server does not modify any source file. `redact-check` remains report-only and is unaffected by this command.
+- The server keeps no on-disk state between calls.
 
 ### `ackit task`
 Creates a structured task file under `docs/tasks`.

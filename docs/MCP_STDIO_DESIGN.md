@@ -126,3 +126,60 @@ TASK-0178 implements only the safe, local prototype boundary:
 - `ackit.context` returns a write-free context preview; it does not call the agent instruction generator's file-writing path.
 - The CLI stub is `ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>]`. It does not read `Console.In`, does not create a long-lived server, and does not spawn a child process.
 - Real redirected stdio, notifications lifecycle, shutdown behavior, process supervision, and end-to-end editor integration remain future work.
+
+## Implementation Plan: Step 2
+
+TASK-0188 advances the prototype to a real local stdio loop with safety bounds and a deterministic privacy posture. The contract below is implemented in `src/AgentContextKit.Core/Mcp/McpStdioTransport.cs` and exposed by the CLI as `ackit mcp --stdio-server`. The legacy one-shot `ackit mcp --stdio <json-request>` is kept for backward compatibility and unit-test seams.
+
+### Transport
+
+- `McpStdioTransport` reads line-delimited JSON-RPC 2.0 messages from an injected `TextReader` (default: `Console.In`) and writes one JSON-RPC response per request to an injected `TextWriter` (default: `Console.Out`). Diagnostics go to an injected `TextWriter` (default: `Console.Error`).
+- The transport never writes a banner, version, or help line to `Console.Out`; only JSON-RPC responses appear on stdout. After each response the writer is flushed.
+- The transport returns exit code `0` on EOF or a `notifications/exit` / `notifications/shutdown` signal, and `3` only on an unrecoverable loop crash (the per-request error path returns JSON-RPC errors and continues the loop).
+- Concurrent requests are processed sequentially. No parallel queue is added; one request is in-flight at a time.
+- Per-request timeout: `McpStdioOptions.RequestTimeout` defaults to 30 seconds. A timed-out request returns a JSON-RPC `-32603 Internal error` and the loop continues.
+- Maximum line length: `McpStdioOptions.MaxLineLength` defaults to 1 MiB. An oversized line returns a JSON-RPC `-32700 Parse error` and the loop continues.
+
+### JSON-RPC Surface
+
+- `initialize` returns the protocol version `2024-11-05`, the `serverInfo` (name `ackit`, title `AgentContextKit`, version from CLI metadata), and a `capabilities.tools` object.
+- `tools/list` returns the four tools in the documented order: `ackit.scan`, `ackit.findings`, `ackit.context`, `ackit.health`.
+- `tools/call` dispatches to the corresponding tool. Unknown tool names return `-32602 Invalid params` with a generic "Unknown tool" message. The `repoPath` argument is validated before any file system access: URLs, `file:` URIs, UNC paths, and traversal attempts return `-32602`. The error message never echoes the supplied path.
+- `ping` returns `{ "ok": true }`.
+- `notifications/initialized` is accepted silently. No response is written.
+- `notifications/exit` and `notifications/shutdown` close the loop with exit code `0`. No response is written.
+- Unknown method: `-32601 Method not found`.
+- Malformed JSON: `-32700 Parse error` (id is `null`).
+- Invalid request (missing `jsonrpc` or `method`, wrong `jsonrpc` version, non-object `params`): `-32600 Invalid request`.
+- Internal handler error: `-32603 Internal error` and a one-line diagnostic in `Console.Error` that never includes the supplied path or raw exception text.
+
+### Privacy and Sanitization
+
+- The transport never writes raw scanner match text. The Core tool result DTOs return `match: null` for every `ackit.findings` entry.
+- The transport never writes absolute local paths. The Core tool DTOs return only the repository basename (`repositoryName`). The human-readable text content in `ackit.scan` and `ackit.context` references the basename as well.
+- Error messages are generic. The transport does not echo the supplied `repoPath`, file content, or raw exception text. Exception messages are truncated to 256 characters before being written to `Console.Error`.
+- `ackit mcp --repo <path>` is rejected at the CLI layer if the path is a URL, `file:` URI, UNC, or non-existent directory. The transport's default `repoPath` is set only after this validation.
+
+### CLI
+
+- `ackit mcp --help` documents both modes: `--stdio-server` for the real long-lived loop and `--stdio <json-request>` for the one-shot test seam.
+- `ackit mcp --stdio-server [--repo <path>] [--lang en|tr]` starts the real loop. Without `--stdio-server` or `--stdio`, the command prints help and exits `0`.
+- The CLI never writes a banner or version line to `Console.Out`; the `RunMcpStdioServer` path goes straight into the transport loop.
+- The CLI's `RunMcpStdioServer` validates `--repo` once and passes the resolved absolute path as `McpStdioOptions.DefaultRepositoryPath` so a per-request `tools/call` may omit `arguments.repoPath`. An explicit `repoPath` argument always wins over the default.
+- The CLI's `RunMcpStdioServer` blocks the calling thread on `transport.RunAsync().GetAwaiter().GetResult()` and returns the transport's exit code unchanged.
+
+### Lifecycle
+
+1. The editor or test harness launches `ackit mcp --stdio-server [--repo <path>]`.
+2. The server writes nothing to `Console.Out` until a request arrives.
+3. Each request is read as one line, validated, dispatched, and the response is written and flushed.
+4. EOF, `notifications/exit`, `notifications/shutdown`, or a cancelled `CancellationToken` exits with code `0`.
+5. The transport does not create on-disk state, does not touch `Console.Out` outside of JSON-RPC responses, and does not write any diagnostic that contains the supplied `repoPath` or raw match text.
+
+### Out of Scope for Step 2
+
+- HTTP / SSE / streamable HTTP transport.
+- Authentication, authorization, multi-tenant routing, quotas, or rate limiting.
+- A persistent daemon, service installation, or auto-start behavior.
+- Any source mutation. `redact-check` remains report-only and the transport does not propose diffs, suppress findings, or modify files.
+- `ackit.rules` MCP tool — that is TASK-0192.

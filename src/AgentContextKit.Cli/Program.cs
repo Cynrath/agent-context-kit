@@ -77,6 +77,7 @@ public static class Program
         Console.WriteLine("  ackit redact-check [--profile public-release] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit doctor [--lang en|tr] [--json]");
         Console.WriteLine("  ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--install|--dry-run] [--output <repo-relative-dir>] [--lang en|tr] [--json]");
+        Console.WriteLine("  ackit mcp --stdio-server [--repo <path>] [--lang en|tr]");
         Console.WriteLine("  ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]");
         Console.WriteLine("  ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]");
         Console.WriteLine("  ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]");
@@ -932,22 +933,40 @@ public static class Program
     {
         if (HasFlag(args, "--help") || HasFlag(args, "-h"))
         {
-            Console.WriteLine("AgentContextKit MCP stdio prototype");
-            Console.WriteLine("Local JSON-RPC routing only; no real stdin/stdout loop and no child process.");
+            Console.WriteLine("AgentContextKit MCP stdio transport");
+            Console.WriteLine();
             Console.WriteLine("Usage:");
+            Console.WriteLine("  ackit mcp --stdio-server [--repo <path>] [--lang en|tr]");
             Console.WriteLine("  ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]");
+            Console.WriteLine("  ackit mcp --help");
+            Console.WriteLine();
+            Console.WriteLine("Modes:");
+            Console.WriteLine("  --stdio-server   Real stdio loop. Reads JSON-RPC 2.0 line-delimited messages from");
+            Console.WriteLine("                  Console.In and writes JSON-RPC responses to Console.Out.");
+            Console.WriteLine("                  Diagnostics go to Console.Error. Exits 0 on EOF or");
+            Console.WriteLine("                  notifications/exit|shutdown. No network, no source mutation.");
+            Console.WriteLine("  --stdio <json>  One-shot JSON-RPC round-trip (test seam; kept for backward");
+            Console.WriteLine("                  compatibility). Writes the single response to Console.Out or");
+            Console.WriteLine("                  to the file passed with --output.");
+            Console.WriteLine();
+            Console.WriteLine("Methods:");
+            Console.WriteLine("  initialize, tools/list, tools/call, notifications/initialized, ping,");
+            Console.WriteLine("  notifications/exit (or notifications/shutdown).");
+            Console.WriteLine();
             Console.WriteLine("Tools:");
-            Console.WriteLine("  ackit.scan");
-            Console.WriteLine("  ackit.findings");
-            Console.WriteLine("  ackit.context");
-            Console.WriteLine("  ackit.health");
+            Console.WriteLine("  ackit.scan, ackit.findings, ackit.context, ackit.health.");
             return ExitSuccess;
+        }
+
+        if (HasFlag(args, "--stdio-server"))
+        {
+            return RunMcpStdioServer(args, repositoryPath, services);
         }
 
         var input = GetOption(args, "--stdio");
         if (string.IsNullOrWhiteSpace(input))
         {
-            Console.Error.WriteLine("ackit mcp requires --stdio <json-request>.");
+            Console.Error.WriteLine("ackit mcp requires --stdio <json-request> or --stdio-server.");
             return ExitError;
         }
 
@@ -971,6 +990,52 @@ public static class Program
         catch (InvalidOperationException ex)
         {
             Console.Error.WriteLine(ex.Message);
+            return ExitError;
+        }
+    }
+
+    private static int RunMcpStdioServer(string[] args, string repositoryPath, Services services)
+    {
+        var defaultRepo = repositoryPath;
+        var repoOverride = GetOption(args, "--repo");
+        if (!string.IsNullOrWhiteSpace(repoOverride))
+        {
+            var trimmed = repoOverride.Trim();
+            if (trimmed.Contains("://", StringComparison.Ordinal) ||
+                trimmed.StartsWith("file:", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.StartsWith(@"\\", StringComparison.Ordinal) ||
+                trimmed.StartsWith("//", StringComparison.Ordinal))
+            {
+                Console.Error.WriteLine("--repo must be a local directory path, not a URL or remote path.");
+                return ExitCritical;
+            }
+            try
+            {
+                var fullPath = Path.GetFullPath(trimmed);
+                if (!services.FileSystem.DirectoryExists(fullPath))
+                {
+                    Console.Error.WriteLine("--repo must point to an existing local directory.");
+                    return ExitCritical;
+                }
+                defaultRepo = fullPath;
+            }
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+            {
+                Console.Error.WriteLine("--repo must be a valid local directory path.");
+                return ExitCritical;
+            }
+        }
+
+        var options = new McpStdioOptions { DefaultRepositoryPath = defaultRepo };
+        var transport = new McpStdioTransport(services.McpServer, Console.In, Console.Out, Console.Error, options);
+
+        try
+        {
+            return transport.RunAsync().GetAwaiter().GetResult();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"ackit mcp --stdio-server crashed: {ex.GetType().Name}");
             return ExitError;
         }
     }
