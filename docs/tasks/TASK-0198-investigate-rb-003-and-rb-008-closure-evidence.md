@@ -107,8 +107,8 @@ Single `git revert <sha>` for each TASK-0198 commit. No source/runtime migration
 - [x] `ackit scan --ci` and `ackit doctor` recorded.
 - [x] Targeted scripts recorded.
 - [x] `git diff --check` clean.
-- [ ] Working tree clean.
-- [ ] Push completed only after validation.
+- [x] Working tree clean.
+- [x] Push completed only after validation.
 
 ## Evidence
 - Current local and origin HEAD at takeover: `194480a`.
@@ -116,6 +116,11 @@ Single `git revert <sha>` for each TASK-0198 commit. No source/runtime migration
 - `docs/PACKAGE_RECOVERY.md` says NuGet unlist/deprecate/account-recovery authority and backup recovery owner are unverified.
 - Plan commit: `d8bc79b` (`docs: plan task 0198 blocker evidence`).
 - Implementation/sync commit: `b58ec92` (`docs: clarify blocker evidence requirements`).
+- Final evidence commit: `533b64a` (`docs: record task 0198 evidence`).
+- Final local HEAD after push: `533b64a`.
+- Final origin HEAD after push: `533b64a`.
+- Final working tree: clean; raw `git status --porcelain=v1 --untracked-files=all` with stderr suppressed was empty.
+- Push completed: `git push origin master` updated `origin/master` from `194480a` to `533b64a`.
 - `docs/RELEASE_BLOCKER_BOARD.md` now lists `RB-003` and `RB-008` as `Open/partial` and adds a TASK-0198 evidence boundary.
 - `docs/V020_ALPHA3_RELEASE_DECISION.md` still records `NO-GO` and now names the exact closure evidence needed for `RB-003` and `RB-008`.
 - `docs/MAINTAINER_DECISION_REGISTER.md` keeps `MD-003` and `MD-008` as `Partial`.
@@ -139,4 +144,4 @@ Single `git revert <sha>` for each TASK-0198 commit. No source/runtime migration
 Completed investigation. `RB-003` and `RB-008` remain open/partial. `0.2.0-alpha.3` remains NO-GO. No release, tag, GitHub Release, NuGet publish, workflow dispatch, version bump, security-setting change, owner mutation, or destructive NuGet action occurred.
 
 ## Completion notes
-This file records the final TASK-0198 evidence. The resulting final commit hash and post-commit clean working tree are reported in the completion response.
+TASK-0198 final commit/push evidence is now recorded directly in this file. The Windows `git status --short` unreadable-directory warning remains pre-existing; raw porcelain was empty.
