@@ -82,15 +82,19 @@ Single `git revert <sha>`.
 
 ## Completion Evidence
 - File list: above.
-- Commit hash(es): implementation `f5873eb`.
+- Commit hash(es): implementation `f5873eb`; evidence `f2594d0`.
 - Test count: 313/313 (8 new).
 - Hosted checks for pushed HEAD `f5873eb`:
   - `ci` run `27829523172` — success.
   - `cross-platform-smoke` run `27829523186` — success.
   - `cross-platform-source-smoke` run `27829523206` — success.
+- Hosted checks for evidence commit `f2594d0`:
+  - `ci` run `27829870759` — success.
+  - `cross-platform-smoke` run `27829870772` — success.
+  - `cross-platform-source-smoke` run `27829870785` — success.
 
 ## Push
 - `git push origin master` only.
 
 ## Hosted Checks
-- All three standard `master` workflows passed for pushed HEAD `f5873eb`.
+- All three standard `master` workflows passed for both pushed HEAD `f5873eb` and evidence commit `f2594d0`.
