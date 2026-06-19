@@ -153,4 +153,27 @@ Missing:
 Closure conclusion: insufficient evidence to close `RB-008`.
 
 ## Completion notes
-Pending implementation and validation.
+Completed as a docs-only release-blocker closure preflight. Repository evidence remains insufficient to close either blocker.
+
+Commits:
+- Plan: `253fdc3` (`docs: plan task 0201 blocker closure preflight`).
+- Preflight documentation: `cebed0b` (`docs: record blocker closure preflight`).
+- Final evidence: this commit (`docs: record task 0201 evidence`).
+
+Validation:
+- `dotnet restore AgentContextKit.sln`: passed.
+- `dotnet build AgentContextKit.sln -c Release --no-restore`: passed with existing xUnit analyzer warnings; 0 errors.
+- `dotnet test AgentContextKit.sln -c Release --no-build`: passed, 428/428 tests.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci`: passed; existing `.remember` Medium findings and Low local-path findings only.
+- `ackit doctor`: passed.
+- `git diff --check`: passed; CRLF normalization warnings only.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1`: passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-cli-contract.ps1`: passed with dirty-tree warning.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1`: passed with dirty-tree warning.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/verify-release.ps1`: failed during the release-blocker review on the known Windows `git status --short` unreadable-directory stderr warning after its internal restore/build/test/current-source scan/doctor checks passed.
+
+Final status:
+- `RB-003`: open/partial. Closure evidence is missing for an independent backup security owner, non-secret notification coverage path, notification coverage proof, completed-coverage review date, and exact release scope tied to that evidence.
+- `RB-008`: open/partial. Closure evidence is missing for maintainer-verifiable destructive NuGet unlist/deprecate/account-recovery authority, backup recovery owner, owner-linked recovery coverage, completed authority/backup review date, and exact release scope tied to that evidence.
+- Release status: `0.2.0-alpha.3 = NO-GO`.
+- Prohibited actions: no version bump, tag, GitHub Release, NuGet publish, workflow dispatch, security-setting mutation, owner/account/recovery mutation, or destructive NuGet action occurred.
