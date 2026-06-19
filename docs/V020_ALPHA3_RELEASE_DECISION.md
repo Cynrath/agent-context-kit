@@ -19,10 +19,18 @@ Decision date: 2026-06-14. Decision owner: `Cynrath`.
 - Local validation passes 186/186 tests, clean scan, doctor, sample smoke, package verification, contract/readiness/security gates, and the 2,000-file performance tripwire.
 
 ## Blocking Conditions
-1. `RB-003`: an independent backup security notification owner is unassigned. This P0 continuity requirement has no unowned accepted-risk alternative.
-2. `RB-008`: destructive NuGet unlist/deprecate/account-recovery authority and backup recovery coverage are not verified.
+1. `RB-003`: an independent backup security notification owner is unassigned. This P0 continuity requirement has no unowned accepted-risk alternative. Closure requires a second verified human owner or role, a non-secret coverage path, notification coverage evidence, and a review date in the blocker board and ownership docs.
+2. `RB-008`: destructive NuGet unlist/deprecate/account-recovery authority and backup recovery coverage are not verified. Closure requires maintainer-verifiable NuGet recovery authority, backup recovery ownership, trigger/unlist/deprecate/successor steps, and either non-destructive verification evidence or an explicitly bounded accepted-risk decision.
 3. No exact alpha.3 candidate commit, versioned package diff, or candidate-specific hosted RC evidence exists because preparation cannot start before the P0 blocker closes.
 4. Future provenance is implemented locally but can only be verified during an authorized successful publish; it does not replace pre-publish approval.
+
+## TASK-0198 Evidence Check
+
+TASK-0198 rechecked repository-local evidence for `RB-003` and `RB-008` on 2026-06-20. The check found no new maintainer evidence that closes either blocker:
+
+- `docs/SECURITY_NOTIFICATION_OWNERSHIP.md` still records `Cynrath` as primary, backup security triage owner as not assigned, and notification delivery as unverified.
+- `docs/PACKAGE_RECOVERY.md` still records the recovery procedure/tabletop as accepted, but NuGet unlist/deprecate/account-recovery authority and backup recovery owner as unverified.
+- This investigation does not authorize a version bump, release-candidate workflow dispatch, release workflow dispatch, tag, GitHub Release, NuGet publish, owner mutation, security-setting change, or destructive NuGet action.
 
 ## Actions Not Performed
 - no source/package version bump;

@@ -1,6 +1,10 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. No version bump is implied and `0.2.0-alpha.3` remains NO-GO until `RB-003` and `RB-008` are independently resolved. No next project control has been selected; the next entry is "not yet selected / pending maintainer direction".
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. TASK-0198 is an independent docs-only blocker evidence investigation, not a new project control. No version bump is implied and `0.2.0-alpha.3` remains NO-GO until `RB-003` and `RB-008` are independently resolved. No next project control has been selected; the next entry is "not yet selected / pending maintainer direction".
+
+## Active Independent Blocker Investigation
+
+1. TASK-0198 investigate `RB-003` and `RB-008` closure evidence - in progress; docs-only; no release/tag/NuGet/version/security-setting mutation; records exact missing maintainer evidence and keeps `0.2.0-alpha.3` NO-GO.
 
 ## Closed PROJECT-CONTROL-0110 (2026-06-19)
 
@@ -154,7 +158,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- No next project control has been selected. PROJECT-CONTROL-0110 is closed at TASK-0196 (2026-06-19) with 428/428 tests green and the final pushed HEAD at `b073c3d`. `0.2.0-alpha.3` remains NO-GO because `RB-003` (independent backup security owner) and `RB-008` (destructive NuGet recovery authority) remain unresolved. No release, tag, GitHub Release, NuGet publish, or version bump is part of this state. The next entry is "not yet selected / pending maintainer direction"; any new control task must be explicitly authorized through a planning commit before implementation.
+- TASK-0198 is the current independent docs-only investigation. Its only approved direction is to record exact remaining maintainer evidence for `RB-003` (independent backup security owner and notification coverage) and `RB-008` (destructive NuGet recovery authority and backup recovery owner). PROJECT-CONTROL-0110 is closed at TASK-0196 (2026-06-19) with 428/428 tests green and the final pushed HEAD at `b073c3d`. `0.2.0-alpha.3` remains NO-GO. No release, tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate dispatch, security-setting change, or version bump is part of this state. The next project control remains "not yet selected / pending maintainer direction"; any new control task must be explicitly authorized through a planning commit before implementation.
 
 ## Execution Rule
 After the closure of PROJECT-CONTROL-0110, the queue is in pause: no automatic commit or push is authorized without an explicitly active project control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations. RB-003 and RB-008 are independent of this control and remain open.

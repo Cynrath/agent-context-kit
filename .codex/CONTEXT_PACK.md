@@ -9,6 +9,9 @@ PROJECT-CONTROL-0110 closed at TASK-0196 (`b073c3d`) on 2026-06-19 with cumulati
 ## Next Control (Placeholder)
 Not yet selected / pending maintainer direction. `0.2.0-alpha.3` remains NO-GO because `RB-003` (independent backup security owner) and `RB-008` (destructive NuGet recovery authority) remain unresolved. No release, tag, GitHub Release, NuGet publish, or version bump is authorized. Any future control must be explicitly authorized through a planning commit before implementation.
 
+## Current Independent Task
+TASK-0198 is a docs-only investigation of the exact evidence still needed to close `RB-003` and `RB-008`. It may update blocker/decision/handoff docs, but it does not create a new project control, close either blocker, change `0.2.0-alpha.2` metadata, or authorize a release/tag/NuGet/workflow/security-setting action.
+
 TASK-0126 is hosted-verified: automation commit `2f68f14` passed 8/8 and run `27478046088` verified immutable alpha.2 package/release evidence without write permissions or login. TASK-0127 records exact alpha.2 hashes, repository signature, missing author signature/SBOM/attestation, and owner identity difference. TASK-0128 is hosted-verified: commit `4c4fa64` passed standard 8/8 and run `27478635057` passed exact predecessor/config/baseline/SARIF/performance evidence on Windows, Ubuntu, and macOS.
 
 TASK-0129 enabled and independently verified GitHub private vulnerability reporting on 2026-06-14. The repository GET returns `enabled: true` and the public Security page exposes the report entry; notification ownership remains separate.
