@@ -2,7 +2,10 @@
 
 This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0108 are closed. PROJECT-CONTROL-0109 (TASK-0177 through TASK-0186) is closed with 315/315 tests green and all standard hosted checks green for the final pushed HEAD. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is now active as the next local product/code-quality/test/documentation/security pass; no version bump is implied and `0.2.0-alpha.3` remains NO-GO until `RB-003` and `RB-008` are independently resolved.
 
-## Active PROJECT-CONTROL-0110
+## Closed PROJECT-CONTROL-0110 (2026-06-19)
+
+PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/428 green. No release, no tag, no NuGet publish, no version bump; `0.2.0-alpha.3` remains NO-GO.
+
 1. TASK-0188 MCP transport step 2 (real stdio loop with redaction + safety bounds) - completed; pushed.
 2. TASK-0189 `ackit watch` local implementation (FileSystemWatcher, debounce, ignore list, cancellation) - completed; pushed.
 3. TASK-0190 `ackit watch` debounce + ignore-list + cancellation unit tests - completed; pushed.
@@ -10,8 +13,8 @@ This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTRO
 5. TASK-0192 MCP tool surface extension (`ackit.rules` read-only metadata tool) - completed; pushed.
 6. TASK-0193 localization parity for new commands and MCP step 2 error surface - completed; pushed.
 7. TASK-0194 docs update (MCP_STDIO_DESIGN Step 2, WATCH_MODE implementation notes, CLI_REFERENCE) - completed; pushed.
-8. TASK-0195 docs-first local audit + state sync - in progress.
-9. TASK-0196 final validation and hosted check sync - pending.
+8. TASK-0195 docs-first local audit + state sync - completed; pushed.
+9. TASK-0196 final validation and hosted check sync - completed; PROJECT-CONTROL-0110 closed.
 
 ## Active PROJECT-CONTROL-0109
 1. TASK-0177 hook expansion (Anthropic + Continue targets, dry-run preview) - hosted-verified.

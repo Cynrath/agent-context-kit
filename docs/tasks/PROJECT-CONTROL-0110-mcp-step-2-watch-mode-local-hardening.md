@@ -81,6 +81,22 @@ Sequential; do not parallelize across tasks. Each task follows the existing task
 ## Rollback
 Per task; each new test file or doc file is reverted by a single `git revert <sha>` because each task is a separate commit. No schema migration, no published artifact, no remote write.
 
+## Final Validation (TASK-0196)
+
+Captured 2026-06-19 against `master` at `1290b56`:
+
+- `dotnet build AgentContextKit.sln -c Release --no-restore` — 0 warnings, 0 errors.
+- `dotnet test AgentContextKit.sln -c Release --no-build` — 428/428 green.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci` — exit 0; existing `.remember` Medium log findings only; no new findings.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- doctor` — 13/13 PASS; `CriticalRedactRisk` reports no critical findings.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- mcp --help` — exit 0; surface matches the Step 2 docs.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- watch --help` — exit 0; surface matches the docs.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- watch --once` — exit 0; one scan, one status line.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- trim --input .gitignore --output .ackit/cache/trim-out.md --max-chars 200 --lang en` — exit 0; original 963 chars, trimmed to 200 chars; output is deterministic.
+- `git status` clean before the final commit; `git diff --check` clean.
+
+PROJECT-CONTROL-0110 is closed. Cumulative suite: 428/428. No release, no tag, no NuGet publish, no version bump; `0.2.0-alpha.3` remains NO-GO. RB-003 and RB-008 remain open and are independent of this control.
+
 ## Push Policy
 - Master commits are allowed.
 - No force-push, no tag movement, no GitHub Release, no NuGet publish.
