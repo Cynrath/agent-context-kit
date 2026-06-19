@@ -47,6 +47,7 @@ ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--inst
 ackit mcp --stdio-server [--repo <path>] [--lang en|tr]
 ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]
 ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]
+ackit watch [--debounce-ms <N>] [--once] [--max-runtime-ms <N>] [--json] [--lang en|tr]
 ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]
 ackit version
 ackit help

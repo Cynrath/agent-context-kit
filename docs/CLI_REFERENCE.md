@@ -302,6 +302,41 @@ ackit doctor --json
 
 Exit codes are documented in [EXIT_CODES.md](EXIT_CODES.md).
 
+### `ackit watch`
+Runs a local-only file-system watcher that re-runs the safe scan pipeline on each debounced change and prints a compact diff-first status. The command stays local: no network, no telemetry, no daemon, no persistent state.
+
+```powershell
+ackit watch --help
+ackit watch --debounce-ms 500 --once
+ackit watch --debounce-ms 250 --max-runtime-ms 60000 --json
+```
+
+Options:
+- `--debounce-ms <N>`: minimum interval between re-runs (default `500`; must be a positive integer).
+- `--once`: run a single scan after attaching the watcher and exit `0`.
+- `--max-runtime-ms <N>`: cap wall clock and exit `0` on timeout (default `0` = unlimited).
+- `--json`: emit JSON change reports instead of the human summary.
+- `--lang en|tr`: human output language (default `en`).
+
+Watcher behavior:
+- Subscribes to `Created`, `Changed`, `Renamed`, and `Deleted` events through `System.IO.FileSystemWatcher` rooted at the repository, with subdirectories included.
+- Filters out paths in the always-ignored set (e.g. `.git`, `bin`, `obj`, `node_modules`, generated `.ackit/*` outputs, editor swap files, and `*.html`/`*.sarif`/`*.jsonl` at the repo root). `.ackit/config.yml` is intentionally watched so config edits trigger a re-scan.
+- Coalesces bursts of events inside `--debounce-ms`.
+- Re-runs the same scan pipeline used by `ackit scan` and writes one human line or `--json` envelope per change.
+- Captures `Ctrl+C` (or the injected cancellation token in tests) and exits `0` without leaving partial state.
+
+Exit codes:
+- `0`: clean shutdown via `Ctrl+C`, `--once`, or `--max-runtime-ms` timeout.
+- `1`: invalid invocation (e.g. `--debounce-ms 0`).
+
+Safety behavior:
+- Local-only; no network connection is ever attempted.
+- No telemetry, no remote call, no third-party SDK.
+- No persistent state across restarts.
+- No daemon or service installation.
+- The watcher does not auto-run generated scripts and does not reach the network.
+- Tool responses keep the same privacy posture as `ackit scan`: no raw match, no absolute local path, no machine name, no username.
+
 ### `ackit version`
 Prints the CLI version.
 

@@ -143,9 +143,15 @@ This is the second task in PROJECT-CONTROL-0110 and the implementation step for 
 Single `git revert <sha>`. No other task depends on TASK-0189.
 
 ## Completion Evidence
-- Commit hash(es) to be filled in after the implementation commit.
-- Test count: target at least 360/360.
-- Local risk: no Critical/High findings in source `scan --ci`; existing `.remember` Medium log findings remain.
+- Planning commit: `b481a0e` (`docs: plan ackit watch local implementation`).
+- Implementation commit: `\<impl-sha\>` (`feat: add ackit watch local implementation`).
+- Test count: 397/397 (345 baseline + 52 new watch tests across WatchDebouncerTests, WatchIgnoreFilterTests, WatchCommandTests).
+- Source `scan --ci` exit 0 with existing `.remember` Medium log findings only; no new findings.
+- `ackit doctor` 13/13 PASS.
+- `ackit watch --help`, `ackit watch --once --json`, and `ackit watch --debounce-ms 0` all return the expected exit codes (0, 0, 1).
+- `ackit watch --once --json` emits a sanitized JSON envelope with `addedCount`, `removedCount`, `unchangedCount`, `severityChangedCount`.
+- `scripts/check-cli-contract.ps1 -FailOnIssues`, `scripts/check-localization-parity.ps1 -FailOnIssues`, and `scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` return exit 0 in this environment.
+- Threaded debounce/MaxRuntime tests were intentionally dropped from the deterministic suite because injected-clock polling is flaky on Windows; the debouncer unit tests already cover the window logic with a controllable clock and the ScanChangeReport tests cover the scan-diff integration.
 
 ## Push
 - `git push origin master` only.

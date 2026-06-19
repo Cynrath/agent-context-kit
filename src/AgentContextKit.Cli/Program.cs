@@ -46,6 +46,7 @@ public static class Program
                 "mcp" => RunMcp(args, repositoryPath, language, services),
                 "diff" => RunDiff(args, repositoryPath, language, json, services),
                 "trim" => RunTrim(args, repositoryPath, language, json, services),
+                "watch" => RunWatch(args, repositoryPath, config, language, json, services),
                 _ => RunUnknown(command, language, services.TextProvider)
             };
         }
@@ -81,6 +82,7 @@ public static class Program
         Console.WriteLine("  ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]");
         Console.WriteLine("  ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]");
         Console.WriteLine("  ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]");
+        Console.WriteLine("  ackit watch [--debounce-ms <N>] [--once] [--max-runtime-ms <N>] [--json] [--lang en|tr]");
         Console.WriteLine("  ackit version");
         return ExitSuccess;
     }
@@ -1253,6 +1255,150 @@ public static class Program
         }
         var bodyBudget = maxChars - header.Length - note.Length;
         return header + note + content.Substring(0, bodyBudget);
+    }
+
+    private static int RunWatch(string[] args, string repositoryPath, AckitConfig config, LanguageCode language, bool json, Services services)
+    {
+        int debounceMs;
+        bool once;
+        int maxRuntimeMs;
+        try
+        {
+            debounceMs = ParsePositiveInt(args, "--debounce-ms", defaultValue: 500);
+            once = HasFlag(args, "--once");
+            maxRuntimeMs = ParsePositiveInt(args, "--max-runtime-ms", defaultValue: 0);
+        }
+        catch (ArgumentException ex)
+        {
+            return WriteInvalidArgumentError("watch", ex.Message, json, language, services);
+        }
+
+        var startupMessage = language.Value == "tr"
+            ? $"ackit watch: izleniyor {GetRepositoryName(repositoryPath)} (debounce {debounceMs} ms)"
+            : $"ackit watch: watching {GetRepositoryName(repositoryPath)} (debounce {debounceMs} ms)";
+        Console.WriteLine(startupMessage);
+
+        var options = new WatchOptions(
+            Debounce: TimeSpan.FromMilliseconds(debounceMs),
+            MaxRuntime: TimeSpan.FromMilliseconds(maxRuntimeMs),
+            OneShot: once,
+            Language: language,
+            EmitJson: json,
+            RepositoryPath: repositoryPath,
+            Config: config,
+            Clock: () => services.Clock.UtcNow);
+
+        IFileWatcher watcher = new PhysicalFileWatcher(repositoryPath);
+        if (HasFlag(args, "--help") || HasFlag(args, "-h"))
+        {
+            Console.WriteLine("ackit watch -- local file-system change watcher");
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  ackit watch [--debounce-ms <N>] [--once] [--max-runtime-ms <N>] [--json] [--lang en|tr]");
+            Console.WriteLine("Options:");
+            Console.WriteLine("  --debounce-ms <N>    Minimum interval between re-runs (default 500).");
+            Console.WriteLine("  --once               Run a single scan and exit.");
+            Console.WriteLine("  --max-runtime-ms <N> Wall-clock cap (0 = unlimited).");
+            Console.WriteLine("  --json               Emit JSON change reports.");
+            Console.WriteLine("  --lang en|tr         Human output language (default en).");
+            ((IDisposable)watcher).Dispose();
+            return ExitSuccess;
+        }
+
+        if (HasFlag(args, "--help") || HasFlag(args, "-h"))
+        {
+            return ExitSuccess;
+        }
+
+        WatchResult result;
+        try
+        {
+            result = WatchRunner.Run(watcher, services.RepositoryScanner, options);
+        }
+        finally
+        {
+            ((IDisposable)watcher).Dispose();
+        }
+
+        if (result.LastReport is not null)
+        {
+            try
+            {
+                WriteWatchReport(repositoryPath, result.LastReport, language, json);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("ackit watch report failed: " + ex.GetType().Name);
+            }
+        }
+
+        return ExitSuccess;
+    }
+
+    private static void WriteWatchReport(string repositoryPath, ScanChangeReport report, LanguageCode language, bool json)
+    {
+        if (json)
+        {
+            var dto = new
+            {
+                schemaVersion = JsonSchemaVersion,
+                toolVersion = Version,
+                generatedAtUtc = DateTimeOffset.UtcNow,
+                command = "watch",
+                repositoryName = GetRepositoryName(repositoryPath),
+                addedCount = report.AddedCount,
+                removedCount = report.RemovedCount,
+                unchangedCount = report.UnchangedCount,
+                severityChangedCount = report.SeverityChangedCount,
+                addedSample = report.AddedSample.Select(finding => new
+                {
+                    ruleId = RiskRuleCatalog.GetRuleId(finding),
+                    severity = finding.Severity.ToString(),
+                    path = finding.Path,
+                    message = finding.Message
+                }).ToArray(),
+                removedSample = report.RemovedSample.Select(finding => new
+                {
+                    ruleId = RiskRuleCatalog.GetRuleId(finding),
+                    severity = finding.Severity.ToString(),
+                    path = finding.Path,
+                    message = finding.Message
+                }).ToArray(),
+                severityChangedSample = report.SeverityChangedSample.Select(sample => new
+                {
+                    ruleId = sample.RuleId,
+                    path = sample.Path,
+                    fromSeverity = sample.FromSeverity,
+                    toSeverity = sample.ToSeverity
+                }).ToArray()
+            };
+            WriteJson(dto);
+            return;
+        }
+
+        var title = language.Value == "tr" ? "degisiklik" : "change";
+        Console.WriteLine($"{title}: +{report.AddedCount} -{report.RemovedCount} ~{report.SeverityChangedCount} (unchanged {report.UnchangedCount})");
+    }
+
+    private static int ParsePositiveInt(string[] args, string name, int defaultValue)
+    {
+        var raw = GetOption(args, name);
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return defaultValue;
+        }
+        if (!int.TryParse(raw, out var value))
+        {
+            throw new ArgumentException($"{name} must be a positive integer.");
+        }
+        if (value <= 0 && name != "--max-runtime-ms")
+        {
+            throw new ArgumentException($"{name} must be a positive integer.");
+        }
+        if (value < 0)
+        {
+            throw new ArgumentException($"{name} must not be negative.");
+        }
+        return value;
     }
 
     private static int RunUnknown(string command, LanguageCode language, ITextProvider textProvider)
