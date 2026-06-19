@@ -1,6 +1,6 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0108 are closed. PROJECT-CONTROL-0109 now governs scan/export/hooks hardening plus MCP transport prototype step 1 while the alpha.3 release remains NO-GO.
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0108 are closed. PROJECT-CONTROL-0109 (TASK-0177 through TASK-0186) is closed with 315/315 tests green and all standard hosted checks green for the final pushed HEAD. PROJECT-CONTROL-0110 is a placeholder; it is not started and no version bump is implied. The alpha.3 release remains NO-GO.
 
 ## Active PROJECT-CONTROL-0109
 1. TASK-0177 hook expansion (Anthropic + Continue targets, dry-run preview) - hosted-verified.
@@ -13,7 +13,7 @@ This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTRO
 8. TASK-0183 catalog rule id and severity stability test - hosted-verified; 305/305 tests green; pushed HEAD `4aaa157`.
 9. TASK-0184 scan `--include` / `--exclude` glob filters - hosted-verified; 313/313 tests green; pushed HEAD `f5873eb`.
 10. TASK-0185 nightly local check workflow (`.github/workflows`) - hosted-verified; 315/315 tests green; pushed HEAD `7311d4e`.
-11. TASK-0186 final validation and hosted check sync.
+11. TASK-0186 final validation and hosted check sync - hosted-verified; 315/315 tests green; pushed HEAD `a1151c7`; PROJECT-CONTROL-0109 closed.
 
 ## Active PROJECT-CONTROL-0108
 1. TASK-0168 post-0107 audit and state sync - completed.
@@ -140,7 +140,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- PROJECT-CONTROL-0109 continues independent local product, code-quality, test, documentation, and security work. TASK-0186 final validation and hosted check sync is next. It must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
+- PROJECT-CONTROL-0109 closed at TASK-0186. PROJECT-CONTROL-0110 is a placeholder for the next local product/code-quality/test/documentation/security pass; it is not started yet and must not start work that depends on closing `RB-003` or `RB-008`, and must not claim release readiness.
 
 ## Execution Rule
 Continue TASK-0178 through TASK-0186 in order without per-task prompts. After successful validation, normal commit/push is automatic for this control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
