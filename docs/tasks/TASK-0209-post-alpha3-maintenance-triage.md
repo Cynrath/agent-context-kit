@@ -159,4 +159,69 @@ Current-state cleanup performed in this task:
 - Did not change source code, tests, workflows, package metadata, release assets, tags, GitHub Release, NuGet package state, or workflow dispatch state.
 
 ## Completion notes
-Pending.
+Completed as post-alpha3 planning/triage only.
+
+Commits:
+- Plan: `a7d0135` (`docs: plan task 0209 post-alpha3 triage`)
+- Triage result: `5919de6` (`docs: record post-alpha3 maintenance triage`)
+- Final evidence: this commit
+
+Current HEAD/origin at final evidence collection:
+- Local HEAD before this final evidence commit: `5919de61f233f0dd6ba8ad7a336efe1918da5d98`
+- Local HEAD short before this final evidence commit: `5919de6`
+- `origin/master`: `f9675d58069a8024b32b8d004e102ffe0b1433b9`
+- `origin/master` short: `f9675d5`
+- Working tree before this final evidence edit: clean.
+
+Release status:
+- `AgentContextKit` `0.2.0-alpha.3` remains the current published GitHub/NuGet prerelease.
+- NuGet package, tag `v0.2.0-alpha.3`, and GitHub prerelease remain unchanged.
+- TASK-0208 provenance hardening remains complete for future releases.
+- No release workflow dispatch, release-candidate dispatch, NuGet publish, tag mutation, GitHub Release mutation, package metadata change, version bump, or alpha.3 artifact mutation occurred.
+
+Validation results:
+- `ackit --version`: passed, `AgentContextKit 0.2.0-alpha.3`.
+- `ackit doctor`: passed all checks.
+- `ackit scan --ci`: exited `0`; reported existing Medium/Low review findings only.
+- `git diff --check`: passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1`: passed; working tree clean and no missing Markdown/source commits detected.
+- `dotnet test AgentContextKit.sln -c Release --no-build`: passed, `428/428`.
+- Additional build check: a concurrent build/test run reproduced the existing xUnit analyzer warnings, but also produced transient MSB3026 file-lock retry warnings because tests were running at the same time. A later standalone `dotnet build AgentContextKit.sln -c Release --no-restore` completed with `0` warnings and `0` errors due the already-built incremental state.
+
+xUnit analyzer warning classification:
+- `xUnit1051` in `tests/AgentContextKit.Tests/McpStdioTransportTests.cs`: real test-code responsiveness warning. Most calls to `McpStdioTransport.RunAsync(...)` should pass `TestContext.Current.CancellationToken`; the intentional cancellation-behavior test needs careful handling so the semantic canceled-token assertion remains covered.
+- `xUnit2013` in `tests/AgentContextKit.Tests/WatchCommandTests.cs`: real test-style warning at `Assert.Equal(1, report.SeverityChangedSample.Count)`. Preferred follow-up is `Assert.Single(report.SeverityChangedSample)`.
+- Recommendation: TASK-0210 should fix these warnings as focused test-source cleanup, then run Release build/test/scan. This task did not start implementation.
+
+Scan finding classification:
+- Medium `.remember/logs/**/*.log` findings: accepted local artifact review findings for now; classify retention/ignore/cleanup in a dedicated task before any deletion.
+- Medium `artifacts/package-validation/0.2.0-alpha.3/*.nupkg` and `*.snupkg` findings: accepted local release/package validation artifacts for now; do not delete as part of triage because they may be evidence.
+- Low local-path findings in `docs/CLI_REFERENCE.md`, `docs/tasks/TASK-0203-v020-alpha3-release-preparation.md`, and `tests/AgentContextKit.Tests/McpStdioTransportTests.cs`: likely documentation/test-fixture path references or scanner false positives, but require human-readable classification before suppression/redaction.
+- Recommendation: TASK-0211 should record this classification without automatic redaction, destructive cleanup, or baseline acceptance.
+
+Stale current-state audit result:
+- README/public docs show `0.2.0-alpha.3` as current and published.
+- Release docs no longer say alpha3 is pending or unpublished as current state.
+- TASK-0208 provenance hardening is marked complete in current-state docs.
+- Stale current-state provenance follow-up wording was corrected in `docs/ROADMAP.md`, `docs/RELEASE_CHECKLIST.md`, `docs/PROJECT_EXECUTION_QUEUE.md`, and `docs/MAINTAINER_DECISION_REGISTER.md`.
+- The exact stale-provenance search returned no matches after cleanup.
+- Remaining `0.2.0-alpha.3` NO-GO / unpublished matches are historical task/control evidence or command text, not current release status.
+- Remaining workflow-pin evidence is real but separate: `.github/workflows/cross-platform-smoke.yml` still installs `0.2.0-alpha.2`, and `docs/MAINTAINER_GUIDE.md` records this as a follow-up. This is classified as lower-priority TASK-0212 workflow pin/status cleanup, not an alpha3 release-state error.
+
+Recommended next task:
+- TASK-0210 analyzer-warning cleanup.
+- Scope: `tests/AgentContextKit.Tests/McpStdioTransportTests.cs` and `tests/AgentContextKit.Tests/WatchCommandTests.cs`.
+- Expected validation: `dotnet build AgentContextKit.sln -c Release --no-restore`, `dotnet test AgentContextKit.sln -c Release --no-build`, `ackit scan --ci`, `ackit doctor`, `git diff --check`, and the Markdown completeness guard.
+
+Out-of-scope confirmation:
+- No NuGet publish.
+- No GitHub Release mutation.
+- No tag creation, movement, or deletion.
+- No release workflow dispatch.
+- No release-candidate workflow dispatch.
+- No version bump.
+- No package metadata change.
+- No unrelated source feature work.
+- No large refactor.
+- No destructive cleanup of release evidence.
+- No automatic redaction or baseline acceptance.
