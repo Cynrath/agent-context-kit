@@ -22,7 +22,13 @@ try {
     $cases = @(
         @{ Name = "missing attestation permission"; Content = ([regex]::new('(?m)^      attestations: write\r?\n')).Replace($content, '', 1) },
         @{ Name = "missing official attest action"; Content = $content.Replace("actions/attest@v4", "actions/attest@missing") },
-        @{ Name = "read-only verifier gains attestation permission"; Content = ([regex]::new('(?m)^  verify-existing:\r?\n')).Replace($content, "  verify-existing:`n    permissions:`n      attestations: write`n", 1) }
+        @{ Name = "read-only verifier gains attestation permission"; Content = ([regex]::new('(?m)^  verify-existing:\r?\n')).Replace($content, "  verify-existing:`n    permissions:`n      attestations: write`n", 1) },
+        @{ Name = "missing attestation lookup false path"; Content = $content.Replace('$exists = $false', 'throw "Missing attestation lookup failed before attest step."') },
+        @{ Name = "missing existing attestation true path"; Content = $content.Replace('$exists = $true', '$exists = $false') },
+        @{ Name = "missing provenance query hard failure"; Content = $content.Replace('throw "Unable to query release package attestation state. gh exit code: $attestationExit"', '$exists = $false') },
+        @{ Name = "missing status-aware 404 handling"; Content = $content.Replace('HTTP/\S+\s+404\b', 'HTTP 000') },
+        @{ Name = "missing release asset download failure"; Content = $content.Replace('if ($LASTEXITCODE -ne 0) { throw "Unable to download the exact GitHub Release package asset." }', '') },
+        @{ Name = "missing final attestation verify"; Content = $content.Replace('gh attestation verify', 'Write-Host "attestation verify skipped"') }
     )
 
     foreach ($case in $cases) {

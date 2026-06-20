@@ -129,6 +129,26 @@ if ($verifyReleaseIndex -lt 0 -or $attestIndex -lt 0 -or $verifyAttestationIndex
     $issues.Add("Exact GitHub Release asset must be verified before provenance creation and attestation verification.") | Out-Null
 }
 
+foreach ($marker in @(
+        'gh release download "v${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "AgentContextKit.${{ inputs.version }}.nupkg"',
+        'if ($LASTEXITCODE -ne 0) { throw "Unable to download the exact GitHub Release package asset." }',
+        '$attestationOutput = gh api --include "repos/${{ github.repository }}/attestations/sha256:$digest"',
+        '$attestationExit = $LASTEXITCODE',
+        '$attestationExit -eq 0',
+        '$exists = $true',
+        'HTTP/\S+\s+404\b',
+        '$exists = $false',
+        'Unable to query release package attestation state'
+    )) {
+    if (-not $publishBlock.Contains($marker)) {
+        $issues.Add("Publish provenance probe hardening marker missing: $marker") | Out-Null
+    }
+}
+
+if ($publishBlock.Contains('attestations/sha256:$digest" *> $null')) {
+    $issues.Add("Publish provenance probe must not discard missing-attestation lookup failures before setting exists=false.") | Out-Null
+}
+
 $publishedVerifier = Get-Content -Raw (Join-Path $repoRoot "scripts\verify-published-package.ps1")
 foreach ($tempMarker in @('$env:TEMP', '$env:TMPDIR', '$env:RUNNER_TEMP', '[System.IO.Path]::GetTempPath()')) {
     if (-not $publishedVerifier.Contains($tempMarker)) {

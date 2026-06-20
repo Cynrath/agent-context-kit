@@ -291,8 +291,20 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Unable to download the exact GitHub Release package asset." }
           $subject = Get-Item (Join-Path $subjectRoot "AgentContextKit.${{ inputs.version }}.nupkg")
           $digest = (Get-FileHash -Algorithm SHA256 $subject.FullName).Hash.ToLowerInvariant()
-          gh api "repos/${{ github.repository }}/attestations/sha256:$digest" *> $null
-          $exists = $LASTEXITCODE -eq 0
+          $attestationOutput = gh api --include "repos/${{ github.repository }}/attestations/sha256:$digest" 2>&1
+          $attestationExit = $LASTEXITCODE
+          if ($attestationExit -eq 0) {
+            $exists = $true
+          }
+          else {
+            $attestationText = ($attestationOutput | Out-String)
+            if ($attestationText -match "(?m)^HTTP/\S+\s+404\b" -or $attestationText -match "\(HTTP 404\)") {
+              $exists = $false
+            }
+            else {
+              throw "Unable to query release package attestation state. gh exit code: $attestationExit"
+            }
+          }
           "exists=$($exists.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Attest exact release package
