@@ -175,3 +175,84 @@ Recommended next task:
 - Scope: decide whether ignored `.remember` memory/autonomous logs should remain local-only, be cleaned from workspaces, or receive explicit documentation/ignore treatment; confirm package-validation artifacts remain retained evidence; do not mutate release/package/tag state.
 
 ## Completion notes
+Completed as docs-only scan-finding classification.
+
+Commits:
+- Plan: `c544f4b` (`docs: plan task 0211 scan finding classification`)
+- Classification: `a3abb47` (`docs: classify current scan findings`)
+- Final evidence: this commit
+
+Current HEAD/origin at final evidence collection:
+- Local HEAD before this final evidence commit: `a3abb47e548a1ac4e56a7c3ea189d371eafbdf65`
+- Local HEAD short before this final evidence commit: `a3abb47`
+- `origin/master`: `31d9d4f1d5087f0f37d6a679936c75be14bd3984`
+- `origin/master` short: `31d9d4f`
+- Working tree before this final evidence edit: clean.
+
+Required first checks:
+- `ackit --help`: passed and showed the current `0.2.0-alpha.3` command set.
+- `ackit --version`: passed, `AgentContextKit 0.2.0-alpha.3`.
+- `git fetch origin`: passed; no `.git/FETCH_HEAD` permission error or `.git` write error occurred.
+- Initial local HEAD and `origin/master`: both `31d9d4f1d5087f0f37d6a679936c75be14bd3984`, matching the expected post-TASK-0210 state.
+- `git status --porcelain=v1 --untracked-files=all 2>$null`: clean at start.
+- `git status --short`: exited `0` but printed the known Windows unreadable-directory warning; raw porcelain was clean.
+- `git log --oneline -n 40`: confirmed TASK-0210 final evidence at `31d9d4f`.
+
+Scan evidence:
+- `ackit scan --ci`: exited `0`.
+- Final post-temp-artifact scan summary: `23` findings, `0` Critical, `0` High, `19` Medium, `4` Low.
+- `ackit scan --json > artifacts/task-0211-scan.json`: passed; the file was temporary, ignored by git, created one extra Low local-path finding while present, and was removed before final classification/validation.
+- `ackit scan --json | ConvertFrom-Json | ConvertTo-Json -Depth 20`: passed. JSON fields used: `ruleId`, `severity`, `category`, `path`, `message`, `match`. All `match` values were `null`; suppression count was `0`.
+- Required `rg` evidence command ran. The broad search produced many expected documentation/test mentions of security terms; classification used scan JSON plus targeted metadata and did not copy secret-like snippets into docs.
+
+Finding classification:
+- `MEMORY_LOG_REVIEW`: `.remember/logs/**/*.log` Medium `ACKIT003` findings. Ignored local memory/autonomous logs; no Critical/High finding. Count-only sensitive-term search over `.remember` logs returned no matches. Needs a follow-up retention/cleanup policy decision.
+- `ACCEPTED_RETAINED_ARTIFACT`: ignored alpha3 package-validation `.nupkg` and `.snupkg` Medium `ACKIT003` findings. Retained local release/package validation evidence; no deletion in TASK-0211.
+- `LOCAL_PATH_REFERENCE`: Low `ACKIT004` findings in `docs/CLI_REFERENCE.md`, TASK-0203 evidence, and TASK-0211 required search-pattern text. Safe examples/historical evidence/task command text; no usable credential.
+- `FALSE_POSITIVE_OR_LOW_RISK`: Low `ACKIT004` finding in `McpStdioTransportTests.cs`. Defensive local URI fixture; no usable credential.
+- `NEEDS_FOLLOW_UP`: `.remember` log retention and local artifact policy.
+- `BLOCKING`: none.
+
+Accepted retained artifacts:
+- `artifacts/package-validation/0.2.0-alpha.3/AgentContextKit.0.2.0-alpha.3.nupkg`
+- `artifacts/package-validation/0.2.0-alpha.3/AgentContextKit.0.2.0-alpha.3.snupkg`
+- Both are ignored local artifacts and remain retained release/package validation evidence.
+
+Local path references:
+- `docs/CLI_REFERENCE.md`: generic CLI example.
+- `docs/tasks/TASK-0203-v020-alpha3-release-preparation.md`: historical local validation path evidence.
+- `docs/tasks/TASK-0211-scan-finding-classification.md`: required search-pattern text, not an actual path disclosure.
+- `tests/AgentContextKit.Tests/McpStdioTransportTests.cs`: defensive local URI fixture.
+
+Memory log findings:
+- `17` ignored `.remember/logs/**/*.log` files are reported as Medium `ACKIT003`.
+- `hook-errors.log` and autonomous save logs are empty in local metadata except the two memory logs, which are non-empty local memory artifacts.
+- No deletion, redaction, suppression, or baseline acceptance occurred.
+
+Recommended next task:
+- TASK-0212 `.remember` log retention and local artifact policy.
+- Keep workflow pin/status cleanup and docs/queue simplification as lower-priority follow-ups.
+
+Validation results:
+- `ackit --version`: passed, `AgentContextKit 0.2.0-alpha.3`.
+- `ackit doctor`: passed all checks.
+- `ackit scan --ci`: exited `0`; remaining findings are classified Medium/Low only.
+- `git diff --check`: passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1`: passed; working tree was clean after the classification commit.
+- `dotnet test AgentContextKit.sln -c Release --no-build`: passed, `428/428`.
+
+Out-of-scope confirmation:
+- No source feature work.
+- No `.ackit` baseline mutation.
+- No suppression or ignore-rule mutation.
+- No automatic redaction.
+- No package-validation artifact deletion.
+- No `.remember` cleanup.
+- No NuGet publish.
+- No GitHub Release mutation.
+- No tag creation, movement, or deletion.
+- No release workflow dispatch.
+- No release-candidate workflow dispatch.
+- No version bump.
+- No package metadata change.
+- No owner/account/secret/security-setting/recovery mutation.
