@@ -73,6 +73,28 @@ None for CLI/runtime UX. Maintainer release handoff clarity improves.
 ## Logging/audit impact
 Adds a task-first audit record for external maintainer evidence intake and blocker disposition changes.
 
+## Evidence
+Maintainer-provided evidence to record:
+- Date: 2026-06-20.
+- Release scope: planned `0.2.0-alpha.3`.
+- Provided by: `Cynrath`.
+- GitHub repository: `Cynrath/agent-context-kit`.
+- Primary repository owner: `Cynrath`.
+- Backup user: `ShadowFlameC`.
+- Repository permission: `write` collaborator.
+- Backup repository purpose: independent backup security notification owner and backup maintainer contact.
+- Backup repository coverage: repository security notifications, private vulnerability reporting, future security advisory escalation, direct maintainer escalation.
+- Release approval role: `ShadowFlameC` is not a mandatory reviewer; backup/recovery coverage only.
+- NuGet package: `AgentContextKit`.
+- Primary NuGet/package owner: `Cyranth`.
+- Backup NuGet owner: `ShadowFlameC`.
+- NuGet status: `ShadowFlameC` appears in the current NuGet package owner list.
+- Backup NuGet purpose: backup package recovery owner, package owner continuity, unlist/deprecate coordination, recovery escalation, successor release coordination.
+- GitHub Actions environment: `nuget-release`.
+- Environment purpose: release environment for trusted publishing.
+- Required external approval: not required for primary owner-driven release preparation.
+- Repository secrets: none required for NuGet publish because `.github/workflows/release.yml` uses `NuGet/login@v1` trusted publishing.
+
 ## Plan
 1. Commit this task plan before evidence implementation edits.
 2. Verify `release.yml` matches the trusted-publishing facts and does not require repo secrets.

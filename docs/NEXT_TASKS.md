@@ -1,14 +1,18 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. TASK-0198 is an independent docs-only blocker evidence investigation, not a new project control. TASK-0199 completed the post-0198 state cleanup at `0aad858`. TASK-0200 completed the docs-only README/current-source CLI parity cleanup. TASK-0201 completed the docs-only `RB-003`/`RB-008` closure preflight and found insufficient repository evidence to close either blocker. No version bump is implied and `0.2.0-alpha.3` remains NO-GO until `RB-003` and `RB-008` are independently resolved. No next project control has been selected; the next entry is "not yet selected / pending maintainer direction".
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. TASK-0198 is an independent docs-only blocker evidence investigation, not a new project control. TASK-0199 completed the post-0198 state cleanup at `0aad858`. TASK-0200 completed the docs-only README/current-source CLI parity cleanup. TASK-0201 completed the docs-only `RB-003`/`RB-008` closure preflight. TASK-0202 is the current docs-only maintainer evidence intake for `ShadowFlameC` backup/security/recovery coverage. `RB-003` and `RB-008` are closed for planned `0.2.0-alpha.3` release-preparation entry, but no version bump, candidate, tag, GitHub Release, NuGet publish, workflow dispatch, or release GO exists yet. No next project control has been selected; the next entry after TASK-0202 should be release preparation, not publish.
+
+## Current Independent Maintainer Evidence Intake
+
+1. TASK-0202 record `ShadowFlameC` backup/security/recovery evidence for `RB-003` and `RB-008` - current; docs-only; no version/tag/NuGet/GitHub Release/workflow/security-setting/owner mutation; `0.2.0-alpha.3` is release-preparation eligible but unpublished.
 
 ## Completed Independent Blocker Closure Preflight
 
-1. TASK-0201 perform `RB-003`/`RB-008` closure preflight - completed; docs-only; recorded found/missing maintainer evidence; did not close either blocker; no release/tag/NuGet/version/workflow/security-setting/owner/recovery mutation; `0.2.0-alpha.3` remains NO-GO.
+1. TASK-0201 perform `RB-003`/`RB-008` closure preflight - completed; docs-only; recorded found/missing maintainer evidence; did not close either blocker; no release/tag/NuGet/version/workflow/security-setting/owner/recovery mutation; TASK-0202 later records maintainer evidence.
 
 ## Completed Independent README Parity Task
 
-1. TASK-0200 sync README CLI command surface with current-source `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md` - completed; docs-only; no release/tag/NuGet/version/workflow/security-setting mutation; `0.2.0-alpha.3` remains NO-GO.
+1. TASK-0200 sync README CLI command surface with current-source `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md` - completed; docs-only; no release/tag/NuGet/version/workflow/security-setting mutation; `0.2.0-alpha.3` remained NO-GO at that time.
 
 ## Completed Independent State Cleanup
 
@@ -16,11 +20,11 @@ This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTRO
 
 ## Completed Independent Blocker Investigation
 
-1. TASK-0198 investigate `RB-003` and `RB-008` closure evidence - completed and pushed at `533b64a`; docs-only; no release/tag/NuGet/version/security-setting mutation; recorded exact missing maintainer evidence and kept `0.2.0-alpha.3` NO-GO.
+1. TASK-0198 investigate `RB-003` and `RB-008` closure evidence - completed and pushed at `533b64a`; docs-only; no release/tag/NuGet/version/security-setting mutation; recorded exact missing maintainer evidence and kept `0.2.0-alpha.3` NO-GO at that time.
 
 ## Closed PROJECT-CONTROL-0110 (2026-06-19)
 
-PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/428 green. No release, no tag, no NuGet publish, no version bump; `0.2.0-alpha.3` remains NO-GO.
+PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/428 green. No release, no tag, no NuGet publish, no version bump; `0.2.0-alpha.3` remained NO-GO at control closure.
 
 1. TASK-0188 MCP transport step 2 (real stdio loop with redaction + safety bounds) - completed; pushed.
 2. TASK-0189 `ackit watch` local implementation (FileSystemWatcher, debounce, ignore list, cancellation) - completed; pushed.
@@ -131,13 +135,13 @@ PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/42
 These actions require explicit maintainer control and do not block safe local-only product/documentation work:
 
 1. Rerun the manual hosted RC evidence workflow only for a different selected final-candidate commit; alpha.2 evidence is green at `4c4fa64`.
-2. Keep private vulnerability reporting enabled and assign an independent backup security notification owner; primary ownership is recorded.
+2. Keep private vulnerability reporting enabled and maintain the independent backup security notification owner record; primary ownership is recorded.
 3. Recheck the bounded `Cyranth`/`Cynrath` NuGet identity disposition before expiry or the next release.
 4. Recheck the bounded author-signing deferral before expiry or the next release.
 5. Recheck the bounded SBOM deferral before expiry or the next release.
 6. Obtain hosted provenance evidence only during the next authorized publish; the control is implemented locally.
-7. Verify destructive NuGet recovery authority and assign backup recovery ownership; procedure/tabletop are recorded.
-8. Keep the selected `0.2.0-alpha.3` scope planning-only until the remaining P0/P1 decisions and exact-candidate evidence are complete.
+7. Maintain NuGet backup recovery ownership and recovery procedure/tabletop evidence.
+8. Prepare the selected `0.2.0-alpha.3` scope only through a dedicated release-preparation task with metadata bump, package diff, pack/install smoke, hosted RC evidence, and exact-candidate GO/NO-GO.
 
 ## Local-Only Ecosystem/Product Intelligence Track
 1. TASK-0100 offline OSS ecosystem catalog and roadmap reset - completed locally.
@@ -170,7 +174,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- TASK-0201 completed the docs-only release-blocker closure preflight for `RB-003` and `RB-008`. PROJECT-CONTROL-0110 is closed at TASK-0196 (2026-06-19) with 428/428 tests green and the final pushed HEAD at `b073c3d`. TASK-0198 is completed and pushed at `533b64a`; TASK-0199 is completed and pushed at `0aad858`; TASK-0200 completed the docs-only README/current-source CLI surface parity cleanup. `0.2.0-alpha.3` remains NO-GO because RB-003 and RB-008 still lack closure evidence. No release, tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate dispatch, security-setting change, owner/account/recovery mutation, destructive NuGet action, or version bump is part of this state. The next project control remains "not yet selected / pending maintainer direction"; any new control task must be explicitly authorized through a planning commit before implementation.
+- TASK-0202 is the current docs-only maintainer evidence intake for `RB-003` and `RB-008`. PROJECT-CONTROL-0110 is closed at TASK-0196 (2026-06-19) with 428/428 tests green and the final pushed HEAD at `b073c3d`. TASK-0198 is completed and pushed at `533b64a`; TASK-0199 is completed and pushed at `0aad858`; TASK-0200 completed the docs-only README/current-source CLI surface parity cleanup; TASK-0201 completed closure preflight. `RB-003` and `RB-008` are closed from maintainer-provided `ShadowFlameC` backup/security/recovery evidence for planned `0.2.0-alpha.3`, making release preparation eligible but not publication. No release, tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate dispatch, security-setting change, owner/account/recovery mutation, destructive NuGet action, or version bump is part of TASK-0202. The next task after TASK-0202 should be release preparation, not publish; any new control task must be explicitly authorized through a planning commit before implementation.
 
 ## Execution Rule
-After the closure of PROJECT-CONTROL-0110, the queue is in pause: no automatic commit or push is authorized without an explicitly active project control task. Tag, GitHub pre-release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations. RB-003 and RB-008 are independent of this control and remain open.
+After the closure of PROJECT-CONTROL-0110, the queue is in pause except for explicitly requested independent docs/release-preparation tasks. Tag, GitHub pre-release, NuGet publication, and workflow dispatch are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
