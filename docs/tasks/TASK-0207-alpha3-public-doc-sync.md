@@ -158,3 +158,85 @@ rg -n "Current release: `v0\.2\.0-alpha\.2|Current release \| `v0\.2\.0-alpha\.2
 Before push, use normal commits to correct documentation mistakes. After push, revert the docs-only commits with normal `git revert <sha>` if needed. Do not move tags, replace assets, republish NuGet packages, or mutate GitHub Release state.
 
 ## Completion notes
+Completed as a docs-only public/current-state sync.
+
+Commits:
+- Plan: `32266f9` (`docs: plan task 0207 alpha3 public docs sync`)
+- Implementation: `5629afa` (`docs: sync public docs to alpha3 release`)
+
+Files changed in the implementation commit:
+- `README.md`
+- `.codex/HANDOFF.md`
+- `.codex/CONTEXT_PACK.md`
+- `docs/HOSTED_VALIDATION_STATUS.md`
+- `docs/ISSUE_BACKLOG.md`
+- `docs/MAINTAINER_RELEASE_HANDOFF.md`
+- `docs/NEXT_TASKS.md`
+- `docs/NUGET_METADATA.md`
+- `docs/OSS_READINESS.md`
+- `docs/PRODUCT_SPEC.md`
+- `docs/PROJECT_EXECUTION_QUEUE.md`
+- `docs/PROJECT_MAP.md`
+- `docs/PUBLIC_RELEASE_AUDIT.md`
+- `docs/PUBLIC_RELEASE_GATES.md`
+- `docs/RELEASE_AUTOMATION.md`
+- `docs/RELEASE_BLOCKERS.md`
+- `docs/RELEASE_CHECKLIST.md`
+- `docs/RELEASE_VALIDATION.md`
+- `docs/ROADMAP.md`
+- `docs/SARIF_OUTPUT.md`
+- `docs/SARIF_UPLOAD_WORKFLOW_DESIGN.md`
+- `docs/SECURITY_MODEL.md`
+- `docs/SUPPLY_CHAIN_POLICY.md`
+- `docs/SUPPORT_MATRIX.md`
+- `docs/SUPPRESSION_AUDIT.md`
+- `docs/V020_ALPHA3_RELEASE_DECISION.md`
+- `docs/V030_READINESS.md`
+- `docs/V100_GAP_ANALYSIS.md`
+- `docs/V100_READINESS.md`
+- `docs/WEB_UI_PREVIEW.md`
+
+Updated current-facing docs:
+- Public install and support/status docs now describe `0.2.0-alpha.3` as the current published GitHub/NuGet prerelease.
+- Current package/status docs record NuGet verification, global install smoke, tag `v0.2.0-alpha.3`, GitHub prerelease `v0.2.0-alpha.3`, final publish SHA `92984c6448332aa24b7cff94647f627bf944e535`, and the next follow-up of `release.yml` provenance probe hardening.
+- Product/SARIF/Web UI/support/readiness docs now describe the published alpha.3 command surface rather than the older alpha.2 public state.
+- Documentation-only public examples and guidance use `0.2.0-alpha.3`.
+
+Alpha2 reference audit summary:
+- Full alpha2 audit still finds alpha2 references in 118 files.
+- Updated category: stale current-facing public/package/status/install references were moved to `0.2.0-alpha.3`.
+- Preserved historical category: alpha2 release notes, changelog entries, release-body/scope docs, old TASK evidence, and chronological handoff/task entries that describe what was true at that time.
+- Preserved predecessor category: alpha3 release-candidate predecessor references remain `0.2.0-alpha.2`.
+- Preserved alpha2-specific category: `docs/RELEASE_BODY_V020_ALPHA2.md`, `docs/V020_ALPHA2_SCOPE.md`, alpha2 release evidence, and alpha2 supply-chain/recovery records remain alpha2.
+- Preserved script/test expected category: no script or test fixture expected-version references were changed.
+
+Stale current-facing audit result:
+- The required stale-audit command still prints historical matches only.
+- Current public install alpha2 matches are limited to:
+  - `docs/RELEASE_BODY_V020_ALPHA2.md`: alpha2 release body.
+  - `docs/ROADMAP.md`: historical `v0.2.0-alpha.2` section.
+  - `docs/tasks/TASK-0200-readme-cli-surface-parity.md`: old task evidence for the pre-alpha3 public state.
+- `0.2.0-alpha.3 remains NO-GO/unpublished` matches are old chronological handoff/task evidence or the TASK-0207 audit command text, not current release status.
+
+Validation results:
+- `ackit --version`: passed, `AgentContextKit 0.2.0-alpha.3`.
+- `ackit doctor`: passed all checks.
+- `ackit scan --ci`: exit `0`; existing Medium `.remember` log/package artifact review findings and existing Low local-path findings were reported.
+- `git diff --check`: exit `0`; only CRLF-to-LF working-copy warnings for touched docs were printed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1`: passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-cli-contract.ps1`: passed with the expected dirty-working-tree warning before commit.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1`: passed with the expected dirty-working-tree warning before commit.
+- `dotnet test AgentContextKit.sln -c Release --no-build`: passed, 428/428.
+
+Mutation confirmation:
+- No `src/**`, `tests/**`, `scripts/**`, or `.github/workflows/**` files changed.
+- No package metadata changed.
+- No version bump, tag mutation, GitHub Release mutation, NuGet publish/package-state mutation, workflow dispatch, owner/account/secret/security-setting mutation, or provenance hardening occurred.
+
+Risks and notes:
+- Active workflow YAML pins are intentionally out of scope for this docs-only task.
+- Historical alpha2 references remain numerous by design; they are preserved as evidence, predecessor context, or alpha2-specific documentation.
+- Immutable release rules remain in force: do not reuse versions, move tags, replace assets, republish `0.2.0-alpha.3`, or manually mutate package/release state.
+
+Next task:
+- Harden the `release.yml` provenance probe before the next release.
