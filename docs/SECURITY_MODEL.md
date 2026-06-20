@@ -61,6 +61,16 @@ Config allowlists are local-only, explicit, reviewable, and documented. They can
 
 Current source keeps config suppressions auditable through sanitized local scan output. Audit entries omit raw matches and messages, do not change exit codes, and are not added to SARIF. See `docs/SUPPRESSION_AUDIT.md`.
 
+## Local Artifact Retention Policy
+Ignored local artifacts are not automatically safe and are not automatically disposable.
+
+TASK-0212 defines the current local policy for the two recurring post-alpha3 artifact classes:
+
+- `.remember/logs/**/*.log` files are local-only runtime/memory/autonomous logs. They are not release evidence and may be removed from a local workspace after recording count and size when they are ignored, untracked, and no longer needed for local operator continuity. Do not paste raw log contents into docs or reports.
+- `artifacts/package-validation/<version>/*.{nupkg,snupkg}` files are ignored local package-validation artifacts. The `0.2.0-alpha.3` files are retained local release evidence and must not be deleted by generic cleanup unless a maintainer explicitly changes release-evidence retention policy.
+
+Do not use broad `ignoredPaths`, baseline acceptance, or scanner suppression to make these classes disappear from output without a separate policy task proving the change cannot hide real secrets or release blockers.
+
 The scanner rule catalog, configurable allowlist foundation, and expanded scanner patterns are part of the published `0.2.0-alpha.3` package and current source. Stable `ACKIT` rule IDs and their category mapping are documented in `docs/SCANNER_RULES.md`; the latest additions are `ACKIT006` (`ProductionConfigLike`, High) for production configuration and `ACKIT007` (`DocumentationGap`, Medium) for documentation gaps.
 
 Scanner regression fixtures are synthetic and assembled to avoid committed live-looking credentials. The fixture matrix in `docs/SCANNER_FIXTURES.md` verifies both detection and known-noise boundaries without weakening Critical findings.

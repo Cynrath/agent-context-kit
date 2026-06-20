@@ -162,5 +162,41 @@ Before push, correct documentation with normal commits and restore any incorrect
 
 Do not move tags, replace release assets, republish NuGet packages, dispatch release workflows, mutate GitHub Release/NuGet state, or destructively clean retained release evidence as rollback.
 
+## Policy decision
+Evidence collected before this policy decision:
+
+- Plan commit: `e30c32f` (`docs: plan task 0212 remember log retention`).
+- Local HEAD and `origin/master` matched the expected TASK-0211 HEAD before plan creation: `73e5baa14c22bebc1d92494536c807064110212e`.
+- `.ackit/config.yml`: not present in the current workspace, so no project config suppression exists to review or mutate.
+- `.remember` storage state:
+  - tracked files: none under `.remember`.
+  - ignored/untracked files: `23` files, `469892` bytes total.
+  - ignored log files: `17` files, `467589` bytes total.
+  - ignore source: `.remember/.gitignore` ignores `.remember` contents; `.remember/logs/**/*.log` is ignored.
+  - release evidence: no.
+  - reproducibility requirement: no project or release reproducibility dependency identified.
+- Package-validation artifact state:
+  - tracked files: none under `artifacts/package-validation`.
+  - ignored/untracked files: `2` files, `273609` bytes total.
+  - ignore source: root `.gitignore` ignores `artifacts/`.
+  - files: alpha3 `.nupkg` and `.snupkg` package-validation archives.
+  - release evidence: yes, retained local package-validation evidence for `0.2.0-alpha.3`.
+- `ackit scan --ci` before local cleanup exited `0` with `24` findings: `0` Critical, `0` High, `19` Medium, `5` Low.
+- `ackit scan --json` had `suppressionSummary.total = 0`; finding `match` values were `null`.
+
+Decisions:
+
+| Area | Decision | Rationale | Action |
+| --- | --- | --- | --- |
+| `REMEMBER_LOGS` | Local-only ignored runtime/memory logs. They may be cleaned from local workspaces after summarizing count/size when ignored/untracked and not needed as evidence. | They are not tracked, not release evidence, not needed for reproducibility, and current scan noise comes from their `.log` extension rather than a secret match. | Perform scoped local cleanup of `.remember/logs/**/*.log` after this policy commit; do not commit deleted ignored files; re-run scan and record impact. |
+| `PACKAGE_VALIDATION_ARTIFACTS` | Retained local release/package-validation evidence for alpha3. | They are ignored/untracked artifacts, but they support TASK-0203/TASK-0206 alpha3 validation history. Generic cleanup must not delete them. | Keep locally retained. Do not suppress, delete, mutate release assets, or change package state. |
+| `LOCAL_PATH_REFERENCES` | Safe current examples, historical evidence, required task command text, and defensive test fixture. | No usable credential was identified; the TASK-0212 Low finding is self-induced by required command text. | No immediate normalization. Revisit only through a deliberate docs-polish or scan-scope policy task. |
+
+Scan-scope decision:
+
+- Do not modify `.ackit/config.yml`, `.gitignore`, baseline, or suppression settings in TASK-0212.
+- Prefer local cleanup for disposable ignored `.remember` logs and documentation for retained package evidence.
+- If maintainers later want retained local release artifacts excluded from self-scan output, create a separate policy task that proves the exclusion cannot hide secrets or public-release blockers.
+
 ## Completion notes
 Pending.

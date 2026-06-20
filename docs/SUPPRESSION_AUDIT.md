@@ -43,3 +43,5 @@ Identical audit records are deduplicated. Repeated occurrences of the same confi
 
 ## Review Guidance
 Treat a growing suppression count as configuration debt. Review path and rule-ID suppressions before release, keep entries narrow, and remove entries when the underlying fixture or generated artifact is gone.
+
+TASK-0212 confirms that ignored `.remember` memory logs and retained package-validation archives should not be hidden through broad suppression just to make local scans appear clean. Clean disposable ignored logs locally after count/size review when safe; retain alpha3 package-validation archives as local release evidence unless the release-evidence policy changes.

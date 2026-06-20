@@ -68,8 +68,14 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 
 ### 12. Decide memory-log retention policy
 - Labels: `type: maintenance`, `area: scanner`, `priority: medium`
+- Status: Completed by TASK-0212.
 - Goal: Decide whether ignored `.remember` memory/autonomous logs should remain local-only, be cleaned from workspaces, or receive explicit documentation/ignore treatment after TASK-0211 classified them as `MEMORY_LOG_REVIEW`.
 - Done when: The retention decision is recorded, any cleanup is non-destructive and scoped, package-validation artifacts remain protected as release evidence unless policy changes, and `ackit scan --ci` evidence is refreshed.
+
+### 13. Review scan-scope policy for retained local artifacts
+- Labels: `type: maintenance`, `area: scanner`, `priority: low`
+- Goal: Decide whether retained ignored local release evidence should remain visible in repository self-scans or be handled through a narrow, auditable scan-scope policy.
+- Done when: Any exclusion/suppression approach proves it cannot hide real secrets or release blockers, or the current visible-finding policy is explicitly retained.
 
 ## Maintainer Action Required
 GitHub issue creation is remote-write. Create issues manually when ready; do not create them from an agent session without explicit approval.

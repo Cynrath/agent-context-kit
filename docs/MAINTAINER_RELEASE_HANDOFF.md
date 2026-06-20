@@ -20,6 +20,7 @@ TASK-0206 publish result:
 - NuGet package `AgentContextKit` `0.2.0-alpha.3`, tag `v0.2.0-alpha.3`, and GitHub prerelease `v0.2.0-alpha.3` are published and target the final publish SHA.
 - `release.yml` `operation=verify-existing` run `27870813763` succeeded without package/tag/release mutation.
 - Publish-path follow-up: TASK-0208 hardened the attestation-provenance probe before the next release; the published alpha.3 package/tag/release must not be mutated.
+- Local retention follow-up: TASK-0212 treats ignored `artifacts/package-validation/0.2.0-alpha.3/*.{nupkg,snupkg}` files as retained local package-validation evidence. They should not be committed, published as new release assets, or deleted by generic cleanup unless the maintainer changes release-evidence retention policy.
 
 For a future different candidate, maintainer-only RC evidence command:
 
