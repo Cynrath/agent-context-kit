@@ -69,6 +69,7 @@
 - For planned `0.2.0-alpha.3`, TASK-0203 completed local package validation and install smoke for implementation commit `33e1897`; at TASK-0203 close, hosted RC evidence and exact-candidate GO remained pending.
 - For planned `0.2.0-alpha.3`, TASK-0204 identifies dispatch-time current `origin/master` as the hosted RC candidate, candidate version `0.2.0-alpha.3`, and predecessor `0.2.0-alpha.2`; obtain hosted RC evidence and record the exact-version/exact-commit GO packet before any publication action.
 - For planned `0.2.0-alpha.3`, TASK-0205 records hosted RC run `27868539971` as passed for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source package `0.2.0-alpha.3.ci.27868539971`; exact-candidate GO is for a later publish task only.
+- For TASK-0206 publish gating, source-impacting release-gate script hardening required refreshed hosted RC evidence. Run `27870246504` passed on Windows, Ubuntu, and macOS for exact commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source package `0.2.0-alpha.3.ci.27870246504`.
 - Final publish remains pending and must be authorized by a separate task.
 
 ## Release Candidate Evidence Gate
@@ -96,5 +97,5 @@
 - [x] English/Turkish human output, known argument-error parity, exit-code parity, and language-independent JSON semantics are covered by `scripts/check-localization-parity.ps1 -FailOnIssues`.
 - [x] Security/supply-chain evidence structure and maintainer handoff are present and pass `scripts/check-security-supply-chain-evidence.ps1 -FailOnIssues`; remote items remain explicitly pending.
 - [x] Current-source consolidated local evidence passes `scripts/check-rc-local-readiness.ps1 -RunDependencyReview -FailOnIssues`; the result remains `LOCAL READY / REMOTE NO-GO`.
-- [x] Before publication, resolve whether the release workflow should publish the hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801` or a later docs-only HEAD; TASK-0206 selected the current `origin/master` publish policy required by `release.yml`, proved the bridge to the initial publish SHA `85383a9321566f9e0989a0db5429fb7d72d6109a` is docs/handoff/governance-only with 0 package/source-impacting files, and requires one final post-evidence recompute/classification before dispatch.
+- [x] Before publication, resolve whether the release workflow should publish the hosted RC evidence commit or a later docs-only HEAD; TASK-0206 selected the current `origin/master` publish policy required by `release.yml`, refreshed package/source RC evidence at `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`, and requires one final post-evidence recompute/classification before dispatch.
 - Signing, SBOM, provenance, and package recovery decisions are recorded.

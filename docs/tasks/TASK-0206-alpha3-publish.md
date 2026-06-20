@@ -222,3 +222,23 @@ Third release workflow dispatch:
 - Failure cause: hosted Windows emitted the known unreadable-directory stderr warning from `git status --short` inside `scripts/check-config-generated-conventions.ps1`; the outer release step treats native stderr as a failing command even when Git exits `0`.
 - Publish impact: package packing, artifact upload, publish job, NuGet login, NuGet push, tag creation, GitHub Release creation, and attestation did not run.
 - Remediation: harden release-gate dirty-check calls so they keep untracked/staged/tracked detection but suppress Git stderr before PowerShell can promote it to a native-command error. This changes `scripts/**`, so a new hosted RC evidence workflow for the resulting publish SHA is mandatory before any further publish dispatch.
+
+Source-impacting release-gate remediation:
+- Documentation blocker record commit: `6c3c5c90244c4095591b9485078d6fcd96fed08b` (`docs: record hosted release gate stderr blocker`).
+- Script remediation commit: `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f` (`scripts: harden release gate git status checks`).
+- Scope: `scripts/git-status.ps1` helper plus release-gate scripts that previously used `git status --short` directly for dirty-tree checks.
+- Local validation after remediation: raw porcelain clean; Markdown completeness guard passed; `git diff --check` passed; `dotnet restore` passed; `dotnet build -c Release --no-restore` passed with known xUnit analyzer warnings; `dotnet test -c Release --no-build` passed `428/428`; exact hosted `Run release gates` command set passed under PowerShell 7 with `$PSNativeCommandUseErrorActionPreference = $true`; `verify-release.ps1 -Version 0.2.0-alpha.3` passed.
+
+Refreshed hosted RC evidence after source-impacting remediation:
+- Run ID: `27870246504`.
+- URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27870246504`.
+- Head SHA: `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`.
+- Event: `workflow_dispatch`.
+- Candidate version: `0.2.0-alpha.3`.
+- Predecessor version: `0.2.0-alpha.2`.
+- Source candidate package: `0.2.0-alpha.3.ci.27870246504`.
+- Result: success.
+- Matrix: `windows-2025` job `82480881678`, `ubuntu-latest` job `82480881695`, and `macos-latest` job `82480881666` all succeeded.
+- Annotations: xUnit analyzer warnings only, non-blocking.
+- Publish impact: this refreshed run supersedes the earlier TASK-0205 RC tuple for TASK-0206 publish gating because the script remediation changed `scripts/**`.
+- Next gate: after this evidence commit is documented and pushed, recompute `origin/master`, classify the bridge from `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f` to the new publish SHA, and proceed only if changed files are docs/handoff/governance-only.

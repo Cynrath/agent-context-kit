@@ -5,7 +5,7 @@ Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-p
 ## Decision
 **Exact-candidate GO for a later publish task; publication is not yet performed.**
 
-`0.2.0-alpha.3` is the selected planning version. TASK-0202 closes the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared the source/package metadata, release-preparation docs, local package, package verification, and installed-tool smoke evidence. TASK-0204 identified the dispatch-time `origin/master` hosted RC evidence candidate. TASK-0205 verified hosted RC run `27868539971` for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS jobs all succeeded.
+`0.2.0-alpha.3` is the selected planning version. TASK-0202 closes the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared the source/package metadata, release-preparation docs, local package, package verification, and installed-tool smoke evidence. TASK-0204 identified the dispatch-time `origin/master` hosted RC evidence candidate. TASK-0205 verified hosted RC run `27868539971` for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS jobs all succeeded. TASK-0206 later required source-impacting release-gate script hardening and therefore refreshed hosted RC evidence with run `27870246504` for exact commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`; Windows, Ubuntu, and macOS jobs all succeeded.
 
 This GO authorizes only a later publish-preparation/execution task to proceed to its own exact-commit checks. TASK-0205 does not approve an immediate publish, does not dispatch `release.yml`, and does not create a tag, GitHub Release, or NuGet package.
 
@@ -157,6 +157,17 @@ First TASK-0206 dispatch result: release workflow run `27869569988` failed befor
 Second TASK-0206 dispatch result: release workflow run `27869677726` failed before pack/publish in the same pre-publish `Run release gates` step. The previous v1.0 readiness failure was fixed. The new failure was `scripts/check-security-supply-chain-evidence.ps1 -FailOnIssues`, which still expects the historical `docs/PACKAGE_RECOVERY.md` marker `NuGet unlist/deprecate/account-recovery authority: unverified`. That marker describes the pre-TASK-0202 state and must be retained as historical evidence while TASK-0202 remains the superseding closure record for `RB-008`. The publish job was skipped again, and no NuGet package, tag, GitHub Release, attestation, or release asset was created.
 
 Third TASK-0206 dispatch result: release workflow run `27869894026` failed before pack/publish in `validate exact package`, step `Run release gates`. The first two blocker remediations held, but hosted Windows reproduced the known unreadable-directory stderr warning from `git status --short` in `scripts/check-config-generated-conventions.ps1`; because the release step runs with native command stderr treated as failure, this stopped the gate even though Git exits `0`. The publish job was skipped, and no NuGet package, tag, GitHub Release, attestation, or release asset was created. A script hardening change under `scripts/**` is now required; this is package/source-impacting for release governance, so the next candidate SHA requires fresh hosted RC evidence before another publish dispatch.
+
+TASK-0206 source-impacting remediation and refreshed RC evidence:
+- remediation commit: `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f` (`scripts: harden release gate git status checks`);
+- local validation after remediation: `dotnet restore`, `dotnet build -c Release --no-restore`, `dotnet test -c Release --no-build` (`428/428`), raw porcelain, Markdown completeness guard, `git diff --check`, and the full release workflow `Run release gates` command set under PowerShell 7 with native stderr failure semantics all passed;
+- hosted RC run: `27870246504`, `https://github.com/Cynrath/agent-context-kit/actions/runs/27870246504`;
+- result: `success`;
+- matrix: `windows-2025` job `82480881678`, `ubuntu-latest` job `82480881695`, and `macos-latest` job `82480881666` all succeeded;
+- source candidate package: `0.2.0-alpha.3.ci.27870246504`;
+- annotations: xUnit analyzer warnings only, non-blocking.
+
+TASK-0206 publish decision now uses refreshed RC evidence commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f` as the package/source baseline. Any later publish SHA must be a docs/handoff/governance-only successor to that refreshed evidence commit, or publication must stop for a new hosted RC run.
 
 ## Actions Not Performed
 - no published-package workflow version change;

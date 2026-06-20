@@ -8,6 +8,8 @@ TASK-0128 completed the hardened workflow and exact hosted run. Run [27478635057
 
 TASK-0205 verified hosted `0.2.0-alpha.3` release-candidate evidence with `gh`. Run [27868539971](https://github.com/Cynrath/agent-context-kit/actions/runs/27868539971) passed on Windows, Ubuntu, and macOS for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`.
 
+TASK-0206 refreshed hosted `0.2.0-alpha.3` release-candidate evidence after the release-gate `git status` stderr hardening changed `scripts/**`. Run [27870246504](https://github.com/Cynrath/agent-context-kit/actions/runs/27870246504) passed on Windows, Ubuntu, and macOS for exact commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27870246504`. This refreshed tuple supersedes the earlier TASK-0205 tuple for TASK-0206 publish gating only; the earlier tuple remains valid historical evidence for its exact commit.
+
 Alpha.3 hosted evidence tuple:
 - workflow: `release-candidate-evidence.yml`
 - run ID: `27868539971`
@@ -24,6 +26,23 @@ Alpha.3 hosted evidence tuple:
   - `macos-latest`: success, job `82476527416`
 - status: hosted RC evidence passed
 - release decision: exact-candidate GO for a later publish task only
+
+TASK-0206 refreshed alpha.3 hosted evidence tuple:
+- workflow: `release-candidate-evidence.yml`
+- run ID: `27870246504`
+- run URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27870246504`
+- event: `workflow_dispatch`
+- branch: `master`
+- candidate commit: `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`
+- candidate version: `0.2.0-alpha.3`
+- predecessor version: `0.2.0-alpha.2`
+- source candidate package: `0.2.0-alpha.3.ci.27870246504`
+- matrix:
+  - `windows-2025`: success, job `82480881678`
+  - `ubuntu-latest`: success, job `82480881695`
+  - `macos-latest`: success, job `82480881666`
+- status: hosted RC evidence passed
+- release decision: refreshed exact-candidate GO for TASK-0206 publish gating, subject to final docs-only publish-SHA bridge classification
 
 Each hosted job completed these expected steps successfully:
 - checkout exact commit;
@@ -108,7 +127,7 @@ gh workflow run release-candidate-evidence.yml `
   -f predecessor_version=0.2.0-alpha.2
 ```
 
-TASK-0128's dispatch is complete and remains alpha.2-only. TASK-0205 records the alpha.3 hosted RC evidence for `beaa14deed3dbc55ac98d216679f9a9799261801`. Do not tag, publish, or create a GitHub Release from this evidence-recording task; publication still requires a separate authorized publish task.
+TASK-0128's dispatch is complete and remains alpha.2-only. TASK-0205 records the alpha.3 hosted RC evidence for `beaa14deed3dbc55ac98d216679f9a9799261801`. TASK-0206 records refreshed alpha.3 hosted RC evidence for `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f` after source-impacting script hardening. Do not tag, publish, or create a GitHub Release from evidence recording alone; TASK-0206 publication must still pass the release workflow and immutable release checks.
 
 ## Failure Interpretation
 - Predecessor install failure can indicate NuGet/network availability rather than source behavior.
