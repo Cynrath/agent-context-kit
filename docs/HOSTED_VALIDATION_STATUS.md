@@ -7,7 +7,7 @@ TASK-0206 completed `0.2.0-alpha.3` publication after refreshed hosted RC eviden
 - Refreshed hosted RC run: `27870246504` for commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`.
 - NuGet package: `AgentContextKit` `0.2.0-alpha.3` verified.
 - Global tool install smoke: passed; `ackit version` returned `AgentContextKit 0.2.0-alpha.3`.
-- Remaining follow-up: harden the `release.yml` provenance probe before the next release.
+- TASK-0208 follow-up: release provenance probe hardening is complete locally for future releases; no alpha.3 package/tag/release mutation occurred.
 
 ## Historical Alpha.2 Commit
 - Branch: `master`

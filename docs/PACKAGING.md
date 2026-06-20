@@ -71,7 +71,7 @@ Version `0.2.0-alpha.3` has been published and install-verified. Future versions
 
 The workflow uses NuGet Trusted Publishing through `NuGet/login@v1`. API keys, repository secrets for package credentials, local environment credentials, and credential-bearing `NuGet.Config` files are prohibited.
 
-TASK-0206 publish-path note: `operation=publish` completed package/tag/release creation in staged recovery runs, but the post-publish provenance probe failed before attestation. `release.yml` `operation=verify-existing` run `27870813763` succeeded for the immutable release state. Harden the provenance probe before the next release.
+TASK-0206 publish-path note: `operation=publish` completed package/tag/release creation in staged recovery runs, but the post-publish provenance probe failed before attestation. `release.yml` `operation=verify-existing` run `27870813763` succeeded for the immutable release state. TASK-0208 hardened the provenance probe for future releases without mutating alpha.3 package/tag/release state.
 
 See [RELEASE_AUTOMATION.md](RELEASE_AUTOMATION.md) for the dispatch, exact-SHA, idempotency, and recovery contract.
 

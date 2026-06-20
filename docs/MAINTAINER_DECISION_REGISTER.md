@@ -69,6 +69,6 @@ TASK-0206 records `0.2.0-alpha.3` publication and immutable post-publish verific
 - `MD-010`: published. Final publish SHA `92984c6448332aa24b7cff94647f627bf944e535` is a docs/handoff/governance-only successor to refreshed hosted RC evidence commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`.
 - NuGet package `AgentContextKit` `0.2.0-alpha.3`, tag `v0.2.0-alpha.3`, and GitHub prerelease `v0.2.0-alpha.3` exist and target the publish SHA.
 - `release.yml` `operation=verify-existing` run `27870813763` succeeded without package/tag/release mutation.
-- `MD-007`: follow-up required. The publish path failed after package/tag/release creation in the provenance probe before attestation. Do not manually attest or mutate alpha.3; harden the workflow before the next release.
+- `MD-007`: follow-up completed locally in TASK-0208. The publish path failed after package/tag/release creation in the provenance probe before attestation; `release.yml` now treats missing attestation HTTP 404 as `exists=false` for future releases. Do not manually attest or mutate alpha.3.
 
 No manual tag creation, manual GitHub Release creation, manual NuGet package upload, repository secret creation, tag movement, version reuse, package replacement, owner/account mutation, or destructive NuGet action occurred in TASK-0206.

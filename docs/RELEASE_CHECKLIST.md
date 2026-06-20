@@ -65,7 +65,7 @@
 - Release nupkg SHA-256: `72649efbd3ab0b6751281e200de5671cb361c53ad954bbd5510a4d31232cb33f`.
 - Release snupkg SHA-256: `716da07eb6bfa6c12b98b7e6ceaeb6e94999547a686b0af5bce5a0d75d2c9c2f`.
 - `release.yml` read-only `operation=verify-existing` run `27870813763` succeeded for the immutable release state.
-- Publish-path follow-up: `operation=publish` created/verified package, tag, release, and assets, but failed after publication in the attestation-provenance probe. Harden that idempotency path before the next release.
+- Publish-path follow-up: `operation=publish` created/verified package, tag, release, and assets, but failed after publication in the attestation-provenance probe. TASK-0208 hardened that idempotency path for future releases without mutating alpha.3 package/tag/release state.
 
 ## Historical v0.2.0-alpha.2 Release-Candidate Gate
 - Scope is defined in `docs/V020_ALPHA2_SCOPE.md`.

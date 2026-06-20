@@ -86,7 +86,7 @@ The baseline diff workflow runs `ackit scan --baseline <path> --ci` so new High 
 
 See [RC_HOSTED_EVIDENCE.md](RC_HOSTED_EVIDENCE.md) before manually dispatching the RC workflow.
 
-Current alpha.3 publication is complete. TASK-0206 published final SHA `92984c6448332aa24b7cff94647f627bf944e535` after refreshed hosted RC evidence run `27870246504` for commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`; Windows, Ubuntu, and macOS evidence jobs all succeeded.
+Current alpha.3 publication is complete. TASK-0206 published final SHA `92984c6448332aa24b7cff94647f627bf944e535` after refreshed hosted RC evidence run `27870246504` for commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`; Windows, Ubuntu, and macOS evidence jobs all succeeded. TASK-0208 hardened `release.yml` so a future publish path treats missing release asset attestation HTTP 404 as `exists=false` and proceeds to `actions/attest@v4`; no workflow dispatch or release mutation occurred in TASK-0208.
 
 For a future different candidate, use the exact selected `origin/master` tuple:
 

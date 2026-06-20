@@ -13,7 +13,7 @@ Final alpha.3 validation:
 - `release.yml` `operation=verify-existing` run `27870813763` succeeded without package/tag/release mutation.
 - Release assets are present: nupkg SHA-256 `72649efbd3ab0b6751281e200de5671cb361c53ad954bbd5510a4d31232cb33f`; snupkg SHA-256 `716da07eb6bfa6c12b98b7e6ceaeb6e94999547a686b0af5bce5a0d75d2c9c2f`.
 
-Publish-path caveat: `operation=publish` created or verified the package, tag, release, and assets but failed after publication in the provenance probe before attestation. Treat this as a workflow hardening follow-up before the next release, not as permission to mutate the already-published alpha.3 package or tag.
+Publish-path caveat: `operation=publish` created or verified the package, tag, release, and assets but failed after publication in the provenance probe before attestation. TASK-0208 hardened the probe so missing attestation HTTP 404 becomes `exists=false` for future publish runs. This was not a new publish and does not grant permission to mutate the already-published alpha.3 package or tag.
 
 ## PROJECT-CONTROL-0102 Pre-Version Evidence
 On 2026-06-13, TASK-0116–0122 validation passed with a zero-warning Release build, 186/186 tests, clean source scan, doctor PASS, sample smoke, JSON/SARIF/locale/link contracts, local package install smoke, and all requested readiness/security/supply-chain gates. The unchanged 2,000-file/30-second performance tripwire completed in 3.961 seconds standalone and 2.785 seconds through the RC gate.

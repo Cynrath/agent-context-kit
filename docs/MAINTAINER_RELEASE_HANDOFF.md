@@ -9,7 +9,7 @@ Future release sequences must not use API keys. Publication is allowed only thro
 ## Future Release-Candidate Decision
 TASK-0092 prepares a conditional local contract freeze in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and the authoritative GO/NO-GO checklist in `docs/MAINTAINER_RC_DECISION.md`. The current decision is NO-GO for RC publication until hosted evidence, remaining P0 gaps, private vulnerability reporting, schema assets, and supply-chain decisions are complete.
 
-TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. TASK-0202 records the missing backup security and package recovery evidence. TASK-0203 prepared source/package metadata and local package evidence. TASK-0204 identified dispatch-time current `origin/master` as the exact hosted RC evidence candidate and predecessor `0.2.0-alpha.2`. TASK-0205 verified hosted RC run `27868539971` as green for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS jobs all succeeded. TASK-0206 then refreshed hosted RC evidence after source-impacting release-gate hardening and published `0.2.0-alpha.3`.
+TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. TASK-0202 records the missing backup security and package recovery evidence. TASK-0203 prepared source/package metadata and local package evidence. TASK-0204 identified dispatch-time current `origin/master` as the exact hosted RC evidence candidate and predecessor `0.2.0-alpha.2`. TASK-0205 verified hosted RC run `27868539971` as green for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS jobs all succeeded. TASK-0206 then refreshed hosted RC evidence after source-impacting release-gate hardening and published `0.2.0-alpha.3`. TASK-0208 hardened the release asset provenance probe for future release runs without mutating alpha.3 release state.
 
 TASK-0134 evaluated the earlier GO packet on 2026-06-14 and recorded NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0203 superseded only the local preparation boundary. TASK-0204 superseded only the hosted-RC planning boundary. TASK-0205 superseded the hosted-evidence pending boundary with exact-candidate GO. TASK-0206 is the only task that authorized and completed publication.
 
@@ -19,7 +19,7 @@ TASK-0206 publish result:
 - Final bridge from refreshed RC evidence to publish SHA: docs/handoff/governance-only, 0 package/source-impacting files.
 - NuGet package `AgentContextKit` `0.2.0-alpha.3`, tag `v0.2.0-alpha.3`, and GitHub prerelease `v0.2.0-alpha.3` are published and target the final publish SHA.
 - `release.yml` `operation=verify-existing` run `27870813763` succeeded without package/tag/release mutation.
-- Publish-path follow-up: harden the attestation-provenance probe before the next release; the published alpha.3 package/tag/release must not be mutated.
+- Publish-path follow-up: TASK-0208 hardened the attestation-provenance probe before the next release; the published alpha.3 package/tag/release must not be mutated.
 
 For a future different candidate, maintainer-only RC evidence command:
 

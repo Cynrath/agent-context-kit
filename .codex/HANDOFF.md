@@ -25,7 +25,7 @@ agent-context-kit
 - GitHub Release page and NuGet publish are complete for `v0.2.0-alpha.3`.
 - NuGet global tool install verification and package smoke verification are complete for `0.2.0-alpha.3`.
 - Publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
-- Follow-up before the next release: harden the `release.yml` provenance probe.
+- TASK-0208 hardened the `release.yml` provenance probe for future releases; missing attestation HTTP 404 now records `exists=false` instead of failing before `actions/attest@v4`.
 - Codex for OSS form submission is complete per maintainer-provided status.
 
 ## Recommended Checks

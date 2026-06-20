@@ -24,13 +24,14 @@ The release job uses GitHub environment `nuget-release` and only that job receiv
 The `verify-existing` job is separate from publication. It has only `contents: read`, does not use the `nuget-release` environment, does not request `id-token: write`, does not call `NuGet/login`, and cannot publish, tag, upload, or edit a GitHub Release.
 
 ## Artifact Provenance
-After NuGet, tag, and GitHub Release verification, the publish job downloads the exact release `.nupkg`. If its SHA-256 already has a repository attestation, creation is skipped. Otherwise `actions/attest@v4` creates provenance, and `gh attestation verify` requires the `release.yml` signer workflow. This occurs only in the publish job; alpha.2 is not retrospectively attested.
+After NuGet, tag, and GitHub Release verification, the publish job downloads the exact release `.nupkg`. If its SHA-256 already has a repository attestation, creation is skipped. If the attestation lookup returns HTTP 404, the workflow records `exists=false` and lets `actions/attest@v4` create provenance. Other lookup failures remain blocking. `gh attestation verify` then requires the `release.yml` signer workflow. This occurs only in the publish job; alpha.2 is not retrospectively attested.
 
 ## Idempotency And Partial Failure
 - Concurrency serializes runs for the same operation and version.
 - An existing NuGet version is verified and not republished.
 - An existing tag must target the exact requested commit or the workflow fails without moving it.
 - If NuGet succeeds and GitHub Release creation later fails, rerun the same inputs. The workflow verifies the package, skips republish, verifies/creates the exact tag, and completes missing release assets.
+- If the exact release asset exists but its attestation is missing, the provenance probe records `exists=false` and continues to `actions/attest@v4`; if the attestation already exists, it records `exists=true` and skips creating a duplicate attestation.
 - NuGet failure stops tag and release creation.
 
 ## Existing Release Recovery Verification

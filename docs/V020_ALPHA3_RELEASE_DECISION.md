@@ -1,6 +1,6 @@
 # v0.2.0-alpha.3 Release Decision
 
-Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-preparation update: 2026-06-20. Hosted RC planning update: 2026-06-20. Hosted RC evidence update: 2026-06-20. Publish update: 2026-06-20. Decision owner: `Cynrath`.
+Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-preparation update: 2026-06-20. Hosted RC planning update: 2026-06-20. Hosted RC evidence update: 2026-06-20. Publish update: 2026-06-20. Provenance hardening update: 2026-06-20. Decision owner: `Cynrath`.
 
 ## Decision
 **Published: `AgentContextKit` `0.2.0-alpha.3` is available on NuGet and recorded as GitHub prerelease `v0.2.0-alpha.3`.**
@@ -19,7 +19,7 @@ Final release state:
 
 Publish workflow caveat:
 - `operation=publish` runs `27870383897`, `27870603776`, and `27870710093` completed the immutable publication sequence in stages but did not finish green. Run `27870383897` published the NuGet package and then hit NuGet propagation delay before tag/release. Run `27870603776` created the exact tag and GitHub prerelease/assets without republishing, then failed in the provenance probe. Run `27870710093` reproduced the same provenance-probe failure after verifying existing package/tag/release.
-- The failed provenance step attempted `gh api repos/Cynrath/agent-context-kit/attestations/sha256:<digest>` for the release nupkg and exited nonzero when no attestation existed, before `actions/attest@v4` could run. This is a workflow idempotency/provenance follow-up for the next release. It did not move tags, replace assets, reuse a version, expose secrets, or manually mutate release state.
+- The failed provenance step attempted `gh api repos/Cynrath/agent-context-kit/attestations/sha256:<digest>` for the release nupkg and exited nonzero when no attestation existed, before `actions/attest@v4` could run. TASK-0208 hardened this workflow idempotency path for future releases by treating missing attestation HTTP 404 as `exists=false`. It did not move tags, replace assets, reuse a version, expose secrets, dispatch a workflow, or manually mutate release state.
 
 ## Verified Inputs
 - TASK-0126 immutable alpha.2 recovery verification is green in run `27478046088`.
@@ -39,7 +39,7 @@ Publish workflow caveat:
 
 ## Remaining Release Conditions
 1. `0.2.0-alpha.3` publication is complete and immutable; do not republish, replace assets, move `v0.2.0-alpha.3`, or reuse the version.
-2. Record and carry forward the workflow provenance follow-up: the publish path's attestation probe must handle the "no attestation exists yet" case before the next release.
+2. TASK-0208 completed the workflow provenance follow-up locally: the publish path's attestation probe now handles the "no attestation exists yet" HTTP 404 case as `exists=false`. Future release execution still requires its own hosted evidence and authorized dispatch.
 3. Future releases still require their own task, hosted RC evidence, exact SHA decision, package/source bridge classification, and `release.yml` dispatch.
 4. The current published package remains governed by successor-release policy; any correction must be a new version unless it is docs-only evidence.
 5. Repository secrets and manual NuGet API keys remain prohibited for package publication.
@@ -193,7 +193,7 @@ TASK-0206 publish decision now uses refreshed RC evidence commit `eef0adc4d5d11d
 
 ## Next Required Task
 Post-publish follow-up:
-1. harden the `release.yml` provenance/idempotency probe so a missing attestation records `exists=false` and lets `actions/attest@v4` run;
+1. TASK-0208 hardened the `release.yml` provenance/idempotency probe so a missing attestation records `exists=false` and lets `actions/attest@v4` run in a future publish path;
 2. keep public docs and documentation-only examples pinned to `0.2.0-alpha.3`; any active workflow YAML pin change remains a separate workflow task;
 3. keep successor-release policy for any package or release-asset correction.
 

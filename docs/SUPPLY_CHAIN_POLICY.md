@@ -28,14 +28,14 @@ Local review on 2026-06-13 found no vulnerable or deprecated direct/transitive p
 ## Signing, SBOM, And Provenance Decision
 The current published `0.2.0-alpha.3` package is available through NuGet.org and was verified by TASK-0206. Historical alpha.2 read-only verification found NuGet.org repository signing, no author signature, no SBOM in the package or GitHub Release assets, and no accessible GitHub provenance attestation for the exact package digest. Exact alpha.2 NuGet/release hashes and hosted recovery evidence remain in `docs/PUBLISHED_SUPPLY_CHAIN_STATUS.md`; alpha.3 package/release evidence remains in `docs/tasks/TASK-0206-alpha3-publish.md`.
 
-NuGet.org repository signing must not be described as author-signed. Before 1.0 RC, the maintainer must make and record explicit decisions for:
+Packages with NuGet repository signatures are repository-signed by NuGet.org and must not be described as author-signed. Before 1.0 RC, the maintainer must make and record explicit decisions for:
 - NuGet package signing;
 - source/package provenance or attestations;
 - SBOM generation and publication;
 - recovery/deprecation procedure for a bad package.
 - alignment of the public NuGet owner profile `Cyranth` with the project persona and package author `Cynrath`.
 
-TASK-0132 records the current decisions in `docs/SUPPLY_CHAIN_DECISIONS.md`: author signing and SBOM are bounded deferrals, while exact GitHub Release package provenance is implemented in the publish workflow. TASK-0206 exposed a publish-path provenance probe failure after package/tag/release creation; hardening that idempotency path is the next release follow-up. No claim is made that alpha.2 has project provenance.
+TASK-0132 records the current decisions in `docs/SUPPLY_CHAIN_DECISIONS.md`: author signing and SBOM are bounded deferrals, while exact GitHub Release package provenance is implemented in the publish workflow. TASK-0206 exposed a publish-path provenance probe failure after package/tag/release creation; TASK-0208 hardened that idempotency path so missing attestation HTTP 404 records `exists=false` in future publish runs. No claim is made that alpha.2 has project provenance.
 
 TASK-0095 consolidates the decision fields. TASK-0127 refreshes the exact published package/release state for alpha.2. TASK-0129 verifies private reporting. TASK-0130 accepts the immutable-package recovery procedure while leaving destructive authority and backup ownership explicit. TASK-0131 dispositions the owner identity. TASK-0132 defers author signing/SBOM with bounded accepted risk and adds future-release provenance; no unverified published control is claimed.
 
