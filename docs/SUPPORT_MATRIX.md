@@ -5,8 +5,8 @@ This matrix documents the tested and intended support surface for AgentContextKi
 ## Current Release
 - Package: `AgentContextKit`
 - Command: `ackit`
-- Current release: `v0.2.0-alpha.2`
-- Previous release: `v0.1.0-alpha.2`
+- Current release: `v0.2.0-alpha.3`
+- Previous release: `v0.2.0-alpha.2`
 - Target framework: .NET 10
 
 ## Supported Operating Systems
@@ -35,6 +35,7 @@ This matrix documents the tested and intended support surface for AgentContextKi
 - Generation: `ackit generate`, `ackit task`.
 - Local artifacts: `ackit report`, `ackit webui`, `ackit prompt-pack`, `ackit context-export`.
 - Safety checks: `ackit redact-check`, `ackit doctor`.
+- Local automation helpers: `ackit mcp`, `ackit watch`, `ackit diff`, `ackit trim`.
 
 ## Not Supported
 - Hosted Web UI.

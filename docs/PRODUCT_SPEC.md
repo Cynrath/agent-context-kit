@@ -26,7 +26,7 @@ AgentContextKit is an offline-first .NET CLI that prepares repositories for safe
 - Automatic publishing from push or pull-request events.
 
 ## Next Product Direction
-The published alpha.2 package includes baseline-aware CI policy and configuration diagnostics. The next package scope is selected only after TASK-0125 final hosted validation and the maintained security/supply-chain decisions; `docs/V030_ROADMAP_DECISION.md` remains a planning input rather than a release commitment.
+The published alpha.3 package includes baseline-aware CI policy, configuration diagnostics, MCP stdio, `ackit watch`, `diff`, and `trim`. The next package scope remains maintainer-reviewed; `docs/V030_ROADMAP_DECISION.md` remains a planning input rather than a release commitment.
 
 ## Future Optional LLM Scope
 v0.5 may add optional LLM-assisted workflows, but the default product remains offline-first. Any future provider integration must require explicit user consent, dry-run context review, safe secret handling, and local auditability before remote calls or context export.
@@ -38,11 +38,13 @@ v0.5 may add optional LLM-assisted workflows, but the default product remains of
 - Teams cleaning private projects before public release.
 
 ## Current Commands
-This list describes current source and the published `0.2.0-alpha.2` package. The published NuGet package includes `sarif`.
+This list describes current source and the published `0.2.0-alpha.3` package.
 
 - `init`
 - `scan`
 - `scan --ci`
+- `config-check`
+- `baseline`
 - `sarif`
 - `report`
 - `webui`
@@ -53,7 +55,8 @@ This list describes current source and the published `0.2.0-alpha.2` package. Th
 - `redact-check`
 - `doctor`
 - `hooks`
-- `mcp` (Core-only JSON-RPC prototype; no real stdio loop yet)
+- `mcp`
+- `watch`
 - `diff`
 - `trim`
 - `version`

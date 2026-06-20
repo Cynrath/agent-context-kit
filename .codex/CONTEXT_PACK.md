@@ -36,9 +36,9 @@ TASK-0131 accepts the public `Cyranth` NuGet owner / `Cynrath` project persona d
 
 TASK-0132 defers author signing/SBOM with dated accepted risk and adds future-release GitHub artifact provenance to the isolated publish job. The read-only verifier has no attestation permission.
 
-TASK-0133 selects `0.2.0-alpha.3` as a compatible planning scope. TASK-0202 makes release preparation eligible by closing RB-003/RB-008. TASK-0203 prepared source/package metadata and local package evidence. TASK-0204 identifies the exact hosted RC candidate and dispatch tuple, but publication remains pending hosted RC evidence, exact-candidate validation, and GO.
+TASK-0133 selected `0.2.0-alpha.3` as a compatible planning scope. TASK-0202 made release preparation eligible by closing RB-003/RB-008. TASK-0203 prepared source/package metadata and local package evidence. TASK-0204 identified the exact hosted RC candidate and dispatch tuple. TASK-0205 verified hosted RC evidence, and TASK-0206 published `0.2.0-alpha.3`.
 
-TASK-0134 recorded the earlier evidence-backed NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0202 updates that decision to release-preparation eligible / publication not approved. TASK-0203 prepared the local alpha.3 candidate; no tag, release, NuGet publication, workflow dispatch, or final release GO exists.
+TASK-0134 recorded the earlier evidence-backed NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0202 updated that decision to release-preparation eligible / publication not approved, TASK-0205 recorded exact-candidate GO, and TASK-0206 superseded the pre-publication state by publishing `0.2.0-alpha.3`.
 
 PROJECT-CONTROL-0107 begins at `a5686aa` with 238/238 tests green and TASK-0159 through TASK-0167 queued. The control is docs-first; the planning commit lands before any implementation.
 
@@ -100,17 +100,17 @@ TASK-0187 is implemented and hosted-verified. It was inserted as a user-prioriti
 - No risk findings in the latest local scan.
 - Package URLs point to `https://github.com/Cynrath/agent-context-kit`.
 - GitHub repository is public.
-- Current release tag `v0.2.0-alpha.2` is pushed at exact package commit `f540479a92cbe66097f6796553828ee49ddd5512`.
+- Current release tag `v0.2.0-alpha.3` is pushed at exact publish commit `92984c6448332aa24b7cff94647f627bf944e535`.
 - GitHub Actions latest `master` run is green.
 - Read-only GitHub CLI validation on 2026-06-06 confirmed `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` succeeded after `docs: add sample gallery and demo scenarios`.
 - Repository description and topics are set.
-- GitHub Release page for `v0.2.0-alpha.2` is completed as a pre-release with validated package assets.
-- NuGet package `AgentContextKit` version `0.2.0-alpha.2` is published through GitHub OIDC Trusted Publishing.
-- NuGet global tool install and full disposable smoke verification are completed for `0.2.0-alpha.2`.
+- GitHub Release page for `v0.2.0-alpha.3` is completed as a pre-release with validated package assets.
+- NuGet package `AgentContextKit` version `0.2.0-alpha.3` is published through GitHub OIDC Trusted Publishing.
+- NuGet global tool install and full disposable smoke verification are completed for `0.2.0-alpha.3`.
 - NuGet global tool smoke test is completed, including `ackit --help` and Web UI generation.
 - Cross-platform CI smoke workflow succeeded on commit `868dff3` for Windows, Ubuntu, and macOS.
 - Codex for OSS form submission is completed per maintainer-provided status.
-- Alpha.2 hardening and publication verification are complete through TASK-0056.
+- Alpha.3 publication verification is complete through TASK-0206. Alpha.2 hardening and publication evidence remains historical.
 - TASK-0057 added GitHub issue templates, a pull request template, maintainer guide, contributor onboarding, support matrix, repository hygiene, and issue triage docs.
 - TASK-0057 pre-commit validation passed: restore, Release build, 67/67 tests, `scan --ci`, `doctor`, `scan --json`, installed `ackit` version/help, hygiene scans, `git diff --check`, and v1.0 documentation release gate.
 - TASK-0058 added README badges, GitHub label guidance, repository settings checklist, and public presentation hardening docs.
@@ -178,7 +178,7 @@ powershell -ExecutionPolicy Bypass -File scripts/verify-release.ps1
 - NuGet smoke test: completed.
 - Cross-platform smoke workflow: completed successfully on Windows, Ubuntu, and macOS.
 - Codex for OSS form submission is completed per maintainer-provided status.
-- Current release publication: TASK-0065 records `v0.2.0-alpha.1` tag push, GitHub pre-release, NuGet publish, global tool install verification, and `ackit sarif` evidence.
+- Current release publication: TASK-0206 records `v0.2.0-alpha.3` tag push, GitHub pre-release, NuGet publish, global tool install verification, and immutable release verification. TASK-0065 remains historical alpha.1 evidence.
 - `docs/MAINTAINER_RELEASE_HANDOFF.md` contains the current published release state and future release guidance.
 - GitHub contributor workflow docs were added in TASK-0057: `docs/MAINTAINER_GUIDE.md`, `docs/SUPPORT_MATRIX.md`, `docs/CONTRIBUTOR_ONBOARDING.md`, `docs/GITHUB_REPO_HYGIENE.md`, and `docs/ISSUE_TRIAGE.md`.
 - Public repository presentation docs were added in TASK-0058: `docs/GITHUB_LABELS.md` and `docs/GITHUB_SETTINGS_CHECKLIST.md`.

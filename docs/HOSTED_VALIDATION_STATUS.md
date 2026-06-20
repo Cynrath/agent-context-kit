@@ -1,8 +1,15 @@
 # Hosted Validation Status
 
-The alpha.2 recovery, supply-chain, and hosted RC hardening commits passed the standard hosted matrix. TASK-0128 also completed the separate read-only three-OS release-candidate evidence workflow. This closes the missing hosted-run evidence for the reviewed alpha.2 state; it does not approve a future release candidate or 1.0 GA.
+TASK-0206 completed `0.2.0-alpha.3` publication after refreshed hosted RC evidence. NuGet package verification, global tool install smoke, tag `v0.2.0-alpha.3`, and GitHub prerelease `v0.2.0-alpha.3` are complete. The alpha.2 recovery, supply-chain, and hosted RC hardening evidence below remains historical for that release.
 
-## Current Commit
+## Current Alpha.3 Publication Evidence
+- Final publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
+- Refreshed hosted RC run: `27870246504` for commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`.
+- NuGet package: `AgentContextKit` `0.2.0-alpha.3` verified.
+- Global tool install smoke: passed; `ackit version` returned `AgentContextKit 0.2.0-alpha.3`.
+- Remaining follow-up: harden the `release.yml` provenance probe before the next release.
+
+## Historical Alpha.2 Commit
 - Branch: `master`
 - Commit: `4c4fa64ff34287dff01818d52f49b521efb3176d`
 - Local/remote state observed on 2026-06-13: `master` equals `origin/master`.

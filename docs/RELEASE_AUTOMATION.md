@@ -40,11 +40,11 @@ After NuGet, tag, and GitHub Release verification, the publish job downloads the
 
 ## Local Commands
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/prepare-release.ps1 -Version 0.2.0-alpha.2 -CommitSha (git rev-parse HEAD) -AllowDirty -FailOnIssues
+powershell -ExecutionPolicy Bypass -File scripts/prepare-release.ps1 -Version 0.2.0-alpha.3 -CommitSha (git rev-parse HEAD) -AllowDirty -FailOnIssues
 powershell -ExecutionPolicy Bypass -File scripts/check-release-workflow.ps1 -FailOnIssues
 powershell -ExecutionPolicy Bypass -File scripts/test-supply-chain-workflow.ps1
 powershell -ExecutionPolicy Bypass -File scripts/test-release-recovery.ps1
-powershell -ExecutionPolicy Bypass -File scripts/verify-published-package.ps1 -Version 0.2.0-alpha.2
+powershell -ExecutionPolicy Bypass -File scripts/verify-published-package.ps1 -Version 0.2.0-alpha.3
 ```
 
 The published-package verifier uses a disposable tool path and repository, checks `version`/`--help`, exercises the installed command surface, expects exit code `2` for a synthetic secret, removes the fixture, and requires a final clean scan.

@@ -1,7 +1,7 @@
 # 1.0 Readiness Gap Analysis
 
 ## Verdict
-AgentContextKit is **not ready for 1.0 general availability**. The current published release is `v0.2.0-alpha.2`. Existing v1.0-labelled documents and scripts prove that early contract, convention, documentation, and release-gate assets exist; they do not prove long-term compatibility, production-scale performance, migration safety, or a complete support/security process.
+AgentContextKit is **not ready for 1.0 general availability**. The current published release is `v0.2.0-alpha.3`. Existing v1.0-labelled documents and scripts prove that early contract, convention, documentation, and release-gate assets exist; they do not prove long-term compatibility, production-scale performance, migration safety, or a complete support/security process.
 
 ## Priority Definitions
 - **P0**: must be complete before a 1.0 release candidate.
@@ -25,7 +25,7 @@ AgentContextKit is **not ready for 1.0 general availability**. The current publi
 | V100-12 | P2 | Public presentation assets and hosted docs remain deferred. | Visual policy, screenshot plan, docs-site plan. | Docs | Sanitized screenshots and/or approved docs-site activation after privacy review. | No | Yes, for Pages/settings |
 
 ## Required Sequence
-1. Complete the scoped `v0.2.0-alpha.2` hardening release or explicitly supersede it.
+1. Treat the scoped `v0.2.0-alpha.2` hardening release as historical and maintain the current `v0.2.0-alpha.3` published state without mutating immutable release artifacts.
 2. Implement the v0.3 baseline/config direction from `docs/V030_ROADMAP_DECISION.md`.
 3. Convert the TASK-0092 conditional local freeze into a final candidate acceptance after hosted evidence and remaining schema assets are complete.
 4. Complete security response, performance, support-lifecycle, and supply-chain P0/P1 evidence.

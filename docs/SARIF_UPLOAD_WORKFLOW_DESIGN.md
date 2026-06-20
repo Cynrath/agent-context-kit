@@ -14,7 +14,7 @@ This is preferred over an automatic push or pull-request trigger for the first o
 3. Grant only:
    - `contents: read`
    - `security-events: write`
-4. Install the pinned published package `AgentContextKit` `0.2.0-alpha.2`.
+4. Install the pinned published package `AgentContextKit` `0.2.0-alpha.3`.
 5. Run `ackit sarif --output .ackit/reports/ackit.sarif`.
 6. Parse the file with PowerShell `ConvertFrom-Json`.
 7. Upload only the SARIF file with `github/codeql-action/upload-sarif`.

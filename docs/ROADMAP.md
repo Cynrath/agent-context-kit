@@ -32,13 +32,15 @@
 - Includes the alpha.1 SARIF/scanner catalog/config allowlist surface plus scanner precision hardening, sanitized suppression audit output, baseline-aware CI policy, config diagnostics, contract coverage, local Markdown-link validation, and exact-commit OIDC release automation.
 - Published install command is `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2`.
 
-## v0.2.0-alpha.3 Planning
-- Selected as the smallest compatible next prerelease for additive release recovery, hosted evidence, security ownership, and supply-chain automation work.
-- No CLI, config, JSON, baseline, SARIF, package ID, or offline-first behavior change is planned.
+## v0.2.0-alpha.3
+- Published on GitHub and NuGet through TASK-0206 from final publish SHA `92984c6448332aa24b7cff94647f627bf944e535`.
+- Selected as the smallest compatible prerelease for additive release recovery, hosted evidence, security ownership, and supply-chain automation work.
 - TASK-0203 prepared source/package metadata as the local `0.2.0-alpha.3` candidate.
-- TASK-0205 records hosted RC run `27868539971` as green for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801` and records exact-candidate GO for a later publish task only.
-- Tag creation, GitHub Release creation, NuGet publication, and release workflow dispatch remain pending until a separate authorized publish task resolves whether to publish the RC evidence commit or a later docs-only HEAD.
-- TASK-0134 completed the earlier safe evaluation boundary with NO-GO; TASK-0205 supersedes it with the hosted-evidence GO boundary in `docs/V020_ALPHA3_RELEASE_DECISION.md`.
+- TASK-0205 recorded hosted RC run `27868539971` as green for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`.
+- TASK-0206 refreshed hosted RC evidence after release-gate hardening with run `27870246504` for exact commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`, then published `0.2.0-alpha.3`.
+- NuGet package verification and global tool install smoke passed.
+- Tag `v0.2.0-alpha.3` and GitHub prerelease `v0.2.0-alpha.3` exist and target the final publish SHA.
+- Next release follow-up: harden the `release.yml` provenance probe before another publication.
 
 ## v0.2.0-alpha.1
 - Published on GitHub and NuGet in TASK-0065.

@@ -14,7 +14,7 @@ Generate a preview:
 ackit webui --output .ackit/webui/demo.html
 ```
 
-The published NuGet `0.2.0-alpha.2` global tool supports `ackit webui` and `ackit sarif`.
+The published NuGet `0.2.0-alpha.3` global tool supports `ackit webui` and `ackit sarif`.
 
 ## Public Artifact Rule
 Generated Web UI HTML can include local repository paths and local audit context. Keep it local and do not publish it as a GitHub Release asset, NuGet package asset, or committed docs file.

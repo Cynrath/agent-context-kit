@@ -11,7 +11,7 @@ TASK-0092 prepares a conditional local contract freeze in `docs/RELEASE_CANDIDAT
 
 TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. TASK-0202 records the missing backup security and package recovery evidence. TASK-0203 prepared source/package metadata and local package evidence. TASK-0204 identified dispatch-time current `origin/master` as the exact hosted RC evidence candidate and predecessor `0.2.0-alpha.2`. TASK-0205 verified hosted RC run `27868539971` as green for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS jobs all succeeded. TASK-0206 then refreshed hosted RC evidence after source-impacting release-gate hardening and published `0.2.0-alpha.3`.
 
-TASK-0134 evaluated the earlier GO packet on 2026-06-14 and recorded NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0203 supersedes only the local preparation boundary. TASK-0204 supersedes only the hosted-RC planning boundary. TASK-0205 supersedes the hosted-evidence pending boundary with exact-candidate GO, but it still does not authorize release workflow dispatch, release-candidate workflow dispatch, tag creation, GitHub Release creation, or NuGet publication.
+TASK-0134 evaluated the earlier GO packet on 2026-06-14 and recorded NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0203 superseded only the local preparation boundary. TASK-0204 superseded only the hosted-RC planning boundary. TASK-0205 superseded the hosted-evidence pending boundary with exact-candidate GO. TASK-0206 is the only task that authorized and completed publication.
 
 TASK-0206 publish result:
 - Final publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
@@ -42,16 +42,11 @@ gh workflow run release-candidate-evidence.yml `
 ## Current Published State
 - GitHub repository public: yes, `https://github.com/Cynrath/agent-context-kit`.
 - `master` pushed: yes.
-- `v0.2.0-alpha.2` tag pushed: yes.
 - `v0.2.0-alpha.3` tag pushed: yes, at `92984c6448332aa24b7cff94647f627bf944e535`.
 - GitHub Actions latest `master` run is green per maintainer-provided release status.
 - Read-only GitHub CLI validation on 2026-06-05 confirmed `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` succeeded for commit `8dac9237c27ba912d056344155f1c9f901557bf5`.
 - Repository description is set.
 - Repository topics are set.
-- GitHub Release page for `v0.2.0-alpha.2`: completed as a pre-release.
-- NuGet publish for `AgentContextKit` `0.2.0-alpha.2`: completed.
-- NuGet global tool install verification for `0.2.0-alpha.2`: completed.
-- NuGet global tool smoke test for `0.2.0-alpha.2`: completed.
 - GitHub Release page for `v0.2.0-alpha.3`: completed as a pre-release.
 - NuGet publish for `AgentContextKit` `0.2.0-alpha.3`: completed.
 - NuGet global tool install verification for `0.2.0-alpha.3`: completed.
@@ -64,6 +59,13 @@ gh workflow run release-candidate-evidence.yml `
 - `ToolCommandName` is `ackit`.
 - `Authors` and `Company` are `Cynrath`.
 - Codex for OSS application pack is ready in `docs/CODEX_FOR_OSS_APPLICATION.md`.
+
+Previous release state:
+- `v0.2.0-alpha.2` tag pushed: yes.
+- GitHub Release page for `v0.2.0-alpha.2`: completed as a pre-release.
+- NuGet publish for `AgentContextKit` `0.2.0-alpha.2`: completed.
+- NuGet global tool install verification for `0.2.0-alpha.2`: completed.
+- NuGet global tool smoke test for `0.2.0-alpha.2`: completed.
 
 ## Verified Install
 Maintainer verification evidence:
@@ -110,11 +112,11 @@ Completed smoke test evidence:
 - `ubuntu-latest`
 - `macos-latest`
 
-The workflow installs .NET 10, installs `AgentContextKit` version `0.2.0-alpha.2` globally, adds the platform-specific `.dotnet/tools` path, creates a clean demo app, runs the installed-tool smoke flow, verifies fake secret detection returns exit code `2`, deletes the fake secret, runs `ackit sarif`, and finishes with `ackit scan --ci`.
+The documentation-only public smoke examples install .NET 10, install `AgentContextKit` version `0.2.0-alpha.3` globally, add the platform-specific `.dotnet/tools` path, create a clean demo app, run the installed-tool smoke flow, verify fake secret detection returns exit code `2`, delete the fake secret, run `ackit sarif`, and finish with `ackit scan --ci`.
 
-This workflow remains the published-package smoke baseline for the current release. It does not create tags, publish NuGet packages, or mutate release metadata.
+The active workflow file is not changed by this docs-only handoff. Published-package smoke documentation and examples now point at `0.2.0-alpha.3`. The workflow does not create tags, publish NuGet packages, or mutate release metadata.
 
-Latest read-only GitHub CLI evidence:
+Historical alpha.2 read-only GitHub CLI evidence:
 - Workflow run `27471224861`, commit `ead65120928835419fb91bf695e845721620c394`, branch `master`, conclusion `success`.
 - Jobs `smoke (windows-2025)`, `smoke (ubuntu-latest)`, and `smoke (macos-latest)` completed successfully with the published alpha.2 package.
 
@@ -133,8 +135,8 @@ Latest read-only GitHub CLI evidence:
 - Workflow run `27471224867`, commit `ead65120928835419fb91bf695e845721620c394`, branch `master`, conclusion `success`.
 - Jobs `source smoke (windows-2025)`, `source smoke (ubuntu-latest)`, and `source smoke (macos-latest)` completed successfully.
 
-## v0.2.0-alpha.2 Published Handoff
-Current source is published as the `0.2.0-alpha.2` package. It includes `ackit sarif`, SARIF 2.1.0 output, scanner rule catalog hardening, configurable allowlists, additive JSON `ruleId`, expanded scanner patterns, sample gallery docs, demo scenarios, Web UI preview docs, and visual asset guidance.
+## Historical v0.2.0-alpha.2 Published Handoff
+The `0.2.0-alpha.2` package was the previous published package. It includes `ackit sarif`, SARIF 2.1.0 output, scanner rule catalog hardening, configurable allowlists, additive JSON `ruleId`, expanded scanner patterns, sample gallery docs, demo scenarios, Web UI preview docs, and visual asset guidance.
 
 Maintainer-only next release actions:
 - Decide the next version after TASK-0125 final hosted validation.

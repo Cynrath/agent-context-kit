@@ -142,7 +142,7 @@ PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/42
 
 ## Completed Local Execution
 - TASK-0066 through TASK-0099 are completed locally.
-- The current published release is `v0.2.0-alpha.2`.
+- The current published release is `v0.2.0-alpha.3`; `v0.2.0-alpha.2` remains historical predecessor evidence.
 - Standard `ci`, published-package smoke, and source-package smoke are green for current remote `master`.
 - The release-candidate evidence boundary remains `LOCAL READY / REMOTE NO-GO` where applicable.
 - Completed local documentation, tests, and gates do not claim 1.0 readiness or close remote P0/P1 decisions.
@@ -190,7 +190,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- Recommended next action: harden the `release.yml` provenance probe so missing attestation state does not fail before `actions/attest@v4`, then separately update published-package smoke workflow/docs to `0.2.0-alpha.3` if desired. No mutation of the published `0.2.0-alpha.3` package, tag, or GitHub Release is authorized.
+- Recommended next action: harden the `release.yml` provenance probe so missing attestation state does not fail before `actions/attest@v4`. No mutation of the published `0.2.0-alpha.3` package, tag, or GitHub Release is authorized.
 
 ## Execution Rule
 After the closure of PROJECT-CONTROL-0110, the queue is in pause except for explicitly requested independent docs/release-preparation tasks. Tag, GitHub pre-release, NuGet publication, and workflow dispatch are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

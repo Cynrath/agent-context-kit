@@ -13,14 +13,16 @@ Shared package metadata:
 
 Publication state:
 - GitHub Actions latest `master` run is green.
-- GitHub Release page for `v0.2.0-alpha.2` is completed as a pre-release.
-- NuGet publish is completed for `0.2.0-alpha.2`.
-- NuGet global tool install verification is completed for `0.2.0-alpha.2`.
 - GitHub Release page for `v0.2.0-alpha.3` is completed as a pre-release.
 - NuGet publish is completed for `0.2.0-alpha.3`.
 - NuGet global tool install verification is completed for `0.2.0-alpha.3`.
 - Publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
 - `release.yml` `operation=verify-existing` run `27870813763` succeeded for the immutable alpha.3 release state.
+
+Previous release state:
+- GitHub Release page for `v0.2.0-alpha.2` is completed as a pre-release.
+- NuGet publish is completed for `0.2.0-alpha.2`.
+- NuGet global tool install verification is completed for `0.2.0-alpha.2`.
 
 The public NuGet owner identity is `Cyranth`, while package metadata and repository persona use `Cynrath`. This intentional current-state disposition is documented in `docs/NUGET_OWNER_IDENTITY.md`; metadata remains `Cynrath` and no owner mutation is performed.
 

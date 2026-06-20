@@ -41,7 +41,7 @@ Default commands process repository content locally: no repository upload, AI AP
 | Current release | `v0.2.0-alpha.3` published on GitHub and NuGet as a pre-release |
 | Release evidence | Published from `92984c6448332aa24b7cff94647f627bf944e535`; NuGet install verified |
 | Package | `AgentContextKit` global tool install verified |
-| Previous release | `v0.1.0-alpha.2` |
+| Previous release | `v0.2.0-alpha.2` |
 | Runtime | .NET 10 |
 | Platforms | Windows, Ubuntu, macOS via GitHub Actions smoke flows |
 | Privacy model | Offline-first; no repository upload and no remote AI API calls in the MVP |

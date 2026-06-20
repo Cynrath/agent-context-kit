@@ -144,7 +144,7 @@ dotnet list AgentContextKit.sln package --deprecated
 
 The 2026-06-12 post-migration review found no vulnerable or deprecated direct/transitive packages. TASK-0091 replaced Legacy `xunit` `2.9.3` with `xunit.v3` `3.2.2`, updated the Visual Studio runner to `3.1.5`, and preserved 169/169 passing tests.
 
-The `sarif` command is available in current source and in the published NuGet `0.2.0-alpha.2` global tool.
+The `sarif` command is available in current source and in the published NuGet `0.2.0-alpha.3` global tool.
 
 ## Local v0.2.0-alpha.3 Candidate Package Validation
 Use temporary directories outside the repository:
@@ -418,15 +418,9 @@ Historical `0.2.0-alpha.2` smoke evidence remains valid for that release and inc
 ## Cross-Platform Published-Package Smoke Workflow
 `.github/workflows/cross-platform-smoke.yml` verifies the published global tool on Windows, Ubuntu, and macOS.
 
-The workflow:
-- Installs .NET 10 with `actions/setup-dotnet`.
-- Installs `AgentContextKit` version `0.2.0-alpha.2` as a NuGet global tool.
-- Adds the global tool path using `%USERPROFILE%\.dotnet\tools` on Windows and `~/.dotnet/tools` on Linux/macOS.
-- Creates a clean console app, initializes git, and runs the installed-tool smoke commands.
-- Verifies fake secret detection returns exit code `2`, deletes the fake secret, and confirms the final `ackit scan --ci` has no risk findings.
-- Runs as post-release validation only; it does not publish NuGet packages or create tags.
+Current public examples and package verification docs install `AgentContextKit` version `0.2.0-alpha.3`. The active workflow YAML pin is outside TASK-0207's docs-only scope.
 
-Latest recorded hosted result:
+Historical alpha.2 hosted result:
 - Workflow: `cross-platform-smoke`.
 - Commit: `6d38f11`.
 - Branch: `master`.
@@ -434,7 +428,7 @@ Latest recorded hosted result:
 - Windows, Ubuntu, and macOS jobs succeeded.
 - NuGet global tool install, `ackit version`, `ackit --help`, DemoApp smoke flow, expected fake-secret `redact-check` failure, and final `scan --ci` all completed successfully.
 
-The workflow installs the current published package `0.2.0-alpha.2` and exercises `ackit sarif`.
+The current public package guidance installs `0.2.0-alpha.3` and exercises `ackit sarif`.
 
 ## Cross-Platform Source Smoke Workflow
 `.github/workflows/cross-platform-source-smoke.yml` verifies the current branch and local package before future publication.
@@ -490,14 +484,14 @@ Hosted workflow validation is complete for the latest TASK-0056 push. Future wor
 - Confirm no permanent global tool install is required for validation.
 - Confirm GitHub Actions latest `master` run is green.
 - Confirm GitHub Release page exists for the current release tag.
-- Confirm NuGet package availability and global tool install for `AgentContextKit` version `0.2.0-alpha.2`.
+- Confirm NuGet package availability and global tool install for `AgentContextKit` version `0.2.0-alpha.3`.
 - Confirm the published NuGet global tool smoke test remains documented and reproducible.
 - Confirm Codex for OSS form submission remains recorded; keep `docs/CODEX_FOR_OSS_APPLICATION.md` as the submitted application pack/reference.
 
-See [MAINTAINER_RELEASE_HANDOFF.md](MAINTAINER_RELEASE_HANDOFF.md) for published release status and alpha.2 follow-up guidance.
+See [MAINTAINER_RELEASE_HANDOFF.md](MAINTAINER_RELEASE_HANDOFF.md) for published release status and follow-up guidance.
 
 ## Baseline Validation
-The published NuGet `0.2.0-alpha.2` package includes the explicit baseline workflow added by TASK-0086.
+The published NuGet `0.2.0-alpha.3` package includes the explicit baseline workflow added by TASK-0086.
 
 ```powershell
 dotnet run --project src/AgentContextKit.Cli -- baseline --output .ackit-baseline.json

@@ -1,6 +1,6 @@
 # Historical v0.3 Milestone Readiness
 
-This document records an early internal milestone that used the v0.3 label for CI mode, exit code standardization, HTML reports, example workflows, and local readiness orchestration. Those capabilities are already implemented and published in `v0.2.0-alpha.2`.
+This document records an early internal milestone that used the v0.3 label for CI mode, exit code standardization, HTML reports, example workflows, and local readiness orchestration. Those capabilities were first published before alpha.3 and are included in the current `v0.2.0-alpha.3` package.
 
 The future v0.3 package direction is a separate product decision focused on baseline-aware CI policy and configuration diagnostics. See `docs/V030_ROADMAP_DECISION.md`.
 
@@ -28,7 +28,7 @@ powershell -ExecutionPolicy Bypass -File scripts/check-v030-readiness.ps1 -FailO
 
 ## Current Public State
 - Repository and package URLs are finalized at `https://github.com/Cynrath/agent-context-kit`.
-- Current published release is `v0.2.0-alpha.2` on GitHub and NuGet.
+- Current published release is `v0.2.0-alpha.3` on GitHub and NuGet.
 - Future package publication, tags, and GitHub Release changes remain maintainer-only actions.
 
 ## Required Validation

@@ -75,7 +75,7 @@ TASK-0202 records maintainer-provided external evidence from `Cynrath` dated 202
 Result:
 - `RB-003` is closed for `0.2.0-alpha.3` release-preparation entry.
 - `RB-008` is closed for `0.2.0-alpha.3` release-preparation entry.
-- `0.2.0-alpha.3` is release-preparation eligible, but not published.
+- At TASK-0202 close, `0.2.0-alpha.3` was release-preparation eligible and not yet published. TASK-0206 supersedes this with the published state recorded at the top of this file.
 - TASK-0203 is authorized to prepare source/package metadata for local validation only.
 
 ## TASK-0203 Release Preparation
@@ -139,9 +139,9 @@ TASK-0205 records hosted release-candidate evidence for run `27868539971`:
 - job IDs: macOS `82476527416`, Windows `82476527430`, Ubuntu `82476527450`;
 - annotations: xUnit analyzer warnings only (`xUnit1051` and `xUnit2013`), non-blocking.
 
-TASK-0205 decision:
+TASK-0205 pre-publication decision:
 - exact-candidate GO is recorded for a later publish task;
-- `0.2.0-alpha.3` remains unpublished;
+- at that point, `0.2.0-alpha.3` was not yet published;
 - hosted RC evidence validates commit `beaa14deed3dbc55ac98d216679f9a9799261801`;
 - TASK-0205 docs commits happen after the hosted evidence and must be considered by the later publish task's exact-commit policy;
 - no tag, GitHub Release, NuGet publish, release workflow dispatch, new release-candidate workflow dispatch, owner/account/recovery mutation, repository secret creation, branch ruleset mutation, security advisory, or destructive NuGet action is authorized or performed in TASK-0205.
@@ -194,7 +194,7 @@ TASK-0206 publish decision now uses refreshed RC evidence commit `eef0adc4d5d11d
 ## Next Required Task
 Post-publish follow-up:
 1. harden the `release.yml` provenance/idempotency probe so a missing attestation records `exists=false` and lets `actions/attest@v4` run;
-2. update published-package smoke workflow/docs to `0.2.0-alpha.3` only in a separate docs/workflow task;
+2. keep public docs and documentation-only examples pinned to `0.2.0-alpha.3`; any active workflow YAML pin change remains a separate workflow task;
 3. keep successor-release policy for any package or release-asset correction.
 
 Immutable release rules remain in force: never reuse a NuGet version, move an existing tag, force push, or replace published artifacts.

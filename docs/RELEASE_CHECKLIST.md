@@ -27,13 +27,13 @@
 ## Completed Public Release State
 - Public repository exists: `https://github.com/Cynrath/agent-context-kit`.
 - `master` is pushed.
-- `v0.2.0-alpha.2` is pushed.
+- `v0.2.0-alpha.3` is pushed.
 - GitHub Actions latest `master` run is green.
 - Repository description is set.
 - Repository topics are set.
-- GitHub Release page for `v0.2.0-alpha.2` is created as a pre-release.
-- NuGet package `AgentContextKit` version `0.2.0-alpha.2` is published.
-- NuGet global tool install is verified for `0.2.0-alpha.2`.
+- GitHub Release page for `v0.2.0-alpha.3` is created as a pre-release.
+- NuGet package `AgentContextKit` version `0.2.0-alpha.3` is published.
+- NuGet global tool install is verified for `0.2.0-alpha.3`.
 - NuGet global tool smoke test is verified in a clean demo app.
 - Cross-platform CI smoke workflow succeeded on Windows, Ubuntu, and macOS.
 - Codex for OSS form submission is completed per maintainer-provided status.
@@ -80,7 +80,7 @@
 - Review all generated files before future publishing.
 - For the next release after `0.2.0-alpha.3`, approve push, hosted CI/source smoke validation, tag, GitHub Release, NuGet publish, and NuGet install verification in a dedicated release task.
 - TASK-0206 completed the authorized `0.2.0-alpha.3` publication through `release.yml` release objects and post-publish verification.
-- Update published-package smoke workflow/docs from `0.2.0-alpha.2` to `0.2.0-alpha.3` in a separate follow-up task if desired.
+- TASK-0207 syncs public docs and documentation-only examples to `0.2.0-alpha.3`; active workflow YAML changes remain out of scope for that docs-only task.
 - Harden the `release.yml` provenance probe before the next publish so missing attestation state does not fail before `actions/attest@v4` can run.
 
 ## Release Candidate Evidence Gate

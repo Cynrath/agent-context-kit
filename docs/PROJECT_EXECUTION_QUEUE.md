@@ -130,4 +130,5 @@ Last verified locally on 2026-06-14 at commit `a5686aa`:
 - `powershell -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` clean.
 
 ## Alpha.3 Status
-- `0.2.0-alpha.3` remains NO-GO. `RB-003` (independent backup security owner) and `RB-008` (destructive NuGet recovery authority) remain maintainer-gated blockers; see `docs/V020_ALPHA3_RELEASE_DECISION.md`, `docs/RELEASE_BLOCKER_BOARD.md`, and `docs/MAINTAINER_DECISION_REGISTER.md`.
+- `0.2.0-alpha.3` is published and verified. `RB-003` and `RB-008` are closed for the alpha.3 release path by TASK-0202 evidence.
+- Do not mutate the published package, tag, GitHub Release, NuGet owner state, or release workflow history. Next release work should harden the `release.yml` provenance probe.
