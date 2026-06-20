@@ -57,6 +57,7 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 
 ### 10. Classify current scan Medium/Low findings
 - Labels: `type: maintenance`, `area: scanner`, `priority: medium`
+- Status: Completed by TASK-0211.
 - Goal: Classify `.remember` logs, retained alpha3 package-validation artifacts, and Low local-path findings as real cleanup work, accepted local artifact review findings, or false positives.
 - Done when: A human-readable classification is recorded without auto-redaction, destructive artifact cleanup, or baseline acceptance.
 
@@ -64,6 +65,11 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 - Labels: `type: maintenance`, `area: ci`, `priority: low`
 - Goal: Decide whether `cross-platform-smoke.yml` should install published `AgentContextKit` `0.2.0-alpha.3` instead of the historical alpha2 pin.
 - Done when: The workflow/status docs are intentionally aligned and focused workflow/static validation is recorded.
+
+### 12. Decide memory-log retention policy
+- Labels: `type: maintenance`, `area: scanner`, `priority: medium`
+- Goal: Decide whether ignored `.remember` memory/autonomous logs should remain local-only, be cleaned from workspaces, or receive explicit documentation/ignore treatment after TASK-0211 classified them as `MEMORY_LOG_REVIEW`.
+- Done when: The retention decision is recorded, any cleanup is non-destructive and scoped, package-validation artifacts remain protected as release evidence unless policy changes, and `ackit scan --ci` evidence is refreshed.
 
 ## Maintainer Action Required
 GitHub issue creation is remote-write. Create issues manually when ready; do not create them from an agent session without explicit approval.

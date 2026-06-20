@@ -141,4 +141,37 @@ dotnet test AgentContextKit.sln -c Release --no-build
 ## Rollback plan
 Before push, correct the docs with normal commits and remove any temporary scan artifact from `artifacts/`. After push, use normal `git revert <sha>` for TASK-0211 docs commits if the classification record is wrong. Do not move tags, replace release assets, republish NuGet packages, dispatch release workflows, mutate GitHub Release/NuGet state, or destructively clean retained evidence.
 
+## Classification results
+Evidence source:
+
+- `ackit scan --ci` exited `0` after TASK-0210.
+- After the temporary `artifacts/task-0211-scan.json` evidence file was removed, the remaining scan set was `23` findings: `19` Medium, `4` Low, `0` High, `0` Critical.
+- `ackit scan --json` provides `ruleId`, `severity`, `category`, `path`, `message`, and `match`; all finding `match` values are `null`.
+- Suppression summary is `0`; no finding is currently hidden by `safeDomains`, `ignoredPaths`, or `ignoredFindingIds`.
+- `git status --ignored` shows `.remember/logs/**`, `artifacts/package-validation/**`, and the temporary TASK-0211 scan JSON as ignored local artifacts.
+- The temporary TASK-0211 scan JSON produced an extra Low local-path finding while present, and was removed before classification/final validation.
+
+| Finding group | Severity | File/path pattern | Classification | Rationale | Next action |
+| --- | --- | --- | --- | --- | --- |
+| `.remember` autonomous save logs | Medium, `ACKIT003`, `BuildArtifact` | `.remember/logs/autonomous/*.log` | `MEMORY_LOG_REVIEW` | Ignored local memory/autonomous logs. The scan flags the `.log` extension for public-release review; most autonomous save files are empty in local metadata. Count-only sensitive-term search found no hits in `.remember` logs, but the non-empty memory logs are local operational artifacts and should not be silently accepted as public evidence. | Create a focused follow-up to decide whether `.remember` logs belong in the repository workspace, should remain ignored-only, or should be cleaned outside release evidence. No deletion in TASK-0211. |
+| `.remember` hook/memory logs | Medium, `ACKIT003`, `BuildArtifact` | `.remember/logs/hook-errors.log`, `.remember/logs/memory-*.log` | `MEMORY_LOG_REVIEW` | Ignored local memory/hook logs. `hook-errors.log` is empty; memory logs are non-empty local agent memory artifacts. They are not reported as secrets by current scan, but they remain inappropriate to normalize without a retention policy. | Same follow-up as above; review retention/ignore/cleanup policy without exposing log content. |
+| Alpha3 package-validation archives | Medium, `ACKIT003`, `BuildArtifact` | `artifacts/package-validation/0.2.0-alpha.3/*.{nupkg,snupkg}` | `ACCEPTED_RETAINED_ARTIFACT` | Ignored package archives retained as local alpha3 package-validation evidence. They match TASK-0203/TASK-0206 release evidence and should not be deleted or redacted under a classification-only task. | Keep retained locally. Revisit only if release evidence policy changes or a future cleanup task explicitly replaces this evidence. |
+| CLI reference local-path example | Low, `ACKIT004`, `LocalPath` | `docs/CLI_REFERENCE.md` | `LOCAL_PATH_REFERENCE` | Safe documentation example for `ackit mcp --stdio-server --repo ...`; no credential or private host is exposed. | No blocking action. Optional future docs polish can normalize the example if maintainers want lower scan noise. |
+| TASK-0203 local validation path | Low, `ACKIT004`, `LocalPath` | `docs/tasks/TASK-0203-v020-alpha3-release-preparation.md` | `LOCAL_PATH_REFERENCE` | Historical local package-validation evidence path. It documents where alpha3 package validation occurred and does not expose usable credentials. | Keep as historical evidence. Normalize only through a deliberate historical-evidence policy task. |
+| TASK-0211 required search pattern | Low, `ACKIT004`, `LocalPath` | `docs/tasks/TASK-0211-scan-finding-classification.md` | `LOCAL_PATH_REFERENCE` | Self-induced by the required evidence-extraction regex that searches for Windows/user/home path patterns. It is a scanner pattern, not an actual local path value. | Accepted as low-risk task evidence. Do not suppress; revisit only if task-command examples are later normalized. |
+| MCP stdio local URI fixture | Low, `ACKIT004`, `LocalPath` | `tests/AgentContextKit.Tests/McpStdioTransportTests.cs` | `FALSE_POSITIVE_OR_LOW_RISK` | Test fixture verifies that unsafe local URI input is rejected/sanitized. The scan sees the fixture as a local-path-like value, but the test is intentionally defensive and contains no usable secret. | Keep test fixture. No suppression in TASK-0211. |
+
+Blocking assessment:
+
+- `BLOCKING`: none.
+- Critical/High findings: none.
+- `NEEDS_FOLLOW_UP`: `.remember` log retention/cleanup policy should be handled in a focused follow-up because these are ignored local memory artifacts, not release evidence.
+- Accepted retained artifacts: alpha3 `.nupkg` and `.snupkg` validation archives remain local retained evidence.
+- Local path references: safe examples, historical evidence, required scan pattern text, and a defensive test fixture. None expose credentials or require immediate redaction.
+
+Recommended next task:
+
+- TASK-0212 `.remember` log retention and local artifact policy.
+- Scope: decide whether ignored `.remember` memory/autonomous logs should remain local-only, be cleaned from workspaces, or receive explicit documentation/ignore treatment; confirm package-validation artifacts remain retained evidence; do not mutate release/package/tag state.
+
 ## Completion notes
