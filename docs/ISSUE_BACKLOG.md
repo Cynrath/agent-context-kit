@@ -49,5 +49,20 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 - Goal: Add safe scanner fixtures for more risk patterns without using real secrets.
 - Done when: Fixtures cover allowlisted noise, real-looking fake secrets, local paths, package artifacts, and expected severity.
 
+### 9. Resolve post-alpha3 xUnit analyzer warnings
+- Labels: `type: maintenance`, `area: tests`, `priority: medium`
+- Goal: Remove hosted/local analyzer annotations `xUnit1051` and `xUnit2013`.
+- Done when: `McpStdioTransportTests` uses `TestContext.Current.CancellationToken` for cancellable async calls, `WatchCommandTests` uses the xUnit-preferred collection-size assertion, and Release build/test pass without these analyzer warnings.
+
+### 10. Classify current scan Medium/Low findings
+- Labels: `type: maintenance`, `area: scanner`, `priority: medium`
+- Goal: Classify `.remember` logs, retained alpha3 package-validation artifacts, and Low local-path findings as real cleanup work, accepted local artifact review findings, or false positives.
+- Done when: A human-readable classification is recorded without auto-redaction, destructive artifact cleanup, or baseline acceptance.
+
+### 11. Sync published-package workflow pin/status
+- Labels: `type: maintenance`, `area: ci`, `priority: low`
+- Goal: Decide whether `cross-platform-smoke.yml` should install published `AgentContextKit` `0.2.0-alpha.3` instead of the historical alpha2 pin.
+- Done when: The workflow/status docs are intentionally aligned and focused workflow/static validation is recorded.
+
 ## Maintainer Action Required
 GitHub issue creation is remote-write. Create issues manually when ready; do not create them from an agent session without explicit approval.

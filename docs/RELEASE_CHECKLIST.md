@@ -81,7 +81,7 @@
 - For the next release after `0.2.0-alpha.3`, approve push, hosted CI/source smoke validation, tag, GitHub Release, NuGet publish, and NuGet install verification in a dedicated release task.
 - TASK-0206 completed the authorized `0.2.0-alpha.3` publication through `release.yml` release objects and post-publish verification.
 - TASK-0207 syncs public docs and documentation-only examples to `0.2.0-alpha.3`; active workflow YAML changes remain out of scope for that docs-only task.
-- Harden the `release.yml` provenance probe before the next publish so missing attestation state does not fail before `actions/attest@v4` can run.
+- TASK-0208 hardened the `release.yml` provenance probe so missing attestation state records `exists=false` before `actions/attest@v4` in future publish runs.
 
 ## Release Candidate Evidence Gate
 - `scripts/check-release-candidate-evidence.ps1 -FailOnIssues` passes.

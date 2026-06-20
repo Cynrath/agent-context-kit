@@ -133,5 +133,30 @@ rg -n "TODO|FOLLOW-UP|follow-up|TASK-0209|alpha4|0\.2\.0-alpha\.4|v0\.3\.0|V030|
 ## Rollback plan
 Before push, correct the docs with normal commits. After push, revert TASK-0209 docs commits with normal `git revert <sha>` if the triage record is wrong. Do not move tags, replace release assets, republish NuGet packages, dispatch release workflows, or mutate GitHub Release/NuGet state.
 
+## Triage result
+Prioritized maintenance plan:
+
+1. TASK-0210 analyzer-warning cleanup.
+   - Evidence: hosted RC/release annotations and local build evidence show `xUnit1051` in `tests/AgentContextKit.Tests/McpStdioTransportTests.cs` and `xUnit2013` in `tests/AgentContextKit.Tests/WatchCommandTests.cs`.
+   - Scope: pass `TestContext.Current.CancellationToken` to async `RunAsync` calls that accept cancellation tokens, and replace the single `Assert.Equal(1, report.SeverityChangedSample.Count)` with the xUnit-preferred collection assertion.
+   - Reason: this is small, local, behavior-preserving test-source cleanup and removes recurring hosted annotations.
+2. TASK-0211 scan-finding classification.
+   - Evidence: `ackit scan --ci` exits `0` with Medium review findings for `.remember/logs/**/*.log` and `artifacts/package-validation/0.2.0-alpha.3/*.{nupkg,snupkg}`, plus Low local-path findings in `docs/CLI_REFERENCE.md`, `docs/tasks/TASK-0203-v020-alpha3-release-preparation.md`, and `tests/AgentContextKit.Tests/McpStdioTransportTests.cs`.
+   - Scope: classify each finding as accepted local artifact review evidence, real cleanup work, or false positive. Do not auto-redact, delete release evidence, or accept a new baseline without explicit review.
+3. TASK-0212 workflow pin/status cleanup.
+   - Evidence: `docs/MAINTAINER_GUIDE.md` records published-package smoke workflow pin sync as a follow-up, and `.github/workflows/cross-platform-smoke.yml` still installs `AgentContextKit` `0.2.0-alpha.2`.
+   - Scope: decide whether to update the workflow pin to `0.2.0-alpha.3`, then run focused workflow/static checks. This is lower priority than analyzer cleanup because it touches workflow behavior.
+4. TASK-0213 docs/queue simplification.
+   - Evidence: `docs/PROJECT_EXECUTION_QUEUE.md` still has old active-section headings for completed controls.
+   - Scope: docs-only cleanup of queue headings and stale "next release work should harden provenance" wording without rewriting historical evidence.
+5. Defer alpha4 and v0.3.0 planning.
+   - Reason: the immediate backlog contains smaller, evidence-backed maintenance work that should be cleared before selecting the next package scope.
+
+Current-state cleanup performed in this task:
+
+- Replaced stale current-state provenance-hardening follow-up wording with TASK-0208-complete wording in current release/queue docs.
+- Kept historical TASK-0206/TASK-0207/TASK-0208 evidence intact.
+- Did not change source code, tests, workflows, package metadata, release assets, tags, GitHub Release, NuGet package state, or workflow dispatch state.
+
 ## Completion notes
 Pending.

@@ -131,4 +131,4 @@ Last verified locally on 2026-06-14 at commit `a5686aa`:
 
 ## Alpha.3 Status
 - `0.2.0-alpha.3` is published and verified. `RB-003` and `RB-008` are closed for the alpha.3 release path by TASK-0202 evidence.
-- Do not mutate the published package, tag, GitHub Release, NuGet owner state, or release workflow history. Next release work should harden the `release.yml` provenance probe.
+- Do not mutate the published package, tag, GitHub Release, NuGet owner state, or release workflow history. TASK-0208 already hardened the `release.yml` provenance probe; any future release work still requires a dedicated task, hosted evidence, and explicit workflow dispatch authorization.

@@ -40,7 +40,7 @@
 - TASK-0206 refreshed hosted RC evidence after release-gate hardening with run `27870246504` for exact commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`, then published `0.2.0-alpha.3`.
 - NuGet package verification and global tool install smoke passed.
 - Tag `v0.2.0-alpha.3` and GitHub prerelease `v0.2.0-alpha.3` exist and target the final publish SHA.
-- Next release follow-up: harden the `release.yml` provenance probe before another publication.
+- Post-alpha3 maintenance: TASK-0208 hardened the `release.yml` provenance probe; TASK-0209 selects analyzer-warning cleanup as the next local maintenance task before scan classification, workflow pin/status cleanup, docs/queue simplification, or new package-scope planning.
 
 ## v0.2.0-alpha.1
 - Published on GitHub and NuGet in TASK-0065.
