@@ -1,7 +1,7 @@
 # Release Validation
 
 ## Planned v0.2.0-alpha.3 Decision
-TASK-0134 records an evidence-backed NO-GO on 2026-06-14. Planning commit `eabbe6a` passed the standard 8/8 hosted jobs, but independent backup security ownership and NuGet recovery authority/backup evidence remain incomplete. Source/package metadata stays `0.2.0-alpha.2`; no alpha.3 package, tag, release, or publish action was attempted.
+TASK-0134 recorded an evidence-backed NO-GO on 2026-06-14. TASK-0202 later closed the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepares source/package metadata as `0.2.0-alpha.3` for local validation only; no alpha.3 tag, GitHub Release, NuGet publish, release workflow dispatch, or release-candidate workflow dispatch is authorized.
 
 This checklist validates local release readiness without publishing.
 
@@ -102,15 +102,15 @@ The 2026-06-12 post-migration review found no vulnerable or deprecated direct/tr
 
 The `sarif` command is available in current source and in the published NuGet `0.2.0-alpha.2` global tool.
 
-## v0.2.0-alpha.2 Published Package Validation
+## Local v0.2.0-alpha.3 Candidate Package Validation
 Use temporary directories outside the repository:
 
 ```powershell
-$pkg = Join-Path $env:TEMP "ackit-v020-alpha2-nupkg"
-$tools = Join-Path $env:TEMP "ackit-v020-alpha2-tools"
+$pkg = Join-Path $env:TEMP "ackit-v020-alpha3-nupkg"
+$tools = Join-Path $env:TEMP "ackit-v020-alpha3-tools"
 New-Item -ItemType Directory -Force -Path $pkg,$tools | Out-Null
 dotnet pack src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release -o $pkg
-dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --version 0.2.0-alpha.2 --ignore-failed-sources
+dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --version 0.2.0-alpha.3 --ignore-failed-sources
 & (Join-Path $tools "ackit.exe") version
 & (Join-Path $tools "ackit.exe") --help
 & (Join-Path $tools "ackit.exe") sarif --output .ackit/reports/task-0064-local.sarif
@@ -353,7 +353,7 @@ $tools = Join-Path $env:TEMP "ackit-tools-$stamp"
 New-Item -ItemType Directory -Force -Path $pkg, $tools | Out-Null
 
 dotnet pack src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -o $pkg
-dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --version 0.2.0-alpha.2 --ignore-failed-sources
+dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --version 0.2.0-alpha.3 --ignore-failed-sources
 & (Join-Path $tools "ackit.exe") version
 & (Join-Path $tools "ackit.exe") --help
 & (Join-Path $tools "ackit.exe") scan --json
@@ -408,7 +408,7 @@ The workflow:
 - Uses `actions/checkout@v6` and `actions/setup-dotnet@v5`.
 - Runs restore, Release build, and Release tests.
 - Packs `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj` into a temporary package directory.
-- Installs `AgentContextKit` version `0.2.0-alpha.2` from that temporary package source into a temporary tool path.
+- Installs `AgentContextKit` version `0.2.0-alpha.3` from that temporary package source into a temporary tool path.
 - Runs `ackit version`, `ackit --help`, a clean demo app smoke flow, expected fake-secret `redact-check` failure, fake secret cleanup, and final `ackit scan --ci`.
 - Does not push, tag, create GitHub Releases, or publish NuGet packages.
 

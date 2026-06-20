@@ -65,8 +65,9 @@
 ## Remaining Manual Actions
 - Review all generated files before future publishing.
 - For the next release, approve push, hosted CI/source smoke validation, tag, GitHub Release, NuGet publish, and NuGet install verification in a dedicated release task.
-- For planned `0.2.0-alpha.3`, assign and verify an independent backup security notification owner before metadata changes or publication.
-- Verify destructive NuGet recovery authority and backup coverage, then record the exact-version/exact-commit GO packet.
+- For planned `0.2.0-alpha.3`, TASK-0202 closes independent backup security notification ownership and backup package recovery coverage for release preparation.
+- For planned `0.2.0-alpha.3`, complete TASK-0203 local package validation and install smoke before calling the candidate locally prepared.
+- For planned `0.2.0-alpha.3`, obtain hosted RC evidence and record the exact-version/exact-commit GO packet before any publication action.
 
 ## Release Candidate Evidence Gate
 - `scripts/check-release-candidate-evidence.ps1 -FailOnIssues` passes.
@@ -75,7 +76,7 @@
 - Vulnerability and deprecation reviews are dated and reviewed.
 - Private GitHub vulnerability reporting is enabled and independently verified.
 - [x] Authenticated GitHub API status returned `enabled: true` on 2026-06-14 and the public report entry is visible.
-- [ ] Assign and verify an independent backup security notification owner; primary owner is `Cynrath`.
+- [x] Assign and verify an independent backup security notification owner; primary owner is `Cynrath`, backup owner is `ShadowFlameC` per TASK-0202 maintainer evidence.
 - Hosted Windows, Ubuntu, and macOS upgrade/source-package smoke evidence is green.
 - [x] Standard `ci`, published-package smoke, and source-package smoke are green for commit `37d5220`; see `docs/HOSTED_VALIDATION_STATUS.md`.
 - [x] The dedicated manual `release-candidate-evidence` workflow is green on Windows, Ubuntu, and macOS for reviewed commit `4c4fa64`; rerun for a future exact candidate.
@@ -83,7 +84,9 @@
 - [x] Repeated the read-only supply-chain audit for published `0.2.0-alpha.2` without changing package or release state.
 - [x] Recorded a bounded accepted-risk disposition for NuGet owner `Cyranth` versus project persona/package author `Cynrath`.
 - [x] Recorded author-signing and SBOM deferrals plus future provenance implementation.
-- [ ] Verify destructive NuGet recovery authority and backup recovery ownership before release GO.
+- [x] Verify package owner continuity and backup recovery ownership before release preparation; `ShadowFlameC` is recorded as NuGet package owner / backup package recovery owner per TASK-0202. No destructive NuGet action was performed.
+- [ ] Complete TASK-0203 local `0.2.0-alpha.3` package validation and install smoke.
+- [ ] Rerun hosted RC evidence for the exact `0.2.0-alpha.3` candidate commit.
 - `scripts/check-release-candidate-workflow.ps1 -FailOnIssues` passes and the manual `release-candidate-evidence` workflow is green on all three OS runners.
 - [x] The `xunit` Legacy warning is resolved through the TASK-0091 xUnit v3 migration; 169/169 tests and clean dependency reviews are recorded.
 - [x] The conditional local contract freeze and NO-GO decision package are recorded in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and `docs/MAINTAINER_RC_DECISION.md`.
@@ -91,5 +94,5 @@
 - [x] English/Turkish human output, known argument-error parity, exit-code parity, and language-independent JSON semantics are covered by `scripts/check-localization-parity.ps1 -FailOnIssues`.
 - [x] Security/supply-chain evidence structure and maintainer handoff are present and pass `scripts/check-security-supply-chain-evidence.ps1 -FailOnIssues`; remote items remain explicitly pending.
 - [x] Current-source consolidated local evidence passes `scripts/check-rc-local-readiness.ps1 -RunDependencyReview -FailOnIssues`; the result remains `LOCAL READY / REMOTE NO-GO`.
-- [ ] Rerun the same gate on the exact selected candidate commit after hosted and maintainer evidence is recorded.
+- [ ] Rerun the same gate on the exact selected candidate commit after TASK-0203 local evidence and hosted RC evidence are recorded.
 - Signing, SBOM, provenance, and package recovery decisions are recorded.

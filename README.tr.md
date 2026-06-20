@@ -14,7 +14,7 @@ AgentContextKit, Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI ve benze
 
 Public repository URL: `https://github.com/Cynrath/agent-context-kit`
 
-Current release: `v0.2.0-alpha.2` GitHub ve NuGet uzerinde pre-release olarak yayinlandi; global tool kurulumu dogrulandi.
+Current release: `v0.2.0-alpha.2` GitHub ve NuGet uzerinde pre-release olarak yayinlandi; global tool kurulumu dogrulandi. Lokal source/package candidate `0.2.0-alpha.3` olarak hazirlaniyor; hosted RC evidence ve yayin onayi bekliyor.
 
 Varsayılan komutlar repository içeriğini yerelde işler; repository upload, AI API çağrısı, telemetry veya harici araç çalıştırma yapmaz. Ayrıntı: [Varsayılan No-Network Politikası](docs/NO_NETWORK_DEFAULT_POLICY.md).
 
@@ -149,7 +149,7 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 
 Yayinlanmis `0.2.0-alpha.2` paketi human/JSON scan ciktisina sanitized suppression audit alanlari ekler.
 
-Mevcut source ayrica scan glob filtreleri ve local-only `mcp`, `diff`, `trim`, `watch` komutlarini icerir. Bu current-source komut haritasi yeni bir NuGet release iddiasi degildir.
+Mevcut source `0.2.0-alpha.3` lokal candidate metadata ile hazirlanir ve scan glob filtreleri ile local-only `mcp`, `diff`, `trim`, `watch` komutlarini icerir. Bu current-source komut haritasi `0.2.0-alpha.3` NuGet'te yayinlandi iddiasi degildir.
 
 Kurulu tool icin hizli dogrulama:
 
@@ -193,7 +193,7 @@ Daha fazla rehberli ornek icin [Sample Gallery](docs/SAMPLE_GALLERY.md) ve [Demo
 
 ## CLI Komutlari
 `ackit sarif`, yayinlanmis `0.2.0-alpha.2` NuGet global tool ve mevcut source icinde vardir.
-Asagidaki harita current-source `--help`, `docs/CLI_CONTRACT.md` ve `docs/CLI_REFERENCE.md` ile uyumludur. Yayinlanmis NuGet paketi `0.2.0-alpha.2` olarak kalir.
+Asagidaki harita current-source `--help`, `docs/CLI_CONTRACT.md` ve `docs/CLI_REFERENCE.md` ile uyumludur. Yayinlanmis NuGet paketi `0.2.0-alpha.2` olarak kalir; `0.2.0-alpha.3` source candidate icin hosted RC evidence ve yayin onayi gerekir.
 
 ```text
 ackit init [--lang en|tr] [--json]
@@ -298,7 +298,7 @@ Onemli dokumanlar:
 Bkz. [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Paketleme
-Lokal paket dogrulama adimlari [docs/PACKAGING.md](docs/PACKAGING.md) ve [docs/RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md) dosyalarinda yer alir. `0.2.0-alpha.2` paketi NuGet global tool olarak yayinlandi ve dogrulandi.
+Lokal paket dogrulama adimlari [docs/PACKAGING.md](docs/PACKAGING.md) ve [docs/RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md) dosyalarinda yer alir. `0.2.0-alpha.2` paketi NuGet global tool olarak yayinlandi ve dogrulandi; `0.2.0-alpha.3` daha sonra yetkili publish yapilana kadar lokal source/package candidate'tir.
 
 Public release blocker listesi [docs/RELEASE_BLOCKERS.md](docs/RELEASE_BLOCKERS.md) dosyasinda takip edilir.
 

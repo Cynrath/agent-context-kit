@@ -1,11 +1,11 @@
 # v0.2.0-alpha.3 Release Decision
 
-Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Decision owner: `Cynrath`.
+Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-preparation update: 2026-06-20. Decision owner: `Cynrath`.
 
 ## Decision
-**Release-preparation eligible; publication is not approved.**
+**Release preparation in progress; publication is not approved.**
 
-`0.2.0-alpha.3` is the selected planning version. TASK-0202 closes the ownership/recovery blockers from maintainer-provided evidence, so a dedicated release-preparation task may proceed. No exact candidate commit has been prepared and source/package metadata remains `0.2.0-alpha.2`.
+`0.2.0-alpha.3` is the selected planning version. TASK-0202 closes the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepares the source/package metadata and release-preparation docs for local candidate validation. Hosted RC evidence, exact-candidate GO, tag creation, GitHub Release creation, NuGet publication, and workflow dispatch remain pending and unauthorized.
 
 ## Verified Inputs
 - TASK-0126 immutable alpha.2 recovery verification is green in run `27478046088`.
@@ -19,11 +19,13 @@ Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Decision 
 - Local validation passes 186/186 tests, clean scan, doctor, sample smoke, package verification, contract/readiness/security gates, and the 2,000-file performance tripwire.
 - TASK-0202 records maintainer-provided evidence from `Cynrath` dated 2026-06-20 that `ShadowFlameC` is repository `write` collaborator, independent backup security notification owner, backup maintainer contact, current NuGet package owner, and backup package recovery owner for planned `0.2.0-alpha.3`.
 - `.github/workflows/release.yml` uses `environment: nuget-release`, `NuGet/login@v1` with `user: Cyranth`, and `NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}` from trusted publishing. No repository secret is required for NuGet publish.
+- TASK-0203 prepares package metadata, CLI runtime version, source-package smoke pin, and release-preparation docs for `0.2.0-alpha.3` local validation. This is not publication approval.
 
 ## Remaining Release Conditions
-1. No exact alpha.3 candidate commit, versioned package diff, package smoke, candidate-specific hosted RC evidence, or final exact-candidate GO exists yet.
+1. TASK-0203 local validation, package verification, and install smoke evidence must be recorded before the local candidate is considered prepared.
 2. Future provenance is implemented locally but can only be verified during an authorized successful publish; it does not replace pre-publish approval.
-3. Publication, tag creation, GitHub Release creation, and workflow dispatch remain unauthorized until release preparation records the exact candidate evidence and a new GO decision.
+3. Candidate-specific hosted RC evidence is still pending and must be obtained in a later task.
+4. Publication, tag creation, GitHub Release creation, and workflow dispatch remain unauthorized until release preparation and hosted RC evidence record a new exact-candidate GO decision.
 
 ## TASK-0198 Evidence Check
 
@@ -57,11 +59,20 @@ Result:
 - `RB-003` is closed for `0.2.0-alpha.3` release-preparation entry.
 - `RB-008` is closed for `0.2.0-alpha.3` release-preparation entry.
 - `0.2.0-alpha.3` is release-preparation eligible, but not published.
-- Source/package metadata remains `0.2.0-alpha.2`.
+- TASK-0203 is authorized to prepare source/package metadata for local validation only.
+
+## TASK-0203 Release Preparation
+
+TASK-0203 prepares the local `0.2.0-alpha.3` candidate by updating package metadata, the CLI runtime version, source-package smoke pin, release-preparation docs, and package validation evidence. The source-smoke workflow pin is updated because `scripts/prepare-release.ps1` requires the source-package smoke version to match the requested candidate version.
+
+TASK-0203 boundaries:
+- local package validation and installed-tool smoke are required before the candidate is recorded as locally prepared;
+- hosted RC evidence remains pending for a later task;
+- final release GO is not recorded in TASK-0203;
+- no tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate workflow dispatch, owner/account/recovery mutation, repository secret creation, branch ruleset mutation, security advisory, or destructive NuGet action is authorized.
 
 ## Actions Not Performed
-- no source/package version bump;
-- no README or published-package workflow version change;
+- no published-package workflow version change;
 - no release-candidate workflow dispatch for alpha.3;
 - no release workflow dispatch;
 - no NuGet login or publish;
@@ -73,13 +84,12 @@ Result:
 - no owner removal, account/recovery mutation, or destructive NuGet action.
 
 ## Next Required Task
-Release preparation, not publication:
-1. recheck all bounded decisions and dependencies;
-2. change metadata to `0.2.0-alpha.3` in a dedicated preparation commit;
-3. record package diff/changelog/release-body updates for the exact candidate;
-4. pack, inspect, and install-smoke the exact package;
-5. obtain standard 8/8 and dedicated three-OS RC evidence for that exact commit;
-6. record exact-version/exact-commit GO or NO-GO;
-7. only after GO, publish through the OIDC-only release workflow.
+Finish release preparation, then hosted RC evidence:
+1. finish TASK-0203 local restore/build/test/source scan/doctor/package validation/install smoke;
+2. record the exact local candidate commit and package path;
+3. push the validated release-preparation commits;
+4. in a later task, obtain standard hosted checks and dedicated three-OS RC evidence for the exact candidate;
+5. record exact-version/exact-commit GO or NO-GO;
+6. only after GO, publish through the OIDC-only release workflow.
 
 Immutable release rules remain in force: never reuse a NuGet version, move an existing tag, force push, or replace published artifacts.

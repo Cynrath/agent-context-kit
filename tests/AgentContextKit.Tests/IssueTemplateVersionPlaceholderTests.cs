@@ -4,8 +4,8 @@ namespace AgentContextKit.Tests;
 
 public sealed class IssueTemplateVersionPlaceholderTests
 {
-    private const string CurrentVersion = "0.2.0-alpha.2";
-    private const string PreviousVersion = "0.2.0-alpha.1";
+    private const string CurrentVersion = "0.2.0-alpha.3";
+    private const string PreviousVersion = "0.2.0-alpha.2";
 
     [Fact]
     public void AllIssueTemplatesReferenceCurrentVersionPlaceholder()
@@ -22,7 +22,7 @@ public sealed class IssueTemplateVersionPlaceholderTests
 
             var hasStalePlaceholder = Regex.IsMatch(
                 content,
-                @"AgentContextKit\s+0\.2\.0-alpha\.1(?!\.)",
+                @"AgentContextKit\s+0\.2\.0-alpha\.2(?!\.)",
                 RegexOptions.IgnoreCase);
 
             Assert.False(

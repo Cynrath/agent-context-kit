@@ -8,7 +8,7 @@ Current package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.
 Important fields:
 - `PackageId`: `AgentContextKit`
 - `ToolCommandName`: `ackit`
-- `Version`: `0.2.0-alpha.2` published pre-release
+- `Version`: `0.2.0-alpha.3` local release-preparation candidate; current published package remains `0.2.0-alpha.2`
 - `Authors`: `Cynrath`
 - `PackageLicenseExpression`: `MIT`
 - `PackageReadmeFile`: `README.md`
@@ -42,7 +42,7 @@ dotnet pack src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release -o $pk
 ```powershell
 $tools = Join-Path $env:TEMP "ackit-tools"
 New-Item -ItemType Directory -Force -Path $tools | Out-Null
-dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --version 0.2.0-alpha.2 --ignore-failed-sources
+dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --version 0.2.0-alpha.3 --ignore-failed-sources
 & (Join-Path $tools "ackit.exe") --help
 & (Join-Path $tools "ackit.exe") sarif --output .ackit/reports/local-package.sarif
 ```
@@ -58,10 +58,10 @@ ackit scan --ci
 ```
 
 ## Current Published Package
-The current published package is `0.2.0-alpha.2`. Source/package metadata, public install commands, and published-package smoke are synchronized to that version.
+The current published package is `0.2.0-alpha.2`. Public install commands and published-package smoke remain synchronized to that version until an authorized alpha.3 publish completes. Source/package metadata is prepared as the local `0.2.0-alpha.3` candidate for TASK-0203 validation.
 
 ## OIDC NuGet Publish
-Version `0.2.0-alpha.2` has been published and install-verified. Future versions are published only from the reviewed exact commit after all gates pass, using the manual `.github/workflows/release.yml` workflow and the preconfigured `nuget-release` environment.
+Version `0.2.0-alpha.2` has been published and install-verified. Future versions, including `0.2.0-alpha.3`, are published only from the reviewed exact commit after all gates pass, using the manual `.github/workflows/release.yml` workflow and the preconfigured `nuget-release` environment.
 
 The workflow uses NuGet Trusted Publishing through `NuGet/login@v1`. API keys, repository secrets for package credentials, local environment credentials, and credential-bearing `NuGet.Config` files are prohibited.
 

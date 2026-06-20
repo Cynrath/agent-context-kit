@@ -29,7 +29,7 @@ JSON responses include:
 ```json
 {
   "schemaVersion": 2,
-  "toolVersion": "0.2.0-alpha.2",
+  "toolVersion": "0.2.0-alpha.3",
   "generatedAtUtc": "2026-06-03T00:00:00+00:00",
   "command": "scan"
 }
@@ -109,7 +109,7 @@ Example shape:
 ```json
 {
   "schemaVersion": 2,
-  "toolVersion": "0.2.0-alpha.2",
+  "toolVersion": "0.2.0-alpha.3",
   "generatedAtUtc": "2026-06-03T00:00:00+00:00",
   "command": "scan",
   "ciMode": false,

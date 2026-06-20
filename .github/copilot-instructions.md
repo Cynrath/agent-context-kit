@@ -23,10 +23,10 @@ This file is hand-maintained. `ackit generate` does not regenerate it. Update it
 
 ## Release Status
 - Current release: `v0.2.0-alpha.2` published on GitHub and NuGet as a pre-release.
-- Current source matches the published `v0.2.0-alpha.2` release plus post-publish workflow/documentation fixes.
+- Current source/package metadata is prepared as the local `0.2.0-alpha.3` release candidate; hosted RC evidence and publication are pending.
 - Previous release: `v0.1.0-alpha.2` published and verified; pushed, released, and published.
 - Main stack: `.NET`, `.NET CLI / .NET Tool`, and `GitHub Actions`.
-- `0.2.0-alpha.3` remains NO-GO. `RB-003` (independent backup security owner) and `RB-008` (destructive NuGet recovery authority) are unresolved.
+- `0.2.0-alpha.3` is release-prepared locally only after TASK-0203 validation. `RB-003` and `RB-008` are closed by TASK-0202, but hosted RC evidence and publication approval remain pending.
 
 ## Commit And Push Policy
 - Hard prohibitions: never force-push, never rewrite history, never move an existing tag, never create a remote, never publish a package, never create a release, never delete user changes, never expose secrets, never fabricate owner, identity, signature, or recovery evidence.

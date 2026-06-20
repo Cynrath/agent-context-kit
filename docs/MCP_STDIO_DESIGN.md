@@ -42,7 +42,7 @@ JSON-RPC 2.0 over stdio, one JSON object per line:
 ```json
 {
   "protocolVersion": "2024-11-05",
-  "serverInfo": { "name": "ackit", "title": "AgentContextKit", "version": "<local>0.2.0-alpha.2+<sha>" },
+  "serverInfo": { "name": "ackit", "title": "AgentContextKit", "version": "<local>0.2.0-alpha.3+<sha>" },
   "capabilities": { "tools": {} }
 }
 ```

@@ -6,6 +6,8 @@
 ## Current Hosted Status
 TASK-0128 completed the hardened workflow and exact hosted run. Run [27478635057](https://github.com/Cynrath/agent-context-kit/actions/runs/27478635057) passed on Windows, Ubuntu, and macOS for exact commit `4c4fa64ff34287dff01818d52f49b521efb3176d`, predecessor `0.2.0-alpha.1`, and source candidate `0.2.0-alpha.2.ci.27478635057`.
 
+No hosted `0.2.0-alpha.3` release-candidate evidence has been dispatched or recorded yet. TASK-0203 is local release preparation only; it does not dispatch this workflow.
+
 ## What It Verifies
 - restore, Release build, and the full test suite on each runner;
 - published predecessor `AgentContextKit` `0.2.0-alpha.1` install in an isolated tool path;
@@ -62,11 +64,11 @@ gh workflow run release-candidate-evidence.yml `
   --repo Cynrath/agent-context-kit `
   --ref master `
   -f commit_sha=<exact-master-sha> `
-  -f candidate_version=0.2.0-alpha.2 `
-  -f predecessor_version=0.2.0-alpha.1
+  -f candidate_version=0.2.0-alpha.3 `
+  -f predecessor_version=0.2.0-alpha.2
 ```
 
-TASK-0128's dispatch is complete. Do not reuse its alpha.2 evidence as proof for a different commit or version. Do not tag, publish, or call the project RC-ready until remaining P0/P1 decisions are resolved or explicitly accepted.
+TASK-0128's dispatch is complete. Do not reuse its alpha.2 evidence as proof for the alpha.3 candidate. Do not tag, publish, or call alpha.3 release-ready until TASK-0203 local evidence, hosted RC evidence, and an exact-candidate GO are recorded.
 
 ## Failure Interpretation
 - Predecessor install failure can indicate NuGet/network availability rather than source behavior.

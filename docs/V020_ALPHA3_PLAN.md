@@ -7,7 +7,7 @@ The smallest SemVer-compatible next prerelease is `0.2.0-alpha.3`.
 
 The changes since `v0.2.0-alpha.2` are additive release recovery, hosted evidence, security ownership documentation, and supply-chain automation controls. They do not require a minor-version increment and do not intentionally change the CLI, JSON, SARIF, config, baseline, or package runtime contracts.
 
-This is a scope selection only. Source/package metadata remains `0.2.0-alpha.2` until a dedicated preparation task receives an exact-version and exact-commit GO decision.
+This began as a scope selection only. TASK-0203 prepares source/package metadata as `0.2.0-alpha.3` for local validation; hosted RC evidence, exact-candidate GO, tag creation, GitHub Release creation, NuGet publication, and workflow dispatch remain pending.
 
 ## Included Scope
 - read-only immutable-release recovery verification;

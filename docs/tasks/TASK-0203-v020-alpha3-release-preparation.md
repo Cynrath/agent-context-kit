@@ -52,11 +52,40 @@ This task makes the repository ready for hosted release-candidate evidence in a 
 ## Affected files
 - `docs/tasks/TASK-0203-v020-alpha3-release-preparation.md`
 - `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj`
+- `src/AgentContextKit.Cli/Program.cs`
+- `src/AgentContextKit.Core/Templates.cs`
+- `.github/workflows/cross-platform-source-smoke.yml`
+- `.github/ISSUE_TEMPLATE/*.yml`
+- `scripts/check-package-metadata.ps1`
+- `scripts/check-release-candidate-inputs.ps1`
+- `scripts/verify-release.ps1`
+- `tests/AgentContextKit.Tests/AgentContextKitBehaviorTests.cs`
+- `tests/AgentContextKit.Tests/IssueTemplateVersionPlaceholderTests.cs`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `.cursor/rules/project.mdc`
+- `.github/copilot-instructions.md`
 - `README.md`
 - `README.tr.md`
+- `docs/RELEASE_BLOCKER_BOARD.md`
 - `docs/V020_ALPHA3_RELEASE_DECISION.md`
+- `docs/V020_ALPHA3_PLAN.md`
+- `docs/MAINTAINER_DECISION_REGISTER.md`
+- `docs/MAINTAINER_RELEASE_HANDOFF.md`
+- `docs/NUGET_METADATA.md`
+- `docs/PACKAGING.md`
 - `docs/RELEASE_CHECKLIST.md`
+- `docs/RELEASE_VALIDATION.md`
+- `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md`
 - `docs/RC_HOSTED_EVIDENCE.md`
+- `docs/GITHUB_ACTIONS_USAGE.md`
+- `docs/HTML_REPORTS.md`
+- `docs/JSON_OUTPUT.md`
+- `docs/MCP_STDIO_DESIGN.md`
+- `docs/ROADMAP.md`
+- `docs/TROUBLESHOOTING.md`
+- `docs/WEB_UI_PROTOTYPE.md`
+- `docs/examples/github-actions-source-package-smoke.yml`
 - `docs/NEXT_TASKS.md`
 - `.codex/SESSION_HANDOFF.md`
 - `.codex/CONTEXT_PACK.md`
@@ -88,6 +117,7 @@ Adds task-first audit records for local release-candidate preparation, package v
 
 ## Package/release impact
 - Package metadata changes from `0.2.0-alpha.2` to `0.2.0-alpha.3`.
+- CLI runtime version and source-package smoke install pin change to `0.2.0-alpha.3`; `scripts/prepare-release.ps1` requires these to match the requested candidate version, so this workflow YAML change is a release-preparation parity fix, not a workflow dispatch or publication action.
 - Local `.nupkg` and `.snupkg` are created under `artifacts/package-validation/0.2.0-alpha.3`.
 - Hosted RC evidence remains pending.
 - Publication remains not authorized and not performed.

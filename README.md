@@ -39,6 +39,7 @@ Default commands process repository content locally: no repository upload, AI AP
 | Area | Status |
 | --- | --- |
 | Current release | `v0.2.0-alpha.2` published on GitHub and NuGet as a pre-release |
+| Local candidate | Source/package metadata prepared as `0.2.0-alpha.3`; hosted RC evidence and publication pending |
 | Package | `AgentContextKit` global tool install verified |
 | Previous release | `v0.1.0-alpha.2` |
 | Runtime | .NET 10 |
@@ -184,7 +185,7 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 
 The published `0.2.0-alpha.2` package adds sanitized suppression audit fields to human/JSON scan output.
 
-Current source also includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands. These current-source command map entries do not imply a new NuGet release.
+Current source is prepared as the `0.2.0-alpha.3` local candidate and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands. These current-source command map entries do not imply that `0.2.0-alpha.3` is published on NuGet.
 
 ### Try it on a sample
 
@@ -229,7 +230,7 @@ Pop-Location
 ---
 
 ## CLI Command Map
-This map follows current-source `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`. The published NuGet package remains `0.2.0-alpha.2`; see the reference docs for per-command availability notes.
+This map follows current-source `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`. The published NuGet package remains `0.2.0-alpha.2`; the `0.2.0-alpha.3` source candidate still needs hosted RC evidence and publication approval.
 
 ```text
 ackit init [--lang en|tr] [--json]
@@ -350,7 +351,7 @@ Public release blockers are tracked in [Release Blockers](docs/RELEASE_BLOCKERS.
 
 ## Packaging
 
-Local package validation is documented in [Packaging](docs/PACKAGING.md) and [Release Validation](docs/RELEASE_VALIDATION.md). The `0.2.0-alpha.2` package is published as a NuGet global tool.
+Local package validation is documented in [Packaging](docs/PACKAGING.md) and [Release Validation](docs/RELEASE_VALIDATION.md). The `0.2.0-alpha.2` package is published as a NuGet global tool; `0.2.0-alpha.3` is a local source/package candidate until a later authorized publish.
 
 ```powershell
 dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2

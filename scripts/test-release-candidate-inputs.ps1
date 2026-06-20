@@ -45,9 +45,9 @@ try {
     }
     finally { Pop-Location }
 
-    Invoke-Case -Name "valid" -CommitSha $headSha -CandidateVersion $sourceVersion -PredecessorVersion "0.2.0-alpha.1" -ShouldPass $true
-    Invoke-Case -Name "short-sha" -CommitSha "abcdef0" -CandidateVersion $sourceVersion -PredecessorVersion "0.2.0-alpha.1" -ShouldPass $false
-    Invoke-Case -Name "wrong-version" -CommitSha $headSha -CandidateVersion "0.2.0-alpha.3" -PredecessorVersion "0.2.0-alpha.1" -ShouldPass $false
+    Invoke-Case -Name "valid" -CommitSha $headSha -CandidateVersion $sourceVersion -PredecessorVersion "0.2.0-alpha.2" -ShouldPass $true
+    Invoke-Case -Name "short-sha" -CommitSha "abcdef0" -CandidateVersion $sourceVersion -PredecessorVersion "0.2.0-alpha.2" -ShouldPass $false
+    Invoke-Case -Name "wrong-version" -CommitSha $headSha -CandidateVersion "0.2.0-alpha.4" -PredecessorVersion "0.2.0-alpha.2" -ShouldPass $false
     Invoke-Case -Name "same-version" -CommitSha $headSha -CandidateVersion $sourceVersion -PredecessorVersion $sourceVersion -ShouldPass $false
 
     Write-Host "Release-candidate input positive and negative tests passed."

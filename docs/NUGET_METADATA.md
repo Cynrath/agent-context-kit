@@ -3,7 +3,9 @@
 AgentContextKit package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj`.
 
 ## Current Status
-Package metadata is final for `AgentContextKit` version `0.2.0-alpha.2`, which is the currently published NuGet package:
+Source package metadata is prepared for the local `AgentContextKit` `0.2.0-alpha.3` release candidate. The currently published NuGet package remains `0.2.0-alpha.2`.
+
+Shared package metadata:
 - `RepositoryUrl` is `https://github.com/Cynrath/agent-context-kit`.
 - `PackageProjectUrl` is `https://github.com/Cynrath/agent-context-kit`.
 - `Authors` is `Cynrath`.
@@ -12,8 +14,9 @@ Package metadata is final for `AgentContextKit` version `0.2.0-alpha.2`, which i
 Publication state:
 - GitHub Actions latest `master` run is green.
 - GitHub Release page for `v0.2.0-alpha.2` is completed as a pre-release.
-- NuGet publish is completed.
-- NuGet global tool install verification is completed.
+- NuGet publish is completed for `0.2.0-alpha.2`.
+- NuGet global tool install verification is completed for `0.2.0-alpha.2`.
+- `0.2.0-alpha.3` publication is not approved or performed.
 
 The public NuGet owner identity is `Cyranth`, while package metadata and repository persona use `Cynrath`. This intentional current-state disposition is documented in `docs/NUGET_OWNER_IDENTITY.md`; metadata remains `Cynrath` and no owner mutation is performed.
 
@@ -51,7 +54,7 @@ ackit --help
 - `PackAsTool`: `true`
 - `ToolCommandName`: `ackit`
 - `PackageId`: `AgentContextKit`
-- `Version`: `0.2.0-alpha.2`
+- `Version`: `0.2.0-alpha.3`
 - `Authors`: `Cynrath`
 - `Company`: `Cynrath`
 - `PackageReadmeFile`: `README.md`

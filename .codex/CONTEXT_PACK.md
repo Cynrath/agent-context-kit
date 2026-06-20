@@ -6,11 +6,13 @@ AgentContextKit (`ackit`) is an offline-first .NET 10 CLI for AI-assisted reposi
 ## Last Closed Control
 PROJECT-CONTROL-0110 closed at TASK-0196 (`b073c3d`) on 2026-06-19 with cumulative suite 428/428 green. Scope: MCP transport step 2 (real stdio loop with safety bounds), `ackit watch` local implementation, watch debounce/ignore-list/cancellation unit tests, trim edge case tests, `ackit.rules` MCP read-only metadata tool, localization parity for new commands and MCP step 2 error surface, docs update, docs-first audit + state sync, and final validation. No release, tag, NuGet publication, secret, or model-name disclosure was part of this control.
 
-## Next Control (Placeholder)
-Not yet selected / pending maintainer direction. TASK-0202 closes `RB-003` and `RB-008` from maintainer-provided `ShadowFlameC` backup/security/recovery evidence, making `0.2.0-alpha.3` release-preparation eligible. No release, tag, GitHub Release, NuGet publish, workflow dispatch, or version bump is authorized by TASK-0202. Any future control must be explicitly authorized through a planning commit before implementation.
+## Current Independent Task
+TASK-0203 is active release preparation for local `0.2.0-alpha.3`. TASK-0202 closes `RB-003` and `RB-008` from maintainer-provided `ShadowFlameC` backup/security/recovery evidence, making release preparation eligible. TASK-0203 may update source/package metadata, CLI runtime version, source-package smoke version parity, README/release-prep docs, and local package validation evidence. No tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate workflow dispatch, owner/account/recovery mutation, repository secret creation, branch ruleset mutation, security advisory, or destructive NuGet action is authorized.
 
 ## Last Independent Task
 TASK-0202 completed the docs-only maintainer evidence intake. It records `ShadowFlameC` as repository `write` collaborator, independent backup security notification owner, backup maintainer contact, current NuGet package owner, and backup package recovery owner for planned `0.2.0-alpha.3`. `ShadowFlameC` is backup/recovery coverage only, not a mandatory release approver. Primary owner-driven release preparation remains allowed for `Cynrath` / `Cyranth`.
+
+TASK-0203 plan commit `da51d4d` starts local release preparation. The candidate is not locally prepared until restore/build/test/current-source scan/doctor/package verification/install smoke pass and TASK-0203 evidence records the candidate commit and package path. Hosted RC evidence and publication approval remain pending.
 
 TASK-0201 completed the docs-only `RB-003`/`RB-008` closure preflight. At TASK-0201 close, repository evidence was insufficient to close either blocker: `RB-003` lacked independent backup security owner and notification coverage evidence; `RB-008` lacked destructive NuGet recovery authority and backup recovery owner evidence. TASK-0202 records the maintainer evidence that supersedes that boundary.
 
@@ -30,9 +32,9 @@ TASK-0131 accepts the public `Cyranth` NuGet owner / `Cynrath` project persona d
 
 TASK-0132 defers author signing/SBOM with dated accepted risk and adds future-release GitHub artifact provenance to the isolated publish job. The read-only verifier has no attestation permission.
 
-TASK-0133 selects `0.2.0-alpha.3` as a compatible planning scope only. Source/package metadata remains `0.2.0-alpha.2`; TASK-0202 makes release preparation eligible by closing RB-003/RB-008, but publication remains pending release preparation, exact-candidate validation, and GO.
+TASK-0133 selects `0.2.0-alpha.3` as a compatible planning scope. TASK-0202 makes release preparation eligible by closing RB-003/RB-008. TASK-0203 prepares source/package metadata and local package evidence, but publication remains pending hosted RC evidence, exact-candidate validation, and GO.
 
-TASK-0134 recorded the earlier evidence-backed NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0202 updates that decision to release-preparation eligible / publication not approved. There is no alpha.3 candidate commit, package, tag, release, or NuGet publication.
+TASK-0134 recorded the earlier evidence-backed NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0202 updates that decision to release-preparation eligible / publication not approved. TASK-0203 is preparing the local alpha.3 candidate; no tag, release, NuGet publication, workflow dispatch, or final release GO exists.
 
 PROJECT-CONTROL-0107 begins at `a5686aa` with 238/238 tests green and TASK-0159 through TASK-0167 queued. The control is docs-first; the planning commit lands before any implementation.
 

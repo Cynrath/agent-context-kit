@@ -50,7 +50,7 @@ jobs:
         run: |
           $tools = Join-Path $env:RUNNER_TEMP "ackit-tools"
           New-Item -ItemType Directory -Force -Path $tools | Out-Null
-          dotnet tool install AgentContextKit --tool-path $tools --add-source "$env:ACKIT_PACKAGE_SOURCE" --version 0.2.0-alpha.2 --ignore-failed-sources
+          dotnet tool install AgentContextKit --tool-path $tools --add-source "$env:ACKIT_PACKAGE_SOURCE" --version 0.2.0-alpha.3 --ignore-failed-sources
           "ACKIT_TOOL_PATH=$tools" | Out-File -FilePath $env:GITHUB_ENV -Append
           $tools | Out-File -FilePath $env:GITHUB_PATH -Append
 

@@ -39,7 +39,7 @@ ackit report --output .ackit/reports/baseline.html --baseline .ackit-baseline.js
 ```json
 {
   "schemaVersion": 2,
-  "toolVersion": "0.2.0-alpha.2",
+  "toolVersion": "0.2.0-alpha.3",
   "command": "report",
   "report": {
     "path": ".ackit/reports/scan-report.html",

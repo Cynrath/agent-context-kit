@@ -35,7 +35,7 @@
 ## v0.2.0-alpha.3 Planning
 - Selected as the smallest compatible next prerelease for additive release recovery, hosted evidence, security ownership, and supply-chain automation work.
 - No CLI, config, JSON, baseline, SARIF, package ID, or offline-first behavior change is planned.
-- Source/package metadata remains `0.2.0-alpha.2` until TASK-0134 receives an exact-version and exact-commit GO decision.
+- TASK-0203 prepares source/package metadata as the local `0.2.0-alpha.3` candidate; hosted RC evidence, exact-candidate GO, tag creation, GitHub Release creation, NuGet publication, and workflow dispatch remain pending.
 - Publication is NO-GO while independent backup security ownership remains unresolved; see `docs/V020_ALPHA3_PLAN.md`.
 - TASK-0134 completed the safe evaluation boundary with NO-GO; resume conditions are in `docs/V020_ALPHA3_RELEASE_DECISION.md`.
 

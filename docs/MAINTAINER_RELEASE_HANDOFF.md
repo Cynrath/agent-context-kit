@@ -9,9 +9,9 @@ Future release sequences must not use API keys. Publication is allowed only thro
 ## Future Release-Candidate Decision
 TASK-0092 prepares a conditional local contract freeze in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and the authoritative GO/NO-GO checklist in `docs/MAINTAINER_RC_DECISION.md`. The current decision is NO-GO for RC publication until hosted evidence, remaining P0 gaps, private vulnerability reporting, schema assets, and supply-chain decisions are complete.
 
-TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. Metadata remains `0.2.0-alpha.2`; TASK-0134 must not prepare or publish the candidate until an independent backup security notification owner and the remaining recovery authority evidence are recorded.
+TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. TASK-0202 records the missing backup security and package recovery evidence. TASK-0203 prepares source/package metadata and local package evidence only; hosted RC evidence, exact-candidate GO, tag, GitHub Release, NuGet publish, and workflow dispatch remain pending.
 
-TASK-0134 evaluated the GO packet on 2026-06-14 and recorded NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. The planning commit passed standard 8/8, but no alpha.3 candidate was prepared and no release workflow was dispatched.
+TASK-0134 evaluated the earlier GO packet on 2026-06-14 and recorded NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0203 supersedes only the local preparation boundary; it still does not authorize release workflow dispatch or publication.
 
 ## Current Published State
 - GitHub repository public: yes, `https://github.com/Cynrath/agent-context-kit`.

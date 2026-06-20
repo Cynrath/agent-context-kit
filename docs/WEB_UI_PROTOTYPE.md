@@ -52,7 +52,7 @@ Generated Web UI files are no-build, single-file HTML artifacts. They include in
 ```json
 {
   "schemaVersion": 2,
-  "toolVersion": "0.2.0-alpha.2",
+  "toolVersion": "0.2.0-alpha.3",
   "command": "webui",
   "webUi": {
     "path": ".ackit/webui/index.html",

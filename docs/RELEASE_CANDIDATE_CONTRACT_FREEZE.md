@@ -3,7 +3,7 @@
 ## Status
 Conditional local freeze prepared on 2026-06-12. This document records the contract surface that passed local review; it does not select a release-candidate version, approve publication, or close hosted and maintainer-only blockers.
 
-Current source/package metadata remains `0.2.0-alpha.1` until a dedicated release-preparation task selects and applies a new version.
+Current source/package metadata is being prepared as `0.2.0-alpha.3` by TASK-0203. This does not approve publication or change the frozen compatibility surface by itself.
 
 ## Frozen Contract Inventory
 | Contract | Frozen Value | Normative Detail |

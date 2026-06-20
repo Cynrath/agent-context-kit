@@ -27,15 +27,15 @@ Use the same repository rules as AGENTS.md.
 
 ## Release Status
 - Current release: `v0.2.0-alpha.2` published and verified on GitHub and NuGet as a pre-release.
-- Current source matches the published `v0.2.0-alpha.2` release plus post-publish workflow/documentation fixes.
+- Current source/package metadata is prepared as the local `0.2.0-alpha.3` release candidate; hosted RC evidence and publication are pending.
 - Previous release: `v0.1.0-alpha.2` published and verified; pushed, released, and published.
 - NuGet global tool install verification: completed.
 - Published-package smoke workflow installs `AgentContextKit` `0.2.0-alpha.2`.
-- Source-package smoke workflow installs the local `AgentContextKit` `0.2.0-alpha.2` package.
+- Source-package smoke workflow installs the local `AgentContextKit` `0.2.0-alpha.3` package.
 
 ## Risk Summary
 - No risk findings in the latest local scan.
-- `0.2.0-alpha.3` is NO-GO. Do not bump version, tag, publish, or release.
+- `0.2.0-alpha.3` is release-prepared locally only after TASK-0203 validation; do not tag, publish, create a GitHub Release, or dispatch release workflows.
 
 ## Recommended Checks
 - `dotnet build AgentContextKit.sln -c Release --no-restore`
