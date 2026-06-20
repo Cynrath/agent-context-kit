@@ -139,4 +139,37 @@ Maintainer-provided evidence to record:
 Single `git revert <sha>` for each TASK-0202 commit. Docs-only changes; no source/runtime migration, package cleanup, tag cleanup, release cleanup, NuGet cleanup, or workflow cleanup required.
 
 ## Completion notes
-Pending implementation and validation.
+Completed as a docs-only maintainer evidence intake. `RB-003` and `RB-008` are closed for planned `0.2.0-alpha.3` release-preparation entry from maintainer-provided `ShadowFlameC` backup/security/recovery evidence.
+
+Commits:
+- Plan: `98f5458` (`docs: plan task 0202 maintainer evidence intake`).
+- Evidence implementation: `f7b7d48` (`docs: record maintainer blocker evidence`).
+- Final evidence: this commit (`docs: record task 0202 evidence`).
+
+Validation:
+- `ackit --help`: passed before edits; installed global package still exposes the published `0.2.0-alpha.2` command surface.
+- `git fetch origin`: passed after maintainer fixed local Git access.
+- `git status --porcelain=v1 --untracked-files=all 2>$null`: empty before edits.
+- `git status --short`: emitted the known Windows unreadable-directory warning; raw porcelain was empty.
+- `git rev-parse --short HEAD`: `c030815` before TASK-0202 plan; `98f5458` after plan; `f7b7d48` after implementation.
+- `git rev-parse --short origin/master`: `c030815` before push.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- --help`: passed; current-source command surface includes `scan --include/--exclude`, `mcp --stdio-server`, `mcp --stdio`, `diff`, `trim`, and `watch`.
+- `dotnet restore AgentContextKit.sln`: passed.
+- `dotnet build AgentContextKit.sln -c Release --no-restore`: passed with existing xUnit analyzer warnings; 0 errors.
+- `dotnet test AgentContextKit.sln -c Release --no-build`: passed, 428/428.
+- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci`: passed; existing `.remember` Medium findings and Low local-path findings only.
+- `ackit doctor`: passed.
+- `git diff --check`: passed; CRLF normalization warnings only before final evidence.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1`: passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-cli-contract.ps1`: passed with dirty-tree warning.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1`: passed with dirty-tree warning.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/verify-release.ps1`: internal restore, build, test, current-source `scan --ci`, and doctor steps passed; release blocker review failed only on the known Windows `git status --short` unreadable-directory stderr behavior.
+
+Final status:
+- `RB-003`: closed. `ShadowFlameC` is recorded as independent backup security notification owner and backup maintainer contact for planned `0.2.0-alpha.3`.
+- `RB-008`: closed. `ShadowFlameC` is recorded as current NuGet package owner and backup package recovery owner for planned `0.2.0-alpha.3`.
+- `0.2.0-alpha.3`: release-preparation eligible, not published.
+- Primary owner-driven release preparation remains allowed for `Cynrath` / `Cyranth`.
+- `ShadowFlameC`: backup/recovery owner, not mandatory release approver.
+- Next task: release preparation, not publish. Scope should include metadata bump to `0.2.0-alpha.3`, package diff, pack/install smoke, hosted RC evidence, and exact-candidate GO/NO-GO.
+- Prohibited actions: no version bump, package metadata change, tag, GitHub Release, NuGet publish, workflow dispatch, security advisory, branch ruleset mutation, repository secret creation, owner removal, account/recovery mutation, or destructive NuGet action occurred.
