@@ -199,4 +199,105 @@ Scan-scope decision:
 - If maintainers later want retained local release artifacts excluded from self-scan output, create a separate policy task that proves the exclusion cannot hide secrets or public-release blockers.
 
 ## Completion notes
-Pending.
+Completed as docs/policy plus scoped local cleanup.
+
+Commits:
+
+- Plan: `e30c32f` (`docs: plan task 0212 remember log retention`)
+- Policy: `13b7266` (`docs: define remember log retention policy`)
+- Final evidence: this commit
+
+Current HEAD/origin at final evidence collection:
+
+- Local HEAD before this final evidence commit: `13b72662956442456a54cf11a99310d75c937dda`
+- Local HEAD short before this final evidence commit: `13b7266`
+- `origin/master`: `73e5baa14c22bebc1d92494536c807064110212e`
+- `origin/master` short: `73e5baa`
+
+Required first checks:
+
+- `ackit --help`: passed and showed the current `0.2.0-alpha.3` command set.
+- `ackit --version`: passed, `AgentContextKit 0.2.0-alpha.3`.
+- `git fetch origin`: passed; no `.git/FETCH_HEAD` permission error or `.git` write error occurred.
+- Initial local HEAD and `origin/master`: both `73e5baa14c22bebc1d92494536c807064110212e`, matching the expected TASK-0211 state.
+- `git status --porcelain=v1 --untracked-files=all 2>$null`: clean at start.
+- `git status --short`: exited `0` but printed the known Windows unreadable-directory warning; raw porcelain was clean.
+- `git log --oneline -n 40`: confirmed TASK-0211 final evidence at `73e5baa`.
+
+Read/inspection notes:
+
+- Required docs and state files were read before edits.
+- `.ackit/config.yml` was requested but is not present in this workspace.
+- Project structure remains .NET 10 CLI/tool: `src/AgentContextKit.Cli`, `src/AgentContextKit.Core`, and `tests/AgentContextKit.Tests`.
+- Runtime projects have no external runtime package references; test dependencies are `coverlet.collector`, `Microsoft.NET.Test.Sdk`, `xunit.v3`, `xunit.runner.visualstudio`, and `YamlDotNet`.
+
+Storage state for `.remember` logs:
+
+- Tracked files under `.remember`: none.
+- Ignored/untracked state: yes.
+- Ignore source for logs: `.remember/.gitignore`.
+- Pre-cleanup `.remember` file metadata: `23` ignored/untracked files, `469892` bytes total.
+- Pre-cleanup `.remember/logs/**/*.log`: `17` files, `467589` bytes total.
+- Release evidence: no.
+- Needed for reproducibility: no.
+- Safe to keep locally: yes, but not useful as release evidence and not appropriate to paste into docs.
+- Cleanup performed: yes. Removed `17` ignored/untracked `.remember/logs/**/*.log` files totaling `467589` bytes.
+- Post-cleanup `.remember/logs/**/*.log`: `0` files, `0` bytes.
+- Raw `.remember` log contents were not pasted into docs.
+
+Storage state for package-validation artifacts:
+
+- Tracked files under `artifacts/package-validation`: none.
+- Ignored/untracked state: yes.
+- Ignore source: root `.gitignore` `artifacts/` rule.
+- Retained files: alpha3 `.nupkg` and `.snupkg`.
+- Total retained local artifact size: `273609` bytes.
+- Release evidence: yes, local package-validation evidence for `0.2.0-alpha.3`.
+- Cleanup performed: no. These artifacts remain retained.
+- Public release/package/tag state mutation: none.
+
+Scan evidence:
+
+- Pre-cleanup `ackit scan --ci`: exit `0`; `24` findings, `0` Critical, `0` High, `19` Medium, `5` Low.
+- Pre-cleanup `ackit scan --json | ConvertFrom-Json | ConvertTo-Json -Depth 20`: passed; `suppressionSummary.total = 0`; finding `match` values were `null`.
+- Required `rg` evidence command ran. It produced expected documentation/test mentions of `.remember`, package artifacts, local-path patterns, and security terms; no raw `.remember` log content was copied into docs.
+- Post-cleanup `ackit scan --ci`: exit `0`; `7` findings, `0` Critical, `0` High, `2` Medium, `5` Low.
+- Post-cleanup `ackit scan --json | ConvertFrom-Json | ConvertTo-Json -Depth 20`: passed; `riskSummary.total = 7`; `suppressionSummary.total = 0`.
+- Impact: cleanup removed all `.remember` log `ACKIT003` findings. Remaining Medium findings are retained package-validation artifacts.
+
+Policy decisions:
+
+- `REMEMBER_LOGS`: local-only ignored runtime/memory logs. They may be locally cleaned after count/size review when ignored/untracked and not needed for evidence. TASK-0212 performed that cleanup.
+- `PACKAGE_VALIDATION_ARTIFACTS`: retained local alpha3 release/package-validation evidence. Do not delete through generic cleanup and do not mutate release assets/package state.
+- `LOCAL_PATH_REFERENCES`: safe examples, historical evidence, required task command text, and defensive test fixture. No immediate normalization.
+- Scan-scope suppression/exclusion: not changed. A separate deliberate policy task is required before excluding retained local release evidence from scans.
+
+Recommended next task:
+
+- TASK-0213 published-package workflow pin/status sync.
+- Lower-priority optional follow-up: review scan-scope policy for retained local artifacts only if maintainers want a deliberate exclusion/suppression policy.
+
+Validation results:
+
+- `ackit --version`: passed, `AgentContextKit 0.2.0-alpha.3`.
+- `ackit doctor`: passed all checks.
+- `ackit scan --ci`: exited `0`; remaining findings are `2` Medium retained package artifacts and `5` Low local-path references.
+- `git diff --check`: passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1`: passed; no untracked or staged entries.
+- `dotnet test AgentContextKit.sln -c Release --no-build`: passed, `428/428`.
+
+Out-of-scope confirmation:
+
+- No source feature work.
+- No package metadata change.
+- No version bump.
+- No NuGet publish.
+- No GitHub Release mutation.
+- No tag creation, movement, or deletion.
+- No release workflow dispatch.
+- No release-candidate workflow dispatch.
+- No package-validation artifact deletion.
+- No automatic redaction.
+- No `.ackit` baseline mutation.
+- No suppression, `.ackit/config.yml`, or `.gitignore` mutation.
+- No owner/account/secret/security-setting/recovery mutation.
