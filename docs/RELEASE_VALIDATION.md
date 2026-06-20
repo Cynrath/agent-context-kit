@@ -1,7 +1,7 @@
 # Release Validation
 
 ## Planned v0.2.0-alpha.3 Decision
-TASK-0134 recorded an evidence-backed NO-GO on 2026-06-14. TASK-0202 later closed the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepares source/package metadata as `0.2.0-alpha.3` for local validation only; no alpha.3 tag, GitHub Release, NuGet publish, release workflow dispatch, or release-candidate workflow dispatch is authorized.
+TASK-0134 recorded an evidence-backed NO-GO on 2026-06-14. TASK-0202 later closed the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared source/package metadata as `0.2.0-alpha.3` and local package evidence. TASK-0204 identifies dispatch-time current `origin/master` as the exact hosted RC evidence candidate; preflight started from `195b933df52ccba37e0edc8327e64aaecb5c5d8b`. No alpha.3 tag, GitHub Release, NuGet publish, release workflow dispatch, or release-candidate workflow dispatch is authorized by TASK-0204.
 
 This checklist validates local release readiness without publishing.
 
@@ -64,6 +64,30 @@ powershell -ExecutionPolicy Bypass -File scripts/check-rc-local-readiness.ps1 -R
 ```
 
 Hosted RC evidence is manual-only. After a maintainer push, dispatch `.github/workflows/release-candidate-evidence.yml` and record the three OS results as described in `docs/RC_HOSTED_EVIDENCE.md`.
+
+For the prepared alpha.3 candidate, use:
+
+```powershell
+$commitSha = (git rev-parse origin/master).Trim()
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-candidate-inputs.ps1 `
+  -CommitSha $commitSha `
+  -CandidateVersion 0.2.0-alpha.3 `
+  -PredecessorVersion 0.2.0-alpha.2 `
+  -RequireOriginMaster
+```
+
+Then a maintainer can manually dispatch:
+
+```powershell
+gh workflow run release-candidate-evidence.yml `
+  --repo Cynrath/agent-context-kit `
+  --ref master `
+  -f commit_sha=$commitSha `
+  -f candidate_version=0.2.0-alpha.3 `
+  -f predecessor_version=0.2.0-alpha.2
+```
+
+TASK-0204 records these instructions only; it does not dispatch the workflow.
 
 The normative local evidence matrix and dated results are maintained in `docs/RELEASE_CANDIDATE_EVIDENCE.md`.
 

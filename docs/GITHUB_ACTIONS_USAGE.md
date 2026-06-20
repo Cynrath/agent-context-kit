@@ -86,6 +86,26 @@ The baseline diff workflow runs `ackit scan --baseline <path> --ci` so new High 
 
 See [RC_HOSTED_EVIDENCE.md](RC_HOSTED_EVIDENCE.md) before manually dispatching the RC workflow.
 
+Current alpha.3 RC evidence dispatch is pending. Use the exact TASK-0204 tuple:
+
+```powershell
+$commitSha = (git rev-parse origin/master).Trim()
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-candidate-inputs.ps1 `
+  -CommitSha $commitSha `
+  -CandidateVersion 0.2.0-alpha.3 `
+  -PredecessorVersion 0.2.0-alpha.2 `
+  -RequireOriginMaster
+
+gh workflow run release-candidate-evidence.yml `
+  --repo Cynrath/agent-context-kit `
+  --ref master `
+  -f commit_sha=$commitSha `
+  -f candidate_version=0.2.0-alpha.3 `
+  -f predecessor_version=0.2.0-alpha.2
+```
+
+This manual workflow does not publish, tag, create a GitHub Release, upload artifacts, upload SARIF, or approve release publication.
+
 ## Privacy Notes
 - The MVP does not upload repository content.
 - `.ackit/` outputs are local generated artifacts and are ignored by git.

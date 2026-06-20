@@ -1,11 +1,11 @@
 # v0.2.0-alpha.3 Release Decision
 
-Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-preparation update: 2026-06-20. Decision owner: `Cynrath`.
+Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-preparation update: 2026-06-20. Hosted RC planning update: 2026-06-20. Decision owner: `Cynrath`.
 
 ## Decision
 **Release candidate prepared locally; hosted RC evidence and publication approval are still pending.**
 
-`0.2.0-alpha.3` is the selected planning version. TASK-0202 closes the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared the source/package metadata, release-preparation docs, local package, package verification, and installed-tool smoke evidence at implementation commit `33e1897`. Hosted RC evidence, exact-candidate GO, tag creation, GitHub Release creation, NuGet publication, and workflow dispatch remain pending and unauthorized.
+`0.2.0-alpha.3` is the selected planning version. TASK-0202 closes the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared the source/package metadata, release-preparation docs, local package, package verification, and installed-tool smoke evidence at implementation commit `33e1897`. TASK-0204 identifies dispatch-time current `origin/master` as the hosted RC evidence candidate; preflight started from `195b933df52ccba37e0edc8327e64aaecb5c5d8b`, but TASK-0204 docs commits advance the branch before final dispatch. Hosted RC evidence, exact-candidate GO, tag creation, GitHub Release creation, NuGet publication, and workflow dispatch remain pending and unauthorized.
 
 ## Verified Inputs
 - TASK-0126 immutable alpha.2 recovery verification is green in run `27478046088`.
@@ -20,6 +20,7 @@ Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-p
 - TASK-0202 records maintainer-provided evidence from `Cynrath` dated 2026-06-20 that `ShadowFlameC` is repository `write` collaborator, independent backup security notification owner, backup maintainer contact, current NuGet package owner, and backup package recovery owner for planned `0.2.0-alpha.3`.
 - `.github/workflows/release.yml` uses `environment: nuget-release`, `NuGet/login@v1` with `user: Cyranth`, and `NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}` from trusted publishing. No repository secret is required for NuGet publish.
 - TASK-0203 prepared package metadata, CLI runtime version, source-package smoke pin, release-preparation docs, local package validation, and installed-tool smoke evidence for `0.2.0-alpha.3`. This is not publication approval.
+- TASK-0204 verified current-source `version` reports `AgentContextKit 0.2.0-alpha.3` and preflight `origin/master` was `195b933df52ccba37e0edc8327e64aaecb5c5d8b`.
 
 ## Remaining Release Conditions
 1. Hosted RC evidence must be recorded for the exact `0.2.0-alpha.3` candidate commit before any release GO.
@@ -78,6 +79,35 @@ TASK-0203 boundaries:
 - final release GO is not recorded in TASK-0203;
 - no tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate workflow dispatch, owner/account/recovery mutation, repository secret creation, branch ruleset mutation, security advisory, or destructive NuGet action is authorized.
 
+## TASK-0204 Hosted RC Evidence Planning
+
+TASK-0204 prepares the exact hosted RC evidence plan for the already prepared local candidate. The release-candidate workflow validates that `commit_sha` equals checked-out `HEAD` and current `origin/master`; because TASK-0204 commits move the branch, the workflow must be manually dispatched later with the post-push `origin/master` SHA:
+
+```powershell
+$commitSha = (git rev-parse origin/master).Trim()
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-candidate-inputs.ps1 `
+  -CommitSha $commitSha `
+  -CandidateVersion 0.2.0-alpha.3 `
+  -PredecessorVersion 0.2.0-alpha.2 `
+  -RequireOriginMaster
+
+gh workflow run release-candidate-evidence.yml `
+  --repo Cynrath/agent-context-kit `
+  --ref master `
+  -f commit_sha=$commitSha `
+  -f candidate_version=0.2.0-alpha.3 `
+  -f predecessor_version=0.2.0-alpha.2
+```
+
+Read-only hosted run check result: no exact hosted alpha.3 `release-candidate-evidence` run exists yet. Historical alpha.2 run `27478635057` remains valid only for alpha.2 and must not be reused as alpha.3 evidence.
+
+TASK-0204 boundaries:
+- hosted RC evidence is pending;
+- exact-candidate GO is not recorded;
+- publication remains not approved;
+- no workflow dispatch is performed unless explicitly requested by the maintainer in the current session;
+- no tag, GitHub Release, NuGet publish, release workflow dispatch, owner/account/recovery mutation, repository secret creation, branch ruleset mutation, security advisory, or destructive NuGet action is authorized.
+
 ## Actions Not Performed
 - no published-package workflow version change;
 - no release-candidate workflow dispatch for alpha.3;
@@ -91,9 +121,10 @@ TASK-0203 boundaries:
 - no owner removal, account/recovery mutation, or destructive NuGet action.
 
 ## Next Required Task
-Hosted RC evidence and exact-candidate decision:
-1. obtain standard hosted checks and dedicated three-OS RC evidence for the exact prepared candidate;
-2. record exact-version/exact-commit GO or NO-GO;
-3. only after an explicit GO in a separate authorized release task, publish through the OIDC-only release workflow.
+Manual hosted RC dispatch and exact-candidate decision:
+1. a maintainer dispatches `release-candidate-evidence.yml` with the post-push TASK-0204 tuple above;
+2. record Windows, Ubuntu, and macOS results for the exact dispatch-time `origin/master` commit;
+3. record exact-version/exact-commit GO or NO-GO;
+4. only after an explicit GO in a separate authorized release task, publish through the OIDC-only release workflow.
 
 Immutable release rules remain in force: never reuse a NuGet version, move an existing tag, force push, or replace published artifacts.
