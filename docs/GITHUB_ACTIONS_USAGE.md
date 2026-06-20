@@ -86,7 +86,9 @@ The baseline diff workflow runs `ackit scan --baseline <path> --ci` so new High 
 
 See [RC_HOSTED_EVIDENCE.md](RC_HOSTED_EVIDENCE.md) before manually dispatching the RC workflow.
 
-Current alpha.3 RC evidence dispatch is pending. Use the exact TASK-0204 tuple:
+Current alpha.3 RC evidence is complete. TASK-0205 verified run `27868539971` for commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS evidence jobs all succeeded.
+
+For a future different candidate, use the exact selected `origin/master` tuple:
 
 ```powershell
 $commitSha = (git rev-parse origin/master).Trim()
@@ -104,7 +106,7 @@ gh workflow run release-candidate-evidence.yml `
   -f predecessor_version=0.2.0-alpha.2
 ```
 
-This manual workflow does not publish, tag, create a GitHub Release, upload artifacts, upload SARIF, or approve release publication.
+This manual workflow does not publish, tag, create a GitHub Release, upload artifacts, upload SARIF, or approve release publication. TASK-0205 records exact-candidate GO for a later publish task only; no release workflow dispatch or publication was performed.
 
 ## Privacy Notes
 - The MVP does not upload repository content.

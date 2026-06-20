@@ -1,7 +1,9 @@
 # Release Validation
 
 ## Planned v0.2.0-alpha.3 Decision
-TASK-0134 recorded an evidence-backed NO-GO on 2026-06-14. TASK-0202 later closed the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared source/package metadata as `0.2.0-alpha.3` and local package evidence. TASK-0204 identifies dispatch-time current `origin/master` as the exact hosted RC evidence candidate; preflight started from `195b933df52ccba37e0edc8327e64aaecb5c5d8b`. No alpha.3 tag, GitHub Release, NuGet publish, release workflow dispatch, or release-candidate workflow dispatch is authorized by TASK-0204.
+TASK-0134 recorded an evidence-backed NO-GO on 2026-06-14. TASK-0202 later closed the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared source/package metadata as `0.2.0-alpha.3` and local package evidence. TASK-0204 identified dispatch-time current `origin/master` as the exact hosted RC evidence candidate. TASK-0205 verified hosted RC run `27868539971` as successful for commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`.
+
+The alpha.3 decision is exact-candidate GO for a later publish task only. No alpha.3 tag, GitHub Release, NuGet publish, release workflow dispatch, or new release-candidate workflow dispatch is authorized by TASK-0205.
 
 This checklist validates local release readiness without publishing.
 
@@ -65,7 +67,17 @@ powershell -ExecutionPolicy Bypass -File scripts/check-rc-local-readiness.ps1 -R
 
 Hosted RC evidence is manual-only. After a maintainer push, dispatch `.github/workflows/release-candidate-evidence.yml` and record the three OS results as described in `docs/RC_HOSTED_EVIDENCE.md`.
 
-For the prepared alpha.3 candidate, use:
+For the prepared alpha.3 candidate, TASK-0205 recorded completed hosted evidence:
+
+- run: `27868539971`;
+- URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27868539971`;
+- commit: `beaa14deed3dbc55ac98d216679f9a9799261801`;
+- candidate version: `0.2.0-alpha.3`;
+- predecessor version: `0.2.0-alpha.2`;
+- source candidate package: `0.2.0-alpha.3.ci.27868539971`;
+- matrix: `windows-2025`, `ubuntu-latest`, and `macos-latest` all succeeded.
+
+For a future different candidate, use:
 
 ```powershell
 $commitSha = (git rev-parse origin/master).Trim()
@@ -87,7 +99,7 @@ gh workflow run release-candidate-evidence.yml `
   -f predecessor_version=0.2.0-alpha.2
 ```
 
-TASK-0204 records these instructions only; it does not dispatch the workflow.
+TASK-0204 recorded these instructions only. TASK-0205 records the maintainer-dispatched alpha.3 hosted run after read-only `gh` verification. TASK-0205 does not dispatch a workflow, publish a package, create a tag, or create a GitHub Release.
 
 The normative local evidence matrix and dated results are maintained in `docs/RELEASE_CANDIDATE_EVIDENCE.md`.
 

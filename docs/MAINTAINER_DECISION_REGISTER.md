@@ -1,6 +1,6 @@
 # Maintainer Decision Register
 
-This register records future maintainer decisions. It contains no approval yet.
+This register records future maintainer decisions and release-scoped approval boundaries. It contains no credentials or private recovery material.
 
 | Decision ID | Related blocker | Status | Decision | Rationale | Owner role | Evidence | Effective scope | Review/expiry | Remote action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -13,7 +13,7 @@ This register records future maintainer decisions. It contains no approval yet.
 | MD-007 | RB-007 provenance | Implemented locally | Attest next release asset | GitHub first-party attestation binds exact release nupkg to release workflow | Cynrath | `release.yml`, workflow tests, future run | Next published release | At next publish | Attestation write in publish job only |
 | MD-008 | RB-008 recovery | Complete | Procedure accepted; `ShadowFlameC` assigned as NuGet backup package recovery owner | Immutable successor recovery requires package owner continuity and backup recovery coverage | `Cynrath` decision owner; `Cyranth` primary NuGet/package owner; `ShadowFlameC` backup owner | Maintainer-provided evidence dated 2026-06-20; `ShadowFlameC` appears in current NuGet package owner list; `docs/PACKAGE_RECOVERY.md`; TASK-0202 | Package lifecycle / planned `0.2.0-alpha.3` release-preparation entry | Recheck before each RC or owner/recovery change | No package state changed; no destructive NuGet action performed; `ShadowFlameC` is not mandatory release approver |
 | MD-009 | RB-009 candidate | Selected / publication deferred | `0.2.0-alpha.3` | Additive release/security automation is the smallest compatible prerelease scope; metadata waits for GO | Cynrath release maintainer | `docs/V020_ALPHA3_PLAN.md` | Next candidate planning | Before metadata change or 2026-09-30 | No release write |
-| MD-010 | RB-010 approval | Local candidate prepared / publish deferred | Prepared `0.2.0-alpha.3` locally in TASK-0203; do not publish yet | TASK-0202 closes ownership/recovery blockers; TASK-0203 records metadata and local package evidence, but hosted RC evidence and exact-candidate publication GO remain pending | `Cynrath` release maintainer | `docs/V020_ALPHA3_RELEASE_DECISION.md`; TASK-0202 maintainer evidence; TASK-0203 release-preparation task | Prepared local `0.2.0-alpha.3` candidate at implementation commit `33e1897`; hosted RC evidence pending | Until hosted RC evidence records exact-candidate GO or NO-GO | Local metadata/docs/package-validation work only; no release write |
+| MD-010 | RB-010 approval | Exact-candidate GO / publish deferred | `0.2.0-alpha.3` is GO for a later publish task only; do not publish in TASK-0205 | TASK-0202 closes ownership/recovery blockers; TASK-0203 records metadata and local package evidence; TASK-0205 verifies hosted RC run `27868539971` green on all three OS jobs | `Cynrath` release maintainer | `docs/V020_ALPHA3_RELEASE_DECISION.md`; `docs/RC_HOSTED_EVIDENCE.md`; TASK-0202 maintainer evidence; TASK-0203 release-preparation task; TASK-0205 hosted evidence task | Exact hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801`; candidate `0.2.0-alpha.3`; predecessor `0.2.0-alpha.2`; source package `0.2.0-alpha.3.ci.27868539971` | Publish task must resolve RC commit vs later docs-only HEAD policy | No release write in TASK-0205; publication requires separate authorized OIDC release task |
 
 ## Recording A Decision
 Replace `TBD` only with explicit maintainer evidence. Record the exact commit/version scope. Accepted risk must include why, compensating controls, owner role, review/expiry date, and rollback/recovery path. Do not use this register to store credentials, certificates, private report content, or recovery secrets.
@@ -45,8 +45,19 @@ No version bump, package metadata change, tag, GitHub Release, NuGet publish, wo
 
 TASK-0203 prepared the local `0.2.0-alpha.3` candidate at implementation commit `33e1897`.
 
-- `MD-010`: local candidate prepared / publish deferred. Package metadata, CLI runtime version, source-package smoke version parity, release-preparation docs, package verification, and installed-tool smoke evidence are recorded.
-- Hosted RC evidence is pending for the exact candidate.
-- Exact-candidate GO or NO-GO is pending.
+- `MD-010`: local candidate prepared / publish deferred at TASK-0203 close. Package metadata, CLI runtime version, source-package smoke version parity, release-preparation docs, package verification, and installed-tool smoke evidence are recorded.
+- Hosted RC evidence was pending for the exact candidate at TASK-0203 close.
+- Exact-candidate GO or NO-GO was pending at TASK-0203 close.
 
 No tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate workflow dispatch, security advisory, branch ruleset mutation, repository secret creation, owner/account/recovery mutation, or destructive NuGet action occurred in TASK-0203.
+
+## TASK-0205 Hosted RC Evidence GO
+
+TASK-0205 records hosted RC evidence for maintainer-dispatched run `27868539971`.
+
+- `MD-010`: exact-candidate GO / publish deferred. The hosted run passed for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate version `0.2.0-alpha.3`, predecessor version `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`.
+- Windows job `82476527430`, Ubuntu job `82476527450`, and macOS job `82476527416` all succeeded.
+- The only annotations are non-blocking xUnit analyzer warnings (`xUnit1051` and `xUnit2013`).
+- The later publish task must resolve whether publication uses the RC evidence commit or a later docs-only HEAD under the release workflow exact-commit policy.
+
+No tag, GitHub Release, NuGet publish, release workflow dispatch, new release-candidate workflow dispatch, security advisory, branch ruleset mutation, repository secret creation, owner/account/recovery mutation, or destructive NuGet action occurred in TASK-0205.

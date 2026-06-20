@@ -66,8 +66,10 @@
 - Review all generated files before future publishing.
 - For the next release, approve push, hosted CI/source smoke validation, tag, GitHub Release, NuGet publish, and NuGet install verification in a dedicated release task.
 - For planned `0.2.0-alpha.3`, TASK-0202 closes independent backup security notification ownership and backup package recovery coverage for release preparation.
-- For planned `0.2.0-alpha.3`, TASK-0203 completed local package validation and install smoke for implementation commit `33e1897`; hosted RC evidence and exact-candidate GO remain pending.
+- For planned `0.2.0-alpha.3`, TASK-0203 completed local package validation and install smoke for implementation commit `33e1897`; at TASK-0203 close, hosted RC evidence and exact-candidate GO remained pending.
 - For planned `0.2.0-alpha.3`, TASK-0204 identifies dispatch-time current `origin/master` as the hosted RC candidate, candidate version `0.2.0-alpha.3`, and predecessor `0.2.0-alpha.2`; obtain hosted RC evidence and record the exact-version/exact-commit GO packet before any publication action.
+- For planned `0.2.0-alpha.3`, TASK-0205 records hosted RC run `27868539971` as passed for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source package `0.2.0-alpha.3.ci.27868539971`; exact-candidate GO is for a later publish task only.
+- Final publish remains pending and must be authorized by a separate task.
 
 ## Release Candidate Evidence Gate
 - `scripts/check-release-candidate-evidence.ps1 -FailOnIssues` passes.
@@ -86,7 +88,7 @@
 - [x] Recorded author-signing and SBOM deferrals plus future provenance implementation.
 - [x] Verify package owner continuity and backup recovery ownership before release preparation; `ShadowFlameC` is recorded as NuGet package owner / backup package recovery owner per TASK-0202. No destructive NuGet action was performed.
 - [x] Complete TASK-0203 local `0.2.0-alpha.3` package validation and install smoke for implementation commit `33e1897`.
-- [ ] Rerun hosted RC evidence for the dispatch-time current `origin/master` commit with candidate `0.2.0-alpha.3` and predecessor `0.2.0-alpha.2`.
+- [x] Rerun hosted RC evidence for the dispatch-time current `origin/master` commit with candidate `0.2.0-alpha.3` and predecessor `0.2.0-alpha.2`; run `27868539971` passed on Windows, Ubuntu, and macOS for `beaa14deed3dbc55ac98d216679f9a9799261801`.
 - `scripts/check-release-candidate-workflow.ps1 -FailOnIssues` passes and the manual `release-candidate-evidence` workflow is green on all three OS runners.
 - [x] The `xunit` Legacy warning is resolved through the TASK-0091 xUnit v3 migration; 169/169 tests and clean dependency reviews are recorded.
 - [x] The conditional local contract freeze and NO-GO decision package are recorded in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and `docs/MAINTAINER_RC_DECISION.md`.
@@ -94,5 +96,5 @@
 - [x] English/Turkish human output, known argument-error parity, exit-code parity, and language-independent JSON semantics are covered by `scripts/check-localization-parity.ps1 -FailOnIssues`.
 - [x] Security/supply-chain evidence structure and maintainer handoff are present and pass `scripts/check-security-supply-chain-evidence.ps1 -FailOnIssues`; remote items remain explicitly pending.
 - [x] Current-source consolidated local evidence passes `scripts/check-rc-local-readiness.ps1 -RunDependencyReview -FailOnIssues`; the result remains `LOCAL READY / REMOTE NO-GO`.
-- [ ] Rerun the same gate on the exact selected candidate commit after TASK-0203 local evidence and hosted RC evidence are recorded.
+- [ ] Before publication, resolve whether the release workflow should publish the hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801` or a later docs-only HEAD; if using a later docs-only HEAD, prove package/source metadata is unchanged or record new hosted RC evidence for that final HEAD.
 - Signing, SBOM, provenance, and package recovery decisions are recorded.

@@ -1,11 +1,13 @@
 # v0.2.0-alpha.3 Release Decision
 
-Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-preparation update: 2026-06-20. Hosted RC planning update: 2026-06-20. Decision owner: `Cynrath`.
+Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-preparation update: 2026-06-20. Hosted RC planning update: 2026-06-20. Hosted RC evidence update: 2026-06-20. Decision owner: `Cynrath`.
 
 ## Decision
-**Release candidate prepared locally; hosted RC evidence and publication approval are still pending.**
+**Exact-candidate GO for a later publish task; publication is not yet performed.**
 
-`0.2.0-alpha.3` is the selected planning version. TASK-0202 closes the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared the source/package metadata, release-preparation docs, local package, package verification, and installed-tool smoke evidence at implementation commit `33e1897`. TASK-0204 identifies dispatch-time current `origin/master` as the hosted RC evidence candidate; preflight started from `195b933df52ccba37e0edc8327e64aaecb5c5d8b`, but TASK-0204 docs commits advance the branch before final dispatch. Hosted RC evidence, exact-candidate GO, tag creation, GitHub Release creation, NuGet publication, and workflow dispatch remain pending and unauthorized.
+`0.2.0-alpha.3` is the selected planning version. TASK-0202 closes the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared the source/package metadata, release-preparation docs, local package, package verification, and installed-tool smoke evidence. TASK-0204 identified the dispatch-time `origin/master` hosted RC evidence candidate. TASK-0205 verified hosted RC run `27868539971` for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS jobs all succeeded.
+
+This GO authorizes only a later publish-preparation/execution task to proceed to its own exact-commit checks. TASK-0205 does not approve an immediate publish, does not dispatch `release.yml`, and does not create a tag, GitHub Release, or NuGet package.
 
 ## Verified Inputs
 - TASK-0126 immutable alpha.2 recovery verification is green in run `27478046088`.
@@ -21,12 +23,14 @@ Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-p
 - `.github/workflows/release.yml` uses `environment: nuget-release`, `NuGet/login@v1` with `user: Cyranth`, and `NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}` from trusted publishing. No repository secret is required for NuGet publish.
 - TASK-0203 prepared package metadata, CLI runtime version, source-package smoke pin, release-preparation docs, local package validation, and installed-tool smoke evidence for `0.2.0-alpha.3`. This is not publication approval.
 - TASK-0204 verified current-source `version` reports `AgentContextKit 0.2.0-alpha.3` and preflight `origin/master` was `195b933df52ccba37e0edc8327e64aaecb5c5d8b`.
+- TASK-0205 verified hosted RC run `27868539971` with `gh`: run conclusion `success`; head SHA `beaa14deed3dbc55ac98d216679f9a9799261801`; event `workflow_dispatch`; branch `master`; jobs `evidence (windows-2025)`, `evidence (ubuntu-latest)`, and `evidence (macos-latest)` all succeeded.
 
 ## Remaining Release Conditions
-1. Hosted RC evidence must be recorded for the exact `0.2.0-alpha.3` candidate commit before any release GO.
+1. Publication remains a separate task and must run the release workflow's exact-commit checks before any tag, GitHub Release, or NuGet publish.
 2. Future provenance is implemented locally but can only be verified during an authorized successful publish; it does not replace pre-publish approval.
-3. Candidate-specific hosted RC evidence is still pending and must be obtained in a later task.
-4. Publication, tag creation, GitHub Release creation, and workflow dispatch remain unauthorized until hosted RC evidence records a new exact-candidate GO decision.
+3. TASK-0205 documentation commits happen after the hosted RC evidence commit and do not change package/source code. A future publish task must decide whether to publish the RC commit `beaa14deed3dbc55ac98d216679f9a9799261801` or the final docs-only HEAD according to repository release policy.
+4. If the release workflow requires `release_commit_sha == origin/master`, the publish task may need to publish a final documentation HEAD only after confirming package/source metadata remains unchanged from the RC evidence commit, or record a new hosted RC run for that final HEAD.
+5. Tag creation, GitHub Release creation, NuGet publication, and release workflow dispatch remain unauthorized until a separate explicit publish task.
 
 ## TASK-0198 Evidence Check
 
@@ -108,9 +112,31 @@ TASK-0204 boundaries:
 - no workflow dispatch is performed unless explicitly requested by the maintainer in the current session;
 - no tag, GitHub Release, NuGet publish, release workflow dispatch, owner/account/recovery mutation, repository secret creation, branch ruleset mutation, security advisory, or destructive NuGet action is authorized.
 
+## TASK-0205 Hosted RC Evidence And GO
+
+TASK-0205 records hosted release-candidate evidence for run `27868539971`:
+
+- run URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27868539971`;
+- event: `workflow_dispatch`;
+- branch: `master`;
+- candidate commit: `beaa14deed3dbc55ac98d216679f9a9799261801`;
+- candidate version: `0.2.0-alpha.3`;
+- predecessor version: `0.2.0-alpha.2`;
+- source candidate package: `0.2.0-alpha.3.ci.27868539971`;
+- matrix result: `windows-2025`, `ubuntu-latest`, and `macos-latest` all succeeded;
+- job IDs: macOS `82476527416`, Windows `82476527430`, Ubuntu `82476527450`;
+- annotations: xUnit analyzer warnings only (`xUnit1051` and `xUnit2013`), non-blocking.
+
+TASK-0205 decision:
+- exact-candidate GO is recorded for a later publish task;
+- `0.2.0-alpha.3` remains unpublished;
+- hosted RC evidence validates commit `beaa14deed3dbc55ac98d216679f9a9799261801`;
+- TASK-0205 docs commits happen after the hosted evidence and must be considered by the later publish task's exact-commit policy;
+- no tag, GitHub Release, NuGet publish, release workflow dispatch, new release-candidate workflow dispatch, owner/account/recovery mutation, repository secret creation, branch ruleset mutation, security advisory, or destructive NuGet action is authorized or performed in TASK-0205.
+
 ## Actions Not Performed
 - no published-package workflow version change;
-- no release-candidate workflow dispatch for alpha.3;
+- no release-candidate workflow dispatch by TASK-0205; the maintainer-dispatched run `27868539971` was verified read-only;
 - no release workflow dispatch;
 - no NuGet login or publish;
 - no tag or GitHub Release creation;
@@ -121,10 +147,9 @@ TASK-0204 boundaries:
 - no owner removal, account/recovery mutation, or destructive NuGet action.
 
 ## Next Required Task
-Manual hosted RC dispatch and exact-candidate decision:
-1. a maintainer dispatches `release-candidate-evidence.yml` with the post-push TASK-0204 tuple above;
-2. record Windows, Ubuntu, and macOS results for the exact dispatch-time `origin/master` commit;
-3. record exact-version/exact-commit GO or NO-GO;
-4. only after an explicit GO in a separate authorized release task, publish through the OIDC-only release workflow.
+Publish preparation/execution decision:
+1. decide whether the publish task should use the hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801` or a later docs-only HEAD according to the release workflow's exact-commit policy;
+2. if using a later docs-only HEAD, prove package/source metadata remains unchanged from the hosted RC evidence commit or obtain a new hosted RC run for that final HEAD;
+3. only after a separate explicit publish task authorizes it, publish through the OIDC-only release workflow.
 
 Immutable release rules remain in force: never reuse a NuGet version, move an existing tag, force push, or replace published artifacts.

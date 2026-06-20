@@ -9,11 +9,16 @@ Future release sequences must not use API keys. Publication is allowed only thro
 ## Future Release-Candidate Decision
 TASK-0092 prepares a conditional local contract freeze in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and the authoritative GO/NO-GO checklist in `docs/MAINTAINER_RC_DECISION.md`. The current decision is NO-GO for RC publication until hosted evidence, remaining P0 gaps, private vulnerability reporting, schema assets, and supply-chain decisions are complete.
 
-TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. TASK-0202 records the missing backup security and package recovery evidence. TASK-0203 prepared source/package metadata and local package evidence. TASK-0204 identifies dispatch-time current `origin/master` as the exact hosted RC evidence candidate and predecessor `0.2.0-alpha.2`; preflight started from `195b933df52ccba37e0edc8327e64aaecb5c5d8b`. Hosted RC evidence, exact-candidate GO, tag, GitHub Release, NuGet publish, and workflow dispatch remain pending.
+TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. TASK-0202 records the missing backup security and package recovery evidence. TASK-0203 prepared source/package metadata and local package evidence. TASK-0204 identified dispatch-time current `origin/master` as the exact hosted RC evidence candidate and predecessor `0.2.0-alpha.2`. TASK-0205 verified hosted RC run `27868539971` as green for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS jobs all succeeded. Exact-candidate GO is recorded for a later publish task only.
 
-TASK-0134 evaluated the earlier GO packet on 2026-06-14 and recorded NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0203 supersedes only the local preparation boundary. TASK-0204 supersedes only the hosted-RC planning boundary; it still does not authorize release workflow dispatch, release-candidate workflow dispatch, or publication.
+TASK-0134 evaluated the earlier GO packet on 2026-06-14 and recorded NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0203 supersedes only the local preparation boundary. TASK-0204 supersedes only the hosted-RC planning boundary. TASK-0205 supersedes the hosted-evidence pending boundary with exact-candidate GO, but it still does not authorize release workflow dispatch, release-candidate workflow dispatch, tag creation, GitHub Release creation, or NuGet publication.
 
-Maintainer-only alpha.3 RC evidence command:
+Later publish task boundary:
+- decide whether to publish the hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801` or a later docs-only HEAD according to the release workflow exact-commit policy;
+- if using a later docs-only HEAD, prove package/source metadata remains unchanged from the hosted RC evidence commit or obtain a new hosted RC run;
+- publish only through the manual OIDC release workflow after explicit authorization in that task.
+
+For a future different candidate, maintainer-only RC evidence command:
 
 ```powershell
 $commitSha = (git rev-parse origin/master).Trim()

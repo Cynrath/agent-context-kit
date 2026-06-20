@@ -1,6 +1,10 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. TASK-0198 is an independent docs-only blocker evidence investigation, not a new project control. TASK-0199 completed the post-0198 state cleanup at `0aad858`. TASK-0200 completed the docs-only README/current-source CLI parity cleanup. TASK-0201 completed the docs-only `RB-003`/`RB-008` closure preflight. TASK-0202 completed the docs-only maintainer evidence intake for `ShadowFlameC` backup/security/recovery coverage. `RB-003` and `RB-008` are closed for planned `0.2.0-alpha.3` release-preparation entry. TASK-0203 prepared the local `0.2.0-alpha.3` package candidate at implementation commit `33e1897`. TASK-0204 is preparing dispatch-time `origin/master` hosted RC instructions; preflight started from `195b933df52ccba37e0edc8327e64aaecb5c5d8b`, but TASK-0204 commits advance the branch before dispatch. Hosted RC evidence, release GO, tag, GitHub Release, NuGet publish, and workflow dispatch remain pending and unauthorized.
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. TASK-0198 is an independent docs-only blocker evidence investigation, not a new project control. TASK-0199 completed the post-0198 state cleanup at `0aad858`. TASK-0200 completed the docs-only README/current-source CLI parity cleanup. TASK-0201 completed the docs-only `RB-003`/`RB-008` closure preflight. TASK-0202 completed the docs-only maintainer evidence intake for `ShadowFlameC` backup/security/recovery coverage. `RB-003` and `RB-008` are closed for planned `0.2.0-alpha.3` release-preparation entry. TASK-0203 prepared the local `0.2.0-alpha.3` package candidate at implementation commit `33e1897`. TASK-0204 prepared dispatch-time `origin/master` hosted RC instructions. TASK-0205 records hosted RC run `27868539971` as passed for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801` with candidate `0.2.0-alpha.3` and predecessor `0.2.0-alpha.2`; exact-candidate GO is for a later publish task only. Tag, GitHub Release, NuGet publish, release workflow dispatch, new release-candidate dispatch, and package publication remain pending and unauthorized.
+
+## Completed Independent Hosted RC Evidence GO
+
+1. TASK-0205 record alpha3 hosted RC evidence / GO - completed locally after read-only `gh` verification; run `27868539971` passed on `windows-2025`, `ubuntu-latest`, and `macos-latest`; exact candidate commit `beaa14deed3dbc55ac98d216679f9a9799261801`; candidate `0.2.0-alpha.3`; predecessor `0.2.0-alpha.2`; source candidate package `0.2.0-alpha.3.ci.27868539971`; annotations are xUnit analyzer warnings only; no publish/tag/GitHub Release/release workflow/new RC workflow/secret/owner/security-setting mutation.
 
 ## Completed Independent Hosted RC Evidence Planning
 
@@ -149,7 +153,7 @@ These actions require explicit maintainer control and do not block safe local-on
 5. Recheck the bounded SBOM deferral before expiry or the next release.
 6. Obtain hosted provenance evidence only during the next authorized publish; the control is implemented locally.
 7. Maintain NuGet backup recovery ownership and recovery procedure/tabletop evidence.
-8. Obtain hosted RC evidence and an exact-candidate GO/NO-GO decision for the prepared local `0.2.0-alpha.3` candidate; do not publish from the preparation task.
+8. Maintain the TASK-0205 hosted RC evidence record and exact-candidate GO for `0.2.0-alpha.3`; do not publish outside a separate explicit release task.
 
 ## Local-Only Ecosystem/Product Intelligence Track
 1. TASK-0100 offline OSS ecosystem catalog and roadmap reset - completed locally.
@@ -182,7 +186,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- The next action should be maintainer manual dispatch of `release-candidate-evidence.yml` for dispatch-time `origin/master`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`. Do not publish unless a separate explicit release task authorizes publication after hosted evidence and GO. No release, tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate dispatch, security-setting change, owner/account/recovery mutation, destructive NuGet action, or repository secret creation is authorized by TASK-0204.
+- The next action should be publish preparation/execution only after resolving whether publication uses the hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801` or a later docs-only HEAD. If a later docs-only HEAD is used, prove package/source metadata is unchanged from the hosted RC evidence commit or record a new hosted RC run for that final HEAD. Do not publish unless a separate explicit release task authorizes publication. No release, tag, GitHub Release, NuGet publish, release workflow dispatch, new release-candidate dispatch, security-setting change, owner/account/recovery mutation, destructive NuGet action, or repository secret creation is authorized by TASK-0205.
 
 ## Execution Rule
 After the closure of PROJECT-CONTROL-0110, the queue is in pause except for explicitly requested independent docs/release-preparation tasks. Tag, GitHub pre-release, NuGet publication, and workflow dispatch are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

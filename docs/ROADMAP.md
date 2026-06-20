@@ -35,9 +35,10 @@
 ## v0.2.0-alpha.3 Planning
 - Selected as the smallest compatible next prerelease for additive release recovery, hosted evidence, security ownership, and supply-chain automation work.
 - No CLI, config, JSON, baseline, SARIF, package ID, or offline-first behavior change is planned.
-- TASK-0203 prepares source/package metadata as the local `0.2.0-alpha.3` candidate; hosted RC evidence, exact-candidate GO, tag creation, GitHub Release creation, NuGet publication, and workflow dispatch remain pending.
-- Publication is NO-GO while independent backup security ownership remains unresolved; see `docs/V020_ALPHA3_PLAN.md`.
-- TASK-0134 completed the safe evaluation boundary with NO-GO; resume conditions are in `docs/V020_ALPHA3_RELEASE_DECISION.md`.
+- TASK-0203 prepared source/package metadata as the local `0.2.0-alpha.3` candidate.
+- TASK-0205 records hosted RC run `27868539971` as green for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801` and records exact-candidate GO for a later publish task only.
+- Tag creation, GitHub Release creation, NuGet publication, and release workflow dispatch remain pending until a separate authorized publish task resolves whether to publish the RC evidence commit or a later docs-only HEAD.
+- TASK-0134 completed the earlier safe evaluation boundary with NO-GO; TASK-0205 supersedes it with the hosted-evidence GO boundary in `docs/V020_ALPHA3_RELEASE_DECISION.md`.
 
 ## v0.2.0-alpha.1
 - Published on GitHub and NuGet in TASK-0065.

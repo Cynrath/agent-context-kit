@@ -6,16 +6,40 @@
 ## Current Hosted Status
 TASK-0128 completed the hardened workflow and exact hosted run. Run [27478635057](https://github.com/Cynrath/agent-context-kit/actions/runs/27478635057) passed on Windows, Ubuntu, and macOS for exact commit `4c4fa64ff34287dff01818d52f49b521efb3176d`, predecessor `0.2.0-alpha.1`, and source candidate `0.2.0-alpha.2.ci.27478635057`.
 
-TASK-0204 checked hosted runs read-only. No hosted `0.2.0-alpha.3` release-candidate evidence has been dispatched or recorded yet. TASK-0203 prepared a local package candidate at implementation commit `33e1897`. TASK-0204 preflight started from `origin/master` commit `195b933df52ccba37e0edc8327e64aaecb5c5d8b`, but the RC workflow validates that `commit_sha` equals dispatch-time `origin/master`; therefore maintainers must use the post-TASK-0204 pushed `origin/master` SHA when dispatching.
+TASK-0205 verified hosted `0.2.0-alpha.3` release-candidate evidence with `gh`. Run [27868539971](https://github.com/Cynrath/agent-context-kit/actions/runs/27868539971) passed on Windows, Ubuntu, and macOS for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`.
 
-Alpha.3 pending dispatch tuple:
+Alpha.3 hosted evidence tuple:
 - workflow: `release-candidate-evidence.yml`
-- candidate commit: dispatch-time current `origin/master` full SHA
+- run ID: `27868539971`
+- run URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27868539971`
+- event: `workflow_dispatch`
+- branch: `master`
+- candidate commit: `beaa14deed3dbc55ac98d216679f9a9799261801`
 - candidate version: `0.2.0-alpha.3`
 - predecessor version: `0.2.0-alpha.2`
-- expected matrix: `windows-2025`, `ubuntu-latest`, `macos-latest`
-- status: hosted RC evidence pending
-- release decision: pending; no GO and no publication approval
+- source candidate package: `0.2.0-alpha.3.ci.27868539971`
+- matrix:
+  - `windows-2025`: success, job `82476527430`
+  - `ubuntu-latest`: success, job `82476527450`
+  - `macos-latest`: success, job `82476527416`
+- status: hosted RC evidence passed
+- release decision: exact-candidate GO for a later publish task only
+
+Each hosted job completed these expected steps successfully:
+- checkout exact commit;
+- setup .NET;
+- validate exact commit and versions through `scripts/check-release-candidate-inputs.ps1`;
+- restore, Release build, and tests;
+- install predecessor and source candidate;
+- verify predecessor upgrade and baseline policy;
+- run the synthetic performance tripwire;
+- write evidence summary.
+
+Non-blocking annotations were xUnit analyzer warnings only:
+- `xUnit1051` cancellation-token responsiveness warnings in `tests/AgentContextKit.Tests/McpStdioTransportTests.cs`;
+- `xUnit2013` collection-size assertion warning in `tests/AgentContextKit.Tests/WatchCommandTests.cs`.
+
+No hosted job failed. Artifact upload and SARIF upload were disabled. The run did not publish a package, create or move a tag, create a GitHub Release, create repository secrets, or mutate release/security settings.
 
 ## What It Verifies
 - restore, Release build, and the full test suite on each runner;
@@ -59,14 +83,14 @@ Hosted benchmark evidence from the successful run:
 - macOS: 0.684 seconds.
 
 ## Maintainer Execution
-For a future final candidate, dispatch `release-candidate-evidence` from the reviewed branch and record:
+For a future different candidate, dispatch `release-candidate-evidence` from the reviewed branch and record:
 - workflow URL and commit SHA;
 - each OS result;
 - predecessor and candidate package versions;
 - benchmark elapsed time from each job;
 - any accepted runner-specific warning or failure.
 
-Equivalent maintainer command:
+Equivalent maintainer command for a future candidate:
 
 ```powershell
 $commitSha = (git rev-parse origin/master).Trim()
@@ -84,7 +108,7 @@ gh workflow run release-candidate-evidence.yml `
   -f predecessor_version=0.2.0-alpha.2
 ```
 
-TASK-0128's dispatch is complete. Do not reuse its alpha.2 evidence as proof for the alpha.3 candidate. Do not tag, publish, or call alpha.3 release-ready until hosted RC evidence and an exact-candidate GO are recorded for the dispatch-time `origin/master` candidate.
+TASK-0128's dispatch is complete and remains alpha.2-only. TASK-0205 records the alpha.3 hosted RC evidence for `beaa14deed3dbc55ac98d216679f9a9799261801`. Do not tag, publish, or create a GitHub Release from this evidence-recording task; publication still requires a separate authorized publish task.
 
 ## Failure Interpretation
 - Predecessor install failure can indicate NuGet/network availability rather than source behavior.
