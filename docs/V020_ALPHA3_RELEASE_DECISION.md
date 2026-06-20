@@ -81,7 +81,7 @@ TASK-0203 boundaries:
 
 ## TASK-0204 Hosted RC Evidence Planning
 
-TASK-0204 prepares the exact hosted RC evidence plan for the already prepared local candidate. The release-candidate workflow validates that `commit_sha` equals checked-out `HEAD` and current `origin/master`; because TASK-0204 commits move the branch, the workflow must be manually dispatched later with the post-push `origin/master` SHA:
+TASK-0204 prepared the exact hosted RC evidence plan for the already prepared local candidate. The release-candidate workflow validates that `commit_sha` equals checked-out `HEAD` and current `origin/master`; because TASK-0204 commits move the branch, the workflow must be manually dispatched later with the post-push `origin/master` SHA:
 
 ```powershell
 $commitSha = (git rev-parse origin/master).Trim()

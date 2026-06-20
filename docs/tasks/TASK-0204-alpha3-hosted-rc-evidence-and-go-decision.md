@@ -27,8 +27,8 @@ This task does not publish, tag, create a GitHub Release, dispatch workflows, mu
   - workflow installs the published predecessor package;
   - workflow packs and installs the source candidate package;
   - workflow runs upgrade, baseline, SARIF, and synthetic performance evidence.
-- Use expected dispatch inputs:
-  - `commit_sha=195b933df52ccba37e0edc8327e64aaecb5c5d8b`
+- Use dispatch inputs that match the dispatch-time `origin/master` state:
+  - `commit_sha=<post-TASK-0204 origin/master full SHA>`
   - `candidate_version=0.2.0-alpha.3`
   - `predecessor_version=0.2.0-alpha.2`
 - Check read-only hosted run status for `release-candidate-evidence.yml`; record whether exact alpha.3 evidence already exists.
@@ -90,13 +90,13 @@ Adds task-first audit records for exact hosted RC evidence planning and release 
 ## Package/release impact
 - Candidate source/package version remains `0.2.0-alpha.3`.
 - Published predecessor for hosted RC evidence is `0.2.0-alpha.2`.
-- Exact candidate commit is current `origin/master`, `195b933df52ccba37e0edc8327e64aaecb5c5d8b`.
+- Exact candidate commit is dispatch-time current `origin/master`. TASK-0204 preflight started from `195b933df52ccba37e0edc8327e64aaecb5c5d8b`, but TASK-0204 commits advance the branch before dispatch.
 - Hosted RC evidence remains pending unless an exact passing run already exists.
 - Publication remains not authorized and not performed.
 
 ## Acceptance criteria
 - TASK-0204 plan is committed before other release-decision documentation edits.
-- Exact candidate full SHA and short SHA are recorded.
+- Exact preflight SHA and dispatch-time SHA handling are recorded; final pushed HEAD is reported after push.
 - Candidate version `0.2.0-alpha.3` and predecessor version `0.2.0-alpha.2` are recorded.
 - RC workflow contract is verified and documented.
 - Hosted run status is checked read-only.
@@ -120,7 +120,7 @@ Adds task-first audit records for exact hosted RC evidence planning and release 
 - `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-cli-contract.ps1`
 - `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1`
 - `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-candidate-workflow.ps1`
-- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-candidate-inputs.ps1 -CommitSha 195b933df52ccba37e0edc8327e64aaecb5c5d8b -CandidateVersion 0.2.0-alpha.3 -PredecessorVersion 0.2.0-alpha.2 -RequireOriginMaster`
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-candidate-inputs.ps1 -CommitSha <dispatch-time-origin-master-full-sha> -CandidateVersion 0.2.0-alpha.3 -PredecessorVersion 0.2.0-alpha.2 -RequireOriginMaster`
 - `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-candidate-evidence.ps1`
 - `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/verify-release.ps1`
 
@@ -129,7 +129,8 @@ Adds task-first audit records for exact hosted RC evidence planning and release 
 - Accidentally treating hosted RC evidence planning as final publish approval.
 - Dispatching the workflow without explicit maintainer instruction.
 - Using predecessor `0.2.0-alpha.1` instead of the current published predecessor `0.2.0-alpha.2`.
-- Recording `33e1897` as the hosted candidate when the workflow expects current `origin/master` commit `195b933`.
+- Recording `33e1897` as the hosted candidate when the workflow expects current `origin/master`.
+- Recording preflight `195b933` as the final dispatch commit after TASK-0204 commits advance `origin/master`.
 - Root `dotnet restore` can fail when both `.sln` and `.slnx` exist; use explicit `AgentContextKit.sln`.
 - Global installed `ackit` may still be `0.2.0-alpha.2`, so global help/scan can differ from current-source behavior until alpha.3 is published.
 - Some PowerShell gates may hit the known Windows `git status --short` unreadable-directory stderr warning even when raw porcelain is clean.
@@ -139,4 +140,26 @@ Adds task-first audit records for exact hosted RC evidence planning and release 
 Single `git revert <sha>` for TASK-0204 documentation/evidence commits if the hosted evidence plan must be replaced. No tag, release, NuGet package, workflow run, owner, secret, branch rule, security advisory, or remote setting cleanup should be needed because this task does not perform those actions.
 
 ## Completion notes
-Pending.
+Completed locally on 2026-06-20.
+
+Evidence summary:
+- Plan commit: `4517893` (`docs: plan task 0204 hosted rc evidence`).
+- Documentation preparation commit: `2fa9195` (`docs: prepare alpha3 hosted rc evidence`).
+- Candidate version: `0.2.0-alpha.3`.
+- Predecessor version: `0.2.0-alpha.2`.
+- Preflight candidate SHA at task start: `195b933df52ccba37e0edc8327e64aaecb5c5d8b` (`195b933`).
+- Dispatch candidate rule: use dispatch-time current `origin/master` full SHA, because `scripts/check-release-candidate-inputs.ps1 -RequireOriginMaster` requires `HEAD == commit_sha == origin/master`.
+- Local verification finding: `check-release-candidate-inputs.ps1 -CommitSha 195b933df52ccba37e0edc8327e64aaecb5c5d8b -CandidateVersion 0.2.0-alpha.3 -PredecessorVersion 0.2.0-alpha.2 -RequireOriginMaster` failed after TASK-0204 plan commit because checked-out `HEAD` no longer matched the preflight SHA. This proves hard-coding `195b933` would fail once TASK-0204 commits are pushed.
+- HEAD-only input validation passed for documentation preparation commit `4517893c5a6333e59fe5e5a1df8a8c79d650d639` with candidate `0.2.0-alpha.3` and predecessor `0.2.0-alpha.2`.
+- Workflow contract verified: `workflow_dispatch`, required inputs, exact input validation through `scripts/check-release-candidate-inputs.ps1`, `windows-2025` / `ubuntu-latest` / `macos-latest` matrix, predecessor install, source candidate pack/install, upgrade/baseline/SARIF/performance evidence, no artifact upload, and no SARIF upload.
+- Read-only hosted run check: only historical alpha.2 RC runs were found (`27478635057` success for `4c4fa64`, `27478415124` failure for earlier attempt). No alpha.3 hosted RC run exists yet.
+- Required local validation passed: explicit `dotnet restore AgentContextKit.sln`, `dotnet build AgentContextKit.sln -c Release --no-restore`, `dotnet test AgentContextKit.sln -c Release --no-build` (`428/428`), current-source `version`, current-source `--help`, current-source `scan --ci`, `ackit doctor`, and `git diff --check`.
+- Targeted gates passed: `check-tracked-vs-untracked-md.ps1`, `check-cli-contract.ps1`, `check-localization-parity.ps1`, `check-release-candidate-workflow.ps1`, and HEAD-only `check-release-candidate-inputs.ps1`.
+- `check-release-candidate-evidence.ps1` exited `0` but reported subordinate gate issues caused by the known Windows `git status --short` unreadable-directory stderr warning and the dirty documentation working tree during pre-commit validation. Raw porcelain is checked separately before push.
+- `verify-release.ps1` passed restore/build/test/current-source scan/doctor, then stopped in release blocker review because `check-release-blockers.ps1` hit the same known Windows `git status --short` unreadable-directory stderr warning.
+- Hosted RC evidence status: pending.
+- Release decision: pending; no exact-candidate GO and no NO-GO from hosted evidence.
+- Release publication status: not authorized and not performed.
+- Version/tag/GitHub Release/NuGet/workflow dispatch status: no tag, no GitHub Release, no NuGet publish, no release workflow dispatch, and no release-candidate workflow dispatch occurred.
+
+Result: TASK-0204 records the hosted RC dispatch plan and keeps `0.2.0-alpha.3` unpublished with hosted RC evidence pending. The next action is maintainer manual dispatch of `release-candidate-evidence.yml` using the post-push `origin/master` full SHA, `candidate_version=0.2.0-alpha.3`, and `predecessor_version=0.2.0-alpha.2`.
