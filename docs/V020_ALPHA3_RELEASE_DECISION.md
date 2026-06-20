@@ -154,6 +154,8 @@ Pre-dispatch GO: proceed to `release.yml` publish dispatch only after pushing th
 
 First TASK-0206 dispatch result: release workflow run `27869569988` failed before pack/publish in the Windows `validate exact package` job. The failed step was `Run release gates`; `scripts/check-v100-readiness.ps1 -FailOnIssues` reported missing `.codex/NEXT_STEPS.md` references to `V100_GAP_ANALYSIS.md`, `RELEASE_CANDIDATE_CONTRACT_FREEZE.md`, and `MAINTAINER_RC_DECISION.md`. Restore/build/test and source output validation had passed. The publish job was skipped, and no NuGet package, tag, GitHub Release, attestation, or release asset was created. TASK-0206 may continue only after a docs-only remediation commit restores the references, the gate passes, and the RC-to-publish bridge is reclassified as package/source clean.
 
+Second TASK-0206 dispatch result: release workflow run `27869677726` failed before pack/publish in the same pre-publish `Run release gates` step. The previous v1.0 readiness failure was fixed. The new failure was `scripts/check-security-supply-chain-evidence.ps1 -FailOnIssues`, which still expects the historical `docs/PACKAGE_RECOVERY.md` marker `NuGet unlist/deprecate/account-recovery authority: unverified`. That marker describes the pre-TASK-0202 state and must be retained as historical evidence while TASK-0202 remains the superseding closure record for `RB-008`. The publish job was skipped again, and no NuGet package, tag, GitHub Release, attestation, or release asset was created.
+
 ## Actions Not Performed
 - no published-package workflow version change;
 - no release-candidate workflow dispatch by TASK-0205; the maintainer-dispatched run `27868539971` was verified read-only;

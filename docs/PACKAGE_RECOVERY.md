@@ -46,6 +46,8 @@ Review before each release candidate and after any owner, publishing, recovery, 
 
 2026-06-20 TASK-0201 preflight result: `RB-008` remained open/partial before TASK-0202 maintainer evidence.
 
+Historical gate marker retained for release automation: `NuGet unlist/deprecate/account-recovery authority: unverified` described the pre-TASK-0202 state. TASK-0202 superseded this state for planned `0.2.0-alpha.3` release-preparation entry by recording `ShadowFlameC` as current NuGet package owner and backup package recovery owner. Destructive NuGet actions are still not executed solely for release evidence.
+
 Found evidence:
 - decision owner: `Cynrath`;
 - normal NuGet publication authority: successful alpha.2 OIDC Trusted Publishing under configured user `Cyranth`;

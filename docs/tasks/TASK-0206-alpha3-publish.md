@@ -198,3 +198,15 @@ First release workflow dispatch:
 - Failure cause: `scripts/check-v100-readiness.ps1 -FailOnIssues` reported missing `.codex/NEXT_STEPS.md` references to `V100_GAP_ANALYSIS.md`, `RELEASE_CANDIDATE_CONTRACT_FREEZE.md`, and `MAINTAINER_RC_DECISION.md`.
 - Publish impact: package packing, artifact upload, publish job, NuGet login, NuGet push, tag creation, GitHub Release creation, and attestation did not run.
 - Remediation: restore the missing `.codex/NEXT_STEPS.md` references in a docs-only commit, rerun the v1.0 readiness gate, recompute publish SHA from `origin/master`, repeat RC-to-publish bridge classification, and dispatch a new `release.yml` run only if the bridge remains package/source clean.
+
+Second release workflow dispatch:
+- Run ID: `27869677726`.
+- URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27869677726`.
+- Head SHA: `945194af4f1a9cb18ef739c79785a7a09987b8bc`.
+- Event: `workflow_dispatch`.
+- Result: failure in `validate exact package`, step `Run release gates`.
+- Passed before failure: checkout, setup .NET, commit/version validation, restore/build/test, and source output validation.
+- Improvement from first run: `check-v100-readiness.ps1` passed after `.codex/NEXT_STEPS.md` references were restored.
+- Failure cause: `scripts/check-security-supply-chain-evidence.ps1 -FailOnIssues` expected the historical `docs/PACKAGE_RECOVERY.md` marker `NuGet unlist/deprecate/account-recovery authority: unverified`.
+- Publish impact: package packing, artifact upload, publish job, NuGet login, NuGet push, tag creation, GitHub Release creation, and attestation did not run.
+- Remediation: restore that phrase as a historical pre-TASK-0202 gate marker in `docs/PACKAGE_RECOVERY.md`, without changing scripts or source/package files; rerun security/supply-chain and RC-local readiness gates, recompute publish SHA, repeat bridge classification, and dispatch a new `release.yml` run only if package/source clean.
