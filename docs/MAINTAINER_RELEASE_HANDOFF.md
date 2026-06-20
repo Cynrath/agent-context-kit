@@ -18,6 +18,8 @@ Later publish task boundary:
 - if using a later docs-only HEAD, prove package/source metadata remains unchanged from the hosted RC evidence commit or obtain a new hosted RC run;
 - publish only through the manual OIDC release workflow after explicit authorization in that task.
 
+TASK-0206 pre-dispatch update: the release workflow's `operation=publish` path requires `automation_commit_sha == release_commit_sha` and `scripts/prepare-release.ps1 -RequireOriginMaster`, so publication must use the current final `origin/master` SHA at dispatch time for both inputs. The bridge from hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801` to initial TASK-0206 publish candidate `85383a9321566f9e0989a0db5429fb7d72d6109a` was classified as docs/handoff/governance-only with 0 package/source-impacting files. TASK-0206 may dispatch `release.yml` after the pre-dispatch evidence commit is pushed, `origin/master` is recomputed, and the bridge remains package/source clean.
+
 For a future different candidate, maintainer-only RC evidence command:
 
 ```powershell

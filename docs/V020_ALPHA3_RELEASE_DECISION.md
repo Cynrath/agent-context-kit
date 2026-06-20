@@ -134,6 +134,24 @@ TASK-0205 decision:
 - TASK-0205 docs commits happen after the hosted evidence and must be considered by the later publish task's exact-commit policy;
 - no tag, GitHub Release, NuGet publish, release workflow dispatch, new release-candidate workflow dispatch, owner/account/recovery mutation, repository secret creation, branch ruleset mutation, security advisory, or destructive NuGet action is authorized or performed in TASK-0205.
 
+## TASK-0206 Publish Preflight
+
+TASK-0206 is the explicit publish task for `0.2.0-alpha.3`. The maintainer authorizes verification, GitHub Actions checks, `release.yml` dispatch, run monitoring, and post-publish verification without repeated confirmation, provided all release gates pass and no package/tag/release conflict exists.
+
+Pre-dispatch decision:
+- hosted RC evidence commit: `beaa14deed3dbc55ac98d216679f9a9799261801`;
+- initial publish SHA candidate after TASK-0206 plan push: `85383a9321566f9e0989a0db5429fb7d72d6109a`;
+- final publish SHA policy: recompute current `origin/master` after the pre-dispatch evidence commit is pushed and use that full SHA for both `automation_commit_sha` and `release_commit_sha`;
+- reason: `.github/workflows/release.yml` requires matching automation/release SHAs for `operation=publish`, and runs `scripts/prepare-release.ps1 -RequireOriginMaster`;
+- RC-to-publish bridge from `beaa14deed3dbc55ac98d216679f9a9799261801` to `85383a9321566f9e0989a0db5429fb7d72d6109a`: 16 changed files, all docs/handoff/governance; 0 package/source-impacting files;
+- package/source-impacting paths checked included `src/**`, `tests/**`, `scripts/**`, release workflow YAML, RC workflow YAML, README files, solution/build metadata, `global.json`, and `NuGet.config`;
+- current source version and package metadata both verified `0.2.0-alpha.3`;
+- NuGet package, local tag, and GitHub Release for `v0.2.0-alpha.3` did not exist before publish;
+- local restore/build/test/source CLI smoke/source scan/doctor/diff checks passed;
+- release gates passed except `verify-release.ps1` stopped in its alpha.2-era release blocker review due to the known Windows `git status --short` unreadable-directory stderr warning after restore/build/test/source scan/doctor had passed. Raw porcelain and focused guards were separately clean.
+
+Pre-dispatch GO: proceed to `release.yml` publish dispatch only after pushing the pre-dispatch evidence commit, recomputing `origin/master`, and confirming the bridge remains docs/handoff/governance-only with 0 package/source-impacting changes.
+
 ## Actions Not Performed
 - no published-package workflow version change;
 - no release-candidate workflow dispatch by TASK-0205; the maintainer-dispatched run `27868539971` was verified read-only;

@@ -148,4 +148,42 @@ Adds release audit records for publish SHA selection, RC-to-publish diff classif
 Before workflow dispatch, revert TASK-0206 docs commits with normal `git revert <sha>` if the publish decision changes. After workflow dispatch, do not move tags, reuse versions, delete or replace published packages, or mutate release artifacts manually. If publication succeeds but docs need correction, commit a docs-only follow-up. If publication partially succeeds, use the existing release recovery/verify-existing path and immutable successor-release policy; never overwrite the published version.
 
 ## Completion notes
-Pending.
+In progress on 2026-06-20.
+
+Plan and preflight:
+- Plan commit: `85383a9321566f9e0989a0db5429fb7d72d6109a` (`docs: plan task 0206 alpha3 publish`).
+- Plan commit was pushed to `origin/master` so release workflow exact-commit checks can use remote state.
+- Hosted RC evidence SHA: `beaa14deed3dbc55ac98d216679f9a9799261801`.
+- Initial publish SHA candidate after the plan push: `85383a9321566f9e0989a0db5429fb7d72d6109a`.
+- Publish SHA policy: use the final `origin/master` full SHA at dispatch time for both `automation_commit_sha` and `release_commit_sha`.
+- Reason: `.github/workflows/release.yml` requires `automation_commit_sha == release_commit_sha` for `operation=publish`, and the workflow runs `scripts/prepare-release.ps1 -RequireOriginMaster`.
+
+RC-to-publish bridge classification:
+- Command: `git diff --name-only beaa14deed3dbc55ac98d216679f9a9799261801..85383a9321566f9e0989a0db5429fb7d72d6109a`.
+- Changed files: 16.
+- Package/source-impacting files: 0.
+- Classification: docs/handoff/governance-only successor to the hosted RC evidence commit.
+- Changed paths were limited to `.codex/*`, release/governance docs under `docs/`, and task docs `TASK-0205` / `TASK-0206`.
+- No `src/**`, `tests/**`, `scripts/**`, release workflow YAML, RC workflow YAML, README, solution/build metadata, `global.json`, or `NuGet.config` changed.
+
+Pre-publish validation:
+- Current-source version: `AgentContextKit 0.2.0-alpha.3`.
+- Package metadata gate for `0.2.0-alpha.3`: passed.
+- NuGet package absence check: `0.2.0-alpha.3` did not exist before publish.
+- Local tag absence check: `v0.2.0-alpha.3` did not exist before publish.
+- GitHub Release absence check: `v0.2.0-alpha.3` did not exist before publish.
+- `dotnet restore AgentContextKit.sln`: passed.
+- `dotnet build AgentContextKit.sln -c Release --no-restore`: passed with existing xUnit analyzer warnings only (`xUnit1051`, `xUnit2013`) and 0 errors.
+- `dotnet test AgentContextKit.sln -c Release --no-build`: passed, `428/428`.
+- Current-source `version`, `--help`, and `scan --ci`: passed; scan reported known Medium/Low review findings only.
+- `ackit doctor`: passed.
+- `git diff --check`: passed.
+- `check-tracked-vs-untracked-md`, `check-cli-contract`, `check-localization-parity`, `check-release-candidate-workflow`, and `check-package-metadata`: passed under `pwsh`.
+- `prepare-release.ps1 -Version 0.2.0-alpha.3 -CommitSha 85383a9321566f9e0989a0db5429fb7d72d6109a -RequireOriginMaster -FailOnIssues`: passed, with the known Windows git unreadable-directory stderr warning printed before the successful result.
+- `verify-release.ps1 -Version 0.2.0-alpha.3`: restore/build/test/source scan/doctor passed, then release blocker review stopped on the known Windows `git status --short` unreadable-directory stderr warning. Raw porcelain was separately clean, the Markdown completeness guard passed under `pwsh`, package metadata passed, and historical `v0.2.0-alpha.2` tag resolved to `f540479a92cbe66097f6796553828ee49ddd5512`.
+
+Pre-dispatch decision:
+- GO to proceed to the release workflow dispatch if the recomputed post-evidence `origin/master` remains a docs/handoff/governance-only successor to hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801`.
+- Explicit publish authorization is the maintainer instruction in TASK-0206: publish `0.2.0-alpha.3` only through `release.yml` if all gates pass and no package/tag/release conflict exists.
+- Do not manually create tags or GitHub Releases outside `release.yml`; do not use repository secrets.
+- Final publish SHA must be recomputed after this pre-dispatch evidence commit is pushed.
