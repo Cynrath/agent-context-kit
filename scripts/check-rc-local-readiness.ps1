@@ -6,6 +6,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot "git-status.ps1")
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $issues = New-Object System.Collections.Generic.List[string]
@@ -122,8 +123,8 @@ try {
     }
 
     if (Get-Command git -ErrorAction SilentlyContinue) {
-        $status = git status --short 2>$null
-        if ($LASTEXITCODE -eq 0 -and $status) {
+        $status = Get-GitWorkingTreeStatus
+        if ($status.ExitCode -eq 0 -and $status.Lines) {
             Add-Warning "Working tree has uncommitted changes."
         }
     }

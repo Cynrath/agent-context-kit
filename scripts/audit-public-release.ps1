@@ -4,6 +4,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot "git-status.ps1")
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $projectPath = Join-Path $repoRoot "src\AgentContextKit.Cli\AgentContextKit.Cli.csproj"
@@ -95,8 +96,8 @@ else {
 
         Add-Note "Tracked files audited: $($trackedFiles.Count)"
 
-        $status = git status --short
-        if ($LASTEXITCODE -eq 0 -and $status) {
+        $status = Get-GitWorkingTreeStatus
+        if ($status.ExitCode -eq 0 -and $status.Lines) {
             Add-Issue "Working tree has uncommitted changes."
         }
 

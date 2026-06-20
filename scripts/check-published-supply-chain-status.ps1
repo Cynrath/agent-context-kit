@@ -4,6 +4,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot "git-status.ps1")
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $issues = New-Object System.Collections.Generic.List[string]
@@ -81,8 +82,8 @@ Require-Text $policy "must not be described as author-signed" "Author-signing tr
 if (Get-Command git -ErrorAction SilentlyContinue) {
     Push-Location $repoRoot
     try {
-        $workingTree = git status --short 2>$null
-        if ($LASTEXITCODE -eq 0 -and $workingTree) {
+        $workingTree = Get-GitWorkingTreeStatus
+        if ($workingTree.ExitCode -eq 0 -and $workingTree.Lines) {
             Add-Warning "Working tree has uncommitted changes."
         }
     }
