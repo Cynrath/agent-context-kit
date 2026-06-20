@@ -148,7 +148,7 @@ Adds release audit records for publish SHA selection, RC-to-publish diff classif
 Before workflow dispatch, revert TASK-0206 docs commits with normal `git revert <sha>` if the publish decision changes. After workflow dispatch, do not move tags, reuse versions, delete or replace published packages, or mutate release artifacts manually. If publication succeeds but docs need correction, commit a docs-only follow-up. If publication partially succeeds, use the existing release recovery/verify-existing path and immutable successor-release policy; never overwrite the published version.
 
 ## Completion notes
-In progress on 2026-06-20.
+Completed on 2026-06-20 for NuGet package publication, immutable tag/GitHub prerelease creation, global tool smoke, and read-only release verification. The publish path has a documented post-publish provenance/idempotency follow-up: `operation=publish` created or verified the release objects, then failed in the attestation-provenance probe because the no-attestation case exits nonzero before the attestation step can run.
 
 Plan and preflight:
 - Plan commit: `85383a9321566f9e0989a0db5429fb7d72d6109a` (`docs: plan task 0206 alpha3 publish`).
@@ -242,3 +242,35 @@ Refreshed hosted RC evidence after source-impacting remediation:
 - Annotations: xUnit analyzer warnings only, non-blocking.
 - Publish impact: this refreshed run supersedes the earlier TASK-0205 RC tuple for TASK-0206 publish gating because the script remediation changed `scripts/**`.
 - Next gate: after this evidence commit is documented and pushed, recompute `origin/master`, classify the bridge from `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f` to the new publish SHA, and proceed only if changed files are docs/handoff/governance-only.
+
+Final publish evidence:
+- Final publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
+- Refreshed RC evidence SHA used for the final package/source bridge: `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`.
+- Historical TASK-0205 RC evidence SHA retained for audit: `beaa14deed3dbc55ac98d216679f9a9799261801`.
+- Final RC-to-publish bridge command: `git diff --name-only eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f..92984c6448332aa24b7cff94647f627bf944e535`.
+- Final bridge classification: 8 changed files, all docs/handoff/governance-only; 0 package/source-impacting files.
+- Final bridge files: `.codex/CONTEXT_PACK.md`, `.codex/NEXT_STEPS.md`, `.codex/SESSION_HANDOFF.md`, `docs/NEXT_TASKS.md`, `docs/RC_HOSTED_EVIDENCE.md`, `docs/RELEASE_CHECKLIST.md`, `docs/V020_ALPHA3_RELEASE_DECISION.md`, and `docs/tasks/TASK-0206-alpha3-publish.md`.
+- Final preflight: current-source version, package metadata, `prepare-release.ps1 -RequireOriginMaster`, package/tag/release conflict checks, raw porcelain, local restore/build/test (`428/428`), release gates, and `verify-release.ps1` passed after the script hardening and refreshed RC evidence.
+
+Release workflow evidence:
+- First publish attempt: run `27870383897`, `https://github.com/Cynrath/agent-context-kit/actions/runs/27870383897`, head `92984c6448332aa24b7cff94647f627bf944e535`; validation and NuGet publish completed, then published-package verification timed out during NuGet propagation. No tag or GitHub Release was created in this run.
+- Recovery publish attempt: run `27870603776`, `https://github.com/Cynrath/agent-context-kit/actions/runs/27870603776`, head `92984c6448332aa24b7cff94647f627bf944e535`; existing package was detected without republish, `v0.2.0-alpha.3` tag and GitHub prerelease/assets were created, package/tag/release verification passed, then the provenance probe failed before attestation.
+- Second recovery attempt: run `27870710093`, `https://github.com/Cynrath/agent-context-kit/actions/runs/27870710093`, head `92984c6448332aa24b7cff94647f627bf944e535`; existing package/tag/release were verified, then the same provenance probe failed before attestation.
+- Read-only release verification: run `27870813763`, `https://github.com/Cynrath/agent-context-kit/actions/runs/27870813763`, head `92984c6448332aa24b7cff94647f627bf944e535`; `operation=verify-existing` succeeded without package/tag/release mutation.
+
+Post-publish verification:
+- `scripts/verify-published-package.ps1 -Version 0.2.0-alpha.3`: passed.
+- Global tool reinstall from NuGet: passed.
+- `ackit version`: `AgentContextKit 0.2.0-alpha.3`.
+- `ackit --help`: passed.
+- `ackit doctor`: passed.
+- Tag verification: `v0.2.0-alpha.3` resolves to `92984c6448332aa24b7cff94647f627bf944e535`.
+- GitHub Release verification: `v0.2.0-alpha.3` exists as a prerelease targeting `92984c6448332aa24b7cff94647f627bf944e535`.
+- Release assets: `AgentContextKit.0.2.0-alpha.3.nupkg` SHA-256 `72649efbd3ab0b6751281e200de5671cb361c53ad954bbd5510a4d31232cb33f`; `AgentContextKit.0.2.0-alpha.3.snupkg` SHA-256 `716da07eb6bfa6c12b98b7e6ceaeb6e94999547a686b0af5bce5a0d75d2c9c2f`.
+
+Immutable release compliance:
+- No manual tag creation was performed outside `release.yml`.
+- No manual GitHub Release creation was performed outside `release.yml`.
+- No manual NuGet package upload was performed outside `release.yml`.
+- No repository secret or local NuGet API key was created or used.
+- The version was not reused, the tag was not moved, and package artifacts were not replaced.

@@ -14,11 +14,11 @@ AgentContextKit, Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI ve benze
 
 Public repository URL: `https://github.com/Cynrath/agent-context-kit`
 
-Current release: `v0.2.0-alpha.2` GitHub ve NuGet uzerinde pre-release olarak yayinlandi; global tool kurulumu dogrulandi. Lokal source/package candidate `0.2.0-alpha.3` olarak hazirlaniyor; hosted RC evidence ve yayin onayi bekliyor.
+Current release: `v0.2.0-alpha.3` GitHub ve NuGet uzerinde pre-release olarak yayinlandi; global tool kurulumu dogrulandi. Publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
 
 Varsayılan komutlar repository içeriğini yerelde işler; repository upload, AI API çağrısı, telemetry veya harici araç çalıştırma yapmaz. Ayrıntı: [Varsayılan No-Network Politikası](docs/NO_NETWORK_DEFAULT_POLICY.md).
 
-Kaynak notu: yayinlanmis `0.2.0-alpha.2` NuGet paketi `ackit sarif` komutunu icerir. `0.1.0-alpha.2` onceki release olarak kalir.
+Kaynak notu: yayinlanmis `0.2.0-alpha.3` NuGet paketi `ackit sarif` komutunu icerir. `0.2.0-alpha.2` onceki release olarak kalir.
 
 ## Preview
 Web UI dashboard; readiness score, stack signals, health checks, findings, generated context files ve task previews alanlarini gosterir.
@@ -68,7 +68,7 @@ MVP uzak AI API cagrisi yapmaz ve repository icerigini yuklemez. Bu yaklasim pri
 - `ackit scan --ci`: high veya critical risk bulgularinda otomasyon kontrollerini basarisiz yapar.
 - `ackit baseline`: incelenmis bulgular icin sanitize edilmis lokal baseline olusturur; baseline modu sadece yeni High/Critical bulgulari CI blocker yapar.
 - Stabil scanner rule ID'leri ve safe technical domain, bilinen non-Critical path ve kabul edilen non-Critical rule ID'leri icin dar config allowlist destegi.
-- `ackit sarif`: CI/security incelemesi icin privacy-first SARIF 2.1.0 tarama raporu uretir. Yayinlanmis `0.2.0-alpha.2` paketi ve mevcut source icinde vardir.
+- `ackit sarif`: CI/security incelemesi icin privacy-first SARIF 2.1.0 tarama raporu uretir. Yayinlanmis `0.2.0-alpha.3` paketi ve mevcut source icinde vardir.
 - `ackit report`: offline statik HTML tarama raporu uretir.
 - `ackit webui`: tarama incelemesi icin offline statik Web UI prototipi uretir.
 - `ackit prompt-pack`: remote cagri yapmadan gelecekteki LLM context incelemesi icin lokal dry-run prompt paketi uretir.
@@ -88,7 +88,7 @@ MVP uzak AI API cagrisi yapmaz ve repository icerigini yuklemez. Bu yaklasim pri
 NuGet global tool kurulumu:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 ackit version
 ackit --help
 ```
@@ -103,7 +103,7 @@ ackit doctor
 
 `scan --ci`, High veya Critical bulguda non-zero exit code dondurur. Sadece rapor almak icin once `ackit scan` kullanin.
 
-Yayinlanmis `0.2.0-alpha.2` paketi read-only config tanilarini ve explicit baseline workflow'u destekler:
+Yayinlanmis `0.2.0-alpha.3` paketi read-only config tanilarini ve explicit baseline workflow'u destekler:
 
 ```powershell
 ackit config-check --json
@@ -147,9 +147,7 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
 ```
 
-Yayinlanmis `0.2.0-alpha.2` paketi human/JSON scan ciktisina sanitized suppression audit alanlari ekler.
-
-Mevcut source `0.2.0-alpha.3` lokal candidate metadata ile hazirlanir ve scan glob filtreleri ile local-only `mcp`, `diff`, `trim`, `watch` komutlarini icerir. Bu current-source komut haritasi `0.2.0-alpha.3` NuGet'te yayinlandi iddiasi degildir.
+Yayinlanmis `0.2.0-alpha.3` paketi human/JSON scan ciktisina sanitized suppression audit alanlari ekler ve scan glob filtreleri ile local-only `mcp`, `diff`, `trim`, `watch` komutlarini icerir.
 
 Kurulu tool icin hizli dogrulama:
 
@@ -174,7 +172,7 @@ Pop-Location
 
 Minimal demo app icinde `ackit doctor`, README, LICENSE, SECURITY, test, CI, `.gitignore` veya package metadata eksiklerini raporlayabilir. Bu beklenen repository-health ciktisidir, tool hatasi degildir.
 
-Cross-platform yayinlanmis-paket smoke kapsami `.github/workflows/cross-platform-smoke.yml` ile takip edilir. Workflow, Windows, Ubuntu ve macOS uzerinde `AgentContextKit` `0.2.0-alpha.2` paketini global tool olarak kurar ve temiz demo app uzerinde kurulu-tool smoke akisini calistirir.
+Cross-platform yayinlanmis-paket smoke kapsami `.github/workflows/cross-platform-smoke.yml` ile takip edilir. Workflow pininin `0.2.0-alpha.3` ile senkronlanmasi yayin sonrasi takip isidir; TASK-0206 lokal ve `release.yml verify-existing` dogrulamalarini tamamlamistir.
 Mevcut kaynak smoke kapsami `.github/workflows/cross-platform-source-smoke.yml` ile takip edilir. Bu workflow mevcut branch'i lokalde paketler ve paketi yayin yapmadan gecici package source uzerinden kurar.
 Tested on Windows, Ubuntu, and macOS via GitHub Actions.
 
@@ -192,8 +190,8 @@ Gercek bir projede kullanima almak icin guvenlik, config, agent instruction uret
 Daha fazla rehberli ornek icin [Sample Gallery](docs/SAMPLE_GALLERY.md) ve [Demo Scenarios](docs/DEMO_SCENARIOS.md) dosyalarina bakin.
 
 ## CLI Komutlari
-`ackit sarif`, yayinlanmis `0.2.0-alpha.2` NuGet global tool ve mevcut source icinde vardir.
-Asagidaki harita current-source `--help`, `docs/CLI_CONTRACT.md` ve `docs/CLI_REFERENCE.md` ile uyumludur. Yayinlanmis NuGet paketi `0.2.0-alpha.2` olarak kalir; `0.2.0-alpha.3` source candidate icin hosted RC evidence ve yayin onayi gerekir.
+`ackit sarif`, yayinlanmis `0.2.0-alpha.3` NuGet global tool ve mevcut source icinde vardir.
+Asagidaki harita yayinlanmis `0.2.0-alpha.3` `--help`, `docs/CLI_CONTRACT.md` ve `docs/CLI_REFERENCE.md` ile uyumludur.
 
 ```text
 ackit init [--lang en|tr] [--json]
@@ -298,7 +296,7 @@ Onemli dokumanlar:
 Bkz. [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Paketleme
-Lokal paket dogrulama adimlari [docs/PACKAGING.md](docs/PACKAGING.md) ve [docs/RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md) dosyalarinda yer alir. `0.2.0-alpha.2` paketi NuGet global tool olarak yayinlandi ve dogrulandi; `0.2.0-alpha.3` daha sonra yetkili publish yapilana kadar lokal source/package candidate'tir.
+Lokal paket dogrulama adimlari [docs/PACKAGING.md](docs/PACKAGING.md) ve [docs/RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md) dosyalarinda yer alir. `0.2.0-alpha.3` paketi NuGet global tool olarak yayinlandi ve dogrulandi.
 
 Public release blocker listesi [docs/RELEASE_BLOCKERS.md](docs/RELEASE_BLOCKERS.md) dosyasinda takip edilir.
 

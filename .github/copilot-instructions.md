@@ -22,11 +22,11 @@ This file is hand-maintained. `ackit generate` does not regenerate it. Update it
 - Agent instructions: yes
 
 ## Release Status
-- Current release: `v0.2.0-alpha.2` published on GitHub and NuGet as a pre-release.
-- Current source/package metadata is prepared as the local `0.2.0-alpha.3` release candidate; hosted RC evidence and publication are pending.
-- Previous release: `v0.1.0-alpha.2` published and verified; pushed, released, and published.
+- Current release: `v0.2.0-alpha.3` published on GitHub and NuGet as a pre-release.
+- Current publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
+- Previous release: `v0.2.0-alpha.2` published and verified; pushed, released, and published.
 - Main stack: `.NET`, `.NET CLI / .NET Tool`, and `GitHub Actions`.
-- `0.2.0-alpha.3` is release-prepared locally only after TASK-0203 validation. `RB-003` and `RB-008` are closed by TASK-0202, but hosted RC evidence and publication approval remain pending.
+- `0.2.0-alpha.3` is published and verified by TASK-0206. `RB-003` and `RB-008` are closed by TASK-0202. Do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
 
 ## Commit And Push Policy
 - Hard prohibitions: never force-push, never rewrite history, never move an existing tag, never create a remote, never publish a package, never create a release, never delete user changes, never expose secrets, never fabricate owner, identity, signature, or recovery evidence.

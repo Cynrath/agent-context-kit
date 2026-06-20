@@ -28,7 +28,7 @@ Exit behavior:
 Use the published package for stable CI checks:
 
 ```yaml
-- run: dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+- run: dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 - run: echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 - run: ackit scan --ci
 ```
@@ -41,10 +41,10 @@ See `docs/examples/github-actions-scan-ci.yml`.
 Use it after `scan --ci` so risk findings are handled first. A minimal demo app can fail `doctor` because it intentionally lacks full OSS metadata; that is expected health reporting, not necessarily a tool failure.
 
 ## SARIF Output And Code Scanning Decision
-`ackit sarif --output .ackit/reports/ackit.sarif` is available in current source and the `0.2.0-alpha.2` package. The published NuGet package `0.2.0-alpha.2` includes this command.
+`ackit sarif --output .ackit/reports/ackit.sarif` is available in current source and the `0.2.0-alpha.3` package. The published NuGet package `0.2.0-alpha.3` includes this command.
 
 Use one of these approaches:
-- Install the published `0.2.0-alpha.2` package in CI.
+- Install the published `0.2.0-alpha.3` package in CI.
 - Pack the current branch locally and install from the temporary package source.
 
 SARIF output is local-only by default. It uses repository-relative artifact locations and does not write raw scanner match values into result messages.
@@ -57,7 +57,7 @@ The recommended first opt-in is a manual `workflow_dispatch` job using the pinne
 Published tool smoke validates the package users install from NuGet. It should stay pinned to the current published version:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 ackit version
 ackit --help
 ackit scan --ci
@@ -86,7 +86,7 @@ The baseline diff workflow runs `ackit scan --baseline <path> --ci` so new High 
 
 See [RC_HOSTED_EVIDENCE.md](RC_HOSTED_EVIDENCE.md) before manually dispatching the RC workflow.
 
-Current alpha.3 RC evidence is complete. TASK-0205 verified run `27868539971` for commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS evidence jobs all succeeded.
+Current alpha.3 publication is complete. TASK-0206 published final SHA `92984c6448332aa24b7cff94647f627bf944e535` after refreshed hosted RC evidence run `27870246504` for commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`; Windows, Ubuntu, and macOS evidence jobs all succeeded.
 
 For a future different candidate, use the exact selected `origin/master` tuple:
 
@@ -132,7 +132,7 @@ Upload SARIF only when:
 
 ## When Not To Upload SARIF
 Do not upload SARIF when:
-- using a package version older than `0.2.0-alpha.2`, because it does not include `ackit sarif`;
+- using a package version older than `0.2.0-alpha.3`, because it does not include the current published command surface;
 - reviewing a private or sensitive repository without approval;
 - findings include data that should not appear in a public security integration;
 - repository permissions have not been reviewed; or

@@ -4,14 +4,14 @@ This tutorial covers the Inspect, Harden, Generate, Review, and Validate portion
 
 For Turkish human-readable output, add `--lang tr` to supported commands. CLI command/option names and JSON fields remain unchanged so the same copy-paste workflow and automation contract work in both languages.
 
-This tutorial uses the published `AgentContextKit` `0.2.0-alpha.2` global tool and a disposable synthetic repository. It does not upload repository content or call a remote AI provider.
+This tutorial uses the published `AgentContextKit` `0.2.0-alpha.3` global tool and a disposable synthetic repository. It does not upload repository content or call a remote AI provider.
 
 ## 1. Install And Verify
 
 Prerequisites: Git and the .NET 10 SDK.
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 ackit version
 ackit --help
 ```
@@ -19,7 +19,7 @@ ackit --help
 Expected version:
 
 ```text
-AgentContextKit 0.2.0-alpha.2
+AgentContextKit 0.2.0-alpha.3
 ```
 
 If the tool is already installed at this version, skip the install command and run the two verification commands.

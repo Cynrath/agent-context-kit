@@ -12,7 +12,7 @@ During development, run commands through:
 dotnet run --project src/AgentContextKit.Cli -- <command>
 ```
 
-Availability note: the published NuGet package `AgentContextKit` `0.2.0-alpha.2` includes `ackit sarif`.
+Availability note: the published NuGet package `AgentContextKit` `0.2.0-alpha.3` includes `ackit sarif`.
 
 See [EXIT_CODES.md](EXIT_CODES.md) for the full exit code matrix.
 
@@ -40,7 +40,7 @@ Safe behavior:
 - Reports detected agent instruction files.
 
 ### `ackit config-check`
-Validates `.ackit/config.yml` without changing it. This command is included in the published `0.2.0-alpha.2` package.
+Validates `.ackit/config.yml` without changing it. This command is included in the published `0.2.0-alpha.3` package.
 
 ```powershell
 ackit config-check
@@ -75,12 +75,12 @@ Stack signals include .NET, ASP.NET Core, Razor/Razor Pages, Blazor WebAssembly,
 
 Risk findings include stable `ACKIT` rule IDs in JSON output. See [SCANNER_RULES.md](SCANNER_RULES.md) for the rule catalog and [CONFIGURATION.md](CONFIGURATION.md) for `safeDomains`, `ignoredPaths`, and `ignoredFindingIds`.
 
-The published `0.2.0-alpha.2` package reports sanitized config suppression counts and reasons in human and JSON scan output. This additive audit surface is documented in [SUPPRESSION_AUDIT.md](SUPPRESSION_AUDIT.md).
+The published `0.2.0-alpha.3` package reports sanitized config suppression counts and reasons in human and JSON scan output. This additive audit surface is documented in [SUPPRESSION_AUDIT.md](SUPPRESSION_AUDIT.md).
 
 Exit codes are documented in [EXIT_CODES.md](EXIT_CODES.md).
 
 ### `ackit baseline`
-Creates a deterministic, sanitized local finding baseline. This command is included in the published `0.2.0-alpha.2` package.
+Creates a deterministic, sanitized local finding baseline. This command is included in the published `0.2.0-alpha.3` package.
 
 ```powershell
 ackit baseline
@@ -111,7 +111,7 @@ Required output path:
 - `--output <repo-relative.sarif>`
 
 Published package note:
-- `ackit sarif` is available in NuGet `0.2.0-alpha.2`.
+- `ackit sarif` is available in NuGet `0.2.0-alpha.3`.
 - Use the published package or source/current-branch execution.
 
 Safety behavior:

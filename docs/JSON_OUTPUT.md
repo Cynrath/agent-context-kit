@@ -65,7 +65,7 @@ Schema version `2` adds:
 - `promptPack` generated file metadata on `prompt-pack`.
 - `contextExport` generated file metadata on `context-export`.
 - `ruleId` on scanner finding objects. This is additive and uses the stable rule IDs from [SCANNER_RULES.md](SCANNER_RULES.md). The catalog includes `ACKIT001`–`ACKIT007` plus the `ACKIT999` fallback; current source narrows `ACKIT001` to credential/secret detection, adds `ACKIT006` for production configuration, `ACKIT007` for documentation gaps, and uses `ACKIT005` for general repository hygiene, configuration, and release readiness.
-- `suppressionSummary` and sanitized `suppressions` on current-source `scan` output. These are additive and are not present in the published `0.2.0-alpha.2` package.
+- `suppressionSummary` and sanitized `suppressions` on `scan` output. These are additive and are present in the published `0.2.0-alpha.3` package.
 - `baseline` on current-source `baseline --json` and opt-in `scan --baseline <path> --json` output. The existing-versus-new classification is documented in [BASELINE_MODEL.md](BASELINE_MODEL.md).
 - `config`, `diagnosticSummary`, and sanitized `diagnostics` on current-source `config-check --json` output.
 - `target`, `install`, `dryRun`, `shell`, `mode`, and planned hook `files` with sanitized `contentLength` on current-source `hooks --json` output.

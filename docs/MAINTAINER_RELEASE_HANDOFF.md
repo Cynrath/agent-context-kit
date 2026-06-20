@@ -2,23 +2,24 @@
 
 The completed alpha.2 scope is in `docs/V020_ALPHA2_SCOPE.md`. PROJECT-CONTROL-0102 authorized the validated normal pushes and exact-SHA OIDC release sequence for `v0.2.0-alpha.2`.
 
-This handoff records the completed `v0.2.0-alpha.2` GitHub and NuGet pre-release state.
+This handoff records the completed `v0.2.0-alpha.2` and `v0.2.0-alpha.3` GitHub and NuGet pre-release states.
 
 Future release sequences must not use API keys. Publication is allowed only through the manual OIDC workflow after the exact release commit passes all required hosted jobs.
 
 ## Future Release-Candidate Decision
 TASK-0092 prepares a conditional local contract freeze in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and the authoritative GO/NO-GO checklist in `docs/MAINTAINER_RC_DECISION.md`. The current decision is NO-GO for RC publication until hosted evidence, remaining P0 gaps, private vulnerability reporting, schema assets, and supply-chain decisions are complete.
 
-TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. TASK-0202 records the missing backup security and package recovery evidence. TASK-0203 prepared source/package metadata and local package evidence. TASK-0204 identified dispatch-time current `origin/master` as the exact hosted RC evidence candidate and predecessor `0.2.0-alpha.2`. TASK-0205 verified hosted RC run `27868539971` as green for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS jobs all succeeded. Exact-candidate GO is recorded for a later publish task only.
+TASK-0133 selected `0.2.0-alpha.3` as the smallest compatible planning scope. TASK-0202 records the missing backup security and package recovery evidence. TASK-0203 prepared source/package metadata and local package evidence. TASK-0204 identified dispatch-time current `origin/master` as the exact hosted RC evidence candidate and predecessor `0.2.0-alpha.2`. TASK-0205 verified hosted RC run `27868539971` as green for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS jobs all succeeded. TASK-0206 then refreshed hosted RC evidence after source-impacting release-gate hardening and published `0.2.0-alpha.3`.
 
 TASK-0134 evaluated the earlier GO packet on 2026-06-14 and recorded NO-GO in `docs/V020_ALPHA3_RELEASE_DECISION.md`. TASK-0203 supersedes only the local preparation boundary. TASK-0204 supersedes only the hosted-RC planning boundary. TASK-0205 supersedes the hosted-evidence pending boundary with exact-candidate GO, but it still does not authorize release workflow dispatch, release-candidate workflow dispatch, tag creation, GitHub Release creation, or NuGet publication.
 
-Later publish task boundary:
-- decide whether to publish the hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801` or a later docs-only HEAD according to the release workflow exact-commit policy;
-- if using a later docs-only HEAD, prove package/source metadata remains unchanged from the hosted RC evidence commit or obtain a new hosted RC run;
-- publish only through the manual OIDC release workflow after explicit authorization in that task.
-
-TASK-0206 pre-dispatch update: the release workflow's `operation=publish` path requires `automation_commit_sha == release_commit_sha` and `scripts/prepare-release.ps1 -RequireOriginMaster`, so publication must use the current final `origin/master` SHA at dispatch time for both inputs. The bridge from hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801` to initial TASK-0206 publish candidate `85383a9321566f9e0989a0db5429fb7d72d6109a` was classified as docs/handoff/governance-only with 0 package/source-impacting files. TASK-0206 may dispatch `release.yml` after the pre-dispatch evidence commit is pushed, `origin/master` is recomputed, and the bridge remains package/source clean.
+TASK-0206 publish result:
+- Final publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
+- Refreshed hosted RC evidence: run `27870246504` for commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`.
+- Final bridge from refreshed RC evidence to publish SHA: docs/handoff/governance-only, 0 package/source-impacting files.
+- NuGet package `AgentContextKit` `0.2.0-alpha.3`, tag `v0.2.0-alpha.3`, and GitHub prerelease `v0.2.0-alpha.3` are published and target the final publish SHA.
+- `release.yml` `operation=verify-existing` run `27870813763` succeeded without package/tag/release mutation.
+- Publish-path follow-up: harden the attestation-provenance probe before the next release; the published alpha.3 package/tag/release must not be mutated.
 
 For a future different candidate, maintainer-only RC evidence command:
 
@@ -42,6 +43,7 @@ gh workflow run release-candidate-evidence.yml `
 - GitHub repository public: yes, `https://github.com/Cynrath/agent-context-kit`.
 - `master` pushed: yes.
 - `v0.2.0-alpha.2` tag pushed: yes.
+- `v0.2.0-alpha.3` tag pushed: yes, at `92984c6448332aa24b7cff94647f627bf944e535`.
 - GitHub Actions latest `master` run is green per maintainer-provided release status.
 - Read-only GitHub CLI validation on 2026-06-05 confirmed `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` succeeded for commit `8dac9237c27ba912d056344155f1c9f901557bf5`.
 - Repository description is set.
@@ -50,6 +52,9 @@ gh workflow run release-candidate-evidence.yml `
 - NuGet publish for `AgentContextKit` `0.2.0-alpha.2`: completed.
 - NuGet global tool install verification for `0.2.0-alpha.2`: completed.
 - NuGet global tool smoke test for `0.2.0-alpha.2`: completed.
+- GitHub Release page for `v0.2.0-alpha.3`: completed as a pre-release.
+- NuGet publish for `AgentContextKit` `0.2.0-alpha.3`: completed.
+- NuGet global tool install verification for `0.2.0-alpha.3`: completed.
 - Cross-platform CI smoke validation: completed on commit `868dff3` for Windows, Ubuntu, and macOS.
 - Current published-package smoke validation: completed on commit `8dac9237c27ba912d056344155f1c9f901557bf5` for Windows, Ubuntu, and macOS.
 - Current source-package smoke validation: completed on commit `8dac9237c27ba912d056344155f1c9f901557bf5` for Windows, Ubuntu, and macOS.
@@ -64,7 +69,7 @@ gh workflow run release-candidate-evidence.yml `
 Maintainer verification evidence:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 ackit version
 ackit --help
 ```
@@ -72,13 +77,13 @@ ackit --help
 Expected version output:
 
 ```text
-AgentContextKit 0.2.0-alpha.2
+AgentContextKit 0.2.0-alpha.3
 ```
 
 If the tool is already installed, use:
 
 ```powershell
-dotnet tool update --global AgentContextKit --version 0.2.0-alpha.2
+dotnet tool update --global AgentContextKit --version 0.2.0-alpha.3
 ```
 
 ## Verified NuGet Smoke Test

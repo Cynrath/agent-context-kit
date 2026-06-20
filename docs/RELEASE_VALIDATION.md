@@ -1,11 +1,19 @@
 # Release Validation
 
-## Planned v0.2.0-alpha.3 Decision
+## v0.2.0-alpha.3 Publication Evidence
 TASK-0134 recorded an evidence-backed NO-GO on 2026-06-14. TASK-0202 later closed the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared source/package metadata as `0.2.0-alpha.3` and local package evidence. TASK-0204 identified dispatch-time current `origin/master` as the exact hosted RC evidence candidate. TASK-0205 verified hosted RC run `27868539971` as successful for commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`.
 
-The alpha.3 decision is exact-candidate GO for a later publish task only. No alpha.3 tag, GitHub Release, NuGet publish, release workflow dispatch, or new release-candidate workflow dispatch is authorized by TASK-0205.
+TASK-0206 required source-impacting release-gate script hardening, then refreshed hosted RC evidence with run `27870246504` for commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`. The final publish SHA `92984c6448332aa24b7cff94647f627bf944e535` was classified as a docs/handoff/governance-only successor to that refreshed RC evidence commit.
 
-This checklist validates local release readiness without publishing.
+Final alpha.3 validation:
+- NuGet package `AgentContextKit` `0.2.0-alpha.3` exists and `scripts/verify-published-package.ps1 -Version 0.2.0-alpha.3` passed.
+- Global tool reinstall passed and `ackit version` returned `AgentContextKit 0.2.0-alpha.3`.
+- Tag `v0.2.0-alpha.3` points to `92984c6448332aa24b7cff94647f627bf944e535`.
+- GitHub Release `v0.2.0-alpha.3` exists as a prerelease targeting `92984c6448332aa24b7cff94647f627bf944e535`.
+- `release.yml` `operation=verify-existing` run `27870813763` succeeded without package/tag/release mutation.
+- Release assets are present: nupkg SHA-256 `72649efbd3ab0b6751281e200de5671cb361c53ad954bbd5510a4d31232cb33f`; snupkg SHA-256 `716da07eb6bfa6c12b98b7e6ceaeb6e94999547a686b0af5bce5a0d75d2c9c2f`.
+
+Publish-path caveat: `operation=publish` created or verified the package, tag, release, and assets but failed after publication in the provenance probe before attestation. Treat this as a workflow hardening follow-up before the next release, not as permission to mutate the already-published alpha.3 package or tag.
 
 ## PROJECT-CONTROL-0102 Pre-Version Evidence
 On 2026-06-13, TASK-0116–0122 validation passed with a zero-warning Release build, 186/186 tests, clean source scan, doctor PASS, sample smoke, JSON/SARIF/locale/link contracts, local package install smoke, and all requested readiness/security/supply-chain gates. The unchanged 2,000-file/30-second performance tripwire completed in 3.961 seconds standalone and 2.785 seconds through the RC gate.
@@ -396,23 +404,14 @@ dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --versi
 ```
 
 ## Published NuGet Smoke Test
-The `AgentContextKit` version `0.2.0-alpha.2` published global tool has been smoke-tested from NuGet:
+The `AgentContextKit` version `0.2.0-alpha.3` published global tool has been smoke-tested from NuGet during TASK-0206:
 
-- `ackit version` returned `AgentContextKit 0.2.0-alpha.2`.
+- `ackit version` returned `AgentContextKit 0.2.0-alpha.3`.
 - `ackit --help` worked.
-- `ackit webui` created `.ackit/webui/index.html`.
-- `ackit init --lang tr` created `.ackit/config.yml`.
-- `ackit scan --ci` completed with no risk findings.
-- `ackit generate --target all --lang tr` created agent/context files.
-- `ackit task "Demo smoke test görevi" --lang tr` created a task file.
-- `ackit report --output .ackit/reports/smoke.html` created a local HTML report.
-- `ackit webui --output .ackit/webui/index.html` created a local static Web UI.
-- A fake `OPENAI_API_KEY` in `.env.test` was detected by `redact-check` as Critical and returned exit code `2`.
-- After `.env.test` was removed, `ackit scan --ci` reported no risk findings.
-- `ackit scan --json`, `ackit doctor --json`, `ackit prompt-pack`, and `ackit context-export` worked.
-- `context-export` created a local manifest and did not call a remote LLM provider.
+- `ackit doctor` passed in the repository after global reinstall.
+- `scripts/verify-published-package.ps1 -Version 0.2.0-alpha.3` passed its disposable package verification and smoke flow.
 
-The published `0.2.0-alpha.2` smoke test includes `ackit sarif`.
+Historical `0.2.0-alpha.2` smoke evidence remains valid for that release and included `ackit webui`, `ackit init --lang tr`, `ackit scan --ci`, `ackit generate --target all --lang tr`, `ackit task`, `ackit report`, `ackit sarif`, fake-secret detection, JSON commands, prompt pack, and context export.
 
 `ackit doctor` can fail on a clean minimal console app because README, LICENSE, SECURITY, tests, CI, `.gitignore`, and package metadata are intentionally absent. That is expected health reporting, not a smoke-test failure.
 

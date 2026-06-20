@@ -8,7 +8,7 @@ Current package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.
 Important fields:
 - `PackageId`: `AgentContextKit`
 - `ToolCommandName`: `ackit`
-- `Version`: `0.2.0-alpha.3` local release-preparation candidate; current published package remains `0.2.0-alpha.2`
+- `Version`: `0.2.0-alpha.3`; current published package is `0.2.0-alpha.3`
 - `Authors`: `Cynrath`
 - `PackageLicenseExpression`: `MIT`
 - `PackageReadmeFile`: `README.md`
@@ -51,19 +51,27 @@ dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --versi
 Install the published package from NuGet:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 ackit version
 ackit --help
 ackit scan --ci
 ```
 
 ## Current Published Package
-The current published package is `0.2.0-alpha.2`. Public install commands and published-package smoke remain synchronized to that version until an authorized alpha.3 publish completes. Source/package metadata is prepared as the local `0.2.0-alpha.3` candidate for TASK-0203 validation.
+The current published package is `0.2.0-alpha.3`.
+
+Publication evidence:
+- Publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
+- NuGet package verification passed through `scripts/verify-published-package.ps1 -Version 0.2.0-alpha.3`.
+- Global tool reinstall from NuGet passed and `ackit version` returned `AgentContextKit 0.2.0-alpha.3`.
+- Tag `v0.2.0-alpha.3` and GitHub prerelease `v0.2.0-alpha.3` target `92984c6448332aa24b7cff94647f627bf944e535`.
 
 ## OIDC NuGet Publish
-Version `0.2.0-alpha.2` has been published and install-verified. Future versions, including `0.2.0-alpha.3`, are published only from the reviewed exact commit after all gates pass, using the manual `.github/workflows/release.yml` workflow and the preconfigured `nuget-release` environment.
+Version `0.2.0-alpha.3` has been published and install-verified. Future versions are published only from the reviewed exact commit after all gates pass, using the manual `.github/workflows/release.yml` workflow and the preconfigured `nuget-release` environment.
 
 The workflow uses NuGet Trusted Publishing through `NuGet/login@v1`. API keys, repository secrets for package credentials, local environment credentials, and credential-bearing `NuGet.Config` files are prohibited.
+
+TASK-0206 publish-path note: `operation=publish` completed package/tag/release creation in staged recovery runs, but the post-publish provenance probe failed before attestation. `release.yml` `operation=verify-existing` run `27870813763` succeeded for the immutable release state. Harden the provenance probe before the next release.
 
 See [RELEASE_AUTOMATION.md](RELEASE_AUTOMATION.md) for the dispatch, exact-SHA, idempotency, and recovery contract.
 

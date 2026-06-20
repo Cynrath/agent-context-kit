@@ -9,7 +9,7 @@ AgentContextKit can generate SARIF locally with:
 ackit sarif --output .ackit/reports/ackit.sarif
 ```
 
-The published `0.2.0-alpha.2` NuGet package includes this command.
+The published `0.2.0-alpha.3` NuGet package includes this command.
 
 ## Rationale
 - AgentContextKit is offline-first and local-only by default.

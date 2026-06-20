@@ -1,13 +1,25 @@
 # v0.2.0-alpha.3 Release Decision
 
-Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-preparation update: 2026-06-20. Hosted RC planning update: 2026-06-20. Hosted RC evidence update: 2026-06-20. Decision owner: `Cynrath`.
+Initial decision date: 2026-06-14. Evidence intake update: 2026-06-20. Release-preparation update: 2026-06-20. Hosted RC planning update: 2026-06-20. Hosted RC evidence update: 2026-06-20. Publish update: 2026-06-20. Decision owner: `Cynrath`.
 
 ## Decision
-**Exact-candidate GO for a later publish task; publication is not yet performed.**
+**Published: `AgentContextKit` `0.2.0-alpha.3` is available on NuGet and recorded as GitHub prerelease `v0.2.0-alpha.3`.**
 
 `0.2.0-alpha.3` is the selected planning version. TASK-0202 closes the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared the source/package metadata, release-preparation docs, local package, package verification, and installed-tool smoke evidence. TASK-0204 identified the dispatch-time `origin/master` hosted RC evidence candidate. TASK-0205 verified hosted RC run `27868539971` for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`; Windows, Ubuntu, and macOS jobs all succeeded. TASK-0206 later required source-impacting release-gate script hardening and therefore refreshed hosted RC evidence with run `27870246504` for exact commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`; Windows, Ubuntu, and macOS jobs all succeeded.
 
-This GO authorizes only a later publish-preparation/execution task to proceed to its own exact-commit checks. TASK-0205 does not approve an immediate publish, does not dispatch `release.yml`, and does not create a tag, GitHub Release, or NuGet package.
+TASK-0206 selected final publish SHA `92984c6448332aa24b7cff94647f627bf944e535`, a docs/handoff/governance-only successor to refreshed hosted RC evidence commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`. The final bridge changed 8 files and 0 package/source-impacting files. Publication used `.github/workflows/release.yml` with matching `automation_commit_sha` and `release_commit_sha`.
+
+Final release state:
+- NuGet package: `AgentContextKit` `0.2.0-alpha.3` exists and `scripts/verify-published-package.ps1 -Version 0.2.0-alpha.3` passed.
+- Global tool smoke: reinstall from NuGet passed; `ackit version` returned `AgentContextKit 0.2.0-alpha.3`.
+- Git tag: `v0.2.0-alpha.3` points to `92984c6448332aa24b7cff94647f627bf944e535`.
+- GitHub Release: `v0.2.0-alpha.3` exists as a prerelease targeting `92984c6448332aa24b7cff94647f627bf944e535`.
+- Release assets: `AgentContextKit.0.2.0-alpha.3.nupkg` SHA-256 `72649efbd3ab0b6751281e200de5671cb361c53ad954bbd5510a4d31232cb33f`; `AgentContextKit.0.2.0-alpha.3.snupkg` SHA-256 `716da07eb6bfa6c12b98b7e6ceaeb6e94999547a686b0af5bce5a0d75d2c9c2f`.
+- Successful release workflow verification: `release.yml` `operation=verify-existing` run `27870813763`, `https://github.com/Cynrath/agent-context-kit/actions/runs/27870813763`, succeeded without package/tag/release mutation.
+
+Publish workflow caveat:
+- `operation=publish` runs `27870383897`, `27870603776`, and `27870710093` completed the immutable publication sequence in stages but did not finish green. Run `27870383897` published the NuGet package and then hit NuGet propagation delay before tag/release. Run `27870603776` created the exact tag and GitHub prerelease/assets without republishing, then failed in the provenance probe. Run `27870710093` reproduced the same provenance-probe failure after verifying existing package/tag/release.
+- The failed provenance step attempted `gh api repos/Cynrath/agent-context-kit/attestations/sha256:<digest>` for the release nupkg and exited nonzero when no attestation existed, before `actions/attest@v4` could run. This is a workflow idempotency/provenance follow-up for the next release. It did not move tags, replace assets, reuse a version, expose secrets, or manually mutate release state.
 
 ## Verified Inputs
 - TASK-0126 immutable alpha.2 recovery verification is green in run `27478046088`.
@@ -26,11 +38,11 @@ This GO authorizes only a later publish-preparation/execution task to proceed to
 - TASK-0205 verified hosted RC run `27868539971` with `gh`: run conclusion `success`; head SHA `beaa14deed3dbc55ac98d216679f9a9799261801`; event `workflow_dispatch`; branch `master`; jobs `evidence (windows-2025)`, `evidence (ubuntu-latest)`, and `evidence (macos-latest)` all succeeded.
 
 ## Remaining Release Conditions
-1. Publication remains a separate task and must run the release workflow's exact-commit checks before any tag, GitHub Release, or NuGet publish.
-2. Future provenance is implemented locally but can only be verified during an authorized successful publish; it does not replace pre-publish approval.
-3. TASK-0205 documentation commits happen after the hosted RC evidence commit and do not change package/source code. A future publish task must decide whether to publish the RC commit `beaa14deed3dbc55ac98d216679f9a9799261801` or the final docs-only HEAD according to repository release policy.
-4. If the release workflow requires `release_commit_sha == origin/master`, the publish task may need to publish a final documentation HEAD only after confirming package/source metadata remains unchanged from the RC evidence commit, or record a new hosted RC run for that final HEAD.
-5. Tag creation, GitHub Release creation, NuGet publication, and release workflow dispatch remain unauthorized until a separate explicit publish task.
+1. `0.2.0-alpha.3` publication is complete and immutable; do not republish, replace assets, move `v0.2.0-alpha.3`, or reuse the version.
+2. Record and carry forward the workflow provenance follow-up: the publish path's attestation probe must handle the "no attestation exists yet" case before the next release.
+3. Future releases still require their own task, hosted RC evidence, exact SHA decision, package/source bridge classification, and `release.yml` dispatch.
+4. The current published package remains governed by successor-release policy; any correction must be a new version unless it is docs-only evidence.
+5. Repository secrets and manual NuGet API keys remain prohibited for package publication.
 
 ## TASK-0198 Evidence Check
 
@@ -170,21 +182,19 @@ TASK-0206 source-impacting remediation and refreshed RC evidence:
 TASK-0206 publish decision now uses refreshed RC evidence commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f` as the package/source baseline. Any later publish SHA must be a docs/handoff/governance-only successor to that refreshed evidence commit, or publication must stop for a new hosted RC run.
 
 ## Actions Not Performed
-- no published-package workflow version change;
-- no release-candidate workflow dispatch by TASK-0205; the maintainer-dispatched run `27868539971` was verified read-only;
-- no release workflow dispatch;
-- no NuGet login or publish;
-- no tag or GitHub Release creation;
-- no existing tag/package mutation;
+- no manual tag creation outside `release.yml`;
+- no manual GitHub Release creation outside `release.yml`;
+- no manual NuGet package upload outside `release.yml`;
+- no repository secret creation or API-key publication path;
+- no existing tag/package mutation or asset replacement;
 - no security advisory creation;
 - no branch ruleset mutation;
-- no repository secret creation;
 - no owner removal, account/recovery mutation, or destructive NuGet action.
 
 ## Next Required Task
-Publish preparation/execution decision:
-1. decide whether the publish task should use the hosted RC evidence commit `beaa14deed3dbc55ac98d216679f9a9799261801` or a later docs-only HEAD according to the release workflow's exact-commit policy;
-2. if using a later docs-only HEAD, prove package/source metadata remains unchanged from the hosted RC evidence commit or obtain a new hosted RC run for that final HEAD;
-3. only after a separate explicit publish task authorizes it, publish through the OIDC-only release workflow.
+Post-publish follow-up:
+1. harden the `release.yml` provenance/idempotency probe so a missing attestation records `exists=false` and lets `actions/attest@v4` run;
+2. update published-package smoke workflow/docs to `0.2.0-alpha.3` only in a separate docs/workflow task;
+3. keep successor-release policy for any package or release-asset correction.
 
 Immutable release rules remain in force: never reuse a NuGet version, move an existing tag, force push, or replace published artifacts.

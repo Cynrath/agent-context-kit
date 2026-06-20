@@ -27,6 +27,18 @@ PROJECT-CONTROL-0107 planning commit `c249a13` opens with the post-0158 state sy
 - Selected `0.2.0-alpha.3` as the smallest compatible next prerelease scope without changing package metadata or approving publication.
 - Recorded an evidence-backed alpha.3 NO-GO until independent backup security ownership and recovery authority/backup evidence are complete.
 
+## [0.2.0-alpha.3] - 2026-06-20
+
+### Added
+- Added the published package for MCP stdio transport, `ackit.rules`, `ackit watch`, `ackit diff`, `ackit trim`, scan include/exclude filters, release-hardening scripts, and release blocker evidence cleanup accumulated after `0.2.0-alpha.2`.
+
+### Release
+- Published `AgentContextKit` `0.2.0-alpha.3` to NuGet through the OIDC release workflow sequence.
+- Created exact tag `v0.2.0-alpha.3` and GitHub prerelease targeting `92984c6448332aa24b7cff94647f627bf944e535`.
+- Verified global tool install from NuGet; `ackit version` reports `AgentContextKit 0.2.0-alpha.3`.
+- Recorded refreshed hosted RC evidence run `27870246504` and immutable release verification run `27870813763`.
+- Known follow-up: harden the release workflow provenance probe before the next publish so missing attestation state does not fail before attestation can run.
+
 ## [0.2.0-alpha.2] - 2026-06-13
 
 ### Added

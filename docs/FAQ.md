@@ -22,4 +22,4 @@ No. It is pattern-based and can produce false positives or false negatives. Manu
 The project targets international OSS users and Turkish developers.
 
 ## Is it release-ready for NuGet?
-Yes. `v0.2.0-alpha.2` is published on GitHub and NuGet as a pre-release. Future releases still require explicit maintainer approval.
+Yes. `v0.2.0-alpha.3` is published on GitHub and NuGet as a pre-release. Future releases still require explicit maintainer approval.

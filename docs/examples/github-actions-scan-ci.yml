@@ -1,6 +1,6 @@
 # documentation example only
 # Copy into .github/workflows only after review.
-# Uses the published NuGet package AgentContextKit 0.2.0-alpha.2.
+# Uses the published NuGet package AgentContextKit 0.2.0-alpha.3.
 
 name: ackit-scan-ci-example
 
@@ -27,7 +27,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Install AgentContextKit
-        run: dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+        run: dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 
       - name: Add .NET tools to PATH
         run: echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"

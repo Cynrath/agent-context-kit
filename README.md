@@ -38,14 +38,14 @@ Default commands process repository content locally: no repository upload, AI AP
 
 | Area | Status |
 | --- | --- |
-| Current release | `v0.2.0-alpha.2` published on GitHub and NuGet as a pre-release |
-| Local candidate | Source/package metadata prepared as `0.2.0-alpha.3`; hosted RC evidence and publication pending |
+| Current release | `v0.2.0-alpha.3` published on GitHub and NuGet as a pre-release |
+| Release evidence | Published from `92984c6448332aa24b7cff94647f627bf944e535`; NuGet install verified |
 | Package | `AgentContextKit` global tool install verified |
 | Previous release | `v0.1.0-alpha.2` |
 | Runtime | .NET 10 |
 | Platforms | Windows, Ubuntu, macOS via GitHub Actions smoke flows |
 | Privacy model | Offline-first; no repository upload and no remote AI API calls in the MVP |
-| SARIF | `ackit sarif` is included in the published `0.2.0-alpha.2` package |
+| SARIF | `ackit sarif` is included in the published `0.2.0-alpha.3` package |
 
 ---
 
@@ -120,7 +120,7 @@ AgentContextKit gives teams a repeatable local workflow before they hand a repos
 ### Install from NuGet
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 ackit version
 ackit --help
 ```
@@ -135,7 +135,7 @@ ackit doctor
 
 `scan --ci` returns a non-zero exit code for High or Critical findings. Start with `ackit scan` when you want report-only behavior.
 
-The published `0.2.0-alpha.2` package supports read-only config diagnostics and an explicit baseline workflow:
+The published `0.2.0-alpha.3` package supports read-only config diagnostics and an explicit baseline workflow:
 
 ```powershell
 ackit config-check --json
@@ -183,9 +183,7 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
 ```
 
-The published `0.2.0-alpha.2` package adds sanitized suppression audit fields to human/JSON scan output.
-
-Current source is prepared as the `0.2.0-alpha.3` local candidate and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands. These current-source command map entries do not imply that `0.2.0-alpha.3` is published on NuGet.
+The published `0.2.0-alpha.3` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands.
 
 ### Try it on a sample
 
@@ -230,7 +228,7 @@ Pop-Location
 ---
 
 ## CLI Command Map
-This map follows current-source `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`. The published NuGet package remains `0.2.0-alpha.2`; the `0.2.0-alpha.3` source candidate still needs hosted RC evidence and publication approval.
+This map follows published `0.2.0-alpha.3` `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`.
 
 ```text
 ackit init [--lang en|tr] [--json]
@@ -351,10 +349,10 @@ Public release blockers are tracked in [Release Blockers](docs/RELEASE_BLOCKERS.
 
 ## Packaging
 
-Local package validation is documented in [Packaging](docs/PACKAGING.md) and [Release Validation](docs/RELEASE_VALIDATION.md). The `0.2.0-alpha.2` package is published as a NuGet global tool; `0.2.0-alpha.3` is a local source/package candidate until a later authorized publish.
+Local package validation is documented in [Packaging](docs/PACKAGING.md) and [Release Validation](docs/RELEASE_VALIDATION.md). The `0.2.0-alpha.3` package is published as a NuGet global tool.
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 ackit version
 ```
 

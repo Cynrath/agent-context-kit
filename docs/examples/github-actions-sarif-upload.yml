@@ -1,7 +1,7 @@
 # documentation example only
 # Copy into .github/workflows only after review.
 # GitHub Code Scanning upload requires maintainer approval.
-# The published AgentContextKit 0.2.0-alpha.2 package includes ackit sarif.
+# The published AgentContextKit 0.2.0-alpha.3 package includes ackit sarif.
 # Recommended first opt-in: manual trigger, published package, one upload job.
 
 name: ackit-sarif-upload-example
@@ -27,7 +27,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Install published AgentContextKit
-        run: dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+        run: dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 
       - name: Add .NET tools to PATH
         run: echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"

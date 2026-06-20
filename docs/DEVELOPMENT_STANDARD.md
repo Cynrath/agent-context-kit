@@ -7,7 +7,7 @@
 - Update docs when behavior changes.
 - Record assumptions in `docs/DECISIONS.md` or the active task.
 - Do not commit generated `.ackit/`, SARIF, HTML, Web UI, prompt pack, context export, `bin/`, or `obj/` artifacts.
-- `0.2.0-alpha.3` is NO-GO. Do not bump version, tag, publish, or release.
+- `0.2.0-alpha.3` is published and immutable. Do not reuse the version, move the tag, replace assets, republish, or manually mutate the GitHub Release/NuGet package.
 
 ## Commit Completeness Hard Rule
 - Before any push, run `git status` and confirm the working tree is clean.

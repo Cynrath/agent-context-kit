@@ -53,6 +53,20 @@
 - Published install commands are pinned to `0.2.0-alpha.2`.
 - `v0.2.0-alpha.2` tag push, GitHub pre-release, NuGet publish, global install verification, and `ackit sarif` help verification are complete.
 
+## v0.2.0-alpha.3 Published State
+- Source/package metadata and CLI runtime version are `0.2.0-alpha.3`.
+- Final publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
+- Refreshed hosted RC evidence baseline: run `27870246504` for commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`.
+- Final package/source bridge from `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f` to `92984c6448332aa24b7cff94647f627bf944e535`: docs/handoff/governance-only, 0 package/source-impacting files.
+- NuGet package `AgentContextKit` `0.2.0-alpha.3` is published and verified.
+- Global tool reinstall from NuGet passed; `ackit version` returned `AgentContextKit 0.2.0-alpha.3`.
+- Tag `v0.2.0-alpha.3` points to `92984c6448332aa24b7cff94647f627bf944e535`.
+- GitHub Release `v0.2.0-alpha.3` exists as a prerelease targeting `92984c6448332aa24b7cff94647f627bf944e535`.
+- Release nupkg SHA-256: `72649efbd3ab0b6751281e200de5671cb361c53ad954bbd5510a4d31232cb33f`.
+- Release snupkg SHA-256: `716da07eb6bfa6c12b98b7e6ceaeb6e94999547a686b0af5bce5a0d75d2c9c2f`.
+- `release.yml` read-only `operation=verify-existing` run `27870813763` succeeded for the immutable release state.
+- Publish-path follow-up: `operation=publish` created/verified package, tag, release, and assets, but failed after publication in the attestation-provenance probe. Harden that idempotency path before the next release.
+
 ## Historical v0.2.0-alpha.2 Release-Candidate Gate
 - Scope is defined in `docs/V020_ALPHA2_SCOPE.md`.
 - Release is limited to scanner precision, fixture hardening, sanitized suppression audit, contract validation, and repository documentation polish.
@@ -64,13 +78,10 @@
 
 ## Remaining Manual Actions
 - Review all generated files before future publishing.
-- For the next release, approve push, hosted CI/source smoke validation, tag, GitHub Release, NuGet publish, and NuGet install verification in a dedicated release task.
-- For planned `0.2.0-alpha.3`, TASK-0202 closes independent backup security notification ownership and backup package recovery coverage for release preparation.
-- For planned `0.2.0-alpha.3`, TASK-0203 completed local package validation and install smoke for implementation commit `33e1897`; at TASK-0203 close, hosted RC evidence and exact-candidate GO remained pending.
-- For planned `0.2.0-alpha.3`, TASK-0204 identifies dispatch-time current `origin/master` as the hosted RC candidate, candidate version `0.2.0-alpha.3`, and predecessor `0.2.0-alpha.2`; obtain hosted RC evidence and record the exact-version/exact-commit GO packet before any publication action.
-- For planned `0.2.0-alpha.3`, TASK-0205 records hosted RC run `27868539971` as passed for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source package `0.2.0-alpha.3.ci.27868539971`; exact-candidate GO is for a later publish task only.
-- For TASK-0206 publish gating, source-impacting release-gate script hardening required refreshed hosted RC evidence. Run `27870246504` passed on Windows, Ubuntu, and macOS for exact commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source package `0.2.0-alpha.3.ci.27870246504`.
-- Final publish remains pending and must be authorized by a separate task.
+- For the next release after `0.2.0-alpha.3`, approve push, hosted CI/source smoke validation, tag, GitHub Release, NuGet publish, and NuGet install verification in a dedicated release task.
+- TASK-0206 completed the authorized `0.2.0-alpha.3` publication through `release.yml` release objects and post-publish verification.
+- Update published-package smoke workflow/docs from `0.2.0-alpha.2` to `0.2.0-alpha.3` in a separate follow-up task if desired.
+- Harden the `release.yml` provenance probe before the next publish so missing attestation state does not fail before `actions/attest@v4` can run.
 
 ## Release Candidate Evidence Gate
 - `scripts/check-release-candidate-evidence.ps1 -FailOnIssues` passes.
@@ -97,5 +108,5 @@
 - [x] English/Turkish human output, known argument-error parity, exit-code parity, and language-independent JSON semantics are covered by `scripts/check-localization-parity.ps1 -FailOnIssues`.
 - [x] Security/supply-chain evidence structure and maintainer handoff are present and pass `scripts/check-security-supply-chain-evidence.ps1 -FailOnIssues`; remote items remain explicitly pending.
 - [x] Current-source consolidated local evidence passes `scripts/check-rc-local-readiness.ps1 -RunDependencyReview -FailOnIssues`; the result remains `LOCAL READY / REMOTE NO-GO`.
-- [x] Before publication, resolve whether the release workflow should publish the hosted RC evidence commit or a later docs-only HEAD; TASK-0206 selected the current `origin/master` publish policy required by `release.yml`, refreshed package/source RC evidence at `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`, and requires one final post-evidence recompute/classification before dispatch.
+- [x] Before publication, resolve whether the release workflow should publish the hosted RC evidence commit or a later docs-only HEAD; TASK-0206 selected the current `origin/master` publish policy required by `release.yml`, refreshed package/source RC evidence at `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`, classified final publish SHA `92984c6448332aa24b7cff94647f627bf944e535` as a docs/handoff/governance-only successor, and published `0.2.0-alpha.3`.
 - Signing, SBOM, provenance, and package recovery decisions are recorded.

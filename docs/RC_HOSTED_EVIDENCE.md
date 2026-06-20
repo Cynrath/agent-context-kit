@@ -10,6 +10,8 @@ TASK-0205 verified hosted `0.2.0-alpha.3` release-candidate evidence with `gh`. 
 
 TASK-0206 refreshed hosted `0.2.0-alpha.3` release-candidate evidence after the release-gate `git status` stderr hardening changed `scripts/**`. Run [27870246504](https://github.com/Cynrath/agent-context-kit/actions/runs/27870246504) passed on Windows, Ubuntu, and macOS for exact commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27870246504`. This refreshed tuple supersedes the earlier TASK-0205 tuple for TASK-0206 publish gating only; the earlier tuple remains valid historical evidence for its exact commit.
 
+TASK-0206 published `0.2.0-alpha.3` from final SHA `92984c6448332aa24b7cff94647f627bf944e535`, which was classified as a docs/handoff/governance-only successor to refreshed RC evidence commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`. The bridge changed 8 files and 0 package/source-impacting paths. NuGet package `AgentContextKit` `0.2.0-alpha.3`, tag `v0.2.0-alpha.3`, and GitHub prerelease `v0.2.0-alpha.3` now exist and target the final publish SHA.
+
 Alpha.3 hosted evidence tuple:
 - workflow: `release-candidate-evidence.yml`
 - run ID: `27868539971`
@@ -127,7 +129,7 @@ gh workflow run release-candidate-evidence.yml `
   -f predecessor_version=0.2.0-alpha.2
 ```
 
-TASK-0128's dispatch is complete and remains alpha.2-only. TASK-0205 records the alpha.3 hosted RC evidence for `beaa14deed3dbc55ac98d216679f9a9799261801`. TASK-0206 records refreshed alpha.3 hosted RC evidence for `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f` after source-impacting script hardening. Do not tag, publish, or create a GitHub Release from evidence recording alone; TASK-0206 publication must still pass the release workflow and immutable release checks.
+TASK-0128's dispatch is complete and remains alpha.2-only. TASK-0205 records the alpha.3 hosted RC evidence for `beaa14deed3dbc55ac98d216679f9a9799261801`. TASK-0206 records refreshed alpha.3 hosted RC evidence for `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f` after source-impacting script hardening, then published final docs-only successor SHA `92984c6448332aa24b7cff94647f627bf944e535`. Do not tag, publish, or create a GitHub Release from evidence recording alone for future releases; each release still needs its own explicit publish task and immutable release checks.
 
 ## Failure Interpretation
 - Predecessor install failure can indicate NuGet/network availability rather than source behavior.

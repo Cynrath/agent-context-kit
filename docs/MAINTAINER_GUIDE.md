@@ -70,9 +70,9 @@ powershell -ExecutionPolicy Bypass -File scripts/test-samples.ps1 -NoBuild
 ```
 
 ## SARIF And Code Scanning
-The published `0.2.0-alpha.2` package and current source include `ackit sarif --output .ackit/reports/ackit.sarif`, which creates a local SARIF 2.1.0 scanner report with repository-relative paths and no raw scanner match values.
+The published `0.2.0-alpha.3` package and current source include `ackit sarif --output .ackit/reports/ackit.sarif`, which creates a local SARIF 2.1.0 scanner report with repository-relative paths and no raw scanner match values.
 
-The published NuGet `0.2.0-alpha.2` package includes `ackit sarif`. Keep source package smoke for validating future source changes before publication.
+The published NuGet `0.2.0-alpha.3` package includes `ackit sarif`. Keep source package smoke for validating future source changes before publication.
 
 The repository does not enable GitHub Code Scanning upload by default. `docs/examples/github-actions-sarif-upload.yml` is a non-active example only. Before enabling it as a real workflow, maintainers should review the generated SARIF artifact, confirm `security-events: write` permission is acceptable, and decide whether Code Scanning alerts should become part of release validation.
 
@@ -110,8 +110,8 @@ Use `docs/ISSUE_BACKLOG.md` for the first copy-ready issue set. Issue creation i
 - If a release tag points to the wrong commit, stop and document the incident before any maintainer-only tag action.
 
 ## Current Release
-`v0.2.0-alpha.2` is published on GitHub and NuGet as a pre-release. Global tool install, SARIF smoke, published-package smoke, source smoke, Web UI smoke, and hosted Actions validation are complete.
+`v0.2.0-alpha.3` is published on GitHub and NuGet as a pre-release. Global tool install, SARIF smoke, and immutable release verification are complete. Published-package smoke workflow pin sync is a follow-up.
 
-Current source is published as the `0.2.0-alpha.2` package. TASK-0065 synced active docs after publication.
+Current source is published as the `0.2.0-alpha.3` package. TASK-0206 synced release evidence after publication.
 
 For the current pre-release, use `docs/RELEASE_BODY_V020_ALPHA2.md` as the release-note reference.

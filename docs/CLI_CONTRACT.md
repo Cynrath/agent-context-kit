@@ -24,7 +24,7 @@ During development, run the CLI through:
 dotnet run --project src/AgentContextKit.Cli -- <command>
 ```
 
-Current package note: `ackit sarif` is part of the current source command surface and the published `0.2.0-alpha.2` NuGet global tool.
+Current package note: `ackit sarif` is part of the current source command surface and the published `0.2.0-alpha.3` NuGet global tool.
 
 ## Stable Command Surface
 The v1.0 target command surface is:

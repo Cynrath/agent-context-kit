@@ -2,7 +2,7 @@
 
 AgentContextKit reads optional configuration from `.ackit/config.yml`.
 
-Config allowlist fields are part of the current source and `0.2.0-alpha.2` package. The published NuGet `0.2.0-alpha.2` package includes the scanner rule catalog and allowlist feature set.
+Config allowlist fields are part of the current source and `0.2.0-alpha.3` package. The published NuGet `0.2.0-alpha.3` package includes the scanner rule catalog and allowlist feature set.
 
 The MVP parser intentionally supports a small YAML-like subset:
 - `key: value`
@@ -115,7 +115,7 @@ Examples:
 
 Critical findings cannot be silently ignored by this field. If a Critical secret-like finding appears, remove the value, rotate credentials if needed, or move secrets out of source.
 
-The published `0.2.0-alpha.2` package records configured non-Critical suppressions in local `ackit scan` human/JSON output. Audit records identify the rule, severity, category, repository-relative path, and config reason without including raw matches. See [SUPPRESSION_AUDIT.md](SUPPRESSION_AUDIT.md).
+The published `0.2.0-alpha.3` package records configured non-Critical suppressions in local `ackit scan` human/JSON output. Audit records identify the rule, severity, category, repository-relative path, and config reason without including raw matches. See [SUPPRESSION_AUDIT.md](SUPPRESSION_AUDIT.md).
 
 ## Scanner Precision Fields
 The scanner uses a conservative built-in safe technical allowlist for common public platform/package domains and fixture-only placeholder data. Configurable allowlists are local, explicit, and narrow. They do not delete, redact, upload, publish, or mutate files.
