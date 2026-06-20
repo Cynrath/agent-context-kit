@@ -134,4 +134,69 @@ rg -n "RunAsync\([^)]*\)" tests/AgentContextKit.Tests/McpStdioTransportTests.cs
 Before push, correct or revert the focused test/docs edits with normal commits. After push, use normal `git revert <sha>` for TASK-0210 commits if the cleanup is wrong. Do not move tags, replace release assets, republish NuGet packages, dispatch release workflows, or mutate GitHub Release/NuGet state.
 
 ## Completion notes
-Pending.
+Completed as focused test-source cleanup plus evidence/state documentation.
+
+Commits:
+- Plan: `550506c` (`docs: plan task 0210 xunit analyzer cleanup`)
+- Implementation: `3c38057` (`test: clean up xunit analyzer warnings`)
+- Final evidence: this commit
+
+Current HEAD/origin at final evidence collection:
+- Local HEAD before this final evidence commit: `3c380573dd793f61c1d60dc43c1bb29add07fc30`
+- Local HEAD short before this final evidence commit: `3c38057`
+- `origin/master`: `f6b5c88091f3ae7d9b8b480999e5af5051270fea`
+- `origin/master` short: `f6b5c88`
+
+Files changed:
+- `tests/AgentContextKit.Tests/McpStdioTransportTests.cs`
+- `tests/AgentContextKit.Tests/WatchCommandTests.cs`
+- `docs/tasks/TASK-0210-xunit-analyzer-warning-cleanup.md`
+- `docs/NEXT_TASKS.md`
+- `.codex/SESSION_HANDOFF.md`
+- `.codex/CONTEXT_PACK.md`
+- `.codex/NEXT_STEPS.md`
+- `docs/ISSUE_BACKLOG.md`
+
+xUnit1051 cleanup:
+- Passed `TestContext.Current.CancellationToken` to `McpStdioTransport.RunAsync(...)` calls in `McpStdioTransportTests.cs`.
+- Preserved the explicit cancellation test by using `CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken)`, canceling that linked source, and still passing the canceled token to `RunAsync`.
+- `rg -n "RunAsync\([^)]*\)" tests/AgentContextKit.Tests/McpStdioTransportTests.cs` shows all ordinary calls use `TestContext.Current.CancellationToken`; the intentional cancellation test uses the linked `cts.Token`.
+
+xUnit2013 cleanup:
+- Replaced the targeted `Assert.Equal(1, report.SeverityChangedSample.Count)` with `Assert.Single(report.SeverityChangedSample)`.
+- Replaced the remaining `Assert.Equal(25, report.AddedSample.Count)` collection-size assertion with `Assert.Collection(...)` so the requested pattern verification is clean while preserving the exact sample-size assertion.
+- `rg -n "Assert\.Equal\(1,\s*.*\.Count|Assert\.Equal\(.*\.Count" tests/AgentContextKit.Tests/WatchCommandTests.cs` returned no matches.
+
+Targeted test results:
+- Initial requested no-build targeted run: passed, `43/43`.
+- After Release build: `dotnet test tests/AgentContextKit.Tests/AgentContextKit.Tests.csproj -c Release --no-build --filter "FullyQualifiedName~McpStdioTransportTests|FullyQualifiedName~WatchCommandTests"` passed, `43/43`.
+
+Full validation results:
+- `dotnet restore AgentContextKit.sln`: passed; all projects up to date.
+- `dotnet build AgentContextKit.sln -c Release --no-restore`: passed with `0` warnings and `0` errors.
+- `dotnet test AgentContextKit.sln -c Release --no-build`: passed, `428/428`.
+- `ackit doctor`: passed all checks.
+- `ackit scan --ci`: exited `0`; existing Medium/Low review findings remain for `.remember` logs, retained `0.2.0-alpha.3` package-validation artifacts, and Low local-path references.
+- `git diff --check`: passed; Git printed CRLF normalization notices for the modified test files.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1`: passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-cli-contract.ps1`: passed; warned only that the working tree had uncommitted changes during evidence collection.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1`: passed; warned only that the working tree had uncommitted changes during evidence collection.
+
+Release status:
+- `AgentContextKit` `0.2.0-alpha.3` remains the current published GitHub/NuGet prerelease.
+- NuGet package, tag `v0.2.0-alpha.3`, and GitHub prerelease remain unchanged.
+
+Out-of-scope confirmation:
+- No NuGet publish.
+- No GitHub Release mutation.
+- No tag creation, movement, or deletion.
+- No release workflow dispatch.
+- No release-candidate workflow dispatch.
+- No version bump.
+- No package metadata change.
+- No release workflow, release asset, package validation artifact, or provenance evidence mutation.
+- No automatic scan-finding redaction, destructive cleanup, or baseline acceptance.
+
+Recommended next task:
+- TASK-0211 scan-finding classification.
+- Scope: classify current `ackit scan --ci` Medium/Low findings as real follow-up work, accepted local artifact review findings, or false positives without auto-redaction, destructive artifact cleanup, or baseline acceptance.

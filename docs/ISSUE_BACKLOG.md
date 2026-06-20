@@ -51,6 +51,7 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 
 ### 9. Resolve post-alpha3 xUnit analyzer warnings
 - Labels: `type: maintenance`, `area: tests`, `priority: medium`
+- Status: Completed by TASK-0210.
 - Goal: Remove hosted/local analyzer annotations `xUnit1051` and `xUnit2013`.
 - Done when: `McpStdioTransportTests` uses `TestContext.Current.CancellationToken` for cancellable async calls, `WatchCommandTests` uses the xUnit-preferred collection-size assertion, and Release build/test pass without these analyzer warnings.
 
