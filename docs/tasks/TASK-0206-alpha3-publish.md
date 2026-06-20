@@ -187,3 +187,14 @@ Pre-dispatch decision:
 - Explicit publish authorization is the maintainer instruction in TASK-0206: publish `0.2.0-alpha.3` only through `release.yml` if all gates pass and no package/tag/release conflict exists.
 - Do not manually create tags or GitHub Releases outside `release.yml`; do not use repository secrets.
 - Final publish SHA must be recomputed after this pre-dispatch evidence commit is pushed.
+
+First release workflow dispatch:
+- Run ID: `27869569988`.
+- URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27869569988`.
+- Head SHA: `2aa5a49453aeb78844b2ebfd04031f3470d3654e`.
+- Event: `workflow_dispatch`.
+- Result: failure in `validate exact package`, step `Run release gates`.
+- Passed before failure: checkout, setup .NET, commit/version validation, restore/build/test, and source output validation.
+- Failure cause: `scripts/check-v100-readiness.ps1 -FailOnIssues` reported missing `.codex/NEXT_STEPS.md` references to `V100_GAP_ANALYSIS.md`, `RELEASE_CANDIDATE_CONTRACT_FREEZE.md`, and `MAINTAINER_RC_DECISION.md`.
+- Publish impact: package packing, artifact upload, publish job, NuGet login, NuGet push, tag creation, GitHub Release creation, and attestation did not run.
+- Remediation: restore the missing `.codex/NEXT_STEPS.md` references in a docs-only commit, rerun the v1.0 readiness gate, recompute publish SHA from `origin/master`, repeat RC-to-publish bridge classification, and dispatch a new `release.yml` run only if the bridge remains package/source clean.

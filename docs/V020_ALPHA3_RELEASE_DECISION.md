@@ -152,6 +152,8 @@ Pre-dispatch decision:
 
 Pre-dispatch GO: proceed to `release.yml` publish dispatch only after pushing the pre-dispatch evidence commit, recomputing `origin/master`, and confirming the bridge remains docs/handoff/governance-only with 0 package/source-impacting changes.
 
+First TASK-0206 dispatch result: release workflow run `27869569988` failed before pack/publish in the Windows `validate exact package` job. The failed step was `Run release gates`; `scripts/check-v100-readiness.ps1 -FailOnIssues` reported missing `.codex/NEXT_STEPS.md` references to `V100_GAP_ANALYSIS.md`, `RELEASE_CANDIDATE_CONTRACT_FREEZE.md`, and `MAINTAINER_RC_DECISION.md`. Restore/build/test and source output validation had passed. The publish job was skipped, and no NuGet package, tag, GitHub Release, attestation, or release asset was created. TASK-0206 may continue only after a docs-only remediation commit restores the references, the gate passes, and the RC-to-publish bridge is reclassified as package/source clean.
+
 ## Actions Not Performed
 - no published-package workflow version change;
 - no release-candidate workflow dispatch by TASK-0205; the maintainer-dispatched run `27868539971` was verified read-only;
