@@ -63,7 +63,7 @@ public sealed class WatchCommandTests
         var report = ScanChangeReportBuilder.Compute(previous, current);
 
         Assert.Equal(60, report.AddedCount);
-        Assert.Equal(25, report.AddedSample.Count);
+        Assert.Collection(report.AddedSample, Enumerable.Repeat<Action<RiskFinding>>(static _ => { }, 25).ToArray());
         Assert.Equal(0, report.RemovedCount);
         Assert.Equal(0, report.SeverityChangedCount);
         Assert.Equal(0, report.UnchangedCount);
@@ -103,7 +103,7 @@ public sealed class WatchCommandTests
         Assert.Equal(0, report.AddedCount);
         Assert.Equal(0, report.RemovedCount);
         Assert.True(report.SeverityChangedCount >= 1);
-        Assert.Equal(1, report.SeverityChangedSample.Count);
+        Assert.Single(report.SeverityChangedSample);
     }
 
     [Fact]

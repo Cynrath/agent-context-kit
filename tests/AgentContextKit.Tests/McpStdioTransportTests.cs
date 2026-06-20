@@ -11,7 +11,7 @@ public sealed class McpStdioTransportTests
         var (transport, output) = MakeTransport(
             "{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"initialize\",\"params\":{}}");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
 
         Assert.Equal("2024-11-05", response["result"]?["protocolVersion"]?.GetValue<string>());
@@ -26,7 +26,7 @@ public sealed class McpStdioTransportTests
         var (transport, output) = MakeTransport(
             "{\"jsonrpc\":\"2.0\",\"id\":\"2\",\"method\":\"tools/list\",\"params\":{}}");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
         var tools = response["result"]?["tools"]?.AsArray()
             .Select(node => node?["name"]?.GetValue<string>() ?? string.Empty)
@@ -43,7 +43,7 @@ public sealed class McpStdioTransportTests
         using var repo = CreateHealthyRepository();
         var (transport, output) = MakeToolCall("ackit.health", repo.Path);
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
         var summary = response["result"]?["structuredContent"]?["checkSummary"];
 
@@ -60,7 +60,7 @@ public sealed class McpStdioTransportTests
         using var repo = CreateHealthyRepository();
         var (transport, output) = MakeToolCall("ackit.scan", repo.Path, extraArgs: ",\"format\":\"summary\"");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
         var text = response["result"]?["content"]?[0]?["text"]?.GetValue<string>();
 
@@ -77,7 +77,7 @@ public sealed class McpStdioTransportTests
         repo.Write("settings.txt", "pass" + "word=local-only-placeholder");
         var (transport, output) = MakeToolCall("ackit.findings", repo.Path, extraArgs: ",\"minSeverity\":\"high\"");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
         var findings = response["result"]?["structuredContent"]?["findings"]?.AsArray()
             ?? throw new InvalidOperationException("findings array missing.");
@@ -100,7 +100,7 @@ public sealed class McpStdioTransportTests
         var handoffPath = System.IO.Path.Combine(repo.Path, ".codex", "HANDOFF.md");
         var (transport, output) = MakeToolCall("ackit.context", repo.Path, extraArgs: ",\"target\":\"codex\"");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
         var text = response["result"]?["content"]?[0]?["text"]?.GetValue<string>();
 
@@ -117,7 +117,7 @@ public sealed class McpStdioTransportTests
         using var repo = CreateHealthyRepository();
         var (transport, output) = MakeToolCall("ackit.unknown", repo.Path);
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
 
         Assert.Equal(-32602, response["error"]?["code"]?.GetValue<int>());
@@ -132,7 +132,7 @@ public sealed class McpStdioTransportTests
             "{\"jsonrpc\":\"2.0\",\"id\":\"2\",\"method\":\"tools/call\",\"params\":{\"name\":\"ackit.health\",\"arguments\":{\"repoPath\":\"" + EscapeJson(repo.Path) + "\"}}}\n";
         var (transport, output) = MakeTransport(input);
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
         var lines = output.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         Assert.Equal(0, exit);
@@ -150,7 +150,7 @@ public sealed class McpStdioTransportTests
         using var repo = CreateHealthyRepository();
         var (transport, output) = MakeToolCall("ackit.health", "file:///etc/passwd");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
 
         Assert.Equal(-32602, response["error"]?["code"]?.GetValue<int>());
@@ -162,7 +162,7 @@ public sealed class McpStdioTransportTests
         var (transport, output) = MakeTransport(
             "{\"jsonrpc\":\"2.0\",\"id\":\"8\",\"method\":\"tools/foo\",\"params\":{}}");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
 
         Assert.Equal(-32601, response["error"]?["code"]?.GetValue<int>());
@@ -173,7 +173,7 @@ public sealed class McpStdioTransportTests
     {
         var (transport, output) = MakeTransport("{not valid json");
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
 
         Assert.Equal(0, exit);
@@ -188,7 +188,7 @@ public sealed class McpStdioTransportTests
             "{\"jsonrpc\":\"2.0\",\"id\":\"2\",\"method\":\"tools/list\",\"params\":{}}\n";
         var (transport, output) = MakeTransport(input);
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
         var lines = output.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         Assert.Equal(0, exit);
@@ -209,7 +209,7 @@ public sealed class McpStdioTransportTests
             stdout,
             options: new McpStdioOptions { MaxLineLength = 128 });
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(stdout.ToString());
 
         Assert.Equal(0, exit);
@@ -222,7 +222,7 @@ public sealed class McpStdioTransportTests
         var (transport, output) = MakeTransport(
             "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\",\"params\":{}}\n");
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(0, exit);
         Assert.Equal(string.Empty, output.ToString());
@@ -234,7 +234,7 @@ public sealed class McpStdioTransportTests
         var (transport, output) = MakeTransport(
             "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/exit\",\"params\":{}}\n");
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(0, exit);
         Assert.Equal(string.Empty, output.ToString());
@@ -246,7 +246,7 @@ public sealed class McpStdioTransportTests
         var (transport, output) = MakeTransport(
             "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/shutdown\",\"params\":{}}\n");
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(0, exit);
         Assert.Equal(string.Empty, output.ToString());
@@ -258,7 +258,7 @@ public sealed class McpStdioTransportTests
         var stdout = new StringWriter();
         var transport = new McpStdioTransport(CreateRouter(), new StringReader(string.Empty), stdout);
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(0, exit);
         Assert.Equal(string.Empty, stdout.ToString());
@@ -269,7 +269,7 @@ public sealed class McpStdioTransportTests
     {
         var (transport, output) = MakeToolCall("ackit.rules", "");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
         var rules = response["result"]?["structuredContent"]?["rules"]?.AsArray()
             ?? throw new InvalidOperationException("rules array missing.");
@@ -288,7 +288,7 @@ public sealed class McpStdioTransportTests
             "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/exit\",\"params\":{}}\n";
         var (transport, output) = MakeTransport(input);
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
         var lines = output.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         Assert.Equal(0, exit);
@@ -312,7 +312,7 @@ public sealed class McpStdioTransportTests
             "{\"jsonrpc\":\"2.0\",\"id\":\"2\",\"method\":\"tools/list\",\"params\":{}}\n";
         var (transport, output) = MakeTransport(input);
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var text = output.ToString();
 
         Assert.DoesNotContain("Welcome", text, StringComparison.OrdinalIgnoreCase);
@@ -334,7 +334,7 @@ public sealed class McpStdioTransportTests
         repo.Write("secrets-test.txt", $"first line with {marker} embedded inside");
         var (transport, output) = MakeToolCall("ackit.findings", repo.Path, extraArgs: ",\"minSeverity\":\"low\"");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
 
         Assert.DoesNotContain(marker, output.ToString());
     }
@@ -350,7 +350,7 @@ public sealed class McpStdioTransportTests
             "{\"jsonrpc\":\"2.0\",\"id\":\"4\",\"method\":\"tools/call\",\"params\":{\"name\":\"ackit.context\",\"arguments\":{\"repoPath\":\"" + EscapeJson(repo.Path) + "\",\"target\":\"codex\"}}}\n";
         var (transport, output) = MakeTransport(input);
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var text = output.ToString();
 
         var normalized = repo.Path.Replace('\\', '/').TrimEnd('/');
@@ -369,7 +369,7 @@ public sealed class McpStdioTransportTests
         var diagnostics = new StringWriter();
         var transport = new McpStdioTransport(CreateRouter(), new StringReader(input), stdout, diagnostics);
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var stdoutText = stdout.ToString();
         var lines = stdoutText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
@@ -390,7 +390,7 @@ public sealed class McpStdioTransportTests
         var diagnostics = new StringWriter();
         var transport = new McpStdioTransport(server, new StringReader(input), stdout, diagnostics);
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Single(stdout.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries));
         Assert.Contains("notification handler threw", diagnostics.ToString(), StringComparison.OrdinalIgnoreCase);
@@ -406,7 +406,7 @@ public sealed class McpStdioTransportTests
             new StringReader("{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"tools/list\",\"params\":{}}\n"),
             stdout);
 
-        using var cts = new CancellationTokenSource();
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
         cts.Cancel();
 
         var exit = await transport.RunAsync(cts.Token);
@@ -421,7 +421,7 @@ public sealed class McpStdioTransportTests
         var input = "{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"tools/call\",\"params\":{\"name\":\"ackit.health\",\"arguments\":{}}}\n";
         var (transport, output) = MakeTransport(input, new McpStdioOptions { DefaultRepositoryPath = repo.Path });
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
 
         Assert.Equal(0, exit);
@@ -438,7 +438,7 @@ public sealed class McpStdioTransportTests
             "{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"tools/call\",\"params\":{\"name\":\"ackit.health\",\"arguments\":{\"repoPath\":\"" + EscapeJson(repoB.Path) + "\"}}}\n";
         var (transport, output) = MakeTransport(input, new McpStdioOptions { DefaultRepositoryPath = repoA.Path });
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
 
         Assert.Equal(0, exit);
@@ -452,7 +452,7 @@ public sealed class McpStdioTransportTests
         var input = "\n\n{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"tools/list\",\"params\":{}}\n\n";
         var (transport, output) = MakeTransport(input);
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
         var lines = output.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         Assert.Equal(0, exit);
@@ -465,7 +465,7 @@ public sealed class McpStdioTransportTests
         var (transport, output) = MakeTransport(
             "{\"id\":\"1\",\"method\":\"tools/list\",\"params\":{}}\n");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
 
         Assert.Equal(-32600, response["error"]?["code"]?.GetValue<int>());
@@ -477,7 +477,7 @@ public sealed class McpStdioTransportTests
         var (transport, output) = MakeTransport(
             "{\"jsonrpc\":\"1.0\",\"id\":\"1\",\"method\":\"tools/list\",\"params\":{}}\n");
 
-        await transport.RunAsync();
+        await transport.RunAsync(TestContext.Current.CancellationToken);
         var response = ParseSingleResponse(output.ToString());
 
         Assert.Equal(-32600, response["error"]?["code"]?.GetValue<int>());
@@ -493,7 +493,7 @@ public sealed class McpStdioTransportTests
         var stdout = new StringWriter();
         var transport = new McpStdioTransport(server, new StringReader(input), stdout);
 
-        var exit = await transport.RunAsync();
+        var exit = await transport.RunAsync(TestContext.Current.CancellationToken);
         var lines = stdout.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         Assert.Equal(0, exit);
