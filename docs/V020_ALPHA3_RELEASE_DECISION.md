@@ -156,6 +156,8 @@ First TASK-0206 dispatch result: release workflow run `27869569988` failed befor
 
 Second TASK-0206 dispatch result: release workflow run `27869677726` failed before pack/publish in the same pre-publish `Run release gates` step. The previous v1.0 readiness failure was fixed. The new failure was `scripts/check-security-supply-chain-evidence.ps1 -FailOnIssues`, which still expects the historical `docs/PACKAGE_RECOVERY.md` marker `NuGet unlist/deprecate/account-recovery authority: unverified`. That marker describes the pre-TASK-0202 state and must be retained as historical evidence while TASK-0202 remains the superseding closure record for `RB-008`. The publish job was skipped again, and no NuGet package, tag, GitHub Release, attestation, or release asset was created.
 
+Third TASK-0206 dispatch result: release workflow run `27869894026` failed before pack/publish in `validate exact package`, step `Run release gates`. The first two blocker remediations held, but hosted Windows reproduced the known unreadable-directory stderr warning from `git status --short` in `scripts/check-config-generated-conventions.ps1`; because the release step runs with native command stderr treated as failure, this stopped the gate even though Git exits `0`. The publish job was skipped, and no NuGet package, tag, GitHub Release, attestation, or release asset was created. A script hardening change under `scripts/**` is now required; this is package/source-impacting for release governance, so the next candidate SHA requires fresh hosted RC evidence before another publish dispatch.
+
 ## Actions Not Performed
 - no published-package workflow version change;
 - no release-candidate workflow dispatch by TASK-0205; the maintainer-dispatched run `27868539971` was verified read-only;

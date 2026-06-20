@@ -210,3 +210,15 @@ Second release workflow dispatch:
 - Failure cause: `scripts/check-security-supply-chain-evidence.ps1 -FailOnIssues` expected the historical `docs/PACKAGE_RECOVERY.md` marker `NuGet unlist/deprecate/account-recovery authority: unverified`.
 - Publish impact: package packing, artifact upload, publish job, NuGet login, NuGet push, tag creation, GitHub Release creation, and attestation did not run.
 - Remediation: restore that phrase as a historical pre-TASK-0202 gate marker in `docs/PACKAGE_RECOVERY.md`, without changing scripts or source/package files; rerun security/supply-chain and RC-local readiness gates, recompute publish SHA, repeat bridge classification, and dispatch a new `release.yml` run only if package/source clean.
+
+Third release workflow dispatch:
+- Run ID: `27869894026`.
+- URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27869894026`.
+- Head SHA: `64b4df7e587bf11cd2a1880ca41960c9a9cd22aa`.
+- Event: `workflow_dispatch`.
+- Result: failure in `validate exact package`, step `Run release gates`.
+- Passed before failure: checkout, setup .NET, commit/version validation, restore/build/test, and source output validation.
+- Improvement from second run: `check-v100-readiness.ps1` and `check-security-supply-chain-evidence.ps1` both reached the corrected evidence state before the next gate failure.
+- Failure cause: hosted Windows emitted the known unreadable-directory stderr warning from `git status --short` inside `scripts/check-config-generated-conventions.ps1`; the outer release step treats native stderr as a failing command even when Git exits `0`.
+- Publish impact: package packing, artifact upload, publish job, NuGet login, NuGet push, tag creation, GitHub Release creation, and attestation did not run.
+- Remediation: harden release-gate dirty-check calls so they keep untracked/staged/tracked detection but suppress Git stderr before PowerShell can promote it to a native-command error. This changes `scripts/**`, so a new hosted RC evidence workflow for the resulting publish SHA is mandatory before any further publish dispatch.
