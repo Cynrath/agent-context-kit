@@ -1,10 +1,10 @@
 # Next Tasks
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. TASK-0198 is an independent docs-only blocker evidence investigation, not a new project control. TASK-0199 completed the post-0198 state cleanup at `0aad858`. TASK-0200 completed the docs-only README/current-source CLI parity cleanup. TASK-0201 completed the docs-only `RB-003`/`RB-008` closure preflight. TASK-0202 completed the docs-only maintainer evidence intake for `ShadowFlameC` backup/security/recovery coverage. `RB-003` and `RB-008` are closed for planned `0.2.0-alpha.3` release-preparation entry. TASK-0203 is the active release-preparation task: it prepares source/package metadata and local package evidence only, with hosted RC evidence, release GO, tag, GitHub Release, NuGet publish, and workflow dispatch still pending and unauthorized.
+This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. TASK-0198 is an independent docs-only blocker evidence investigation, not a new project control. TASK-0199 completed the post-0198 state cleanup at `0aad858`. TASK-0200 completed the docs-only README/current-source CLI parity cleanup. TASK-0201 completed the docs-only `RB-003`/`RB-008` closure preflight. TASK-0202 completed the docs-only maintainer evidence intake for `ShadowFlameC` backup/security/recovery coverage. `RB-003` and `RB-008` are closed for planned `0.2.0-alpha.3` release-preparation entry. TASK-0203 prepared the local `0.2.0-alpha.3` package candidate at implementation commit `33e1897`, with hosted RC evidence, release GO, tag, GitHub Release, NuGet publish, and workflow dispatch still pending and unauthorized.
 
-## Active Independent Release Preparation
+## Completed Independent Release Preparation
 
-1. TASK-0203 prepare `0.2.0-alpha.3` local release candidate - in progress; plan committed at `da51d4d`; metadata/docs/source-smoke parity are being prepared for local validation; no tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate workflow dispatch, owner/security-setting/secret mutation, or destructive NuGet action.
+1. TASK-0203 prepare `0.2.0-alpha.3` local release candidate - completed locally; plan commit `da51d4d`; implementation commit `33e1897`; package validation and local install smoke passed; known Windows `git status --short` stderr caveat recorded for release gates; no tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate workflow dispatch, owner/security-setting/secret mutation, or destructive NuGet action.
 
 ## Completed Independent Maintainer Evidence Intake
 
@@ -145,7 +145,7 @@ These actions require explicit maintainer control and do not block safe local-on
 5. Recheck the bounded SBOM deferral before expiry or the next release.
 6. Obtain hosted provenance evidence only during the next authorized publish; the control is implemented locally.
 7. Maintain NuGet backup recovery ownership and recovery procedure/tabletop evidence.
-8. Complete TASK-0203 local `0.2.0-alpha.3` release preparation with metadata bump, package diff, pack/install smoke, and evidence; hosted RC evidence and exact-candidate GO/NO-GO remain a later task.
+8. Obtain hosted RC evidence and an exact-candidate GO/NO-GO decision for the prepared local `0.2.0-alpha.3` candidate; do not publish from the preparation task.
 
 ## Local-Only Ecosystem/Product Intelligence Track
 1. TASK-0100 offline OSS ecosystem catalog and roadmap reset - completed locally.
@@ -178,7 +178,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- TASK-0203 is the active release-preparation task for `0.2.0-alpha.3`. It may update package metadata, source-package smoke version, README/current-source wording, release-preparation docs, and local package evidence only. The next task after TASK-0203 should be hosted RC evidence / exact-candidate GO decision, not publish. No release, tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate dispatch, security-setting change, owner/account/recovery mutation, destructive NuGet action, or repository secret creation is authorized by TASK-0203.
+- Hosted RC evidence / exact-candidate GO decision for the prepared local `0.2.0-alpha.3` candidate. This next task should validate the exact candidate commit in hosted workflows and record GO or NO-GO; it should not publish unless a separate explicit release task authorizes publication. No release, tag, GitHub Release, NuGet publish, release workflow dispatch, release-candidate dispatch, security-setting change, owner/account/recovery mutation, destructive NuGet action, or repository secret creation was authorized or performed by TASK-0203.
 
 ## Execution Rule
 After the closure of PROJECT-CONTROL-0110, the queue is in pause except for explicitly requested independent docs/release-preparation tasks. Tag, GitHub pre-release, NuGet publication, and workflow dispatch are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

@@ -58,6 +58,7 @@ This task makes the repository ready for hosted release-candidate evidence in a 
 - `.github/ISSUE_TEMPLATE/*.yml`
 - `scripts/check-package-metadata.ps1`
 - `scripts/check-release-candidate-inputs.ps1`
+- `scripts/test-release-candidate-inputs.ps1`
 - `scripts/verify-release.ps1`
 - `tests/AgentContextKit.Tests/AgentContextKitBehaviorTests.cs`
 - `tests/AgentContextKit.Tests/IssueTemplateVersionPlaceholderTests.cs`
@@ -177,4 +178,27 @@ Adds task-first audit records for local release-candidate preparation, package v
 Single `git revert <sha>` for the TASK-0203 implementation and evidence commits if the candidate must be abandoned. The plan commit can remain as historical task record or be reverted separately if required. Delete local untracked package-validation artifacts only if they were not committed; no tag, release, NuGet package, workflow run, owner, secret, or remote setting cleanup should be needed because this task does not perform those actions.
 
 ## Completion notes
-Pending.
+Completed locally on 2026-06-20.
+
+Evidence summary:
+- Plan commit: `da51d4d` (`docs: plan task 0203 alpha3 release preparation`).
+- Candidate implementation commit: `33e1897` (`chore: prepare 0.2.0-alpha.3 candidate`).
+- Candidate version: `0.2.0-alpha.3`.
+- Package metadata: `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj` now has `<Version>0.2.0-alpha.3</Version>` and release notes covering MCP stdio / `ackit.rules`, `ackit watch`, `diff` / `trim`, `scan --include` / `scan --exclude`, README/CLI parity, and release-hardening/blocker-evidence cleanup.
+- CLI runtime version: `ackit version` / packaged runtime surface updated to `0.2.0-alpha.3`.
+- Package path used for local validation: `O:\projeler\agent-context-kit\artifacts\package-validation\0.2.0-alpha.3`.
+- Package files created locally: `AgentContextKit.0.2.0-alpha.3.nupkg` and `AgentContextKit.0.2.0-alpha.3.snupkg`.
+- Package verification: `scripts/verify-published-package.ps1 -Version 0.2.0-alpha.3 -PackageSource artifacts/package-validation/0.2.0-alpha.3` passed; output ended with `AgentContextKit 0.2.0-alpha.3 package verification passed.`
+- Install smoke: `dotnet tool install AgentContextKit --version 0.2.0-alpha.3 --add-source artifacts/package-validation/0.2.0-alpha.3 --tool-path <temp>` passed; installed `ackit.exe --help` and `ackit.exe doctor` both exited `0`.
+- Candidate validation passed: explicit `dotnet restore AgentContextKit.sln`, `dotnet build AgentContextKit.sln -c Release --no-restore`, `dotnet test AgentContextKit.sln -c Release --no-build` (`428/428`), current-source `--help`, current-source `scan --ci`, `ackit doctor`, and `git diff --check`.
+- Targeted gates passed: `check-tracked-vs-untracked-md.ps1`, `check-cli-contract.ps1`, `check-localization-parity.ps1`, `check-release-candidate-workflow.ps1`, `check-release-candidate-inputs.ps1`, and `check-package-metadata.ps1 -ExpectedVersion 0.2.0-alpha.3`.
+- `check-release-candidate-evidence.ps1` exited `0` and completed its synthetic benchmark, but reported subordinate gate issues caused by the known Windows `git status --short` unreadable-directory stderr warning. Raw porcelain was separately proven clean.
+- `verify-release.ps1` passed restore/build/test/current-source scan/doctor, then stopped in release blocker review because `check-release-blockers.ps1` hit the same known Windows `git status --short` unreadable-directory stderr warning. Raw porcelain was separately proven clean.
+- Known caveat recorded: global installed `ackit` still represents the published `0.2.0-alpha.2` package, so global `ackit --help` / `ackit scan --ci` can differ from current-source/package-candidate behavior until alpha.3 is published.
+- `RB-003`: closed by TASK-0202 for `0.2.0-alpha.3` release-preparation entry; not a blocker for local preparation.
+- `RB-008`: closed by TASK-0202 for `0.2.0-alpha.3` release-preparation entry; not a blocker for local preparation.
+- Hosted RC evidence status: pending; no release-candidate workflow dispatch was performed.
+- Release publication status: not authorized and not performed.
+- Version/tag/GitHub Release/NuGet/workflow dispatch status: no tag, no GitHub Release, no NuGet publish, no release workflow dispatch, and no release-candidate workflow dispatch occurred.
+
+Result: `0.2.0-alpha.3` is locally release-prepared as an exact package candidate at implementation commit `33e1897`, subject to hosted RC evidence and an exact-candidate GO/NO-GO decision in a later task. It is not published.

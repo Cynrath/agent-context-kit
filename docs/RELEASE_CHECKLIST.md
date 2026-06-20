@@ -66,7 +66,7 @@
 - Review all generated files before future publishing.
 - For the next release, approve push, hosted CI/source smoke validation, tag, GitHub Release, NuGet publish, and NuGet install verification in a dedicated release task.
 - For planned `0.2.0-alpha.3`, TASK-0202 closes independent backup security notification ownership and backup package recovery coverage for release preparation.
-- For planned `0.2.0-alpha.3`, complete TASK-0203 local package validation and install smoke before calling the candidate locally prepared.
+- For planned `0.2.0-alpha.3`, TASK-0203 completed local package validation and install smoke for implementation commit `33e1897`; hosted RC evidence and exact-candidate GO remain pending.
 - For planned `0.2.0-alpha.3`, obtain hosted RC evidence and record the exact-version/exact-commit GO packet before any publication action.
 
 ## Release Candidate Evidence Gate
@@ -85,7 +85,7 @@
 - [x] Recorded a bounded accepted-risk disposition for NuGet owner `Cyranth` versus project persona/package author `Cynrath`.
 - [x] Recorded author-signing and SBOM deferrals plus future provenance implementation.
 - [x] Verify package owner continuity and backup recovery ownership before release preparation; `ShadowFlameC` is recorded as NuGet package owner / backup package recovery owner per TASK-0202. No destructive NuGet action was performed.
-- [ ] Complete TASK-0203 local `0.2.0-alpha.3` package validation and install smoke.
+- [x] Complete TASK-0203 local `0.2.0-alpha.3` package validation and install smoke for implementation commit `33e1897`.
 - [ ] Rerun hosted RC evidence for the exact `0.2.0-alpha.3` candidate commit.
 - `scripts/check-release-candidate-workflow.ps1 -FailOnIssues` passes and the manual `release-candidate-evidence` workflow is green on all three OS runners.
 - [x] The `xunit` Legacy warning is resolved through the TASK-0091 xUnit v3 migration; 169/169 tests and clean dependency reviews are recorded.
