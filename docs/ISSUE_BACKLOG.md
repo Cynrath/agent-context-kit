@@ -65,7 +65,7 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 - Labels: `type: maintenance`, `area: ci`, `priority: low`
 - Status: Completed by TASK-0213.
 - Goal: Decide whether `cross-platform-smoke.yml` should install published `AgentContextKit` `0.2.0-alpha.3` instead of the historical alpha2 pin.
-- Done when: The workflow/status docs are intentionally aligned and focused workflow/static validation is recorded. Completed by updating the active workflow pin to `0.2.0-alpha.3`, preserving historical alpha2 evidence, and recording local validation in TASK-0213.
+- Done when: The workflow/status docs are intentionally aligned and focused workflow/static validation is recorded. Completed by updating the active workflow pin to `0.2.0-alpha.3`, preserving historical alpha2 evidence, recording local validation in TASK-0213, and recording hosted push-run evidence in TASK-0214.
 
 ### 12. Decide memory-log retention policy
 - Labels: `type: maintenance`, `area: scanner`, `priority: medium`
@@ -77,6 +77,11 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 - Labels: `type: maintenance`, `area: scanner`, `priority: low`
 - Goal: Decide whether retained ignored local release evidence should remain visible in repository self-scans or be handled through a narrow, auditable scan-scope policy.
 - Done when: Any exclusion/suppression approach proves it cannot hide real secrets or release blockers, or the current visible-finding policy is explicitly retained.
+
+### 14. Simplify queue docs and stale headings
+- Labels: `type: docs`, `area: docs`, `priority: low`
+- Goal: Reduce stale active-task headings and repeated historical queue text now that TASK-0214 verified the alpha3 published-package hosted smoke result.
+- Done when: Queue/handoff docs point clearly at the next active task without removing required historical release evidence.
 
 ## Maintainer Action Required
 GitHub issue creation is remote-write. Create issues manually when ready; do not create them from an agent session without explicit approval.

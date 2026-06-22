@@ -420,7 +420,20 @@ Historical `0.2.0-alpha.2` smoke evidence remains valid for that release and inc
 ## Cross-Platform Published-Package Smoke Workflow
 `.github/workflows/cross-platform-smoke.yml` verifies the published global tool on Windows, Ubuntu, and macOS.
 
-Current public examples, package verification docs, and the active workflow YAML install `AgentContextKit` version `0.2.0-alpha.3`. TASK-0213 updates `.github/workflows/cross-platform-smoke.yml` because it verifies the current published package. Hosted validation should be observed after the TASK-0213 push; no manual workflow dispatch is performed by the task.
+Current public examples, package verification docs, and the active workflow YAML install `AgentContextKit` version `0.2.0-alpha.3`. TASK-0213 updated `.github/workflows/cross-platform-smoke.yml` because it verifies the current published package. TASK-0214 then verified the push-triggered hosted run for exact TASK-0213 HEAD.
+
+Current alpha.3 hosted result:
+- Workflow: `cross-platform-smoke`.
+- Run: `27940146487`.
+- URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27940146487`.
+- Commit: `fc002a08be83821a3b164c53256cdedab4621fc6`.
+- Branch: `master`.
+- Event: `push`.
+- Status: Success.
+- Windows, Ubuntu, and macOS jobs succeeded.
+- Logs on all three OS jobs include `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3` and `AgentContextKit 0.2.0-alpha.3`.
+- No GitHub warning annotations or error annotations were found.
+- No manual workflow dispatch, release workflow dispatch, release-candidate dispatch, NuGet publish, tag mutation, GitHub Release mutation, package metadata change, version bump, or alpha3 package/release mutation occurred.
 
 Historical alpha.2 hosted result:
 - Workflow: `cross-platform-smoke`.

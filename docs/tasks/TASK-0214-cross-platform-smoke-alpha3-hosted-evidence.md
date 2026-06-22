@@ -148,5 +148,42 @@ Before push, correct documentation with normal commits. After push, use normal `
 
 Do not move tags, replace release assets, republish NuGet packages, dispatch release workflows, mutate GitHub Release/NuGet state, delete retained release evidence, or rewrite history as rollback.
 
+## Hosted evidence notes
+Result classification: `PASS`.
+
+Read-only `gh` inspection found the required hosted run:
+
+- Run ID: `27940146487`.
+- Run URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27940146487`.
+- Workflow: `cross-platform-smoke`.
+- Event: `push`.
+- Branch: `master`.
+- Head SHA: `fc002a08be83821a3b164c53256cdedab4621fc6`.
+- Status/conclusion: `completed` / `success`.
+- Created/updated: `2026-06-22T08:36:55Z` / `2026-06-22T08:37:35Z`.
+
+Job results:
+
+- `smoke (windows-2025)`: `success`, job `82671276846`.
+- `smoke (ubuntu-latest)`: `success`, job `82671276880`.
+- `smoke (macos-latest)`: `success`, job `82671276933`.
+
+Alpha3 install/version proof:
+
+- Windows log includes `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3` and `AgentContextKit 0.2.0-alpha.3`.
+- Ubuntu log includes `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3` and `AgentContextKit 0.2.0-alpha.3`.
+- macOS log includes `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3` and `AgentContextKit 0.2.0-alpha.3`.
+
+Warnings:
+
+- No GitHub warning annotations, error annotations, fatal lines, or `warning:` lines were found in the run log.
+- Git printed its standard default-branch-name hint during disposable `git init` on Ubuntu/macOS; this is non-blocking and not a workflow warning annotation.
+
+Mutation boundary:
+
+- Evidence collection used read-only `gh run list` and `gh run view`.
+- No manual workflow dispatch occurred.
+- No publish, release, tag, NuGet, version, package metadata, package artifact, owner, secret, security-setting, or recovery-state mutation occurred.
+
 ## Completion notes
-Pending hosted evidence inspection.
+Hosted evidence is recorded above. Final validation and clean-tree evidence are pending.
