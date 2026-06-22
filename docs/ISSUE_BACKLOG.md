@@ -63,8 +63,9 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 
 ### 11. Sync published-package workflow pin/status
 - Labels: `type: maintenance`, `area: ci`, `priority: low`
+- Status: Completed by TASK-0213.
 - Goal: Decide whether `cross-platform-smoke.yml` should install published `AgentContextKit` `0.2.0-alpha.3` instead of the historical alpha2 pin.
-- Done when: The workflow/status docs are intentionally aligned and focused workflow/static validation is recorded.
+- Done when: The workflow/status docs are intentionally aligned and focused workflow/static validation is recorded. Completed by updating the active workflow pin to `0.2.0-alpha.3`, preserving historical alpha2 evidence, and recording local validation in TASK-0213.
 
 ### 12. Decide memory-log retention policy
 - Labels: `type: maintenance`, `area: scanner`, `priority: medium`

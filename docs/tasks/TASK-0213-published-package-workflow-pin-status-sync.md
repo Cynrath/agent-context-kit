@@ -147,4 +147,82 @@ Before push, correct documentation/workflow pins with normal commits. After push
 Do not move tags, replace release assets, republish NuGet packages, dispatch release workflows, mutate GitHub Release/NuGet state, or delete retained release evidence as rollback.
 
 ## Completion notes
-Pending.
+Completed as a focused active workflow pin and status-doc sync.
+
+Commits:
+
+- Plan: `647853c` (`docs: plan task 0213 published package pin sync`)
+- Implementation: `a18152d` (`ci: sync published package smoke pin to alpha3`)
+- Final evidence: this commit
+
+Current HEAD/origin at final evidence collection before this final evidence commit:
+
+- Local HEAD: `a18152d84e96dfb24ea852aa678ed2ba2b5e1033`
+- Local HEAD short: `a18152d`
+- `origin/master`: `5d063108f6e2d76169b9540cf6031e47c22c5e9e`
+- `origin/master` short: `5d06310`
+
+Required first checks:
+
+- `ackit --help`: passed and showed the current command set.
+- `ackit --version`: passed, `AgentContextKit 0.2.0-alpha.3`.
+- `git fetch origin`: passed; no `.git/FETCH_HEAD` permission error or `.git` write error occurred.
+- Initial local HEAD and `origin/master`: both `5d063108f6e2d76169b9540cf6031e47c22c5e9e`, matching the expected TASK-0212 state.
+- `git status --porcelain=v1 --untracked-files=all 2>$null`: clean at start.
+- `git status --short`: exited `0` but printed the known Windows unreadable-directory warning; raw porcelain was clean.
+- `git log --oneline -n 40`: confirmed TASK-0212 final evidence at `5d06310`.
+
+Read/inspection notes:
+
+- Required state, release/status, packaging, GitHub Actions, example workflow, active workflow, and README files were read before edits.
+- Project structure remains .NET 10 CLI/tool: `src/AgentContextKit.Cli`, `src/AgentContextKit.Core`, and `tests/AgentContextKit.Tests`.
+- No database, migrations, admin UI, auth/permission system, runtime SEO surface, or runtime localization source was changed.
+
+Audit and classification:
+
+- `UPDATE_TO_ALPHA3`: `.github/workflows/cross-platform-smoke.yml` still installed `AgentContextKit` `0.2.0-alpha.2` while repository docs define it as the active published-package smoke workflow. It now installs `0.2.0-alpha.3`.
+- `UPDATE_TO_ALPHA3`: README.tr and maintainer/release status docs still described the active workflow pin sync as a follow-up. They now record that TASK-0213 syncs the active workflow pin and that hosted validation should be observed after push.
+- `ALREADY_ALPHA3`: `docs/examples/github-actions-published-tool-smoke.yml`, `docs/examples/github-actions-scan-ci.yml`, `docs/examples/github-actions-sarif-upload.yml`, `docs/GITHUB_ACTIONS_USAGE.md`, `docs/PACKAGING.md`, `docs/NUGET_METADATA.md`, and README public install examples already used `0.2.0-alpha.3`.
+- `KEEP_ALPHA2`: README previous-release notes, README.tr previous-release note, `release-candidate-evidence.yml` predecessor default, RC predecessor examples, `docs/RELEASE_VALIDATION.md` alpha2 publication/smoke evidence, `docs/MAINTAINER_RELEASE_HANDOFF.md` previous-release and historical alpha2 handoff sections, `.codex` historical task records, and historical `TASK-*` records.
+
+Active workflow pin:
+
+- Changed. `.github/workflows/cross-platform-smoke.yml` now installs the current published `AgentContextKit` `0.2.0-alpha.3` package.
+
+Example/docs pin:
+
+- Documentation-only public examples already installed `0.2.0-alpha.3`; no example YAML pin change was needed.
+- Status docs now state that the active workflow pin sync is complete locally and that the next push-triggered hosted run should be observed.
+
+Validation results:
+
+- `ackit --version`: passed, `AgentContextKit 0.2.0-alpha.3`.
+- `ackit doctor`: passed all checks.
+- `ackit scan --ci`: exited `0`; remaining findings are `2` Medium retained package artifacts and `5` Low local-path references.
+- `git diff --check`: passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1`: passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1`: passed, with the expected warning that the working tree had uncommitted changes during pre-commit validation.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-workflow.ps1 -FailOnIssues`: passed.
+- `dotnet test AgentContextKit.sln -c Release --no-build`: passed, `428/428`.
+- Focused pin verification passed: active `cross-platform-smoke.yml`, published-tool example, GitHub Actions usage docs, and release validation docs show current-package installs as `0.2.0-alpha.3`; remaining `0.2.0-alpha.2` references in that focused set are predecessor or historical evidence.
+- Some final validation commands printed a transient shell startup warning that oh-my-posh could not write an init script because the file was in use. The affected commands still exited `0`; this did not change repository files, release state, or validation outcomes.
+
+Out-of-scope confirmation:
+
+- No source feature work.
+- No package metadata change.
+- No version bump.
+- No NuGet publish.
+- No GitHub Release mutation.
+- No tag creation, movement, or deletion.
+- No release workflow dispatch.
+- No release-candidate workflow dispatch.
+- No manual workflow dispatch.
+- No package artifact deletion.
+- No `.ackit` baseline mutation.
+- No broad scan suppression.
+- No owner/account/secret/security-setting/recovery mutation.
+
+Recommended next task:
+
+- TASK-0214 docs/queue simplification and stale-heading cleanup, unless maintainers want hosted workflow-result follow-up after the TASK-0213 push first.
