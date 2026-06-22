@@ -1,7 +1,7 @@
 # AgentContextKit Agent Rules
 
 ## Default Workflow
-- Read `README.md`, `docs/PRODUCT_SPEC.md`, `docs/ARCHITECTURE.md`, and the active task before changing code.
+- Read `README.md`, `README.nuget.md`, `docs/PRODUCT_SPEC.md`, `docs/ARCHITECTURE.md`, and the active task before changing code or package metadata.
 - Use task-first workflow: every implementation change starts from a `docs/tasks/` record.
 - Do not code before a task file exists under `docs/tasks/`.
 - Continuous progress hard rule: when the user says to continue, do not ask whether to continue; proceed through the next documented task in order with task docs, implementation, verification, and commit.
@@ -9,6 +9,15 @@
 - Run relevant tests before reporting completion.
 - Prefer safe, minimal, production-ready changes.
 - Do not commit generated `.ackit/`, SARIF, HTML, Web UI, prompt pack, context export, `bin/`, or `obj/` artifacts.
+
+## NuGet Package README Boundary
+- GitHub repository presentation lives in root `README.md`.
+- NuGet package presentation lives in root `README.nuget.md`.
+- `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj` owns `PackageReadmeFile` and the explicit package-root packing entry for `README.nuget.md`.
+- Changes intended to fix the nuget.org package page must update `README.nuget.md`, the CLI `.csproj` package metadata, `scripts/check-package-metadata.ps1`, `docs/PACKAGING.md`, and `docs/NUGET_METADATA.md` together.
+- Keep `README.nuget.md` pure Markdown: no raw HTML blocks, no GitHub-only layout markup, no relative local image paths, and no generated report artifacts.
+- Do not try to fix NuGet rendering by weakening or removing the GitHub README layout unless the GitHub README itself is the intended target.
+- A published NuGet version is immutable for this purpose; visible package README corrections require a later authorized package publish.
 
 ## Safety
 - Keep the MVP offline-first and local-only.
@@ -59,8 +68,8 @@
 - Previous release: `v0.2.0-alpha.2` published and verified; pushed, released, and published.
 - NuGet global tool install verification: completed.
 - GitHub Release page: completed.
-- Published-package smoke workflow may still need a post-publish pin sync to `AgentContextKit` `0.2.0-alpha.3`.
-- Source-package smoke workflow installs the local `AgentContextKit` `0.2.0-alpha.3` package.
+- Published-package smoke workflow is pinned to `AgentContextKit` `0.2.0-alpha.3` and TASK-0214 recorded hosted pass evidence.
+- Source-package smoke workflow installs the local `AgentContextKit` package built from source.
 
 ## Risk Summary
 - No risk findings in the latest local scan.
@@ -71,6 +80,7 @@
 - `dotnet test AgentContextKit.sln -c Release --no-build`
 - `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci`
 - `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- doctor`
+- `powershell -ExecutionPolicy Bypass -File scripts/check-package-metadata.ps1 -FailOnIssues`
 - `powershell -ExecutionPolicy Bypass -File scripts/verify-release.ps1`
 
 ## Handoff
