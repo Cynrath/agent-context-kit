@@ -2180,7 +2180,7 @@ public sealed class CliJsonAndMetadataTests
         Assert.Contains("<PackageProjectUrl>https://github.com/Cynrath/agent-context-kit</PackageProjectUrl>", projectFile);
         Assert.Contains("<RepositoryUrl>https://github.com/Cynrath/agent-context-kit</RepositoryUrl>", projectFile);
         Assert.Contains("<RepositoryType>git</RepositoryType>", projectFile);
-        Assert.Contains("<PackageReadmeFile>README.md</PackageReadmeFile>", projectFile);
+        Assert.Contains("<PackageReadmeFile>README.nuget.md</PackageReadmeFile>", projectFile);
         Assert.Contains("<ToolCommandName>ackit</ToolCommandName>", projectFile);
         Assert.Contains("Copyright (c) 2026 Cynrath", license);
     }

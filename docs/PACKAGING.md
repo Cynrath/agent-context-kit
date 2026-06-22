@@ -11,10 +11,21 @@ Important fields:
 - `Version`: `0.2.0-alpha.3`; current published package is `0.2.0-alpha.3`
 - `Authors`: `Cynrath`
 - `PackageLicenseExpression`: `MIT`
-- `PackageReadmeFile`: `README.md`
+- `PackageReadmeFile`: `README.nuget.md`
 - `RepositoryType`: `git`
 - `RepositoryUrl`: `https://github.com/Cynrath/agent-context-kit`
 - `PackageProjectUrl`: `https://github.com/Cynrath/agent-context-kit`
+
+## README Files
+
+The repository intentionally has two README surfaces:
+
+- `README.md` is the GitHub repository README and may use GitHub-supported layout markup.
+- `README.nuget.md` is the NuGet package README and must stay pure Markdown so nuget.org renders it cleanly.
+
+The NuGet README is wired from `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj` through `PackageReadmeFile` and an explicit package-root packing entry. If the nuget.org README page needs a correction, update `README.nuget.md`, the CLI `.csproj`, `scripts/check-package-metadata.ps1`, and `docs/NUGET_METADATA.md` together.
+
+Published NuGet versions are immutable for README corrections. A visible nuget.org README fix requires a later authorized package publish; do not move tags, replace release assets, or republish an existing version.
 
 Run the dedicated metadata review before pack or publish checks:
 

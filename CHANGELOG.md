@@ -7,6 +7,8 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 ## [Unreleased]
 
 ### Added
+- Added a dedicated pure-Markdown `README.nuget.md` package README and package metadata wiring so nuget.org does not render GitHub README HTML as raw text.
+- Added agent-facing documentation for the split between GitHub `README.md` and NuGet `README.nuget.md` ownership.
 - Added two new stable scanner rule IDs: `ACKIT006` `ProductionConfigLike` (High) for production configuration, environment-specific appsettings, and live-service connection strings, and `ACKIT007` `DocumentationGap` (Medium) for documentation gaps surfaced by the scanner. Existing `ACKIT001` and `ACKIT005` descriptions were narrowed to reflect the new dedicated rules.
 - Added an `Ackit006Ackit007EndToEndTests` coverage class that exercises the Core `RepositoryScanner` on a synthetic `appsettings.Production.json` fixture, asserts the new `ACKIT006` ruleId flows into JSON and the redact-check filter, asserts the catalog mapping for `ACKIT007`, and asserts the SARIF rule catalog advertises the new ID.
 

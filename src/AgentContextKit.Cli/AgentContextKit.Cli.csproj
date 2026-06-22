@@ -17,7 +17,7 @@
     <Company>Cynrath</Company>
     <Copyright>Copyright (c) 2026 Cynrath</Copyright>
     <Description>Offline-first repository context and safety tooling for AI-assisted development.</Description>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>README.nuget.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>ai;coding-agent;context;security;cli;oss</PackageTags>
     <PackageReleaseNotes>MCP stdio server and ackit.rules metadata tool, local watch mode, diff/trim command stabilization, scan include/exclude filter documentation parity, README/CLI reference sync, and release hardening with RB-003/RB-008 evidence cleanup.</PackageReleaseNotes>
@@ -30,7 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.nuget.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
