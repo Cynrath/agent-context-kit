@@ -8,14 +8,16 @@ This NuGet README is intentionally plain Markdown so it renders consistently on 
 
 ## Install
 
+Install the current package version shown on nuget.org:
+
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool install --global AgentContextKit --version <package-version>
 ```
 
 Update an existing global install:
 
 ```powershell
-dotnet tool update --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool update --global AgentContextKit --version <package-version>
 ```
 
 Verify the tool:
