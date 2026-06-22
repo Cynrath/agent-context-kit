@@ -186,4 +186,83 @@ Mutation boundary:
 - No publish, release, tag, NuGet, version, package metadata, package artifact, owner, secret, security-setting, or recovery-state mutation occurred.
 
 ## Completion notes
-Hosted evidence is recorded above. Final validation and clean-tree evidence are pending.
+Completed as a focused hosted workflow-result evidence task.
+
+Commits:
+
+- Plan: `7f669d8` (`docs: plan task 0214 cross-platform smoke evidence`)
+- Hosted evidence/status docs: `6c9ca2e` (`docs: record alpha3 cross-platform smoke evidence`)
+- Final evidence: this commit
+
+Current HEAD/origin at final evidence collection before this final evidence commit:
+
+- Local HEAD: `6c9ca2e550c46971ad12e441244c0d3d59e75c94`
+- Local HEAD short: `6c9ca2e`
+- `origin/master`: `fc002a08be83821a3b164c53256cdedab4621fc6`
+- `origin/master` short: `fc002a0`
+
+Required first checks:
+
+- `ackit --help`: passed and showed the current command set.
+- `ackit --version`: passed, `AgentContextKit 0.2.0-alpha.3`.
+- `git fetch origin`: passed; no `.git/FETCH_HEAD` permission error or `.git` write error occurred.
+- Initial local HEAD and `origin/master`: both `fc002a08be83821a3b164c53256cdedab4621fc6`, matching the expected TASK-0213 final state.
+- `git status --porcelain=v1 --untracked-files=all 2>$null`: clean at start.
+- `git status --short`: exited `0` but printed the known Windows unreadable-directory warning; raw porcelain was clean.
+- `git log --oneline -n 40`: confirmed TASK-0213 final evidence at `fc002a0`.
+
+Hosted run:
+
+- Workflow: `cross-platform-smoke`.
+- Run ID: `27940146487`.
+- URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27940146487`.
+- Event: `push`.
+- Branch: `master`.
+- Head SHA: `fc002a08be83821a3b164c53256cdedab4621fc6`.
+- Status/conclusion: `completed` / `success`.
+- Decision: `PASS`.
+
+Job conclusions:
+
+- `smoke (windows-2025)`: `success`, job `82671276846`.
+- `smoke (ubuntu-latest)`: `success`, job `82671276880`.
+- `smoke (macos-latest)`: `success`, job `82671276933`.
+
+Alpha3 install/version proof:
+
+- Windows log includes `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3` and `AgentContextKit 0.2.0-alpha.3`.
+- Ubuntu log includes `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3` and `AgentContextKit 0.2.0-alpha.3`.
+- macOS log includes `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3` and `AgentContextKit 0.2.0-alpha.3`.
+
+Warnings:
+
+- No GitHub warning annotations, error annotations, fatal lines, or `warning:` lines were found.
+- The only warning-like text was Git's standard default-branch-name hint during disposable `git init` on Ubuntu/macOS.
+
+Validation results:
+
+- `ackit --version`: passed, `AgentContextKit 0.2.0-alpha.3`.
+- `ackit doctor`: passed all checks.
+- `ackit scan --ci`: exited `0`; remaining findings are `2` Medium retained alpha3 package-validation artifacts and `5` Low local-path references.
+- `git diff --check`: passed.
+- `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1`: passed; working tree was clean with no missing Markdown/source commits.
+- `dotnet test AgentContextKit.sln -c Release --no-build`: passed, `428/428`.
+
+Out-of-scope confirmation:
+
+- No NuGet publish.
+- No tag creation, movement, or deletion.
+- No GitHub Release mutation.
+- No NuGet package state mutation.
+- No release workflow dispatch.
+- No release-candidate workflow dispatch.
+- No manual workflow dispatch.
+- No version bump.
+- No package metadata change.
+- No package artifact mutation or deletion.
+- No source feature work.
+- No owner/account/secret/security-setting/recovery mutation.
+
+Recommended next task:
+
+- TASK-0215 docs/queue simplification and stale-heading cleanup.
