@@ -110,7 +110,7 @@ Use `docs/ISSUE_BACKLOG.md` for the first copy-ready issue set. Issue creation i
 - If a release tag points to the wrong commit, stop and document the incident before any maintainer-only tag action.
 
 ## Current Release
-`v0.2.0-alpha.3` is published on GitHub and NuGet as a pre-release. Global tool install, SARIF smoke, and immutable release verification are complete. Published-package smoke workflow pin sync is a follow-up.
+`v0.2.0-alpha.3` is published on GitHub and NuGet as a pre-release. Global tool install, SARIF smoke, immutable release verification, and published-package smoke workflow pin sync are complete. Observe the next push-triggered `cross-platform-smoke` run after TASK-0213 is pushed.
 
 Current source is published as the `0.2.0-alpha.3` package. TASK-0206 synced release evidence after publication.
 

@@ -420,7 +420,7 @@ Historical `0.2.0-alpha.2` smoke evidence remains valid for that release and inc
 ## Cross-Platform Published-Package Smoke Workflow
 `.github/workflows/cross-platform-smoke.yml` verifies the published global tool on Windows, Ubuntu, and macOS.
 
-Current public examples and package verification docs install `AgentContextKit` version `0.2.0-alpha.3`. The active workflow YAML pin is outside TASK-0207's docs-only scope.
+Current public examples, package verification docs, and the active workflow YAML install `AgentContextKit` version `0.2.0-alpha.3`. TASK-0213 updates `.github/workflows/cross-platform-smoke.yml` because it verifies the current published package. Hosted validation should be observed after the TASK-0213 push; no manual workflow dispatch is performed by the task.
 
 Historical alpha.2 hosted result:
 - Workflow: `cross-platform-smoke`.

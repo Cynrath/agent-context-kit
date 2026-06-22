@@ -35,7 +35,7 @@ jobs:
           $ErrorActionPreference = "Stop"
           $PSNativeCommandUseErrorActionPreference = $true
 
-          dotnet tool install --global AgentContextKit --version 0.2.0-alpha.2
+          dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
 
           if ($IsWindows) {
             $toolPath = Join-Path $env:USERPROFILE ".dotnet\tools"

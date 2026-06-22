@@ -172,7 +172,7 @@ Pop-Location
 
 Minimal demo app icinde `ackit doctor`, README, LICENSE, SECURITY, test, CI, `.gitignore` veya package metadata eksiklerini raporlayabilir. Bu beklenen repository-health ciktisidir, tool hatasi degildir.
 
-Cross-platform yayinlanmis-paket smoke kapsami `.github/workflows/cross-platform-smoke.yml` ile takip edilir. Workflow pininin `0.2.0-alpha.3` ile senkronlanmasi yayin sonrasi takip isidir; TASK-0206 lokal ve `release.yml verify-existing` dogrulamalarini tamamlamistir.
+Cross-platform yayinlanmis-paket smoke kapsami `.github/workflows/cross-platform-smoke.yml` ile takip edilir. Workflow pini TASK-0213 ile yayinlanmis `0.2.0-alpha.3` paketine senkronlandi; TASK-0206 lokal ve `release.yml verify-existing` dogrulamalarini tamamlamistir.
 Mevcut kaynak smoke kapsami `.github/workflows/cross-platform-source-smoke.yml` ile takip edilir. Bu workflow mevcut branch'i lokalde paketler ve paketi yayin yapmadan gecici package source uzerinden kurar.
 Tested on Windows, Ubuntu, and macOS via GitHub Actions.
 

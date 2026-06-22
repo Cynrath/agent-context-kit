@@ -52,7 +52,7 @@ gh workflow run release-candidate-evidence.yml `
 - NuGet publish for `AgentContextKit` `0.2.0-alpha.3`: completed.
 - NuGet global tool install verification for `0.2.0-alpha.3`: completed.
 - Cross-platform CI smoke validation: completed on commit `868dff3` for Windows, Ubuntu, and macOS.
-- Current published-package smoke validation: completed on commit `8dac9237c27ba912d056344155f1c9f901557bf5` for Windows, Ubuntu, and macOS.
+- Current published-package smoke validation: latest recorded hosted validation predates the TASK-0213 active workflow pin sync. TASK-0213 updates the active workflow to install `AgentContextKit` `0.2.0-alpha.3`; observe the next push-triggered run after push.
 - Current source-package smoke validation: completed on commit `8dac9237c27ba912d056344155f1c9f901557bf5` for Windows, Ubuntu, and macOS.
 - `RepositoryUrl` is `https://github.com/Cynrath/agent-context-kit`.
 - `PackageProjectUrl` is `https://github.com/Cynrath/agent-context-kit`.
@@ -115,7 +115,7 @@ Completed smoke test evidence:
 
 The documentation-only public smoke examples install .NET 10, install `AgentContextKit` version `0.2.0-alpha.3` globally, add the platform-specific `.dotnet/tools` path, create a clean demo app, run the installed-tool smoke flow, verify fake secret detection returns exit code `2`, delete the fake secret, run `ackit sarif`, and finish with `ackit scan --ci`.
 
-The active workflow file is not changed by this docs-only handoff. Published-package smoke documentation and examples now point at `0.2.0-alpha.3`. The workflow does not create tags, publish NuGet packages, or mutate release metadata.
+TASK-0213 updates the active workflow pin to install `AgentContextKit` `0.2.0-alpha.3`, matching published-package smoke documentation and examples. The workflow does not create tags, publish NuGet packages, or mutate release metadata.
 
 Historical alpha.2 read-only GitHub CLI evidence:
 - Workflow run `27471224861`, commit `ead65120928835419fb91bf695e845721620c394`, branch `master`, conclusion `success`.
