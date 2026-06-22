@@ -30,6 +30,18 @@ This review follows Microsoft Learn NuGet package authoring guidance for package
 - https://learn.microsoft.com/nuget/create-packages/package-authoring-best-practices#package-metadata
 - https://learn.microsoft.com/nuget/reference/msbuild-targets#pack-target
 
+## NuGet README Rendering Contract
+
+The repository intentionally separates the GitHub README and NuGet package README:
+
+- `README.md` is the GitHub repository README.
+- `README.nuget.md` is the NuGet package README.
+- `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj` owns `PackageReadmeFile` and the explicit package-root packing entry.
+
+Keep `README.nuget.md` pure Markdown. Do not add raw HTML, GitHub-only alignment/layout markup, relative local image paths, generated reports, or package artifacts. If nuget.org rendering breaks, edit `README.nuget.md` and the package metadata/check/docs files together.
+
+A published NuGet version cannot be corrected in place for README rendering. The fix becomes visible on nuget.org only after a later authorized package publish.
+
 ## Metadata Review
 Run report-only mode:
 
@@ -69,7 +81,7 @@ AgentContextKit 0.2.0-alpha.3
 - `Version`: `0.2.0-alpha.3`
 - `Authors`: `Cynrath`
 - `Company`: `Cynrath`
-- `PackageReadmeFile`: `README.md`
+- `PackageReadmeFile`: `README.nuget.md`
 - `PackageLicenseExpression`: `MIT`
 - `RepositoryType`: `git`
 - `RepositoryUrl`: `https://github.com/Cynrath/agent-context-kit`
@@ -78,7 +90,7 @@ AgentContextKit 0.2.0-alpha.3
 - `Description`: non-empty
 - `PackageTags`: includes `ai`, `coding-agent`, `security`, `cli`, and `oss`
 - `PackageReleaseNotes`: non-empty
-- `README.md`: present and explicitly packed into the package root
+- `README.nuget.md`: present and explicitly packed into the package root
 
 ## Future Publish Gates
 Before future public publish after `0.2.0-alpha.3`:
