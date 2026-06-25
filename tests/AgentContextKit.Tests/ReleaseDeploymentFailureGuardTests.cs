@@ -17,9 +17,12 @@ public sealed class ReleaseDeploymentFailureGuardTests
             environment =>
             {
                 environment["RUNNER_TEMP"] = runnerTemp;
-                environment["TEMP"] = string.Empty;
-                environment["TMP"] = string.Empty;
-                environment["TMPDIR"] = string.Empty;
+                // Intentionally not overriding TMP/TEMP/TMPDIR: setting these to
+                // empty string in ProcessStartInfo.Environment triggers a Windows
+                // process-creation side effect that creates an empty top-level
+                // directory with non-ASCII replacement characters in the working
+                // directory (the repo root). Inheriting the parent values avoids
+                // this while still validating that the script prefers RUNNER_TEMP.
             });
 
         Assert.Equal(0, result.ExitCode);
