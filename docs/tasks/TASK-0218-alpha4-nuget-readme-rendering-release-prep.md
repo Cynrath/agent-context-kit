@@ -90,7 +90,105 @@ dotnet pack src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-b
 Package contents inspection, local install smoke, and full validation are defined in the task execution.
 
 ## Completion notes
-(To be filled during execution)
+
+### Source version updated to 0.2.0-alpha.4
+- `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj`: `<Version>` changed to `0.2.0-alpha.4`, release notes updated
+- `src/AgentContextKit.Cli/Program.cs`: `Version` constant changed to `0.2.0-alpha.4`
+- `src/AgentContextKit.Core/Templates.cs`: Continue config version strings updated to `0.2.0-alpha.4`
+- `.github/workflows/cross-platform-source-smoke.yml`: source install pin updated to `0.2.0-alpha.4`
+
+### Tests/scripts updated
+- `tests/AgentContextKit.Tests/AgentContextKitBehaviorTests.cs`: all version assertions and `PackageReleaseNotes` assertion updated
+- `tests/AgentContextKit.Tests/IssueTemplateVersionPlaceholderTests.cs`: `CurrentVersion` constant updated
+- `scripts/check-package-metadata.ps1`: default `ExpectedVersion` parameter updated
+
+### Issue templates updated
+- `.github/ISSUE_TEMPLATE/bug_report.yml`
+- `.github/ISSUE_TEMPLATE/docs_improvement.yml`
+- `.github/ISSUE_TEMPLATE/feature_request.yml`
+- `.github/ISSUE_TEMPLATE/security_hardening.yml`
+All version placeholders updated to `0.2.0-alpha.4`.
+
+### Docs/handoff updated
+- `docs/tasks/TASK-0218-alpha4-nuget-readme-rendering-release-prep.md` (this file)
+- `docs/PACKAGING.md`: version line updated to show alpha4 as prepared candidate
+- `docs/NUGET_METADATA.md`: status updated to show alpha4 prepared, alpha3 published
+- `docs/NEXT_TASKS.md`: current task set to TASK-0218
+- `docs/ISSUE_BACKLOG.md`: items 15-16 updated
+- `.codex/SESSION_HANDOFF.md`: current task updated
+- `.codex/CONTEXT_PACK.md`: current task updated
+- `.codex/NEXT_STEPS.md`: entries 51-53 added for TASK-0216/0217/0218
+
+### Protected files verified unchanged
+- `README.nuget.md`: NOT modified
+- `README.md`: NOT modified
+- `README.tr.md`: NOT modified
+- `AGENTS.md`, `CLAUDE.md`: historical alpha3 references kept
+- `.github/workflows/cross-platform-smoke.yml`: published alpha3 pin kept
+- Historical task docs: alpha3 references kept
+- Scripts/verify-release.ps1: alpha3 default kept
+
+### Package validation
+| Check | Result |
+|-------|--------|
+| `dotnet restore` | PASS |
+| `dotnet build -c Release --no-restore` | 0 warnings, 0 errors |
+| `dotnet test -c Release --no-build` | 428/428 PASS |
+| `check-package-metadata.ps1 -FailOnIssues` | PASS (no issues) |
+| `dotnet pack -c Release --no-build` | `AgentContextKit.0.2.0-alpha.4.nupkg` + `.snupkg` created |
+| Package contains `README.nuget.md` at root | YES (2929 bytes) |
+| Nuspec package id | `AgentContextKit` |
+| Nuspec version | `0.2.0-alpha.4` |
+| Nuspec readme | `README.nuget.md` |
+| Local install smoke (`ackit --version`) | `AgentContextKit 0.2.0-alpha.4` |
+| Local install smoke (`ackit doctor`) | 13/13 PASS |
+| Local install smoke (`ackit scan --ci`) | exit 0, Medium/Low only |
+| `git diff --check` | CRLF warnings only |
+| `check-tracked-vs-untracked-md.ps1` | PASS (0 untracked) |
+| `check-local-markdown-links.ps1 -FailOnIssues` | PASS (no broken targets) |
+| `check-localization-parity.ps1` | PASS (exit 0) |
+| `check-release-workflow.ps1 -FailOnIssues` | PASS (exit 0) |
+| Windows Unicode temp guard | PASS (0 weird dirs) |
+
+### Release status (unchanged)
+- `AgentContextKit 0.2.0-alpha.3` remains published and verified
+- `v0.2.0-alpha.3` tag and GitHub prerelease target `92984c6448332aa24b7cff94647f627bf944e535`
+- No version/tag/GitHub Release/NuGet/workflow dispatch mutation occurred
+- `0.2.0-alpha.4` is prepared locally as a candidate, NOT published
 
 ## Evidence
-(To be filled during execution)
+
+### Current state
+- Local HEAD: (after implementation and evidence commits)
+- Origin HEAD: `840c08ff8450c8302dafb348b3ab35f31aca71c5`
+- Working tree: clean (after commits)
+
+### Commits created
+1. `217432a` - docs: plan task 0218 alpha4 release prep
+2. (implementation) - chore: prepare alpha4 package candidate
+3. (evidence) - docs: record task 0218 evidence
+
+### Files changed
+- `.codex/CONTEXT_PACK.md`
+- `.codex/NEXT_STEPS.md`
+- `.codex/SESSION_HANDOFF.md`
+- `.github/ISSUE_TEMPLATE/bug_report.yml`
+- `.github/ISSUE_TEMPLATE/docs_improvement.yml`
+- `.github/ISSUE_TEMPLATE/feature_request.yml`
+- `.github/ISSUE_TEMPLATE/security_hardening.yml`
+- `.github/workflows/cross-platform-source-smoke.yml`
+- `docs/ISSUE_BACKLOG.md`
+- `docs/NEXT_TASKS.md`
+- `docs/NUGET_METADATA.md`
+- `docs/PACKAGING.md`
+- `docs/tasks/TASK-0218-alpha4-nuget-readme-rendering-release-prep.md`
+- `scripts/check-package-metadata.ps1`
+- `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj`
+- `src/AgentContextKit.Cli/Program.cs`
+- `src/AgentContextKit.Core/Templates.cs`
+- `tests/AgentContextKit.Tests/AgentContextKitBehaviorTests.cs`
+- `tests/AgentContextKit.Tests/IssueTemplateVersionPlaceholderTests.cs`
+
+### Recommended next tasks
+- TASK-0219: hosted release-candidate evidence for exact alpha4 candidate commit
+- TASK-0220: authorized 0.2.0-alpha.4 publish, only after hosted RC evidence passes and maintainer explicitly approves publish
