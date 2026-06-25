@@ -12,7 +12,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>ackit</ToolCommandName>
     <PackageId>AgentContextKit</PackageId>
-    <Version>0.2.0-alpha.3</Version>
+    <Version>0.2.0-alpha.4</Version>
     <Authors>Cynrath</Authors>
     <Company>Cynrath</Company>
     <Copyright>Copyright (c) 2026 Cynrath</Copyright>
@@ -20,7 +20,7 @@
     <PackageReadmeFile>README.nuget.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>ai;coding-agent;context;security;cli;oss</PackageTags>
-    <PackageReleaseNotes>MCP stdio server and ackit.rules metadata tool, local watch mode, diff/trim command stabilization, scan include/exclude filter documentation parity, README/CLI reference sync, and release hardening with RB-003/RB-008 evidence cleanup.</PackageReleaseNotes>
+    <PackageReleaseNotes>0.2.0-alpha.4: ships dedicated NuGet package README rendering via README.nuget.md and preserves alpha3 CLI behavior.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/Cynrath/agent-context-kit</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Cynrath/agent-context-kit</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

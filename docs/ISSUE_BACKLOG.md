@@ -84,15 +84,16 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 - Goal: Reduce stale active-task headings and repeated historical queue text now that TASK-0214 verified the alpha3 published-package hosted smoke result.
 - Done when: Queue/handoff docs point clearly at the next active task without removing required historical release evidence.
 
-### 15. Investigate/fix Windows test-created Unicode temp directories (future TASK-0217)
+### 15. Investigate/fix Windows test-created Unicode temp directories (completed by TASK-0217)
 - Labels: `type: maintenance`, `area: tests`, `priority: low`
-- Goal: Prevent empty top-level Unicode temp directories from appearing in the repo after `dotnet test` on Windows.
-- Done when: The root cause is identified and addressed, or a documented guard/cleanup step is added.
+- Status: Completed by TASK-0217. Root cause identified: `ProcessStartInfo.Environment["TMP"] = ""` on Windows creates garbled directory in repo root. Fix applied: removed TMP/TEMP/TMPDIR overrides from test. Pushed at `840c08f` with CI green.
+- Done when: Root cause is identified and addressed. TASK-0217 fixed the single known occurrence.
 
-### 16. Prepare 0.2.0-alpha.4 NuGet README rendering release (future TASK-0218)
+### 16. Prepare 0.2.0-alpha.4 NuGet README rendering release (current TASK-0218)
 - Labels: `type: release`, `area: packaging`, `priority: low`
-- Goal: Publish a successor package so the `README.nuget.md` fix is visible on nuget.org.
-- Done when: TASK-0215 infrastructure is used in an authorized package publish.
+- Status: Active (TASK-0218). Source is prepared as `0.2.0-alpha.4` local candidate. NOT published.
+- Goal: Prepare but do not publish `AgentContextKit 0.2.0-alpha.4` to ship the dedicated `README.nuget.md` package README rendering fix.
+- Done when: TASK-0215 infrastructure is used in an authorized package publish after hosted RC evidence passes.
 
 ## Maintainer Action Required
 GitHub issue creation is remote-write. Create issues manually when ready; do not create them from an agent session without explicit approval.

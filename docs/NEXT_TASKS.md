@@ -23,8 +23,8 @@ This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTRO
 5. TASK-0213 published-package workflow pin/status sync - completed locally. The active `cross-platform-smoke.yml` pin now installs `AgentContextKit` `0.2.0-alpha.3`; documentation examples already used alpha3; historical/predecessor alpha2 references remain intact; no release/tag/NuGet/package metadata/workflow-dispatch mutation occurred.
 6. TASK-0214 cross-platform smoke alpha3 hosted evidence - completed locally after read-only `gh` verification. Push-triggered `cross-platform-smoke` run `27940146487` for exact TASK-0213 HEAD `fc002a08be83821a3b164c53256cdedab4621fc6` passed on `windows-2025`, `ubuntu-latest`, and `macos-latest`; logs prove `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3` and `AgentContextKit 0.2.0-alpha.3` on all three OS jobs. No manual dispatch or release/package/tag mutation occurred.
 7. TASK-0215 completed NuGet README rendering infrastructure via PR #1: `README.nuget.md`, `PackageReadmeFile` wiring, agent docs, and package metadata validation. Visible nuget.org README changes require a later authorized package publish.
-8. Current task: TASK-0216 docs/queue simplification and stale-heading cleanup (this task).
-9. Lower-priority follow-ups: review scan-scope policy for retained local artifacts only if maintainers want a deliberate exclusion/suppression policy; defer alpha4/v0.3.0 planning until the smaller maintenance backlog is complete.
+8. Current task: TASK-0218 alpha4 NuGet README rendering release prep (package candidate prepared locally; not published). TASK-0217 (Windows Unicode temp directory fix) completed and pushed at `840c08f`. TASK-0216 (docs/queue simplification) completed and pushed at `56e4e2a`.
+9. Lower-priority follow-ups: review scan-scope policy for retained local artifacts only if maintainers want a deliberate exclusion/suppression policy.
 
 ## Completed Independent Hosted RC Evidence Planning
 
@@ -206,7 +206,7 @@ These actions require explicit maintainer control and do not block safe local-on
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
 ## Next Task
-- Current task: TASK-0216 docs/queue simplification and stale-heading cleanup. TASK-0215 (NuGet README rendering infrastructure) is completed via PR #1. Avoid release/tag/NuGet/GitHub Release mutation, package metadata change, version bump, or workflow dispatch unless separately authorized.
+- Current task: TASK-0218 alpha4 NuGet README rendering release prep. TASK-0217 (Windows Unicode temp directory fix) completed and pushed at `840c08f` with CI green. TASK-0218 prepares `AgentContextKit 0.2.0-alpha.4` locally as the next prerelease candidate to ship the dedicated `README.nuget.md` package README rendering fix (TASK-0215/PR #1). Alpha4 is NOT published. `0.2.0-alpha.3` remains the current published NuGet version. No tag, GitHub Release, NuGet publish, or workflow dispatch is authorized in TASK-0218. A future explicit publish task is required after release-candidate evidence passes.
 
 ## Execution Rule
 After the closure of PROJECT-CONTROL-0110, the queue is in pause except for explicitly requested independent docs/release-preparation tasks. Tag, GitHub pre-release, NuGet publication, and workflow dispatch are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

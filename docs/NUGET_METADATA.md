@@ -3,7 +3,7 @@
 AgentContextKit package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj`.
 
 ## Current Status
-Source package metadata and the currently published NuGet package are `AgentContextKit` `0.2.0-alpha.3`.
+Source package metadata is prepared as `AgentContextKit` `0.2.0-alpha.4` (local candidate, not published). The currently published NuGet package remains `AgentContextKit` `0.2.0-alpha.3`.
 
 Shared package metadata:
 - `RepositoryUrl` is `https://github.com/Cynrath/agent-context-kit`.
