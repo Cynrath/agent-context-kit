@@ -80,8 +80,19 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 
 ### 14. Simplify queue docs and stale headings
 - Labels: `type: docs`, `area: docs`, `priority: low`
+- Status: Completed by TASK-0216.
 - Goal: Reduce stale active-task headings and repeated historical queue text now that TASK-0214 verified the alpha3 published-package hosted smoke result.
 - Done when: Queue/handoff docs point clearly at the next active task without removing required historical release evidence.
+
+### 15. Investigate/fix Windows test-created Unicode temp directories (future TASK-0217)
+- Labels: `type: maintenance`, `area: tests`, `priority: low`
+- Goal: Prevent empty top-level Unicode temp directories from appearing in the repo after `dotnet test` on Windows.
+- Done when: The root cause is identified and addressed, or a documented guard/cleanup step is added.
+
+### 16. Prepare 0.2.0-alpha.4 NuGet README rendering release (future TASK-0218)
+- Labels: `type: release`, `area: packaging`, `priority: low`
+- Goal: Publish a successor package so the `README.nuget.md` fix is visible on nuget.org.
+- Done when: TASK-0215 infrastructure is used in an authorized package publish.
 
 ## Maintainer Action Required
 GitHub issue creation is remote-write. Create issues manually when ready; do not create them from an agent session without explicit approval.

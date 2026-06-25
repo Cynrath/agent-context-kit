@@ -95,7 +95,7 @@
 | M5 | Accepted risk | SBOM publication | P1 | Deferred through next prerelease decision or 2026-09-30 | Dependency/package controls plus dated review | Exact candidate/package review | No publication | Recheck before expiry |
 | M6 | Implemented locally | Provenance/attestation | P1 | Hosted evidence requires next publish | Exact release nupkg, signer workflow, CLI verification | Workflow static tests plus future hosted attestation | Publish job only | Verified attestation on next release |
 | M7 | Partially complete | Package recovery ownership | P1 | Authority and backup remain | Owner, threshold, communication, immutable successor procedure recorded | Tabletop/document review | Only during incident/action | Verify authority and backup coverage |
-| M8 | Selected / NO-GO | Candidate version and release approval | P0/P1 dependent | `0.2.0-alpha.3` selected; GO packet incomplete | Version scope plus future exact commit, metadata, notes, package diff, GO/NO-GO | Full local and hosted release gates | Yes only after GO | Dedicated approved release-preparation task |
+| M8 | Published | Candidate version and release approval | P0/P1 | `0.2.0-alpha.3` published and verified | TASK-0206 publish evidence: NuGet package, tag, GitHub prerelease, global tool install, immutable verification | Full local and hosted release gates | Yes, completed | Published through OIDC release workflow; successor release for corrections |
 
 ## Local-Only Ecosystem/Product Intelligence Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
@@ -131,4 +131,8 @@ Last verified locally on 2026-06-14 at commit `a5686aa`:
 
 ## Alpha.3 Status
 - `0.2.0-alpha.3` is published and verified. `RB-003` and `RB-008` are closed for the alpha.3 release path by TASK-0202 evidence.
+- NuGet README rendering infrastructure is completed by PR #1 (TASK-0215): `README.nuget.md`, `PackageReadmeFile` wiring, agent docs, and package metadata validation. Visible nuget.org README changes require a later authorized package publish.
 - Do not mutate the published package, tag, GitHub Release, NuGet owner state, or release workflow history. TASK-0208 already hardened the `release.yml` provenance probe; any future release work still requires a dedicated task, hosted evidence, and explicit workflow dispatch authorization.
+
+## Docs/Queue Simplification
+- Current task: TASK-0216 docs/queue simplification and stale-heading cleanup (this task).
