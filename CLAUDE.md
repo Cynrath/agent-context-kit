@@ -42,7 +42,7 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 - Current publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
 - Previous release: `v0.2.0-alpha.3` published and verified; pushed, released, and published.
 - NuGet global tool install verification: completed for `0.2.0-alpha.4`.
-- Published-package smoke workflow may still need a post-publish pin sync to `AgentContextKit` `0.2.0-alpha.3`.
+- Published-package smoke workflow is pinned to `AgentContextKit` `0.2.0-alpha.4` (TASK-0223).
 - Source-package smoke workflow installs the local `AgentContextKit` package from source.
 
 ## Risk Summary

@@ -38,14 +38,14 @@ Default commands process repository content locally: no repository upload, AI AP
 
 | Area | Status |
 | --- | --- |
-| Current release | `v0.2.0-alpha.3` published on GitHub and NuGet as a pre-release |
-| Release evidence | Published from `92984c6448332aa24b7cff94647f627bf944e535`; NuGet install verified |
+| Current release | `v0.2.0-alpha.4` published on GitHub and NuGet as a pre-release |
+| Release evidence | Published from `98cdf9723a509a347bd0403f6373dafe81ba03fb`; NuGet install verified |
 | Package | `AgentContextKit` global tool install verified |
-| Previous release | `v0.2.0-alpha.2` |
+| Previous release | `v0.2.0-alpha.3` |
 | Runtime | .NET 10 |
 | Platforms | Windows, Ubuntu, macOS via GitHub Actions smoke flows |
 | Privacy model | Offline-first; no repository upload and no remote AI API calls in the MVP |
-| SARIF | `ackit sarif` is included in the published `0.2.0-alpha.3` package |
+| SARIF | `ackit sarif` is included in the published `0.2.0-alpha.4` package |
 
 ---
 
@@ -120,7 +120,7 @@ AgentContextKit gives teams a repeatable local workflow before they hand a repos
 ### Install from NuGet
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
 ackit version
 ackit --help
 ```
@@ -135,7 +135,7 @@ ackit doctor
 
 `scan --ci` returns a non-zero exit code for High or Critical findings. Start with `ackit scan` when you want report-only behavior.
 
-The published `0.2.0-alpha.3` package supports read-only config diagnostics and an explicit baseline workflow:
+The published `0.2.0-alpha.4` package supports read-only config diagnostics and an explicit baseline workflow:
 
 ```powershell
 ackit config-check --json
@@ -183,7 +183,7 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
 ```
 
-The published `0.2.0-alpha.3` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands.
+The published `0.2.0-alpha.4` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands.
 
 ### Try it on a sample
 
@@ -228,7 +228,7 @@ Pop-Location
 ---
 
 ## CLI Command Map
-This map follows published `0.2.0-alpha.3` `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`.
+This map follows published `0.2.0-alpha.4` `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`.
 
 ```text
 ackit init [--lang en|tr] [--json]

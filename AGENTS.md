@@ -81,7 +81,7 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 - Previous release: `v0.2.0-alpha.3` published and verified; pushed, released, and published.
 - NuGet global tool install verification: completed for `0.2.0-alpha.4`.
 - GitHub Release page: completed for `v0.2.0-alpha.4`.
-- Published-package smoke workflow is pinned to `AgentContextKit` `0.2.0-alpha.3` (not yet updated for alpha.4).
+- Published-package smoke workflow is pinned to `AgentContextKit` `0.2.0-alpha.4` (TASK-0223).
 - Source-package smoke workflow installs the local `AgentContextKit` package built from source.
 
 ## Risk Summary
