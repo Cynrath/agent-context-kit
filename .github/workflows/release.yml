@@ -127,7 +127,7 @@ jobs:
           $archive = [System.IO.Compression.ZipFile]::OpenRead($nupkg.FullName)
           try {
             $entries = $archive.Entries.FullName
-            foreach ($required in @("AgentContextKit.nuspec", "tools/net10.0/any/AgentContextKit.Cli.dll", "README.md")) {
+            foreach ($required in @("AgentContextKit.nuspec", "tools/net10.0/any/AgentContextKit.Cli.dll", "README.nuget.md")) {
               if ($entries -notcontains $required) { throw "Package entry missing: $required" }
             }
           }

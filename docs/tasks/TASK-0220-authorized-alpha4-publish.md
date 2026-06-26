@@ -26,7 +26,9 @@ The following pre-existing RC issues were fixed during TASK-0220 release preflig
 
 5. **`scripts/test-release-candidate-inputs.ps1`**: Wrong-version test case was hardcoded to `"0.2.0-alpha.4"`, which now matches the source version. Changed to `"9.9.9-alpha.999"` so it remains a valid negative test.
 
-These are release process documentation and test fixes, not public docs (README.md/README.tr.md) or release-relevant source code changes.
+6. **`.github/workflows/release.yml`**: Pack inspection checked for `README.md` but the package now contains `README.nuget.md` (TASK-0215/0218 README split). Updated to check for `README.nuget.md`.
+
+These are release process documentation, test, and release workflow fixes. No public docs (README.md/README.tr.md) or release-relevant source code changed.
 
 ## Preconditions
 
