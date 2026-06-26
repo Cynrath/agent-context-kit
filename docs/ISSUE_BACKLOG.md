@@ -101,11 +101,9 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 - Goal: Publish `AgentContextKit 0.2.0-alpha.4` through the OIDC release workflow after maintainer approval.
 - Done when: NuGet publish succeeds, tag and GitHub Release created, global tool install verified.
 
-### 18. Post-publish public README/docs sync to 0.2.0-alpha.4 (active)
+### 18. Post-publish public README/docs sync to 0.2.0-alpha.4 (completed)
 - Labels: `type: release`, `area: docs`, `priority: low`
-- Status: TASK-0222 active. TASK-0221 completed release recovery.
-- Goal: Update public-facing README.md, README.tr.md, and public docs to reference `0.2.0-alpha.4` as the current published release.
-- Done when: README.md and README.tr.md install commands and version references use `0.2.0-alpha.4`.
+- Status: TASK-0222 completed. TASK-0221 completed release recovery and agent rules. TASK-0223 completed smoke pin. TASK-0224 completed final audit and CI closure. All CI green for HEAD `1bb43d4`. Alpha4 publish train is closed.
 
 ## Maintainer Action Required
 GitHub issue creation is remote-write. Create issues manually when ready; do not create them from an agent session without explicit approval.
