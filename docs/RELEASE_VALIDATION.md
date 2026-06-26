@@ -25,7 +25,28 @@ Push-triggered CI supporting evidence (same commit):
 
 Local TASK-0218 confirmed `README.nuget.md` is packaged at root (2929 bytes) and nuspec readme is `README.nuget.md`.
 
-`0.2.0-alpha.4` is NOT published. No tag, GitHub Release, or NuGet mutation occurred.
+## v0.2.0-alpha.4 Publication Evidence
+
+TASK-0220 published `AgentContextKit 0.2.0-alpha.4` through the OIDC release workflow on 2026-06-26.
+
+Publish commit: `98cdf9723a509a347bd0403f6373dafe81ba03fb`
+
+Release workflow preflight fixes (pre-existing RC issues):
+1. `scripts/verify-release.ps1`: default version updated from `0.2.0-alpha.3` to `0.2.0-alpha.4`
+2. `docs/RELEASE_BLOCKERS.md`, `docs/PUBLIC_RELEASE_AUDIT.md`, `docs/PUBLIC_RELEASE_GATES.md`: updated to alpha4 state and v100 documentation gate patterns
+3. `scripts/test-release-candidate-inputs.ps1`: wrong-version case updated to `9.9.9-alpha.999`
+4. `.github/workflows/release.yml`: pack inspection updated from `README.md` to `README.nuget.md`
+
+Publish run: `28210969527` (initial publish; tag/release completed in recovery run `28211300136`)
+- NuGet package `AgentContextKit` `0.2.0-alpha.4` published
+- Tag `v0.2.0-alpha.4` created at publish commit
+- GitHub prerelease `v0.2.0-alpha.4` created at 2026-06-26T01:32:17Z
+- Global tool install verified: `ackit --version` returns `AgentContextKit 0.2.0-alpha.4`
+- `ackit doctor`: 13/13 PASS
+- `ackit scan --ci`: exit 0
+- `README.nuget.md` package README fix shipped with this release
+
+Post-publish attestation probe: known issue (same as alpha3). Release asset, tag, and GitHub Release are verified.
 
 ## v0.2.0-alpha.3 Publication Evidence
 TASK-0134 recorded an evidence-backed NO-GO on 2026-06-14. TASK-0202 later closed the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared source/package metadata as `0.2.0-alpha.3` and local package evidence. TASK-0204 identified dispatch-time current `origin/master` as the exact hosted RC evidence candidate. TASK-0205 verified hosted RC run `27868539971` as successful for commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`.

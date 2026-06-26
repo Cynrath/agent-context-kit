@@ -132,6 +132,36 @@ TASK-0219 is complete, pushed, and CI-green.
 - `README.md` / `README.tr.md` still wait for TASK-0221.
 - Publish evidence is recorded in docs.
 
+## Release Workflow Attempts
+
+1. Run `28209792287`: Failed at "Validate commit and version" - `verify-release.ps1` default version mismatch (alpha3 vs alpha4).
+2. Run `28210018644`: Failed at "Run release gates" - documentation gate and RC input test failures.
+3. Run `28210343573`: Failed at "Run release gates" - RC input test `wrong-version` case hardcoded to alpha4.
+4. Run `28210581189`: Failed at "Pack and inspect candidate" - nupkg contains `README.nuget.md` not `README.md`.
+5. Run `28210969527` (initial publish): NuGet package published; tag/release verify step failed due to NuGet indexing lag.
+6. Run `28211300136` (recovery): Tag created, GitHub Release created, verify published package passed. Attestation probe failed (known issue).
+
+## Completion
+
+TASK-0220 status:
+- Local HEAD: `98cdf97`
+- Origin HEAD: `98cdf97`
+- Working tree: clean (after commit)
+- Commits created: 5 logical commits (verify-release fix, doc gate fixes, RC test fix, release.yml README fix, evidence update)
+- Preflight: PASS
+- RC evidence: TASK-0219 confirmed GO for candidate `b8e8fce`
+- Release workflow: 6 attempts, 5th succeeded for publish, 6th for tag/release
+- Publish result: `AgentContextKit 0.2.0-alpha.4` published on NuGet
+- Tag: `v0.2.0-alpha.4` at `98cdf97`
+- GitHub Release: prerelease `v0.2.0-alpha.4` at 2026-06-26T01:32:17Z
+- NuGet: global tool install verified
+- `README.nuget.md` visibility: shipped with this release (NuGet CDN may lag)
+- Global tool install: `ackit --version` returns `AgentContextKit 0.2.0-alpha.4`, doctor 13/13 PASS
+- Validation: 428/428 tests, doctor PASS, scan --ci exit 0
+- Windows Unicode temp guard: PASS
+- Push-triggered CI: observed after evidence push
+
 ## Next Task
 
 TASK-0221: post-publish public README/docs sync to `0.2.0-alpha.4`.
+TASK-0222: update published-package smoke workflow pin to `0.2.0-alpha.4`.

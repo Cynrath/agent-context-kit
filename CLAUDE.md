@@ -26,16 +26,16 @@ Use the same repository rules as AGENTS.md.
 - Agent instructions: yes
 
 ## Release Status
-- Current release: `v0.2.0-alpha.3` published and verified on GitHub and NuGet as a pre-release.
-- Current publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
-- Previous release: `v0.2.0-alpha.2` published and verified; pushed, released, and published.
-- NuGet global tool install verification: completed.
+- Current release: `v0.2.0-alpha.4` published and verified on GitHub and NuGet as a pre-release.
+- Current publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
+- Previous release: `v0.2.0-alpha.3` published and verified; pushed, released, and published.
+- NuGet global tool install verification: completed for `0.2.0-alpha.4`.
 - Published-package smoke workflow may still need a post-publish pin sync to `AgentContextKit` `0.2.0-alpha.3`.
-- Source-package smoke workflow installs the local `AgentContextKit` `0.2.0-alpha.3` package.
+- Source-package smoke workflow installs the local `AgentContextKit` package from source.
 
 ## Risk Summary
 - No risk findings in the latest local scan.
-- `0.2.0-alpha.3` is published and verified by TASK-0206; do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
+- `0.2.0-alpha.4` is published and verified by TASK-0220; do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
 
 ## Recommended Checks
 - `dotnet build AgentContextKit.sln -c Release --no-restore`

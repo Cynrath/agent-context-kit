@@ -3,7 +3,7 @@
 AgentContextKit package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj`.
 
 ## Current Status
-Source package metadata is prepared as `AgentContextKit` `0.2.0-alpha.4` (local candidate, not published). The currently published NuGet package remains `AgentContextKit` `0.2.0-alpha.3`.
+`AgentContextKit` `0.2.0-alpha.4` is published through the authorized OIDC release workflow. The previous NuGet package version was `AgentContextKit` `0.2.0-alpha.3`.
 
 Shared package metadata:
 - `RepositoryUrl` is `https://github.com/Cynrath/agent-context-kit`.
@@ -13,11 +13,11 @@ Shared package metadata:
 
 Publication state:
 - GitHub Actions latest `master` run is green.
-- GitHub Release page for `v0.2.0-alpha.3` is completed as a pre-release.
-- NuGet publish is completed for `0.2.0-alpha.3`.
-- NuGet global tool install verification is completed for `0.2.0-alpha.3`.
-- Publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
-- `release.yml` `operation=verify-existing` run `27870813763` succeeded for the immutable alpha.3 release state.
+- GitHub Release page for `v0.2.0-alpha.4` is completed as a pre-release.
+- NuGet publish is completed for `0.2.0-alpha.4`.
+- NuGet global tool install verification is completed for `0.2.0-alpha.4`.
+- Publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb` (commit `98cdf97`).
+- `README.nuget.md` package README is shipped with this release.
 
 Previous release state:
 - GitHub Release page for `v0.2.0-alpha.2` is completed as a pre-release.
@@ -63,7 +63,7 @@ The script is local-only and read-only. It does not pack, push, publish, tag, re
 Install the currently published global tool:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
 ackit version
 ackit --help
 ```
@@ -71,14 +71,14 @@ ackit --help
 Expected version output:
 
 ```text
-AgentContextKit 0.2.0-alpha.3
+AgentContextKit 0.2.0-alpha.4
 ```
 
 ## Required Fields
 - `PackAsTool`: `true`
 - `ToolCommandName`: `ackit`
 - `PackageId`: `AgentContextKit`
-- `Version`: `0.2.0-alpha.3`
+- `Version`: `0.2.0-alpha.4`
 - `Authors`: `Cynrath`
 - `Company`: `Cynrath`
 - `PackageReadmeFile`: `README.nuget.md`

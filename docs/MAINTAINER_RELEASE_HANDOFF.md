@@ -2,15 +2,28 @@
 
 The completed alpha.2 scope is in `docs/V020_ALPHA2_SCOPE.md`. PROJECT-CONTROL-0102 authorized the validated normal pushes and exact-SHA OIDC release sequence for `v0.2.0-alpha.2`.
 
-This handoff records the completed `v0.2.0-alpha.2`, `v0.2.0-alpha.3`, and the `v0.2.0-alpha.4` hosted RC evidence (pre-publish) state.
+This handoff records the completed `v0.2.0-alpha.2`, `v0.2.0-alpha.3`, and `v0.2.0-alpha.4` published state.
 
 Future release sequences must not use API keys. Publication is allowed only through the manual OIDC workflow after the exact release commit passes all required hosted jobs.
 
-## Alpha.4 Hosted RC Evidence (Pre-Publish)
+## Alpha.4 Publication Evidence
 
-TASK-0219 dispatched the `release-candidate-evidence.yml` workflow for exact candidate commit `b8e8fce68f803c50f708d1566f1a38aab4b34bde` with `candidate_version=0.2.0-alpha.4` and `predecessor_version=0.2.0-alpha.3`. Run `28208545684` completed successfully on `windows-2025`, `ubuntu-latest`, and `macos-latest`. All validation steps passed including commit check, restore/build/test (428/428), predecessor upgrade, config compatibility, baseline/SARIF, and the synthetic performance tripwire. Decision: GO.
+TASK-0220 published `AgentContextKit 0.2.0-alpha.4` through the OIDC release workflow on 2026-06-26.
 
-`0.2.0-alpha.4` is NOT published. TASK-0220 can be the authorized publish task with explicit maintainer approval. TASK-0221 should follow for public README/docs sync after alpha4 publish succeeds.
+Publish details:
+- Publish commit: `98cdf9723a509a347bd0403f6373dafe81ba03fb`
+- NuGet package `AgentContextKit` `0.2.0-alpha.4` published
+- Tag `v0.2.0-alpha.4` created at publish commit
+- GitHub prerelease `v0.2.0-alpha.4` created at 2026-06-26T01:32:17Z
+- Global tool install verified: `ackit --version` returns `AgentContextKit 0.2.0-alpha.4`
+- `README.nuget.md` package README fix shipped
+- Predecessor: `0.2.0-alpha.3` remains published and verified
+
+Release workflow runs:
+- Publish initial run: `28210969527` (package published, verify step failed due to NuGet indexing lag)
+- Tag/release recovery run: `28211300136` (tag created, GitHub Release created, verify succeeded)
+
+TASK-0221 should follow for post-publish public README/docs sync.
 
 ## Future Release-Candidate Decision
 TASK-0092 prepares a conditional local contract freeze in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and the authoritative GO/NO-GO checklist in `docs/MAINTAINER_RC_DECISION.md`. The current decision is NO-GO for RC publication until hosted evidence, remaining P0 gaps, private vulnerability reporting, schema assets, and supply-chain decisions are complete.
@@ -49,17 +62,14 @@ gh workflow run release-candidate-evidence.yml `
 ## Current Published State
 - GitHub repository public: yes, `https://github.com/Cynrath/agent-context-kit`.
 - `master` pushed: yes.
-- `v0.2.0-alpha.3` tag pushed: yes, at `92984c6448332aa24b7cff94647f627bf944e535`.
+- `v0.2.0-alpha.4` tag pushed: yes, at `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
 - GitHub Actions latest `master` run is green per maintainer-provided release status.
-- Read-only GitHub CLI validation on 2026-06-05 confirmed `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` succeeded for commit `8dac9237c27ba912d056344155f1c9f901557bf5`.
 - Repository description is set.
 - Repository topics are set.
-- GitHub Release page for `v0.2.0-alpha.3`: completed as a pre-release.
-- NuGet publish for `AgentContextKit` `0.2.0-alpha.3`: completed.
-- NuGet global tool install verification for `0.2.0-alpha.3`: completed.
-- Cross-platform CI smoke validation: completed on commit `868dff3` for Windows, Ubuntu, and macOS.
-- Current published-package smoke validation: completed for the TASK-0213 active workflow pin sync. TASK-0214 verified push-triggered `cross-platform-smoke` run `27940146487` for exact HEAD `fc002a08be83821a3b164c53256cdedab4621fc6`; Windows, Ubuntu, and macOS jobs succeeded and logs prove `AgentContextKit` `0.2.0-alpha.3` install/version smoke.
-- Current source-package smoke validation: completed on commit `8dac9237c27ba912d056344155f1c9f901557bf5` for Windows, Ubuntu, and macOS.
+- GitHub Release page for `v0.2.0-alpha.4`: completed as a pre-release.
+- NuGet publish for `AgentContextKit` `0.2.0-alpha.4`: completed.
+- NuGet global tool install verification for `0.2.0-alpha.4`: completed.
+- `README.nuget.md` package README fix shipped with this release.
 - `RepositoryUrl` is `https://github.com/Cynrath/agent-context-kit`.
 - `PackageProjectUrl` is `https://github.com/Cynrath/agent-context-kit`.
 - `PackageId` is `AgentContextKit`.
@@ -67,18 +77,16 @@ gh workflow run release-candidate-evidence.yml `
 - `Authors` and `Company` are `Cynrath`.
 - Codex for OSS application pack is ready in `docs/CODEX_FOR_OSS_APPLICATION.md`.
 
-Previous release state:
+Previous release states:
+- `v0.2.0-alpha.3` tag pushed: yes, at `92984c6448332aa24b7cff94647f627bf944e535`.
 - `v0.2.0-alpha.2` tag pushed: yes.
-- GitHub Release page for `v0.2.0-alpha.2`: completed as a pre-release.
-- NuGet publish for `AgentContextKit` `0.2.0-alpha.2`: completed.
-- NuGet global tool install verification for `0.2.0-alpha.2`: completed.
-- NuGet global tool smoke test for `0.2.0-alpha.2`: completed.
+- All predecessor releases are published, verified, and immutable.
 
 ## Verified Install
 Maintainer verification evidence:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
 ackit version
 ackit --help
 ```
@@ -86,18 +94,24 @@ ackit --help
 Expected version output:
 
 ```text
-AgentContextKit 0.2.0-alpha.3
+AgentContextKit 0.2.0-alpha.4
 ```
 
 If the tool is already installed, use:
 
 ```powershell
-dotnet tool update --global AgentContextKit --version 0.2.0-alpha.3
+dotnet tool update --global AgentContextKit --version 0.2.0-alpha.4
 ```
 
-## Verified NuGet Smoke Test
-Completed smoke test evidence:
+## Verified NuGet Smoke Test (Current Release)
+Completed alpha.4 smoke test evidence:
 
+- Temporary tool-path install from NuGet: `dotnet tool install AgentContextKit --tool-path <temp> --version 0.2.0-alpha.4`
+- `ackit --version` returned `AgentContextKit 0.2.0-alpha.4`
+- `ackit doctor`: 13/13 PASS in the repository root
+- `ackit scan --ci`: exit 0 (expected Medium/Low findings)
+
+Historical alpha.3 smoke test evidence:
 - Clean test app: external `ackit-smoke-test/DemoApp` directory outside this repository.
 - `ackit init --lang tr` created `.ackit/config.yml`.
 - `ackit scan --ci` reported no risk findings.
@@ -119,13 +133,11 @@ Completed smoke test evidence:
 - `ubuntu-latest`
 - `macos-latest`
 
-The documentation-only public smoke examples install .NET 10, install `AgentContextKit` version `0.2.0-alpha.3` globally, add the platform-specific `.dotnet/tools` path, create a clean demo app, run the installed-tool smoke flow, verify fake secret detection returns exit code `2`, delete the fake secret, run `ackit sarif`, and finish with `ackit scan --ci`.
+Current published-package smoke workflow installs `AgentContextKit` version `0.2.0-alpha.3` (TASK-0213 pin sync). After the alpha.4 publish, the workflow pin should be updated to `0.2.0-alpha.4` (TASK-0222).
 
-TASK-0213 updates the active workflow pin to install `AgentContextKit` `0.2.0-alpha.3`, matching published-package smoke documentation and examples. TASK-0214 verifies the push-triggered hosted run `27940146487` for exact commit `fc002a08be83821a3b164c53256cdedab4621fc6`; `smoke (windows-2025)`, `smoke (ubuntu-latest)`, and `smoke (macos-latest)` all succeeded, and logs on all three OS jobs include the alpha3 install command plus `AgentContextKit 0.2.0-alpha.3`. The workflow does not create tags, publish NuGet packages, or mutate release metadata, and no manual workflow dispatch was performed.
-
-Historical alpha.2 read-only GitHub CLI evidence:
-- Workflow run `27471224861`, commit `ead65120928835419fb91bf695e845721620c394`, branch `master`, conclusion `success`.
-- Jobs `smoke (windows-2025)`, `smoke (ubuntu-latest)`, and `smoke (macos-latest)` completed successfully with the published alpha.2 package.
+Historical alpha.3 published-package hosted evidence:
+- TASK-0214 verified push-triggered hosted run `27940146487` for exact HEAD `fc002a08be83821a3b164c53256cdedab4621fc6`; Windows, Ubuntu, and macOS jobs succeeded.
+- Historical alpha.2 read-only GitHub CLI evidence: Workflow run `27471224861`, commit `ead65120928835419fb91bf695e845721620c394`, branch `master`, conclusion `success`.
 
 ## Cross-Platform Source Smoke Test
 `.github/workflows/cross-platform-source-smoke.yml` is used for current-branch source package validation before future publication.

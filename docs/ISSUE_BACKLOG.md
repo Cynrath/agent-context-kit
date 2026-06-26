@@ -95,11 +95,17 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 - Goal: Prepare but do not publish `AgentContextKit 0.2.0-alpha.4` to ship the dedicated `README.nuget.md` package README rendering fix.
 - Done when: TASK-0215 infrastructure is used in an authorized package publish after hosted RC evidence passes.
 
-### 17. Authorized 0.2.0-alpha.4 publish (pending maintainer approval)
+### 17. Authorized 0.2.0-alpha.4 publish (completed)
 - Labels: `type: release`, `area: packaging`, `priority: low`
-- Status: TASK-0219 recorded GO for hosted RC evidence. TASK-0220 can be the authorized publish task with explicit maintainer approval.
+- Status: Completed by TASK-0220. `AgentContextKit 0.2.0-alpha.4` published through OIDC release workflow on 2026-06-26. NuGet package, tag, and GitHub prerelease verified. Global tool install verified.
 - Goal: Publish `AgentContextKit 0.2.0-alpha.4` through the OIDC release workflow after maintainer approval.
 - Done when: NuGet publish succeeds, tag and GitHub Release created, global tool install verified.
+
+### 18. Post-publish public README/docs sync to 0.2.0-alpha.4 (pending)
+- Labels: `type: release`, `area: docs`, `priority: low`
+- Status: TASK-0220 completed alpha4 publish. TASK-0221 should sync public README/docs after publish verification.
+- Goal: Update public-facing README.md, README.tr.md, and public docs to reference `0.2.0-alpha.4` as the current published release.
+- Done when: README.md and README.tr.md install commands and version references use `0.2.0-alpha.4`.
 
 ## Maintainer Action Required
 GitHub issue creation is remote-write. Create issues manually when ready; do not create them from an agent session without explicit approval.

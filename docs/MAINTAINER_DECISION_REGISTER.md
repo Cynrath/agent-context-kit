@@ -73,12 +73,22 @@ TASK-0206 records `0.2.0-alpha.3` publication and immutable post-publish verific
 
 No manual tag creation, manual GitHub Release creation, manual NuGet package upload, repository secret creation, tag movement, version reuse, package replacement, owner/account mutation, or destructive NuGet action occurred in TASK-0206.
 
+## TASK-0220 Alpha4 Authorization And Publish
+
+TASK-0220 published `AgentContextKit 0.2.0-alpha.4` through the OIDC release workflow on 2026-06-26.
+
+| Decision ID | Related entity | Status | Decision | Rationale | Owner role | Evidence | Effective scope | Review/expiry | Remote action |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| MD-012 | Alpha4 publish | Published | `0.2.0-alpha.4` is published and immutable | TASK-0219 hosted RC evidence GO; maintainer authorized TASK-0220 publish through OIDC release workflow | Release maintainer | TASK-0220 task doc; release run `28210969527`; tag/release run `28211300136`; commit `98cdf9723a509a347bd0403f6373dafe81ba03fb` | Publish SHA `98cdf97`; package `0.2.0-alpha.4` | No version reuse or tag movement | NuGet package published, tag and GitHub prerelease created |
+
+Predecessor release `0.2.0-alpha.3` remains published and immutable.
+
 ## TASK-0219 Alpha4 Hosted RC Evidence
 
 TASK-0219 dispatched the `release-candidate-evidence.yml` workflow for exact candidate commit `b8e8fce68f803c50f708d1566f1a38aab4b34bde` and verified hosted RC evidence.
 
 | Decision ID | Related entity | Status | Decision | Rationale | Owner role | Evidence | Effective scope | Review/expiry | Remote action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| MD-011 | Alpha4 RC evidence | GO | Hosted RC run `28208545684` passed for exact commit `b8e8fce68f803c50f708d1566f1a38aab4b34bde`, candidate `0.2.0-alpha.4`, predecessor `0.2.0-alpha.3` | All required jobs passed on Windows, Ubuntu, and macOS; 428/428 tests; performance tripwire PASS; config compatibility PASS; baseline/SARIF checks PASS; push-triggered CI also green | Release maintainer | TASK-0219 task doc; run `28208545684`; job IDs `83564550663/50665/50688` | Commit `b8e8fce68f803c50f708d1566f1a38aab4b34bde` only | Before alpha4 authorized publish | Workflow dispatch completed; no NuGet publish, tag, or release mutation |
+| MD-011 | Alpha4 RC evidence | GO | Hosted RC run `28208545684` passed for exact commit `b8e8fce68f803c50f708d1566f1a38aab4b34bde`, candidate `0.2.0-alpha.4`, predecessor `0.2.0-alpha.3` | All required jobs passed on Windows, Ubuntu, and macOS; 428/428 tests; performance tripwire PASS; config compatibility PASS; baseline/SARIF checks PASS; push-triggered CI also green | Release maintainer | TASK-0219 task doc; run `28208545684`; job IDs `83564550663/50665/50688` | Commit `b8e8fce68f803c50f708d1566f1a38aab4b34bde` only | Superseded by TASK-0220 publish | Workflow dispatch completed; no NuGet publish, tag, or release mutation |
 
 No NuGet publish, tag mutation, GitHub Release mutation, release workflow dispatch (`release.yml`), package metadata change, version bump, or public README sync occurred in TASK-0219.

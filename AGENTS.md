@@ -63,17 +63,17 @@
 - GitHub Actions: .github/workflows
 
 ## Release Status
-- Current release: `v0.2.0-alpha.3` published on GitHub and NuGet as a pre-release.
-- Current publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
-- Previous release: `v0.2.0-alpha.2` published and verified; pushed, released, and published.
-- NuGet global tool install verification: completed.
-- GitHub Release page: completed.
-- Published-package smoke workflow is pinned to `AgentContextKit` `0.2.0-alpha.3` and TASK-0214 recorded hosted pass evidence.
+- Current release: `v0.2.0-alpha.4` published on GitHub and NuGet as a pre-release.
+- Current publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
+- Previous release: `v0.2.0-alpha.3` published and verified; pushed, released, and published.
+- NuGet global tool install verification: completed for `0.2.0-alpha.4`.
+- GitHub Release page: completed for `v0.2.0-alpha.4`.
+- Published-package smoke workflow is pinned to `AgentContextKit` `0.2.0-alpha.3` (not yet updated for alpha.4).
 - Source-package smoke workflow installs the local `AgentContextKit` package built from source.
 
 ## Risk Summary
 - No risk findings in the latest local scan.
-- `0.2.0-alpha.3` is published and verified by TASK-0206; do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
+- `0.2.0-alpha.4` is published and verified by TASK-0220; do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
 
 ## Recommended Checks
 - `dotnet build AgentContextKit.sln -c Release --no-restore`
