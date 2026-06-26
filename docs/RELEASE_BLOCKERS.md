@@ -3,19 +3,20 @@
 This document lists release blockers and follow-ups after the current GitHub and NuGet publication.
 
 ## Current Status
-`v0.2.0-alpha.3` is published and verified.
+`v0.2.0-alpha.4` is published and verified.
 
 - GitHub repository public: yes, `https://github.com/Cynrath/agent-context-kit`.
 - `master` pushed: yes.
-- `v0.2.0-alpha.3` tag pushed: yes.
-- GitHub Release page for `v0.2.0-alpha.3`: completed as a pre-release.
+- `v0.2.0-alpha.4` tag pushed: yes.
+- GitHub Release page for `v0.2.0-alpha.4`: completed as a pre-release.
 - NuGet publish: completed.
-- NuGet global tool install verification and package smoke for `0.2.0-alpha.3`: completed.
+- NuGet global tool install verification: completed.
 - Package metadata final URL: yes.
 - Codex for OSS application submission: completed per maintainer-provided status.
+- Predecessor release `v0.2.0-alpha.3` is verified and published.
 
 ## Blocking Items
-No active release blockers remain for `v0.2.0-alpha.3`.
+No active release blockers remain for `v0.2.0-alpha.4`.
 
 ## Remaining Follow-Ups
 - Keep `docs/CODEX_FOR_OSS_APPLICATION.md` as the submitted application pack/reference.
@@ -32,13 +33,14 @@ No active release blockers remain for `v0.2.0-alpha.3`.
 - Public GitHub repository exists.
 - `master` is pushed.
 - `v0.2.0-alpha.3` is pushed.
+- `v0.2.0-alpha.2` predecessor release published and verified.
 - GitHub Actions latest `master` run was green for the release commit.
 - Repository description matches the maintained release text.
 - Repository topics include the maintained topic set.
-- GitHub Release page exists for `v0.2.0-alpha.3`.
-- NuGet package `AgentContextKit` version `0.2.0-alpha.3` is published.
-- `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3` was verified.
-- `ackit version` returned `AgentContextKit 0.2.0-alpha.3`.
+- GitHub Release page exists for `v0.2.0-alpha.4`.
+- NuGet package `AgentContextKit` version `0.2.0-alpha.4` is published.
+- `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4` was verified.
+- `ackit version` returned `AgentContextKit 0.2.0-alpha.4`.
 - `ackit --help` was verified.
 
 ## Local Validation
@@ -58,12 +60,12 @@ powershell -ExecutionPolicy Bypass -File scripts/check-public-release-gates.ps1 
 
 ## Install Verification
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
 ackit version
 ackit --help
 ```
 
-If the tool is already installed, use `dotnet tool update --global AgentContextKit --version 0.2.0-alpha.3` or a temporary `--tool-path` install.
+If the tool is already installed, use `dotnet tool update --global AgentContextKit --version 0.2.0-alpha.4` or a temporary `--tool-path` install.
 
 ## References
 - [Create a NuGet package using MSBuild](https://learn.microsoft.com/en-us/nuget/create-packages/creating-a-package-msbuild)

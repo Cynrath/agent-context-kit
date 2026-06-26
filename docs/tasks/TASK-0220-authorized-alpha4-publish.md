@@ -12,6 +12,20 @@ The maintainer explicitly authorizes TASK-0220: publish `AgentContextKit 0.2.0-a
 - Do not republish or mutate `0.2.0-alpha.3`.
 - Do not publish if the exact release preconditions fail.
 
+## Release Workflow Preflight Fixes
+
+The following pre-existing RC issues were fixed during TASK-0220 release preflight:
+
+1. **`scripts/verify-release.ps1`**: Default version parameter was `0.2.0-alpha.3` instead of `0.2.0-alpha.4`. TASK-0218 alpha4 release prep missed updating this file. The release workflow's `prepare-release.ps1` consistency check requires exact version match.
+
+2. **`docs/RELEASE_BLOCKERS.md`**: Updated to alpha4 publish state; restored `v0.2.0-alpha.2` predecessor reference for v100 documentation gate.
+
+3. **`docs/PUBLIC_RELEASE_AUDIT.md`**: Updated to alpha4 publish state; fixed `GitHub Release page: completed` and `NuGet global tool install verification: completed` patterns.
+
+4. **`docs/PUBLIC_RELEASE_GATES.md`**: Updated to alpha4 publish state; fixed `GitHub Release page: completed` and `NuGet publish: completed` patterns.
+
+These are release process documentation fixes, not public docs (README.md/README.tr.md), source code, or package metadata changes.
+
 ## Preconditions
 
 TASK-0219 is complete, pushed, and CI-green.
@@ -55,7 +69,9 @@ TASK-0219 is complete, pushed, and CI-green.
 - No unrelated source changes.
 - No broad docs refactor.
 - No source/package version bump beyond existing `0.2.0-alpha.4`.
-- No change to `README.nuget.md` unless a hard preflight failure proves package README metadata is broken (if so, STOP instead of publishing).
+- No change to `README.nuget.md`.
+- Fix `scripts/verify-release.ps1` default version if preflight requires it (pre-existing RC issue: TASK-0218 missed this update).
+- Fix release process docs (RELEASE_BLOCKERS.md, PUBLIC_RELEASE_AUDIT.md, PUBLIC_RELEASE_GATES.md) to match v100 documentation gate patterns.
 
 ## Implementation
 
