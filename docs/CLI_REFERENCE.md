@@ -248,7 +248,7 @@ Runs the local Core MCP transport. The `ackit mcp` subcommand supports a real lo
 ```powershell
 ackit mcp --help
 ackit mcp --stdio-server
-ackit mcp --stdio-server --repo C:\path\to\repo
+ackit mcp --stdio-server --repo path/to/repo
 ackit mcp --stdio '{"jsonrpc":"2.0","id":"1","method":"initialize","params":{}}'
 ackit mcp --stdio '{"jsonrpc":"2.0","id":"2","method":"tools/list","params":{}}' --output .ackit/mcp/tools.jsonl
 ```
