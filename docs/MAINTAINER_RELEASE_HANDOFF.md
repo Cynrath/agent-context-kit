@@ -23,7 +23,7 @@ Release workflow runs:
 - Publish initial run: `28210969527` (package published, verify step failed due to NuGet indexing lag)
 - Tag/release recovery run: `28211300136` (tag created, GitHub Release created, verify succeeded)
 
-TASK-0221 should follow for post-publish public README/docs sync.
+TASK-0221 completed release recovery: alpha4 release body corrected (was showing stale alpha2 content), release workflow notes-file fixed to use version-specific body files, and ACKit-first dogfood rules added to AGENTS.md/CLAUDE.md. TASK-0222 is active for public README/docs sync.
 
 ## Future Release-Candidate Decision
 TASK-0092 prepares a conditional local contract freeze in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and the authoritative GO/NO-GO checklist in `docs/MAINTAINER_RC_DECISION.md`. The current decision is NO-GO for RC publication until hosted evidence, remaining P0 gaps, private vulnerability reporting, schema assets, and supply-chain decisions are complete.
@@ -133,7 +133,7 @@ Historical alpha.3 smoke test evidence:
 - `ubuntu-latest`
 - `macos-latest`
 
-Current published-package smoke workflow installs `AgentContextKit` version `0.2.0-alpha.3` (TASK-0213 pin sync). After the alpha.4 publish, the workflow pin should be updated to `0.2.0-alpha.4` (TASK-0222).
+Current published-package smoke workflow installs `AgentContextKit` version `0.2.0-alpha.4` (TASK-0223 pin sync).
 
 Historical alpha.3 published-package hosted evidence:
 - TASK-0214 verified push-triggered hosted run `27940146487` for exact HEAD `fc002a08be83821a3b164c53256cdedab4621fc6`; Windows, Ubuntu, and macOS jobs succeeded.
@@ -147,7 +147,7 @@ The workflow:
 - Uses `actions/checkout@v6` and `actions/setup-dotnet@v5`.
 - Runs restore, Release build, and Release tests.
 - Packs the current source into a temporary package directory.
-- Installs `AgentContextKit` version `0.2.0-alpha.3` from the temporary package source into a temporary tool path for the current candidate.
+- Installs `AgentContextKit` version `0.2.0-alpha.4` from the temporary package source into a temporary tool path for the current candidate.
 - Runs `ackit version`, `ackit --help`, clean DemoApp smoke commands, fake-secret `redact-check` expected failure, fake secret cleanup, and final `ackit scan --ci`.
 
 Latest read-only GitHub CLI evidence:
@@ -159,7 +159,7 @@ The `0.2.0-alpha.2` package was the previous published package. It includes `ack
 
 Maintainer-only next release actions:
 - Decide the next version after TASK-0125 final hosted validation.
-- Use `docs/RELEASE_BODY_V020_ALPHA2.md` as the immutable alpha.2 release-note reference.
+- Use `docs/RELEASE_BODY_V020_ALPHA2.md` as the immutable alpha.2 release-note reference. For new releases, create a version-specific `docs/RELEASE_BODY_V020_<VERSION_TAG>.md` and the release workflow `--notes-file` will resolve it automatically.
 - Confirm hosted `ci`, published-package smoke, and source-package smoke are green after the next push.
 - Create any future tags and GitHub Releases only after reviewed release commits.
 - Publish future NuGet packages only from reviewed exact release commits through OIDC Trusted Publishing.

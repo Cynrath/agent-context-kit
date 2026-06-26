@@ -101,9 +101,9 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 - Goal: Publish `AgentContextKit 0.2.0-alpha.4` through the OIDC release workflow after maintainer approval.
 - Done when: NuGet publish succeeds, tag and GitHub Release created, global tool install verified.
 
-### 18. Post-publish public README/docs sync to 0.2.0-alpha.4 (pending)
+### 18. Post-publish public README/docs sync to 0.2.0-alpha.4 (active)
 - Labels: `type: release`, `area: docs`, `priority: low`
-- Status: TASK-0220 completed alpha4 publish. TASK-0221 should sync public README/docs after publish verification.
+- Status: TASK-0222 active. TASK-0221 completed release recovery.
 - Goal: Update public-facing README.md, README.tr.md, and public docs to reference `0.2.0-alpha.4` as the current published release.
 - Done when: README.md and README.tr.md install commands and version references use `0.2.0-alpha.4`.
 

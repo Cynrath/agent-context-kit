@@ -214,7 +214,7 @@ These actions require explicit maintainer control and do not block safe local-on
 1. TASK-0218 alpha4 NuGet README rendering release prep - completed locally. Source/package version updated to `0.2.0-alpha.4`; local package verification and install smoke passed; `README.nuget.md` confirmed packaged. `0.2.0-alpha.3` remains the current published NuGet version.
 
 ## Next Task
-- TASK-0220 completed: `AgentContextKit 0.2.0-alpha.4` published through the authorized OIDC release workflow on 2026-06-26. TASK-0221 should follow for post-publish public README/docs sync after alpha4 publish verification is complete.
+- TASK-0220 completed: `AgentContextKit 0.2.0-alpha.4` published through the authorized OIDC release workflow on 2026-06-26. TASK-0221 completed: alpha4 release body fixed, release workflow notes-file hardened, ACKit-first dogfood rules added. TASK-0222 is active for public README/docs sync to alpha4.
 
 ## Execution Rule
 After the closure of PROJECT-CONTROL-0110, the queue is in pause except for explicitly requested independent docs/release-preparation tasks. Tag, GitHub pre-release, NuGet publication, and workflow dispatch are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

@@ -296,7 +296,7 @@ Onemli dokumanlar:
 Bkz. [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Paketleme
-Lokal paket dogrulama adimlari [docs/PACKAGING.md](docs/PACKAGING.md) ve [docs/RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md) dosyalarinda yer alir. `0.2.0-alpha.3` paketi NuGet global tool olarak yayinlandi ve dogrulandi.
+Lokal paket dogrulama adimlari [docs/PACKAGING.md](docs/PACKAGING.md) ve [docs/RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md) dosyalarinda yer alir. `0.2.0-alpha.4` paketi NuGet global tool olarak yayinlandi ve dogrulandi.
 
 Public release blocker listesi [docs/RELEASE_BLOCKERS.md](docs/RELEASE_BLOCKERS.md) dosyasinda takip edilir.
 

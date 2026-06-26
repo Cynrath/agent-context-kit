@@ -468,7 +468,7 @@ Historical `0.2.0-alpha.2` smoke evidence remains valid for that release and inc
 ## Cross-Platform Published-Package Smoke Workflow
 `.github/workflows/cross-platform-smoke.yml` verifies the published global tool on Windows, Ubuntu, and macOS.
 
-Current public examples, package verification docs, and the active workflow YAML install `AgentContextKit` version `0.2.0-alpha.3`. TASK-0213 updated `.github/workflows/cross-platform-smoke.yml` because it verifies the current published package. TASK-0214 then verified the push-triggered hosted run for exact TASK-0213 HEAD.
+Current public examples and package verification docs reference `AgentContextKit` version `0.2.0-alpha.4`. TASK-0223 updates `.github/workflows/cross-platform-smoke.yml` to pin the installed version to `0.2.0-alpha.4`.
 
 Current alpha.3 hosted result:
 - Workflow: `cross-platform-smoke`.
@@ -491,7 +491,7 @@ Historical alpha.2 hosted result:
 - Windows, Ubuntu, and macOS jobs succeeded.
 - NuGet global tool install, `ackit version`, `ackit --help`, DemoApp smoke flow, expected fake-secret `redact-check` failure, and final `scan --ci` all completed successfully.
 
-The current public package guidance installs `0.2.0-alpha.3` and exercises `ackit sarif`.
+The current public package guidance installs `0.2.0-alpha.4` and exercises `ackit sarif`.
 
 ## Cross-Platform Source Smoke Workflow
 `.github/workflows/cross-platform-source-smoke.yml` verifies the current branch and local package before future publication.
@@ -500,7 +500,7 @@ The workflow:
 - Uses `actions/checkout@v6` and `actions/setup-dotnet@v5`.
 - Runs restore, Release build, and Release tests.
 - Packs `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj` into a temporary package directory.
-- Installs `AgentContextKit` version `0.2.0-alpha.3` from that temporary package source into a temporary tool path.
+- Installs `AgentContextKit` version `0.2.0-alpha.4` from that temporary package source into a temporary tool path.
 - Runs `ackit version`, `ackit --help`, a clean demo app smoke flow, expected fake-secret `redact-check` failure, fake secret cleanup, and final `ackit scan --ci`.
 - Does not push, tag, create GitHub Releases, or publish NuGet packages.
 
@@ -547,7 +547,7 @@ Hosted workflow validation is complete for the latest TASK-0056 push. Future wor
 - Confirm no permanent global tool install is required for validation.
 - Confirm GitHub Actions latest `master` run is green.
 - Confirm GitHub Release page exists for the current release tag.
-- Confirm NuGet package availability and global tool install for `AgentContextKit` version `0.2.0-alpha.3`.
+- Confirm NuGet package availability and global tool install for `AgentContextKit` version `0.2.0-alpha.4`.
 - Confirm the published NuGet global tool smoke test remains documented and reproducible.
 - Confirm Codex for OSS form submission remains recorded; keep `docs/CODEX_FOR_OSS_APPLICATION.md` as the submitted application pack/reference.
 

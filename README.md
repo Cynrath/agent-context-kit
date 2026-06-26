@@ -349,10 +349,10 @@ Public release blockers are tracked in [Release Blockers](docs/RELEASE_BLOCKERS.
 
 ## Packaging
 
-Local package validation is documented in [Packaging](docs/PACKAGING.md) and [Release Validation](docs/RELEASE_VALIDATION.md). The `0.2.0-alpha.3` package is published as a NuGet global tool.
+Local package validation is documented in [Packaging](docs/PACKAGING.md) and [Release Validation](docs/RELEASE_VALIDATION.md). The `0.2.0-alpha.4` package is published as a NuGet global tool.
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
 ackit version
 ```
 
