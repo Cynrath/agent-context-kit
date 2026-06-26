@@ -24,7 +24,9 @@ The following pre-existing RC issues were fixed during TASK-0220 release preflig
 
 4. **`docs/PUBLIC_RELEASE_GATES.md`**: Updated to alpha4 publish state; fixed `GitHub Release page: completed` and `NuGet publish: completed` patterns.
 
-These are release process documentation fixes, not public docs (README.md/README.tr.md), source code, or package metadata changes.
+5. **`scripts/test-release-candidate-inputs.ps1`**: Wrong-version test case was hardcoded to `"0.2.0-alpha.4"`, which now matches the source version. Changed to `"9.9.9-alpha.999"` so it remains a valid negative test.
+
+These are release process documentation and test fixes, not public docs (README.md/README.tr.md) or release-relevant source code changes.
 
 ## Preconditions
 
