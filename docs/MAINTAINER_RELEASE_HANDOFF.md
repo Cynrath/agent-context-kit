@@ -2,9 +2,15 @@
 
 The completed alpha.2 scope is in `docs/V020_ALPHA2_SCOPE.md`. PROJECT-CONTROL-0102 authorized the validated normal pushes and exact-SHA OIDC release sequence for `v0.2.0-alpha.2`.
 
-This handoff records the completed `v0.2.0-alpha.2` and `v0.2.0-alpha.3` GitHub and NuGet pre-release states.
+This handoff records the completed `v0.2.0-alpha.2`, `v0.2.0-alpha.3`, and the `v0.2.0-alpha.4` hosted RC evidence (pre-publish) state.
 
 Future release sequences must not use API keys. Publication is allowed only through the manual OIDC workflow after the exact release commit passes all required hosted jobs.
+
+## Alpha.4 Hosted RC Evidence (Pre-Publish)
+
+TASK-0219 dispatched the `release-candidate-evidence.yml` workflow for exact candidate commit `b8e8fce68f803c50f708d1566f1a38aab4b34bde` with `candidate_version=0.2.0-alpha.4` and `predecessor_version=0.2.0-alpha.3`. Run `28208545684` completed successfully on `windows-2025`, `ubuntu-latest`, and `macos-latest`. All validation steps passed including commit check, restore/build/test (428/428), predecessor upgrade, config compatibility, baseline/SARIF, and the synthetic performance tripwire. Decision: GO.
+
+`0.2.0-alpha.4` is NOT published. TASK-0220 can be the authorized publish task with explicit maintainer approval. TASK-0221 should follow for public README/docs sync after alpha4 publish succeeds.
 
 ## Future Release-Candidate Decision
 TASK-0092 prepares a conditional local contract freeze in `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` and the authoritative GO/NO-GO checklist in `docs/MAINTAINER_RC_DECISION.md`. The current decision is NO-GO for RC publication until hosted evidence, remaining P0 gaps, private vulnerability reporting, schema assets, and supply-chain decisions are complete.

@@ -89,11 +89,17 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 - Status: Completed by TASK-0217. Root cause identified: `ProcessStartInfo.Environment["TMP"] = ""` on Windows creates garbled directory in repo root. Fix applied: removed TMP/TEMP/TMPDIR overrides from test. Pushed at `840c08f` with CI green.
 - Done when: Root cause is identified and addressed. TASK-0217 fixed the single known occurrence.
 
-### 16. Prepare 0.2.0-alpha.4 NuGet README rendering release (current TASK-0218)
+### 16. Prepare 0.2.0-alpha.4 NuGet README rendering release (completed TASK-0218/0219)
 - Labels: `type: release`, `area: packaging`, `priority: low`
-- Status: Active (TASK-0218). Source is prepared as `0.2.0-alpha.4` local candidate. NOT published.
+- Status: Completed. TASK-0218 prepared source as `0.2.0-alpha.4` local candidate. TASK-0219 verified hosted RC evidence (run 28208545684) and recorded GO decision.
 - Goal: Prepare but do not publish `AgentContextKit 0.2.0-alpha.4` to ship the dedicated `README.nuget.md` package README rendering fix.
 - Done when: TASK-0215 infrastructure is used in an authorized package publish after hosted RC evidence passes.
+
+### 17. Authorized 0.2.0-alpha.4 publish (pending maintainer approval)
+- Labels: `type: release`, `area: packaging`, `priority: low`
+- Status: TASK-0219 recorded GO for hosted RC evidence. TASK-0220 can be the authorized publish task with explicit maintainer approval.
+- Goal: Publish `AgentContextKit 0.2.0-alpha.4` through the OIDC release workflow after maintainer approval.
+- Done when: NuGet publish succeeds, tag and GitHub Release created, global tool install verified.
 
 ## Maintainer Action Required
 GitHub issue creation is remote-write. Create issues manually when ready; do not create them from an agent session without explicit approval.

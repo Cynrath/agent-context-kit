@@ -205,8 +205,16 @@ These actions require explicit maintainer control and do not block safe local-on
 - PROJECT-CONTROL-0101 validation passed with a zero-warning Release build, 178/178 tests, source JSON with zero findings, doctor PASS, parsed global SARIF with no Critical/High findings, sample smoke, clean hygiene/local Markdown links, and all requested local gates. The pre-commit public gate reported only the expected dirty working tree blocker.
 - Post-publish commit `ead65120928835419fb91bf695e845721620c394` passed all eight standard hosted jobs: 2 CI, 3 published-package smoke, and 3 source-package smoke.
 
+## Completed Independent Alpha.4 Hosted RC Evidence
+
+1. TASK-0219 alpha4 hosted RC evidence - completed locally with hosted dispatch. Run `28208545684` for exact commit `b8e8fce68f803c50f708d1566f1a38aab4b34bde` passed on `windows-2025`, `ubuntu-latest`, and `macos-latest`; candidate `0.2.0-alpha.4`; predecessor `0.2.0-alpha.3`; source candidate package `0.2.0-alpha.4.ci.28208545684`; 428/428 tests; performance tripwire PASS. Decision: GO. No publish, tag, GitHub Release, NuGet, or workflow dispatch mutation occurred.
+
+## Completed Independent Alpha.4 Release Prep
+
+1. TASK-0218 alpha4 NuGet README rendering release prep - completed locally. Source/package version updated to `0.2.0-alpha.4`; local package verification and install smoke passed; `README.nuget.md` confirmed packaged. `0.2.0-alpha.3` remains the current published NuGet version.
+
 ## Next Task
-- Current task: TASK-0218 alpha4 NuGet README rendering release prep. TASK-0217 (Windows Unicode temp directory fix) completed and pushed at `840c08f` with CI green. TASK-0218 prepares `AgentContextKit 0.2.0-alpha.4` locally as the next prerelease candidate to ship the dedicated `README.nuget.md` package README rendering fix (TASK-0215/PR #1). Alpha4 is NOT published. `0.2.0-alpha.3` remains the current published NuGet version. No tag, GitHub Release, NuGet publish, or workflow dispatch is authorized in TASK-0218. A future explicit publish task is required after release-candidate evidence passes.
+- Current task: TASK-0219 (hosted RC evidence). TASK-0210 through TASK-0218 are complete. TASK-0219 recorded GO evidence for alpha4 hosted RC. TASK-0220 can be an authorized `0.2.0-alpha.4` publish, but only with explicit maintainer approval. TASK-0221 should follow for post-publish public README/docs sync after alpha4 is published.
 
 ## Execution Rule
 After the closure of PROJECT-CONTROL-0110, the queue is in pause except for explicitly requested independent docs/release-preparation tasks. Tag, GitHub pre-release, NuGet publication, and workflow dispatch are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.

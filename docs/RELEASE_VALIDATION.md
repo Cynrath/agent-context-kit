@@ -1,5 +1,32 @@
 # Release Validation
 
+## v0.2.0-alpha.4 Hosted RC Evidence
+
+TASK-0219 verified the exact alpha4 candidate commit `b8e8fce68f803c50f708d1566f1a38aab4b34bde` through hosted release-candidate evidence.
+
+Hosted RC run `28208545684`:
+- Event: `workflow_dispatch`
+- Commit: `b8e8fce68f803c50f708d1566f1a38aab4b34bde`
+- Candidate: `0.2.0-alpha.4`
+- Predecessor: `0.2.0-alpha.3`
+- Source candidate package: `0.2.0-alpha.4.ci.28208545684`
+- Jobs: `evidence (windows-2025)`, `evidence (ubuntu-latest)`, `evidence (macos-latest)` all succeeded
+- Tests: 428/428 passed, 0 warnings, 0 errors
+- Performance tripwire: PASS
+- Config compatibility: PASS
+- Baseline/SARIF checks: PASS
+- Annotation: non-blocking macOS label migration notice only
+- Decision: GO
+
+Push-triggered CI supporting evidence (same commit):
+- `ci` run 28208179383: success
+- `cross-platform-smoke` run 28208179366: success
+- `cross-platform-source-smoke` run 28208179392: success (confirms `AgentContextKit 0.2.0-alpha.4` package build, install, and smoke)
+
+Local TASK-0218 confirmed `README.nuget.md` is packaged at root (2929 bytes) and nuspec readme is `README.nuget.md`.
+
+`0.2.0-alpha.4` is NOT published. No tag, GitHub Release, or NuGet mutation occurred.
+
 ## v0.2.0-alpha.3 Publication Evidence
 TASK-0134 recorded an evidence-backed NO-GO on 2026-06-14. TASK-0202 later closed the ownership/recovery blockers from maintainer-provided evidence. TASK-0203 prepared source/package metadata as `0.2.0-alpha.3` and local package evidence. TASK-0204 identified dispatch-time current `origin/master` as the exact hosted RC evidence candidate. TASK-0205 verified hosted RC run `27868539971` as successful for commit `beaa14deed3dbc55ac98d216679f9a9799261801`, candidate `0.2.0-alpha.3`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`.
 
