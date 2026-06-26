@@ -245,14 +245,19 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           $version = "${{ inputs.version }}"
           $tagName = "v$version"
+          $notesTag = $version -replace '\.', '_' -replace '-', '_'
+          $notesFile = "docs/RELEASE_BODY_V020_$($notesTag.ToUpperInvariant()).md"
+          if (-not (Test-Path $notesFile -PathType Leaf)) {
+            throw "Release body file not found: $notesFile. Create a version-specific body file at this path before release."
+          }
           $packageRoot = "${{ runner.temp }}/ackit-release-package"
           $assets = @(Get-ChildItem $packageRoot -Filter "AgentContextKit.$version.*nupkg" | ForEach-Object FullName)
           if ("${{ steps.state.outputs.release_exists }}" -ne "true") {
             if ([System.Convert]::ToBoolean("${{ inputs.prerelease }}")) {
-              gh release create $tagName @assets --repo "${{ github.repository }}" --verify-tag --target "${{ inputs.release_commit_sha }}" --title "AgentContextKit $version" --notes-file "docs/RELEASE_BODY_V020_ALPHA2.md" --prerelease
+              gh release create $tagName @assets --repo "${{ github.repository }}" --verify-tag --target "${{ inputs.release_commit_sha }}" --title "AgentContextKit $version" --notes-file $notesFile --prerelease
             }
             else {
-              gh release create $tagName @assets --repo "${{ github.repository }}" --verify-tag --target "${{ inputs.release_commit_sha }}" --title "AgentContextKit $version" --notes-file "docs/RELEASE_BODY_V020_ALPHA2.md"
+              gh release create $tagName @assets --repo "${{ github.repository }}" --verify-tag --target "${{ inputs.release_commit_sha }}" --title "AgentContextKit $version" --notes-file $notesFile
             }
           }
           else {

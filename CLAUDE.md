@@ -2,6 +2,18 @@
 
 Use the same repository rules as AGENTS.md.
 
+## Dogfood / ACKit-First
+This repository IS AgentContextKit. Every agent session must dogfood the tool.
+
+- Before ANY task: run `ackit --version`, `ackit doctor`, `ackit scan --ci`.
+- Create new task docs with `ackit task "<title>"` first, then fill/refine the generated Markdown.
+- Do not create task docs manually unless `ackit task` fails. If it fails, record the exact failure.
+- When testing CLI behavior beyond what the installed tool covers, use:
+  `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release -- <args>`
+- Run `ackit doctor` and `ackit scan --ci` before every final commit.
+- Never commit generated `.ackit/`, reports, SARIF, prompt packs, context exports, package artifacts, or temp outputs.
+- Preserve the task-first workflow, release immutability, and no-network/default safety rules.
+
 ## Workflow
 - Task-first: every implementation change starts from `docs/tasks/`.
 - Continuous progress: do not stop between documented tasks; proceed through them in order.

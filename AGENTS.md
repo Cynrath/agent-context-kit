@@ -19,6 +19,19 @@
 - Do not try to fix NuGet rendering by weakening or removing the GitHub README layout unless the GitHub README itself is the intended target.
 - A published NuGet version is immutable for this purpose; visible package README corrections require a later authorized package publish.
 
+## Dogfood / ACKit-First
+This repository IS AgentContextKit. Every agent session must dogfood the tool.
+
+- Before ANY task: run `ackit --version`, `ackit doctor`, `ackit scan --ci`.
+- Create new task docs with `ackit task "<title>"` first, then fill/refine the generated Markdown.
+- Do not create task docs manually unless `ackit task` fails. If it fails, record the exact failure in the task.
+- When testing CLI behavior beyond what the installed tool covers, use:
+  `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release -- <args>`
+- Run `ackit doctor` and `ackit scan --ci` before every final commit.
+- Never commit generated `.ackit/`, reports, SARIF, prompt packs, context exports, package artifacts, or temp outputs.
+- Preserve the task-first workflow, release immutability, and no-network/default safety rules.
+- Run safe ackit commands in temp/output-safe locations when possible.
+
 ## Safety
 - Keep the MVP offline-first and local-only.
 - Do not upload repository content.

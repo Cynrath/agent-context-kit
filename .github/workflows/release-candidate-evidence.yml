@@ -10,12 +10,12 @@ on:
       candidate_version:
         description: Source package version expected at the exact commit
         required: true
-        default: 0.2.0-alpha.2
+        default: 0.2.0-alpha.4
         type: string
       predecessor_version:
         description: Published predecessor package used for upgrade evidence
         required: true
-        default: 0.2.0-alpha.1
+        default: 0.2.0-alpha.3
         type: string
 
 permissions:
