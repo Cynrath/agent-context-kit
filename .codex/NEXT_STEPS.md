@@ -64,4 +64,5 @@ PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green
 58. TASK-0227 completed: post-alpha4 markdown source-of-truth and roadmap reset. All current-state references corrected; roadmap interpretation added.
 59. TASK-0228 completed: V100 gap register refresh against alpha4. All gaps classified; no P0/P1 gaps closed.
 60. TASK-0229 completed: sanitized Web UI screenshot committed and wired into README.md/README.tr.md. V100-12 advanced.
-61. Current task: TASK-0230: V100 local contract and readiness gate rerun against alpha4. Rerun all local V100 gates (CLI contract, config conventions, JSON/SARIF, localization, performance, RC readiness) at current HEAD and record fresh evidence.
+61. TASK-0230 completed: V100 local contract and readiness gate rerun against alpha4. All gates PASS at HEAD `77748e7`. Fresh evidence recorded.
+62. Current task: TASK-0231: post-alpha4 V100 cleanup and next roadmap selection. Classify remaining V100 gaps into actionable buckets and select the next roadmap path.

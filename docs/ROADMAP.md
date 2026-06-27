@@ -277,7 +277,15 @@ This track is also safe local-only work that does not change the published `0.2.
 
 ### Current State
 
-v0.2.0-alpha.4 is the current published release. Local v0.3/v0.4/v0.5 readiness assets exist as historical implementation evidence but do not automatically define the next implementation task. The V100 readiness/gap documents are still versioned for alpha3-era evidence; V100 is not the immediate next track unless a maintainer selects it.
+v0.2.0-alpha.4 is the current published release. Local v0.3/v0.4/v0.5 readiness assets exist as historical implementation evidence but do not automatically define the next implementation task.
+
+### Completed Post-Alpha4 Tasks
+
+- TASK-0227: Markdown source-of-truth reset (all current-state references corrected).
+- TASK-0228: V100 gap register refresh against alpha4 (all gaps classified).
+- TASK-0229: Sanitized Web UI dashboard screenshot committed at `docs/assets/screenshots/ackit-webui-preview-alpha4.webp`.
+- TASK-0230: V100 local contract and readiness gate rerun (all local gates PASS at HEAD `77748e7`).
+- TASK-0231: Post-alpha4 V100 cleanup and next roadmap selection (gap decision matrix created).
 
 ### Historical Context
 
@@ -286,14 +294,26 @@ v0.2.0-alpha.4 is the current published release. Local v0.3/v0.4/v0.5 readiness 
 - V0.5 covered optional LLM integration, prompt pack, and context export -- already shipped.
 - These labels are historical; naming future packages v0.3.0-alpha would conflict with existing usage.
 
-### Recommended Next Paths
+### Gap Bucket Summary (TASK-0231)
 
-After TASK-0227 source-of-truth reset, the next concrete roadmap branch should be one of:
+| Bucket | Count | Gaps |
+| --- | ---: | --- |
+| LOCAL_IMPLEMENTATION_OR_TESTABLE_EVIDENCE | 1 | V100-07 |
+| SECURITY_SUPPLY_CHAIN_MAINTAINER_DECISION | 4 | V100-02, V100-06, V100-08, V100-09 |
+| REMOTE_RELEASE_OR_HOSTED_EVIDENCE | 6 | V100-01, V100-03, V100-04, V100-05, V100-09, V100-10 |
+| DOCUMENTATION_OR_PRESENTATION_FOLLOWUP | 1 | V100-12 |
+| DEFERRED_POST_V100 | 1 | V100-11 |
 
-**A. V100 gap refresh track**: Refresh the gap register against alpha4 and select the smallest P0/P1 local-only gap. Best if docs drift is significant.
+### Key Finding
 
-**B. Web UI public preview track**: Sanitized screenshot / README visual preview. Best for visible product polish.
+Only 1 gap (V100-07, P1 performance) is truly closeable with local-only implementation work. The remaining P0/P1 gaps are blocked on maintainer decisions or remote hosted evidence.
 
-**C. Optional interoperability/product track**: New feature design from `docs/INTEROPERABILITY_BACKLOG.md`. No dependency, no auto-install, no network by default.
+### Recommended Next Track
 
-The source-of-truth reset in TASK-0227 evaluates available evidence and recommends which track to open next. See `docs/tasks/TASK-0227-post-alpha4-markdown-source-of-truth-and-roadmap-reset.md` for the decision.
+**Maintainer decision packet for V100 closure** -- compile V100-02 (CLI contract sign-off), V100-06 (security notification ownership), V100-08 (support lifecycle), and V100-09 (supply-chain decisions) into a single maintainer-reviewable document. This is the highest-leverage next step because these 4 maintainer decisions block the 6 remote-evidence gaps that depend on an RC candidate selection.
+
+Once maintainer decisions are obtained, the next phase is RC candidate selection and remote evidence dispatch for V100-01, V100-03, V100-04, V100-05, V100-09, and V100-10.
+
+Local implementation of V100-07 (performance evidence expansion) can proceed in parallel.
+
+See `docs/tasks/TASK-0231-post-alpha4-v100-cleanup-and-next-roadmap-selection.md` for the full decision matrix.

@@ -43,6 +43,24 @@ AgentContextKit is **not ready for 1.0 general availability**. The current publi
 
 All P0 gaps remain open. No gap is closed by alpha4 publication alone. Alpha4 provides stronger evidence for most gaps but does not satisfy the done criteria for 1.0 RC final-candidate acceptance tasks.
 
+## Post-Alpha4 V100 Cleanup (TASK-0231)
+
+### Action Bucket Classification
+
+| Bucket | Count | Gaps |
+| --- | ---: | --- |
+| LOCAL_IMPLEMENTATION_OR_TESTABLE_EVIDENCE | 1 | V100-07 |
+| SECURITY_SUPPLY_CHAIN_MAINTAINER_DECISION | 4 | V100-02, V100-06, V100-08, V100-09 |
+| REMOTE_RELEASE_OR_HOSTED_EVIDENCE | 6 | V100-01, V100-03, V100-04, V100-05, V100-09, V100-10 |
+| DOCUMENTATION_OR_PRESENTATION_FOLLOWUP | 1 | V100-12 |
+| DEFERRED_POST_V100 | 1 | V100-11 |
+
+### Key Finding
+
+Only 1 gap (V100-07, P1 performance) is truly closeable with local-only implementation work. The remaining P0/P1 gaps are blocked on maintainer decisions or remote hosted evidence. The fastest path to a V100 RC is to compile a maintainer decision packet for V100-02, V100-06, V100-08, and V100-09, resolve those decisions, then select an RC candidate and dispatch remote evidence.
+
+See `docs/tasks/TASK-0231-post-alpha4-v100-cleanup-and-next-roadmap-selection.md` for the full decision matrix and next-task recommendation.
+
 ## Readiness Gates
 A future 1.0 release candidate must provide:
 - zero open P0 gaps;
