@@ -214,7 +214,8 @@ These actions require explicit maintainer control and do not block safe local-on
 1. TASK-0218 alpha4 NuGet README rendering release prep - completed locally. Source/package version updated to `0.2.0-alpha.4`; local package verification and install smoke passed; `README.nuget.md` confirmed packaged.
 
 ## Next Task
-- TASK-0220 completed: `AgentContextKit 0.2.0-alpha.4` published through the authorized OIDC release workflow on 2026-06-26. TASK-0221 completed: alpha4 release body fixed, release workflow notes-file hardened, ACKit-first dogfood rules added. TASK-0222 completed: public README/docs synced to alpha4. TASK-0223 completed: published-package smoke pin updated to alpha4. TASK-0224 completed: final audit and CI closure. All push-triggered CI for HEAD `1bb43d4` is green. Alpha4 publish train is closed.
+- TASK-0227 completed: post-alpha4 markdown source-of-truth and roadmap reset. All current-state references reconciled, roadmap interpretation added.
+- Current task: TASK-0228 V100 gap register refresh against alpha4. Refresh V100 / 1.0 readiness gap documents against the real post-alpha4 state. Documentation and evidence-classification only.
 
 ## Execution Rule
 After the closure of PROJECT-CONTROL-0110, the queue is in pause except for explicitly requested independent docs/release-preparation tasks. Tag, GitHub pre-release, NuGet publication, and workflow dispatch are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
