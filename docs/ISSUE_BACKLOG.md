@@ -4,6 +4,33 @@ This file is a copy-ready bootstrap backlog for GitHub issues. It does not creat
 
 Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 
+## Post-Alpha4 Classification
+
+The alpha4 release train is closed. Proposed issues below are classified as follows:
+
+| # | Status | Notes |
+| --- | --- | --- |
+| 1 | Still open optional GitHub issue seed | Not implemented; could be useful for future contributor onboarding |
+| 2 | Still open optional GitHub issue seed | Not implemented; needs maintainer Code Scanning decision |
+| 3 | Superseded | TASK-0072/0093 completed JSON schema contracts |
+| 4 | Superseded | TASK-0073/0019 completed exit code contracts |
+| 5 | Still open optional GitHub issue seed | Capture plan exists (SCREENSHOT_CAPTURE_PLAN.md); manual capture and commit remain |
+| 6 | Completed | TASK-0079/FIRST_FIVE_MINUTES.md |
+| 7 | Completed | TASK-0078/DOCS_SITE_PLAN.md |
+| 8 | Needs roadmap selection | Not implemented; no TASK assigned |
+| 9 | Completed | TASK-0210 |
+| 10 | Completed | TASK-0211 |
+| 11 | Completed | TASK-0213/0214 |
+| 12 | Completed | TASK-0212 |
+| 13 | Needs roadmap selection | Not implemented; no TASK assigned |
+| 14 | Completed | TASK-0216 |
+| 15 | Completed | TASK-0217 |
+| 16 | Completed | TASK-0218/0219/0220 |
+| 17 | Completed | TASK-0220 |
+| 18 | Completed | TASK-0222/0223/0224 |
+
+Backlog is not fully cleared: issues 1, 2, 5, 8, and 13 remain open as optional GitHub issue seeds or unassigned tasks requiring roadmap selection.
+
 ## Proposed Issues
 
 ### 1. Improve scanner config examples
@@ -36,7 +63,7 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 - Labels: `type: docs`, `area: docs`, `priority: low`, `good first issue`
 - Goal: Create a first-five-minutes tutorial for `ackit`.
 - Status: Completed locally in `docs/FIRST_FIVE_MINUTES.md`.
-- Done when: Tutorial uses the published `0.2.0-alpha.3` install command, a timestamped synthetic demo repository, and verified core commands.
+- Done when: Tutorial uses the published `0.2.0-alpha.4` install command, a timestamped synthetic demo repository, and verified core commands.
 
 ### 7. Add docs site plan
 - Labels: `type: docs`, `area: docs`, `priority: low`
@@ -63,7 +90,7 @@ Apply labels from `docs/GITHUB_LABELS.md` manually after issue creation.
 
 ### 11. Sync published-package workflow pin/status
 - Labels: `type: maintenance`, `area: ci`, `priority: low`
-- Status: Completed by TASK-0213.
+- Status: Completed by TASK-0213 (pin updated to `0.2.0-alpha.3`) and TASK-0223 (pin updated to `0.2.0-alpha.4`).
 - Goal: Decide whether `cross-platform-smoke.yml` should install published `AgentContextKit` `0.2.0-alpha.3` instead of the historical alpha2 pin.
 - Done when: The workflow/status docs are intentionally aligned and focused workflow/static validation is recorded. Completed by updating the active workflow pin to `0.2.0-alpha.3`, preserving historical alpha2 evidence, recording local validation in TASK-0213, and recording hosted push-run evidence in TASK-0214.
 

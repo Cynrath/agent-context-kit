@@ -5,7 +5,7 @@ This matrix documents the tested and intended support surface for AgentContextKi
 ## Current Release
 - Package: `AgentContextKit`
 - Command: `ackit`
-- Current release: `v0.2.0-alpha.3`
+- Current release: `v0.2.0-alpha.4`
 - Previous release: `v0.2.0-alpha.2`
 - Target framework: .NET 10
 

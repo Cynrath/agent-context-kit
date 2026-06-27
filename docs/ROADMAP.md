@@ -40,7 +40,7 @@
 - TASK-0206 refreshed hosted RC evidence after release-gate hardening with run `27870246504` for exact commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`, then published `0.2.0-alpha.3`.
 - NuGet package verification and global tool install smoke passed.
 - Tag `v0.2.0-alpha.3` and GitHub prerelease `v0.2.0-alpha.3` exist and target the final publish SHA.
-- Post-alpha3 maintenance: TASK-0208 hardened the `release.yml` provenance probe; TASK-0209 selected analyzer-warning cleanup; TASK-0210 through TASK-0214 completed the post-alpha3 maintenance chain; TASK-0215 completed NuGet README rendering infrastructure via PR #1; TASK-0216 is current docs/queue simplification.
+- Post-alpha3 maintenance: TASK-0208 hardened the `release.yml` provenance probe; TASK-0209 selected analyzer-warning cleanup; TASK-0210 through TASK-0214 completed the post-alpha3 maintenance chain; TASK-0215 completed NuGet README rendering infrastructure via PR #1; TASK-0216 completed docs/queue simplification.
 
 ## v0.2.0-alpha.1
 - Published on GitHub and NuGet in TASK-0065.
@@ -257,4 +257,43 @@ PROJECT-CONTROL-0107 builds on the post-0106 work with a docs-first plan-then-ex
 - `TASK-0166` sample gallery coverage expansion.
 - `TASK-0167` final validation and hosted check sync.
 
-This track is also safe local-only work that does not change the published `0.2.0-alpha.2` package, the default CLI, JSON schema, SARIF profile, or the alpha.3 NO-GO posture. It does not close `RB-003` or `RB-008` and does not claim release readiness.
+This track is also safe local-only work that does not change the published `0.2.0-alpha.2` package, the default CLI, JSON schema, SARIF profile, or the alpha.3 NO-GO posture (historical; alpha.3 is now published). It does not close `RB-003` or `RB-008` (historical; both were later closed by TASK-0202) and does not claim release readiness.
+
+## v0.2.0-alpha.4
+
+- Published on GitHub and NuGet through TASK-0220 on 2026-06-26 from publish SHA `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
+- Ships the dedicated `README.nuget.md` package README rendering fix via NuGet for the first time.
+- Includes ACKit-first dogfood rules in AGENTS.md/CLAUDE.md.
+- TASK-0221 fixed the alpha4 release body and release workflow notes-file path.
+- TASK-0222 synced public docs to alpha4.
+- TASK-0223 updated published-package smoke pin to `0.2.0-alpha.4`.
+- TASK-0224 completed final audit and CI closure. All CI green for final HEAD `1bb43d4`.
+- TASK-0225 completed post-alpha4 roadmap triage and next-work selection; no blocking backlog reported.
+- TASK-0226 completed post-alpha4 code quality refresh; no blocking findings.
+- TASK-0227 completed post-alpha4 markdown source-of-truth and roadmap reset.
+- Alpha4 release train is closed.
+
+## Post-Alpha4 Roadmap Interpretation
+
+### Current State
+
+v0.2.0-alpha.4 is the current published release. Local v0.3/v0.4/v0.5 readiness assets exist as historical implementation evidence but do not automatically define the next implementation task. The V100 readiness/gap documents are still versioned for alpha3-era evidence; V100 is not the immediate next track unless a maintainer selects it.
+
+### Historical Context
+
+- The v0.3 label was originally used for CI mode, exit codes, HTML reports -- capabilities already shipped.
+- V0.4 covered the Web UI prototype -- already shipped.
+- V0.5 covered optional LLM integration, prompt pack, and context export -- already shipped.
+- These labels are historical; naming future packages v0.3.0-alpha would conflict with existing usage.
+
+### Recommended Next Paths
+
+After TASK-0227 source-of-truth reset, the next concrete roadmap branch should be one of:
+
+**A. V100 gap refresh track**: Refresh the gap register against alpha4 and select the smallest P0/P1 local-only gap. Best if docs drift is significant.
+
+**B. Web UI public preview track**: Sanitized screenshot / README visual preview. Best for visible product polish.
+
+**C. Optional interoperability/product track**: New feature design from `docs/INTEROPERABILITY_BACKLOG.md`. No dependency, no auto-install, no network by default.
+
+The source-of-truth reset in TASK-0227 evaluates available evidence and recommends which track to open next. See `docs/tasks/TASK-0227-post-alpha4-markdown-source-of-truth-and-roadmap-reset.md` for the decision.

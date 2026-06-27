@@ -7,11 +7,13 @@ AgentContextKit (`ackit`) is an offline-first .NET 10 CLI for AI-assisted reposi
 PROJECT-CONTROL-0110 closed at TASK-0196 (`b073c3d`) on 2026-06-19 with cumulative suite 428/428 green. Scope: MCP transport step 2 (real stdio loop with safety bounds), `ackit watch` local implementation, watch debounce/ignore-list/cancellation unit tests, trim edge case tests, `ackit.rules` MCP read-only metadata tool, localization parity for new commands and MCP step 2 error surface, docs update, docs-first audit + state sync, and final validation. No release, tag, NuGet publication, secret, or model-name disclosure was part of this control.
 
 ## Current Independent Task
-TASK-0215 completed the NuGet README rendering infrastructure via PR #1: `README.nuget.md`, `PackageReadmeFile` wiring, agent docs, and package metadata validation. Visible nuget.org README changes require a later authorized package publish. No NuGet publish, tag mutation, GitHub Release mutation, or release workflow dispatch occurred.
+TASK-0220 through TASK-0224 completed: `AgentContextKit 0.2.0-alpha.4` was published through the authorized OIDC release workflow on 2026-06-26, release body corrected, public docs synced, smoke pin updated, CI fully green. Alpha4 publish train is closed. Predecessor `0.2.0-alpha.3` remains published and immutable.
 
-TASK-0218 completed alpha4 NuGet README rendering release prep locally: source/package version updated to `0.2.0-alpha.4`, local package validation and install smoke passed, `README.nuget.md` confirmed packaged at root. Pushed at `b8e8fce` with CI green.
+TASK-0225 completed: post-alpha4 roadmap triage and next-work selection. No blocking backlog reported; roadmap reset deferred to TASK-0227.
 
-Current task: TASK-0220 through TASK-0224 completed. `AgentContextKit 0.2.0-alpha.4` was published through the authorized OIDC release workflow on 2026-06-26, release body corrected, public docs synced, smoke pin updated, CI fully green. Alpha4 publish train is closed. Predecessor `0.2.0-alpha.3` remains published and immutable.
+TASK-0226 completed: post-alpha4 code quality refresh. No blocking findings.
+
+Current task: TASK-0227 post-alpha4 markdown source-of-truth and roadmap reset. Audit all Markdown files, reconcile current-state drift after alpha4, classify stale references, and recommend the next concrete roadmap path. No release, tag, NuGet, version bump, GitHub issue creation, or feature implementation.
 
 TASK-0213 completed published-package workflow pin/status sync. Plan commit `647853c`; implementation commit `a18152d`. The active `.github/workflows/cross-platform-smoke.yml` workflow is the current published-package smoke workflow, so its `dotnet tool install --global AgentContextKit` pin was updated from historical `0.2.0-alpha.2` to current published `0.2.0-alpha.3`. Documentation-only examples already used alpha3. README.tr, release validation, maintainer guide, and maintainer handoff status text record the sync. Historical/predecessor alpha2 references remain intact. Validation passed with `ackit --version`, `ackit doctor`, `ackit scan --ci`, `git diff --check`, Markdown completeness guard, localization parity, release workflow static gate, focused pin grep, and `dotnet test AgentContextKit.sln -c Release --no-build` (`428/428`).
 
@@ -119,13 +121,13 @@ TASK-0187 is implemented and hosted-verified. It was inserted as a user-prioriti
 - No blocking, Critical, or High findings are present in the latest local scan.
 - Package URLs point to `https://github.com/Cynrath/agent-context-kit`.
 - GitHub repository is public.
-- Current release tag `v0.2.0-alpha.3` is pushed at exact publish commit `92984c6448332aa24b7cff94647f627bf944e535`.
+- Current release tag `v0.2.0-alpha.4` is pushed at exact publish commit `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
 - GitHub Actions latest `master` run is green.
 - Read-only GitHub CLI validation on 2026-06-06 confirmed `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` succeeded after `docs: add sample gallery and demo scenarios`.
 - Repository description and topics are set.
-- GitHub Release page for `v0.2.0-alpha.3` is completed as a pre-release with validated package assets.
-- NuGet package `AgentContextKit` version `0.2.0-alpha.3` is published through GitHub OIDC Trusted Publishing.
-- NuGet global tool install and full disposable smoke verification are completed for `0.2.0-alpha.3`.
+- GitHub Release page for `v0.2.0-alpha.4` is completed as a pre-release with validated package assets.
+- NuGet package `AgentContextKit` version `0.2.0-alpha.4` is published through GitHub OIDC Trusted Publishing.
+- NuGet global tool install and full disposable smoke verification are completed for `0.2.0-alpha.4`.
 - NuGet global tool smoke test is completed, including `ackit --help` and Web UI generation.
 - Cross-platform CI smoke workflow succeeded on commit `868dff3` for Windows, Ubuntu, and macOS.
 - Codex for OSS form submission is completed per maintainer-provided status.
@@ -197,7 +199,7 @@ powershell -ExecutionPolicy Bypass -File scripts/verify-release.ps1
 - NuGet smoke test: completed.
 - Cross-platform smoke workflow: completed successfully on Windows, Ubuntu, and macOS.
 - Codex for OSS form submission is completed per maintainer-provided status.
-- Current release publication: TASK-0206 records `v0.2.0-alpha.3` tag push, GitHub pre-release, NuGet publish, global tool install verification, and immutable release verification. TASK-0065 remains historical alpha.1 evidence.
+- Current release publication: TASK-0220 records `v0.2.0-alpha.4` tag push, GitHub pre-release, NuGet publish, global tool install verification, and immutable release verification. Predecessor `v0.2.0-alpha.3` publication remains recorded in TASK-0206.
 - `docs/MAINTAINER_RELEASE_HANDOFF.md` contains the current published release state and future release guidance.
 - GitHub contributor workflow docs were added in TASK-0057: `docs/MAINTAINER_GUIDE.md`, `docs/SUPPORT_MATRIX.md`, `docs/CONTRIBUTOR_ONBOARDING.md`, `docs/GITHUB_REPO_HYGIENE.md`, and `docs/ISSUE_TRIAGE.md`.
 - Public repository presentation docs were added in TASK-0058: `docs/GITHUB_LABELS.md` and `docs/GITHUB_SETTINGS_CHECKLIST.md`.

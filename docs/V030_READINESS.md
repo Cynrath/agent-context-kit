@@ -28,7 +28,7 @@ powershell -ExecutionPolicy Bypass -File scripts/check-v030-readiness.ps1 -FailO
 
 ## Current Public State
 - Repository and package URLs are finalized at `https://github.com/Cynrath/agent-context-kit`.
-- Current published release is `v0.2.0-alpha.3` on GitHub and NuGet.
+- Current published release is `v0.2.0-alpha.4` on GitHub and NuGet. Predecessor `v0.2.0-alpha.3` remains published and immutable.
 - Future package publication, tags, and GitHub Release changes remain maintainer-only actions.
 
 ## Required Validation

@@ -158,7 +158,7 @@ PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/42
 
 ## Completed Local Execution
 - TASK-0066 through TASK-0099 are completed locally.
-- The current published release is `v0.2.0-alpha.3`; `v0.2.0-alpha.2` remains historical predecessor evidence.
+- The current published release is `v0.2.0-alpha.4`; `v0.2.0-alpha.3` remains historical predecessor evidence.
 - Standard `ci`, published-package smoke, and source-package smoke are green for current remote `master`.
 - The release-candidate evidence boundary remains `LOCAL READY / REMOTE NO-GO` where applicable.
 - Completed local documentation, tests, and gates do not claim 1.0 readiness or close remote P0/P1 decisions.
@@ -195,9 +195,9 @@ These actions require explicit maintainer control and do not block safe local-on
 17. TASK-0116 ecosystem documentation consistency and local link audit - completed.
 
 ## Current Remote State
-- Current published release: `v0.2.0-alpha.3` at exact publish commit `92984c6448332aa24b7cff94647f627bf944e535`.
-- GitHub Release: `v0.2.0-alpha.3` published pre-release.
-- NuGet package: `AgentContextKit` `0.2.0-alpha.3`, published through OIDC Trusted Publishing.
+- Current published release: `v0.2.0-alpha.4` at exact publish commit `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
+- GitHub Release: `v0.2.0-alpha.4` published pre-release.
+- NuGet package: `AgentContextKit` `0.2.0-alpha.4`, published through OIDC Trusted Publishing.
 - Published global tool includes `ackit sarif`.
 - Local and remote `master` were aligned at PROJECT-CONTROL-0102 start on `8dadd16`.
 - All eight checked `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` jobs succeeded for `8dadd16`.
@@ -211,7 +211,7 @@ These actions require explicit maintainer control and do not block safe local-on
 
 ## Completed Independent Alpha.4 Release Prep
 
-1. TASK-0218 alpha4 NuGet README rendering release prep - completed locally. Source/package version updated to `0.2.0-alpha.4`; local package verification and install smoke passed; `README.nuget.md` confirmed packaged. `0.2.0-alpha.3` remains the current published NuGet version.
+1. TASK-0218 alpha4 NuGet README rendering release prep - completed locally. Source/package version updated to `0.2.0-alpha.4`; local package verification and install smoke passed; `README.nuget.md` confirmed packaged.
 
 ## Next Task
 - TASK-0220 completed: `AgentContextKit 0.2.0-alpha.4` published through the authorized OIDC release workflow on 2026-06-26. TASK-0221 completed: alpha4 release body fixed, release workflow notes-file hardened, ACKit-first dogfood rules added. TASK-0222 completed: public README/docs synced to alpha4. TASK-0223 completed: published-package smoke pin updated to alpha4. TASK-0224 completed: final audit and CI closure. All push-triggered CI for HEAD `1bb43d4` is green. Alpha4 publish train is closed.

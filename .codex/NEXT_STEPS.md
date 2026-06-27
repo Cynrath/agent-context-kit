@@ -2,7 +2,7 @@
 
 PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 completed TASK-0177 through TASK-0180, then inserted user-prioritized TASK-0187 before TASK-0181 to audit and harden the visible `nuget-release` failed deployments without release/tag/NuGet/deployment mutation.
 
-1. Current published release: `v0.2.0-alpha.3` at exact publish commit `92984c6448332aa24b7cff94647f627bf944e535`.
+1. Current published release: `v0.2.0-alpha.4` at exact publish commit `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
 2. PROJECT-CONTROL-0109 planning commit `b224c20` is the active entry point; TASK-0177 is hosted-verified and TASK-0178 implementation commit `336c3ee` plus evidence commit `90928f1` are pushed.
 3. PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176: post-0107 audit and state sync; Anthropic and Continue generate targets; safe `ackit hooks`; `ackit diff`; `ackit trim`; `ackit watch` (design-only); ACKIT008 HighEntropyString rule; MCP stdio design-only; final validation and CI gate fix.
 4. Local TASK-0177 validation on 2026-06-18: `dotnet build` clean (0 warnings, 0 errors), focused hook tests 6/6 green, full suite 276/276 green, source `ackit scan --ci` exit 0 with existing Medium `.remember` log findings only, `ackit doctor` 13/13 PASS, `verify-release.ps1` passed, `check-cli-contract` and `check-localization-parity` passed. `check-tracked-vs-untracked-md` is rerun after staging because the new test file is intentionally untracked before commit.
@@ -59,3 +59,6 @@ PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green
 53. TASK-0218 completed alpha4 release prep: source/package version updated to `0.2.0-alpha.4`, local package validation and install smoke passed, `README.nuget.md` confirmed packaged. Pushed at `b8e8fce`.
 54. TASK-0219 verified alpha4 hosted RC evidence (run `28208545684`). Decision: GO.
 55. TASK-0220 published `AgentContextKit 0.2.0-alpha.4` through authorized OIDC release workflow on 2026-06-26. Release commit: `98cdf97`. NuGet package, tag `v0.2.0-alpha.4`, and GitHub prerelease verified. Global tool install from NuGet confirmed. `README.nuget.md` package README fix shipped. TASK-0221 completed: alpha4 release body fixed, release workflow notes-file no longer hardcodes `RELEASE_BODY_V020_ALPHA2.md`, ACKit-first dogfood rules added. TASK-0222 completed: public README/docs synced to alpha4. TASK-0223 completed: published-package smoke pin updated to `0.2.0-alpha.4`. TASK-0224 completed: final audit and CI closure verified. All push-triggered CI for final HEAD `1bb43d4` is green. Alpha4 publish train is closed.
+56. TASK-0225 completed: post-alpha4 roadmap triage and next-work selection. No blocking backlog reported; next steps deferred to source-of-truth sync.
+57. TASK-0226 completed: post-alpha4 code quality refresh. No blocking findings reported.
+58. Current task: TASK-0227: post-alpha4 markdown source-of-truth and roadmap reset. Audit all markdown files, reconcile current-state drift after alpha4, and recommend the next real roadmap path.
