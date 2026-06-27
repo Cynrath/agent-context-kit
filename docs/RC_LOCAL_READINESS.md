@@ -3,7 +3,7 @@
 The local/remote boundary is summarized in `docs/RELEASE_BLOCKER_BOARD.md`. Local readiness evidence does not close hosted, security-setting, ownership, signing, SBOM, provenance, recovery, candidate, or approval rows.
 
 ## Decision
-**LOCAL READY / REMOTE NO-GO** as of 2026-06-13.
+**LOCAL READY / REMOTE NO-GO** as of 2026-06-27 (TASK-0230 refresh).
 
 The current source tree has complete local release-candidate evidence for its documented contract, localization, security regression, dependency, package, and repository-hygiene checks. This is not a release approval. Hosted evidence, remote security settings, supply-chain decisions, candidate version selection, and maintainer sign-off remain incomplete.
 
@@ -12,14 +12,14 @@ Standard hosted `ci`, published-package smoke, and source-package smoke are gree
 ## Locally Verified Evidence
 | Area | Evidence | Local Status |
 | --- | --- | --- |
-| Build and tests | .NET 10 restore and zero-warning Release build; 186/186 tests | VERIFIED LOCAL |
+| Build and tests | .NET 10 restore and zero-warning Release build; 428/428 tests (TASK-0230 refresh) | VERIFIED LOCAL |
 | CLI and config contracts | help/exit/config convention gates and read-only config diagnostics | VERIFIED LOCAL |
 | Machine-readable contracts | command JSON schema `2`, baseline schema `1`, SARIF `2.1.0` profile, sanitized golden fixtures | VERIFIED LOCAL |
 | Baseline behavior | deterministic sanitized fingerprints, integrity checks, existing/new classification, output parity | VERIFIED LOCAL |
 | Localization | English/Turkish human output, known errors, exits, and language-independent JSON semantics | VERIFIED LOCAL |
 | Security regression | Critical token coverage, unsuppressible Critical policy, clean self-scan and hygiene checks | VERIFIED LOCAL |
 | Dependencies | direct/transitive vulnerability and deprecation reviews clean after xUnit v3 migration | VERIFIED LOCAL |
-| Performance tripwire | disposable 2,000-file scan completed in 3.495 seconds against a 30-second local threshold | VERIFIED LOCAL |
+| Performance tripwire | disposable 2,000-file scan completed in 5.446 seconds (standalone) / 7.635s (RC gate) against a 30-second local threshold (TASK-0230 refresh at HEAD `583b62e`) | VERIFIED LOCAL |
 | Package | local pack, isolated tool install, help, scan JSON, and package metadata verification | VERIFIED LOCAL |
 | Samples and outputs | sample smoke, doctor, JSON/SARIF parse, and local release verification | VERIFIED LOCAL |
 

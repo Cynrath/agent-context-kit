@@ -1,5 +1,38 @@
 # Release Validation
 
+## v0.2.0-alpha.4 Local Gate Refresh (TASK-0230)
+
+TASK-0230 ran all local V100 contract/readiness gates against the current source at HEAD `583b62e` on 2026-06-27.
+
+All gates passed:
+
+| Gate | Result |
+| --- | --- |
+| `check-v100-readiness.ps1 -FailOnIssues` | PASS (all historical assets present) |
+| `check-v100-documentation-release-gates.ps1 -FailOnIssues` | PASS (all release-critical docs and scripts present) |
+| `check-cli-contract.ps1 -FailOnIssues` | PASS (all 13 JSON-capable commands, exit codes, help signatures) |
+| `check-config-generated-conventions.ps1 -FailOnIssues` | PASS (all config/generated paths and conventions) |
+| `check-json-contract-assets.ps1 -FailOnIssues` | PASS (all 3 schemas, 2 golden fixtures, 13-command coverage) |
+| `check-localization-parity.ps1 -FailOnIssues` | PASS (en/tr parity, Turkish help smoke, JSON invariance) |
+| `check-rc-local-readiness.ps1 -FailOnIssues` | PASS (local ready / remote NO-GO) |
+| 2,000-file performance tripwire (standalone) | 5.446s PASS (30s threshold) |
+| 2,000-file performance tripwire (via RC gate) | 7.635s PASS (30s threshold) |
+
+Local command evidence at HEAD `583b62e`:
+
+| Command | Status | Evidence |
+| --- | --- | --- |
+| `ackit --help` | exit 0 | All 17 commands listed |
+| `ackit version` | exit 0 | `AgentContextKit 0.2.0-alpha.4` |
+| `ackit scan --ci` | exit 0 | Expected Medium/Low findings only |
+| `ackit config-check --json` | exit 0 | schemaVersion 1, 0 diagnostics |
+| `ackit sarif --output .ackit/reports/v100-alpha4.sarif --json` | exit 0 | SARIF 2.1.0 generated |
+| `ackit webui --output .ackit/webui/v100-alpha4.html --json` | exit 0 | Web UI created |
+| `ackit prompt-pack --output .ackit/prompt-packs/v100-alpha4.md --json` | exit 0 | Dry-run prompt pack created |
+| `ackit context-export --prompt-pack .ackit/prompt-packs/v100-alpha4.md --approve --output .ackit/context-exports/v100-alpha4.json --json` | exit 0 | Context export manifest created |
+
+Generated `.ackit/` artifacts are local-only and not committed. This evidence refresh does not close any P0/P1 gap that requires hosted RC evidence, maintainer approval, or remote settings.
+
 ## v0.2.0-alpha.4 Hosted RC Evidence
 
 TASK-0219 verified the exact alpha4 candidate commit `b8e8fce68f803c50f708d1566f1a38aab4b34bde` through hosted release-candidate evidence.

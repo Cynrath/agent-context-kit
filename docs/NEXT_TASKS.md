@@ -214,8 +214,8 @@ These actions require explicit maintainer control and do not block safe local-on
 1. TASK-0218 alpha4 NuGet README rendering release prep - completed locally. Source/package version updated to `0.2.0-alpha.4`; local package verification and install smoke passed; `README.nuget.md` confirmed packaged.
 
 ## Next Task
-- TASK-0228 completed: V100 gap register refresh against alpha4. All gaps classified; no P0/P1 gaps closed.
-- Current task: TASK-0229 public presentation screenshot asset and Web UI preview. Produce a sanitized Web UI dashboard screenshot from a synthetic demo repository and wire it into public documentation. Advances V100-12.
+- TASK-0229 completed: sanitized Web UI dashboard screenshot committed at `docs/assets/screenshots/ackit-webui-preview-alpha4.webp`. V100-12 advanced.
+- Current task: TASK-0230 V100 local contract and readiness gate rerun against alpha4. Rerun all local V100 contract/readiness gates against current source and record fresh evidence for V100-01/02/03/04/07/10.
 
 ## Execution Rule
 After the closure of PROJECT-CONTROL-0110, the queue is in pause except for explicitly requested independent docs/release-preparation tasks. Tag, GitHub pre-release, NuGet publication, and workflow dispatch are allowed only through the explicitly authorized release task and OIDC workflow. Never expose credentials or use force/history-rewrite operations.
