@@ -53,9 +53,12 @@ Default commands process repository content locally: no repository upload, AI AP
 
 The Web UI dashboard shows readiness score, stack signals, health checks, findings, generated context files, and task previews.
 
+![AgentContextKit Web UI dashboard preview](docs/assets/screenshots/ackit-webui-preview-alpha4.webp)
+*Sanitized preview from a synthetic demo repository. No local paths, secrets, or private data are visible.*
+
 ![AgentContextKit flow](docs/assets/diagrams/ackit-flow.svg)
 
-Screenshots are intentionally not committed yet until sanitized assets are available. See [Web UI Preview](docs/WEB_UI_PREVIEW.md), [Visual Assets](docs/VISUAL_ASSETS.md), [Sample Gallery](docs/SAMPLE_GALLERY.md), and [Demo Scenarios](docs/DEMO_SCENARIOS.md).
+See [Web UI Preview](docs/WEB_UI_PREVIEW.md), [Visual Assets](docs/VISUAL_ASSETS.md), [Sample Gallery](docs/SAMPLE_GALLERY.md), and [Demo Scenarios](docs/DEMO_SCENARIOS.md).
 
 ---
 

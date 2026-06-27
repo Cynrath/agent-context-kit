@@ -37,6 +37,9 @@ logs/
 .ackit/prompt-packs/
 .ackit/context-exports/
 
+# Demo/synthetic repos
+.ackit-demo/
+
 # Archives and backups
 *.zip
 *.rar

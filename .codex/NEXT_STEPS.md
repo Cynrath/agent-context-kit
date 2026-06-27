@@ -62,4 +62,5 @@ PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green
 56. TASK-0225 completed: post-alpha4 roadmap triage and next-work selection. No blocking backlog reported; next steps deferred to source-of-truth sync.
 57. TASK-0226 completed: post-alpha4 code quality refresh. No blocking findings reported.
 58. TASK-0227 completed: post-alpha4 markdown source-of-truth and roadmap reset. All current-state references corrected; roadmap interpretation added.
-59. Current task: TASK-0228: V100 gap register refresh against alpha4. Classify each V100 gap against alpha4 evidence, update the gap register, and recommend next task from the refreshed gap register.
+59. TASK-0228 completed: V100 gap register refresh against alpha4. All gaps classified; no P0/P1 gaps closed.
+60. Current task: TASK-0229: public presentation screenshot asset and Web UI preview. Capture a sanitized Web UI dashboard screenshot from a synthetic demo repository and wire it into README.

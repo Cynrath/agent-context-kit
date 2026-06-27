@@ -23,9 +23,12 @@ Kaynak notu: yayinlanmis `0.2.0-alpha.4` NuGet paketi `ackit sarif` komutunu ice
 ## Preview
 Web UI dashboard; readiness score, stack signals, health checks, findings, generated context files ve task previews alanlarini gosterir.
 
+![AgentContextKit Web UI gosterim](docs/assets/screenshots/ackit-webui-preview-alpha4.webp)
+*Sentetik demo reposundan sanitize edilmis onizleme. Yerel yol, gizli bilgi veya kisisel veri icermez.*
+
 ![AgentContextKit flow](docs/assets/diagrams/ackit-flow.svg)
 
-Screenshot dosyalari, sanitize edilmis public asset hazir olana kadar bilerek commitlenmez. Ayrinti icin [Web UI Preview](docs/WEB_UI_PREVIEW.md), [Visual Assets](docs/VISUAL_ASSETS.md), [Sample Gallery](docs/SAMPLE_GALLERY.md) ve [Demo Scenarios](docs/DEMO_SCENARIOS.md) dosyalarina bakin.
+Ayrinti icin [Web UI Preview](docs/WEB_UI_PREVIEW.md), [Visual Assets](docs/VISUAL_ASSETS.md), [Sample Gallery](docs/SAMPLE_GALLERY.md) ve [Demo Scenarios](docs/DEMO_SCENARIOS.md) dosyalarina bakin.
 
 ## İlgili ekosistem
 

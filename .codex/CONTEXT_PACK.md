@@ -13,7 +13,7 @@ TASK-0225 completed: post-alpha4 roadmap triage and next-work selection. No bloc
 
 TASK-0226 completed: post-alpha4 code quality refresh. No blocking findings.
 
-Current task: TASK-0228 V100 gap register refresh against alpha4. Refresh V100 / 1.0 readiness gap documents against the real post-alpha4 state. Documentation and evidence-classification only. No release, tag, NuGet, version bump, GitHub issue creation, or feature implementation.
+Current task: TASK-0229 public presentation screenshot asset and Web UI preview. Produce a sanitized Web UI dashboard screenshot from a synthetic demo repository and wire it into public documentation. Advances V100-12.
 
 TASK-0213 completed published-package workflow pin/status sync. Plan commit `647853c`; implementation commit `a18152d`. The active `.github/workflows/cross-platform-smoke.yml` workflow is the current published-package smoke workflow, so its `dotnet tool install --global AgentContextKit` pin was updated from historical `0.2.0-alpha.2` to current published `0.2.0-alpha.3`. Documentation-only examples already used alpha3. README.tr, release validation, maintainer guide, and maintainer handoff status text record the sync. Historical/predecessor alpha2 references remain intact. Validation passed with `ackit --version`, `ackit doctor`, `ackit scan --ci`, `git diff --check`, Markdown completeness guard, localization parity, release workflow static gate, focused pin grep, and `dotnet test AgentContextKit.sln -c Release --no-build` (`428/428`).
 

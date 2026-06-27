@@ -1,6 +1,6 @@
 # Screenshot Capture Plan
 
-Status: capture plan approved locally; no public screenshot asset is approved or committed yet.
+Status: capture plan approved; first dashboard asset committed. `docs/assets/screenshots/ackit-webui-preview-alpha4.webp` captured via TASK-0229 from a synthetic demo repository. Remaining candidates (report overview, scan terminal) are deferred until future tasks.
 
 ## Goal
 Add useful README and documentation previews later without publishing local paths, private repository data, raw scanner matches, or generated local HTML.

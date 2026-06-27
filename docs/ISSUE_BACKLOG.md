@@ -14,7 +14,7 @@ The alpha4 release train is closed. Proposed issues below are classified as foll
 | 2 | Still open optional GitHub issue seed | Not implemented; needs maintainer Code Scanning decision |
 | 3 | Superseded | TASK-0072/0093 completed JSON schema contracts |
 | 4 | Superseded | TASK-0073/0019 completed exit code contracts |
-| 5 | Still open optional GitHub issue seed | Capture plan exists (SCREENSHOT_CAPTURE_PLAN.md); manual capture and commit remain |
+| 5 | Completed (TASK-0229) | Sanitized Web UI screenshot committed at `docs/assets/screenshots/ackit-webui-preview-alpha4.webp` |
 | 6 | Completed | TASK-0079/FIRST_FIVE_MINUTES.md |
 | 7 | Completed | TASK-0078/DOCS_SITE_PLAN.md |
 | 8 | Needs roadmap selection | Not implemented; no TASK assigned |
@@ -29,7 +29,7 @@ The alpha4 release train is closed. Proposed issues below are classified as foll
 | 17 | Completed | TASK-0220 |
 | 18 | Completed | TASK-0222/0223/0224 |
 
-Backlog is not fully cleared: issues 1, 2, 5, 8, and 13 remain open as optional GitHub issue seeds or unassigned tasks requiring roadmap selection.
+Backlog is not fully cleared: issues 1, 2, 8, and 13 remain open as optional GitHub issue seeds or unassigned tasks requiring roadmap selection.
 
 ## Proposed Issues
 
@@ -53,11 +53,12 @@ Backlog is not fully cleared: issues 1, 2, 5, 8, and 13 remain open as optional 
 - Goal: Harden documented exit code behavior.
 - Done when: Tests cover scan, scan CI, redact-check, SARIF missing output, and invalid commands.
 
-### 5. Add screenshot assets after sanitization
+### 5. Add screenshot assets after sanitization (completed)
 - Labels: `type: docs`, `area: docs`, `priority: low`
+- Status: Completed by TASK-0229. Sanitized Web UI dashboard screenshot committed at `docs/assets/screenshots/ackit-webui-preview-alpha4.webp`. See TASK-0229 for privacy review evidence.
 - Goal: Add public-safe README/Web UI preview images.
-- Plan: Follow `docs/SCREENSHOT_CAPTURE_PLAN.md`; the capture plan is complete, but manual image capture and review remain open.
-- Done when: Assets contain no local paths, usernames, machine names, secrets, private data, browser chrome, or retained metadata and are linked from both README files.
+- Plan: Follow `docs/SCREENSHOT_CAPTURE_PLAN.md`; capture completed in TASK-0229 from a disposable synthetic demo repository.
+- Done when: Assets contain no local paths, usernames, machine names, secrets, private data, browser chrome, or retained metadata and are linked from both README files. PASS: Both README.md and README.tr.md link the asset.
 
 ### 6. Add quickstart tutorial
 - Labels: `type: docs`, `area: docs`, `priority: low`, `good first issue`

@@ -16,6 +16,9 @@ ackit webui --output .ackit/webui/demo.html
 
 The published NuGet `0.2.0-alpha.3` global tool supports `ackit webui` and `ackit sarif`.
 
+## Public Preview Asset
+A sanitized Web UI dashboard screenshot is committed at `docs/assets/screenshots/ackit-webui-preview-alpha4.webp`. It was captured from a disposable synthetic demo repository, cropped to the dashboard region, and stripped of metadata. See `docs/SCREENSHOT_CAPTURE_PLAN.md` and `docs/VISUAL_ASSETS.md` for the capture and review process.
+
 ## Public Artifact Rule
 Generated Web UI HTML can include local repository paths and local audit context. Keep it local and do not publish it as a GitHub Release asset, NuGet package asset, or committed docs file.
 
@@ -37,8 +40,12 @@ Generated Web UI HTML can include local repository paths and local audit context
 - No raw finding match.
 - No generated `.ackit` HTML committed.
 
+## Completed
+- First sanitized Web UI dashboard screenshot captured via TASK-0229 and committed as `docs/assets/screenshots/ackit-webui-preview-alpha4.webp`.
+- README.md and README.tr.md updated with the screenshot reference.
+- Visual asset checklist passed: no absolute path, private username, secret, machine name, raw finding match, browser chrome, or local file URL.
+- Image metadata stripped (zero EXIF, zero private fields).
+
 ## Future Plan
-- Capture the first sanitized asset using `docs/SCREENSHOT_CAPTURE_PLAN.md`.
-- Add a Web UI preview image to README.
-- Add a GitHub README image once the asset passes the visual asset checklist.
 - Consider an optional short GIF demo later if it stays small and sanitized.
+- Consider docs-site activation for hosted documentation pages.
