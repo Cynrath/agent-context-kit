@@ -1,6 +1,6 @@
 # Project Map
 
-Updated: 2026-06-13
+Updated: 2026-07-10
 
 ## Stack
 - .NET: .sln/.slnx/*proj/Program.cs
@@ -218,6 +218,8 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - `docs/V100_DOCUMENTATION_RELEASE_GATE_FREEZE.md`
 - `docs/V100_READINESS.md`
 - `docs/V100_GAP_ANALYSIS.md`
+- `docs/V100_MAINTAINER_DECISION_PACKET.md`
+- `docs/V100_FINAL_CANDIDATE_LOCAL_SELECTION.md`
 - `docs/HOSTED_VALIDATION_STATUS.md`
 - `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`
 - `docs/SECURITY_NOTIFICATION_OWNERSHIP.md`
@@ -310,6 +312,7 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - `tests/AgentContextKit.Tests/AgentContextKitBehaviorTests.cs`
 - `tests/AgentContextKit.Tests/BaselinePolicyTests.cs`
 - `tests/AgentContextKit.Tests/ReleaseCandidateEvidenceTests.cs`
+- `tests/AgentContextKit.Tests/PerformanceResourceEvidenceTests.cs`
 - `tests/AgentContextKit.Tests/ConfigurationValidationTests.cs`
 - `tests/AgentContextKit.Tests/LocalizationParityTests.cs`
 - `tests/fixtures/upgrade/v0.2.0-alpha.2-config.yml`
@@ -319,6 +322,7 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - `tests/fixtures/contracts/sarif-profile-v1-golden.json`
 
 ## v1.0 Tracking
+- Current safe/local completion chain: `docs/tasks/TASK-0232-v100-maintainer-decision-packet-and-source-of-truth-reconciliation.md` through `docs/tasks/TASK-0238-v100-final-local-readiness-audit-and-safe-chain-closeout.md`, `docs/V100_MAINTAINER_DECISION_PACKET.md`, and `docs/V100_FINAL_CANDIDATE_LOCAL_SELECTION.md`; it stops at manual hosted RC dispatch and does not claim RC/1.0 readiness.
 - Release-candidate local evidence and decision package: `docs/RELEASE_CANDIDATE_EVIDENCE.md`, `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md`, `docs/MAINTAINER_RC_DECISION.md`, upgrade fixtures, disposable performance benchmark, security/support/supply-chain policies, and `scripts/check-release-candidate-evidence.ps1`.
 - Machine-readable and localization contract hardening: `docs/tasks/TASK-0093-json-schema-golden-contract-assets.md`, `docs/tasks/TASK-0094-localization-parity-release-gate.md`, `docs/schemas/`, `tests/fixtures/contracts/`, `tests/AgentContextKit.Tests/JsonContractAssetTests.cs`, `tests/AgentContextKit.Tests/LocalizationParityTests.cs`, `scripts/check-json-contract-assets.ps1`, and `scripts/check-localization-parity.ps1`.
 - Security/supply-chain maintainer evidence handoff: `docs/tasks/TASK-0095-security-supply-chain-maintainer-evidence.md`, `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md`, `docs/MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md`, and `scripts/check-security-supply-chain-evidence.ps1`.

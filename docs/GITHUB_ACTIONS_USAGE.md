@@ -28,7 +28,7 @@ Exit behavior:
 Use the published package for stable CI checks:
 
 ```yaml
-- run: dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
+- run: dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
 - run: echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 - run: ackit scan --ci
 ```
@@ -41,10 +41,10 @@ See `docs/examples/github-actions-scan-ci.yml`.
 Use it after `scan --ci` so risk findings are handled first. A minimal demo app can fail `doctor` because it intentionally lacks full OSS metadata; that is expected health reporting, not necessarily a tool failure.
 
 ## SARIF Output And Code Scanning Decision
-`ackit sarif --output .ackit/reports/ackit.sarif` is available in current source and the `0.2.0-alpha.3` package. The published NuGet package `0.2.0-alpha.3` includes this command.
+`ackit sarif --output .ackit/reports/ackit.sarif` is available in current source and the `0.2.0-alpha.4` package. The published NuGet package `0.2.0-alpha.4` includes this command.
 
 Use one of these approaches:
-- Install the published `0.2.0-alpha.3` package in CI.
+- Install the published `0.2.0-alpha.4` package in CI.
 - Pack the current branch locally and install from the temporary package source.
 
 SARIF output is local-only by default. It uses repository-relative artifact locations and does not write raw scanner match values into result messages.
@@ -57,7 +57,7 @@ The recommended first opt-in is a manual `workflow_dispatch` job using the pinne
 Published tool smoke validates the package users install from NuGet. It should stay pinned to the current published version:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
 ackit version
 ackit --help
 ackit scan --ci
@@ -67,7 +67,7 @@ Source package smoke validates the current branch before future publication. Use
 
 ```powershell
 dotnet pack src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -o $pkg
-dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --version 0.2.0-alpha.3 --ignore-failed-sources
+dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --version 0.2.0-alpha.4 --ignore-failed-sources
 ```
 
 See:
@@ -86,7 +86,7 @@ The baseline diff workflow runs `ackit scan --baseline <path> --ci` so new High 
 
 See [RC_HOSTED_EVIDENCE.md](RC_HOSTED_EVIDENCE.md) before manually dispatching the RC workflow.
 
-Current alpha.3 publication is complete. TASK-0206 published final SHA `92984c6448332aa24b7cff94647f627bf944e535` after refreshed hosted RC evidence run `27870246504` for commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`; Windows, Ubuntu, and macOS evidence jobs all succeeded. TASK-0208 hardened `release.yml` so a future publish path treats missing release asset attestation HTTP 404 as `exists=false` and proceeds to `actions/attest@v4`; no workflow dispatch or release mutation occurred in TASK-0208.
+Current alpha.4 publication is complete at final publish SHA `98cdf9723a509a347bd0403f6373dafe81ba03fb`. Alpha.3 publication and hosted evidence remain historical exact-commit records. TASK-0236 prepares the next final-candidate manual hosted tuple but does not dispatch it.
 
 For a future different candidate, use the exact selected `origin/master` tuple:
 
@@ -94,16 +94,16 @@ For a future different candidate, use the exact selected `origin/master` tuple:
 $commitSha = (git rev-parse origin/master).Trim()
 pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-candidate-inputs.ps1 `
   -CommitSha $commitSha `
-  -CandidateVersion 0.2.0-alpha.3 `
-  -PredecessorVersion 0.2.0-alpha.2 `
+  -CandidateVersion 0.2.0-alpha.4 `
+  -PredecessorVersion 0.2.0-alpha.3 `
   -RequireOriginMaster
 
 gh workflow run release-candidate-evidence.yml `
   --repo Cynrath/agent-context-kit `
   --ref master `
   -f commit_sha=$commitSha `
-  -f candidate_version=0.2.0-alpha.3 `
-  -f predecessor_version=0.2.0-alpha.2
+  -f candidate_version=0.2.0-alpha.4 `
+  -f predecessor_version=0.2.0-alpha.3
 ```
 
 This manual workflow does not publish, tag, create a GitHub Release, upload artifacts, upload SARIF, or approve release publication. TASK-0205 records exact-candidate GO for a later publish task only; no release workflow dispatch or publication was performed.
@@ -132,7 +132,7 @@ Upload SARIF only when:
 
 ## When Not To Upload SARIF
 Do not upload SARIF when:
-- using a package version older than `0.2.0-alpha.3`, because it does not include the current published command surface;
+- using a package version older than `0.2.0-alpha.4`, because it does not represent the current published command surface;
 - reviewing a private or sensitive repository without approval;
 - findings include data that should not appear in a public security integration;
 - repository permissions have not been reviewed; or

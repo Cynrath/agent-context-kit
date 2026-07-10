@@ -112,4 +112,4 @@ Completed on 2026-07-10.
 - Local workflow static gate, positive/negative input fixtures, and alpha4/alpha3 current-HEAD input validation all passed.
 - No `gh workflow run`, workflow rerun, package/tag/release/settings/secret/provenance mutation, or hosted result claim occurred.
 
-Commit: recorded after creation. The next task is TASK-0237.
+Commit: `6aa5a6b`. The next task is TASK-0237.

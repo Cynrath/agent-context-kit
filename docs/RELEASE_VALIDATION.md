@@ -262,7 +262,7 @@ The 2026-06-12 post-migration review found no vulnerable or deprecated direct/tr
 
 The `sarif` command is available in current source and in the published NuGet `0.2.0-alpha.4` global tool.
 
-## Local v0.2.0-alpha.3 Candidate Package Validation
+## Historical Local v0.2.0-alpha.3 Candidate Package Validation
 Use temporary directories outside the repository:
 
 ```powershell
@@ -520,12 +520,12 @@ dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --versi
 ```
 
 ## Published NuGet Smoke Test
-The `AgentContextKit` version `0.2.0-alpha.3` published global tool has been smoke-tested from NuGet during TASK-0206:
+The current `AgentContextKit` version `0.2.0-alpha.4` published global tool was smoke-tested from NuGet during TASK-0220:
 
-- `ackit version` returned `AgentContextKit 0.2.0-alpha.3`.
+- `ackit version` returned `AgentContextKit 0.2.0-alpha.4`.
 - `ackit --help` worked.
 - `ackit doctor` passed in the repository after global reinstall.
-- `scripts/verify-published-package.ps1 -Version 0.2.0-alpha.3` passed its disposable package verification and smoke flow.
+- `scripts/verify-published-package.ps1 -Version 0.2.0-alpha.4` passed its disposable package verification and smoke flow.
 
 Historical `0.2.0-alpha.2` smoke evidence remains valid for that release and included `ackit webui`, `ackit init --lang tr`, `ackit scan --ci`, `ackit generate --target all --lang tr`, `ackit task`, `ackit report`, `ackit sarif`, fake-secret detection, JSON commands, prompt pack, and context export.
 
@@ -536,7 +536,7 @@ Historical `0.2.0-alpha.2` smoke evidence remains valid for that release and inc
 
 Current public examples and package verification docs reference `AgentContextKit` version `0.2.0-alpha.4`. TASK-0223 updates `.github/workflows/cross-platform-smoke.yml` to pin the installed version to `0.2.0-alpha.4`.
 
-Current alpha.3 hosted result:
+Historical alpha.3 hosted result:
 - Workflow: `cross-platform-smoke`.
 - Run: `27940146487`.
 - URL: `https://github.com/Cynrath/agent-context-kit/actions/runs/27940146487`.

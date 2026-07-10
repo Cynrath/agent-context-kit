@@ -12,9 +12,11 @@ TASK-0236 prepares the next manual `release-candidate-evidence.yml` tuple withou
 
 No V100 final-candidate run ID or hosted result exists yet. Historical results below remain valid only for their exact commits and must not be relabeled as final-candidate evidence.
 
-TASK-0206 completed `0.2.0-alpha.3` publication after refreshed hosted RC evidence. NuGet package verification, global tool install smoke, tag `v0.2.0-alpha.3`, and GitHub prerelease `v0.2.0-alpha.3` are complete. The alpha.2 recovery, supply-chain, and hosted RC hardening evidence below remains historical for that release.
+## Historical Published-Release Evidence
 
-## Current Alpha.3 Publication Evidence
+TASK-0206 completed `0.2.0-alpha.3` publication after refreshed hosted RC evidence. NuGet package verification, global tool install smoke, tag `v0.2.0-alpha.3`, and GitHub prerelease `v0.2.0-alpha.3` are complete. The alpha.3 and alpha.2 recovery, supply-chain, and hosted RC hardening evidence below remains historical and exact-commit scoped.
+
+## Historical Alpha.3 Publication Evidence
 - Final publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
 - Refreshed hosted RC run: `27870246504` for commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`.
 - NuGet package: `AgentContextKit` `0.2.0-alpha.3` verified.

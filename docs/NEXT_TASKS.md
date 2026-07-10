@@ -11,12 +11,14 @@ The user-authorized TASK-0232 through TASK-0238 chain is the current execution s
 | 3 | TASK-0234 final-candidate local source selection and preparation | COMPLETED | Select the exact last source-impacting local commit as evidence base | TASK-0233 | SHA/path review and candidate input validation | No version bump or publish |
 | 4 | TASK-0235 final-candidate local contract freeze preparation | COMPLETED | Refresh the conditional freeze against the selected base and target contract | TASK-0234 | CLI/config/JSON/localization/V100 doc gates | Final acceptance remains pending |
 | 5 | TASK-0236 hosted RC evidence input preparation | COMPLETED | Prepare exact post-push alpha4/alpha3 dispatch inputs and evidence schema | TASK-0235 | Workflow/input static tests | Manual workflow dispatch is not executed |
-| 6 | TASK-0237 documentation and handoff synchronization | CURRENT | Synchronize roadmap, queues, indexes, readiness, and `.codex` state | TASK-0232–0236 | Markdown, tracked/untracked, V100 docs, ACKit | Documentation only |
-| 7 | TASK-0238 final local readiness audit and safe-chain closeout | PLANNED | Run final complete local suite, close local chain, push once, wait for final CI | TASK-0237 | Complete goal-defined validation and final CI | Next boundary: manual hosted RC dispatch |
+| 6 | TASK-0237 documentation and handoff synchronization | COMPLETED | Synchronize roadmap, queues, indexes, readiness, and `.codex` state | TASK-0232–0236 | Markdown, tracked/untracked, V100 docs, ACKit | Documentation only |
+| 7 | TASK-0238 final local readiness audit and safe-chain closeout | CURRENT | Run final complete local suite, close local chain, push once, wait for final CI | TASK-0237 | Complete goal-defined validation and final CI | Next boundary: manual hosted RC dispatch |
 
 No task in this chain authorizes a version bump, NuGet publish, tag/release mutation, workflow dispatch/rerun, GitHub settings/security/collaborator change, destructive recovery, force push, or a V100 RC/1.0 readiness claim.
 
-This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0109 are closed. PROJECT-CONTROL-0110 (TASK-0188 through TASK-0196) is closed as of 2026-06-19 with 428/428 tests green for the final pushed HEAD. TASK-0198 is an independent docs-only blocker evidence investigation, not a new project control. TASK-0199 completed the post-0198 state cleanup at `0aad858`. TASK-0200 completed the docs-only README/current-source CLI parity cleanup. TASK-0201 completed the docs-only `RB-003`/`RB-008` closure preflight. TASK-0202 completed the docs-only maintainer evidence intake for `ShadowFlameC` backup/security/recovery coverage. `RB-003` and `RB-008` are closed for planned `0.2.0-alpha.3` release-preparation entry. TASK-0203 prepared the local `0.2.0-alpha.3` package candidate at implementation commit `33e1897`. TASK-0204 prepared dispatch-time `origin/master` hosted RC instructions. TASK-0205 records hosted RC run `27868539971` as passed for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801` with candidate `0.2.0-alpha.3` and predecessor `0.2.0-alpha.2`; exact-candidate GO is historical for its exact commit. TASK-0206 completed the authorized OIDC `0.2.0-alpha.3` publish. Release-gate script hardening changed `scripts/**`, so TASK-0206 refreshed hosted RC evidence with run `27870246504` for exact commit `eef0adc4d5d11d7fb19adecc59dba9f9a142fd7f`; all three OS jobs passed. Final publish SHA `92984c6448332aa24b7cff94647f627bf944e535` was a docs/handoff/governance-only successor to that refreshed evidence. NuGet package `0.2.0-alpha.3`, tag `v0.2.0-alpha.3`, and GitHub prerelease `v0.2.0-alpha.3` now exist and are verified. TASK-0208 hardened the release provenance probe for future releases; no alpha.3 package/tag/release state changed. TASK-0209 completed post-alpha3 maintenance triage. TASK-0210 completed focused xUnit analyzer-warning cleanup. TASK-0211 classified the remaining Medium/Low scan findings without redaction, deletion, baseline acceptance, or release/package mutation. TASK-0212 completed `.remember` log retention and local artifact policy: ignored `.remember` logs were locally cleaned after count/size review, while alpha3 package-validation artifacts remain retained local release evidence. TASK-0213 synced the active published-package smoke workflow pin/status to `0.2.0-alpha.3` without release/tag/NuGet/package metadata/workflow-dispatch mutation. TASK-0214 verified the push-triggered hosted `cross-platform-smoke` run for TASK-0213 HEAD `fc002a08be83821a3b164c53256cdedab4621fc6`; run `27940146487` passed on Windows, Ubuntu, and macOS with alpha3 install/version proof. TASK-0215 completed the NuGet README rendering infrastructure through PR #1: added `README.nuget.md`, wired `PackageReadmeFile`, and updated agent docs/packaging metadata validation. TASK-0216 (this task) is the docs/queue simplification and stale-heading cleanup.
+## Historical Execution Record
+
+The remainder of this file is historical execution evidence. PROJECT-CONTROL-0103 through PROJECT-CONTROL-0110 are closed. TASK-0198 through TASK-0227 record the alpha3/alpha4 preparation, publication, verification, and post-release cleanup chain. Historical task-local words such as "current" apply only to their dated task context; the active source of truth is the V100 chain table above.
 
 ## Completed Independent Hosted RC Evidence GO
 
@@ -30,7 +32,7 @@ This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTRO
 
 1. TASK-0208 release provenance probe hardening - completed locally. Plan commit `bac4ef0`; implementation commit `35894b6`. The publish job now treats a missing release asset attestation HTTP 404 as `exists=false` so `actions/attest@v4` can run, treats an existing attestation as `exists=true`, preserves release asset download failure, preserves non-404 `gh api` failure, and keeps `gh attestation verify` as the final verification step. No NuGet publish, tag mutation, GitHub Release mutation, release workflow dispatch, release-candidate workflow dispatch, package metadata change, version bump, owner/account/secret/security-setting mutation, or alpha.3 artifact mutation occurred.
 
-## Post-Alpha3 Maintenance Plan
+## Historical Post-Alpha3 Maintenance Plan
 
 1. TASK-0209 post-alpha3 maintenance triage - completed. It selected TASK-0210 analyzer-warning cleanup as the highest-priority next work.
 2. TASK-0210 analyzer-warning cleanup - completed locally. `McpStdioTransportTests` now passes `TestContext.Current.CancellationToken` through `RunAsync` calls, the intentional cancellation test uses a linked token source, and `WatchCommandTests` uses xUnit collection assertions instead of `Assert.Equal(...Count)`. Release build is clean with `0` warnings and the full suite is `428/428` green.
@@ -39,7 +41,7 @@ This is the unified execution queue. PROJECT-CONTROL-0103 through PROJECT-CONTRO
 5. TASK-0213 published-package workflow pin/status sync - completed locally. The active `cross-platform-smoke.yml` pin now installs `AgentContextKit` `0.2.0-alpha.3`; documentation examples already used alpha3; historical/predecessor alpha2 references remain intact; no release/tag/NuGet/package metadata/workflow-dispatch mutation occurred.
 6. TASK-0214 cross-platform smoke alpha3 hosted evidence - completed locally after read-only `gh` verification. Push-triggered `cross-platform-smoke` run `27940146487` for exact TASK-0213 HEAD `fc002a08be83821a3b164c53256cdedab4621fc6` passed on `windows-2025`, `ubuntu-latest`, and `macos-latest`; logs prove `dotnet tool install --global AgentContextKit --version 0.2.0-alpha.3` and `AgentContextKit 0.2.0-alpha.3` on all three OS jobs. No manual dispatch or release/package/tag mutation occurred.
 7. TASK-0215 completed NuGet README rendering infrastructure via PR #1: `README.nuget.md`, `PackageReadmeFile` wiring, agent docs, and package metadata validation. Visible nuget.org README changes require a later authorized package publish.
-8. Current task: TASK-0218 alpha4 NuGet README rendering release prep (package candidate prepared locally; not published). TASK-0217 (Windows Unicode temp directory fix) completed and pushed at `840c08f`. TASK-0216 (docs/queue simplification) completed and pushed at `56e4e2a`.
+8. Historical checkpoint: TASK-0218 alpha4 NuGet README rendering release prep followed TASK-0217 and TASK-0216.
 9. Lower-priority follow-ups: review scan-scope policy for retained local artifacts only if maintainers want a deliberate exclusion/suppression policy.
 
 ## Completed Independent Hosted RC Evidence Planning
@@ -84,7 +86,7 @@ PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/42
 8. TASK-0195 docs-first local audit + state sync - completed; pushed.
 9. TASK-0196 final validation and hosted check sync - completed; PROJECT-CONTROL-0110 closed.
 
-## Active PROJECT-CONTROL-0109
+## Historical PROJECT-CONTROL-0109
 1. TASK-0177 hook expansion (Anthropic + Continue targets, dry-run preview) - hosted-verified.
 2. TASK-0178 MCP transport prototype step 1 (Core interface + JSON-RPC plumbing, no process spawn) - hosted-verified; 283/283 tests green.
 3. TASK-0179 webui no-build static polish - hosted-verified; 287/287 tests green.
@@ -97,7 +99,7 @@ PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/42
 10. TASK-0185 nightly local check workflow (`.github/workflows`) - hosted-verified; 315/315 tests green; pushed HEAD `7311d4e`.
 11. TASK-0186 final validation and hosted check sync - hosted-verified; 315/315 tests green; pushed HEAD `a1151c7`; PROJECT-CONTROL-0109 closed.
 
-## Active PROJECT-CONTROL-0108
+## Historical PROJECT-CONTROL-0108
 1. TASK-0168 post-0107 audit and state sync - completed.
 2. TASK-0169 add `generate` targets for Anthropic and Continue - completed.
 3. TASK-0170 safe `ackit hooks` command design and implementation - completed.
@@ -108,7 +110,7 @@ PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/42
 8. TASK-0175 MCP stdio design-only - completed.
 9. TASK-0176 final validation and hosted check sync - completed; 270/270 tests green.
 
-## Active PROJECT-CONTROL-0107
+## Historical PROJECT-CONTROL-0107
 1. TASK-0159 post-0158 audit and state sync - completed.
 2. TASK-0160 scanner severity explanation polish - completed.
 3. TASK-0161 config-check actionable diagnostics examples - completed.
@@ -119,7 +121,7 @@ PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/42
 8. TASK-0166 sample gallery coverage expansion - completed.
 9. TASK-0167 final validation and hosted check sync - completed; 257/257 tests green.
 
-## Active PROJECT-CONTROL-0106
+## Historical PROJECT-CONTROL-0106
 1. TASK-0140 repo rules commit and push policy sync - completed.
 2. TASK-0141 project queue and handoff consistency audit - completed.
 3. TASK-0142 scanner rule doc contract consistency - completed.
@@ -139,17 +141,17 @@ PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/42
 9. TASK-0157 safe domain and ignored paths starter config - completed.
 10. TASK-0158 Turkish CLI locale fallback guard - completed.
 
-## Active PROJECT-CONTROL-0104
+## Historical PROJECT-CONTROL-0104
 1. TASK-0135 issue template version placeholder sync - completed.
 2. TASK-0136 active docs project control and test count refresh - completed.
 3. TASK-0137 scanner rule catalog extension - completed; `ACKIT006` and `ACKIT007` added.
 4. TASK-0138 issue template guard test and final audit sync - completed; 192/192 tests green.
 5. PROJECT-CONTROL-0105 post-0104 audit and continuation - completed; SARIF doc and queue refresh merged.
 
-## Active PROJECT-CONTROL-0105
+## Historical PROJECT-CONTROL-0105
 1. TASK-0139 end-to-end coverage for new scanner rule IDs - completed; 197/197 tests green.
 
-## Active PROJECT-CONTROL-0103
+## Historical PROJECT-CONTROL-0103
 1. TASK-0126 release recovery and idempotent verification - completed.
 2. TASK-0127 alpha.2 supply-chain evidence refresh - completed.
 3. TASK-0128 hosted release-candidate evidence hardening - completed; run `27478635057` green on three operating systems.
@@ -160,7 +162,7 @@ PROJECT-CONTROL-0110 closed at TASK-0196 on 2026-06-19. Cumulative suite: 428/42
 8. TASK-0133 next prerelease scope and version selection - completed; `0.2.0-alpha.3` selected without metadata changes.
 9. TASK-0134 conditional next prerelease preparation, publication, and verification - completed to safe boundary with evidence-backed NO-GO; no candidate or publication was attempted.
 
-## Active Alpha.2 Execution
+## Historical Alpha.2 Execution
 1. TASK-0116 documentation consistency and local Markdown-link audit.
 2. TASK-0117 scanner precision audit and hardening.
 3. TASK-0118 suppression audit polish.

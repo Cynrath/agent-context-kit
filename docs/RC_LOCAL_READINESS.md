@@ -3,9 +3,9 @@
 The local/remote boundary is summarized in `docs/RELEASE_BLOCKER_BOARD.md`. Local readiness evidence does not close hosted, security-setting, ownership, signing, SBOM, provenance, recovery, candidate, or approval rows.
 
 ## Decision
-**LOCAL READY / REMOTE NO-GO** as of 2026-06-27 (TASK-0230 refresh).
+**LOCAL READY / REMOTE NO-GO** as of 2026-07-10 (TASK-0233–0237 refresh).
 
-The current source tree has local release-candidate evidence for its documented contract, localization, security regression, dependency, package, and repository-hygiene checks. This is not a release approval. TASK-0232 closes V100-06 and records V100-02/08/09 decisions, but final-candidate/hosted evidence, hosted provenance, candidate/version selection, and final maintainer sign-off remain incomplete.
+The current source tree has local release-candidate evidence for its documented contract, localization, security regression, dependency, package, repository-hygiene, and expanded resource checks. This is not a release approval. TASK-0232 closes V100-06 and records V100-02/08/09 decisions; TASK-0233 expands V100-07 local evidence; TASK-0234 selects source evidence base `b1604ae1e73017521d28e5a83f328bb1347406b6`; TASK-0235 prepares the conditional freeze; TASK-0236 prepares hosted inputs without dispatch. Final-candidate acceptance, hosted evidence/provenance, and final maintainer sign-off remain incomplete.
 
 Standard hosted `ci`, published-package smoke, and source-package smoke are green for commit `4c4fa64ff34287dff01818d52f49b521efb3176d`. Dedicated RC evidence run `27478635057` also passed predecessor/config/baseline/SARIF/performance validation on Windows, Ubuntu, and macOS. The remote decision remains NO-GO for the independent security, ownership, supply-chain, and final candidate approval blockers. See `docs/HOSTED_VALIDATION_STATUS.md`.
 
@@ -19,14 +19,14 @@ Standard hosted `ci`, published-package smoke, and source-package smoke are gree
 | Localization | English/Turkish human output, known errors, exits, and language-independent JSON semantics | VERIFIED LOCAL |
 | Security regression | Critical token coverage, unsuppressible Critical policy, clean self-scan and hygiene checks | VERIFIED LOCAL |
 | Dependencies | direct/transitive vulnerability and deprecation reviews clean after xUnit v3 migration | VERIFIED LOCAL |
-| Performance tripwire | disposable 2,000-file scan completed in 5.446 seconds (standalone) / 7.635s (RC gate) against a 30-second local threshold (TASK-0230 refresh at HEAD `583b62e`) | VERIFIED LOCAL |
+| Performance/resource evidence | mixed 2,000-file scan completed in 5.185 seconds with 44.6 MiB peak working set; interruption and unreadable-file behavior passed against the 30-second/512-MiB local thresholds (TASK-0233) | VERIFIED LOCAL; HOSTED FINAL-RC CONFIRMATION PENDING |
 | Package | local pack, isolated tool install, help, scan JSON, and package metadata verification | VERIFIED LOCAL |
 | Samples and outputs | sample smoke, doctor, JSON/SARIF parse, and local release verification | VERIFIED LOCAL |
 
 ## Remaining Maintainer Evidence
 | Area | Required Evidence | Status |
 | --- | --- | --- |
-| Hosted RC workflow | Standard 8/8 are green for `4c4fa64`; dedicated run `27478635057` passed all three operating systems | VERIFIED HOSTED; rerun for a different final candidate |
+| Hosted RC workflow | Inputs prepared for final pushed HEAD, candidate metadata `0.2.0-alpha.4`, predecessor `0.2.0-alpha.3`; no dispatch performed | HOSTED_INPUT_PREPARED / NOT_DISPATCHED |
 | Private vulnerability reporting | Enabled since 2026-06-14 and freshly reverified `enabled: true` on 2026-07-10 | VERIFIED MAINTAINER |
 | Security notification ownership | `Cynrath` primary; `ShadowFlameC` backup; coverage and non-SLA targets recorded | V100-06 CLOSED |
 | Final contract acceptance | Candidate-specific CLI/config/JSON/baseline/SARIF/localization review | PENDING MAINTAINER |

@@ -35,6 +35,8 @@ Synchronize every active roadmap, queue, documentation index, project map, relea
 - `docs/RELEASE_CANDIDATE_EVIDENCE.md`
 - `docs/RELEASE_VALIDATION.md`
 - `docs/V100_GAP_ANALYSIS.md`
+- `docs/UPGRADE_COMPATIBILITY.md`
+- current-package CI/SARIF/OSS/maintainer/security/supply-chain guidance
 - `.codex/SESSION_HANDOFF.md`
 - `.codex/CONTEXT_PACK.md`
 - `.codex/NEXT_STEPS.md`
@@ -107,4 +109,15 @@ Revert the TASK-0237 commit.
 
 ## Completion notes
 
-Planned.
+Completed on 2026-07-10.
+
+- Synchronized the active V100 chain so TASK-0237 is complete and TASK-0238 is the only remaining safe/local task.
+- Updated the roadmap gap interpretation after TASK-0232–0236 and linked the decision packet plus selected source evidence base.
+- Relabeled closed project-control/alpha tracks as historical without changing their dated evidence.
+- Updated current-facing package guidance to published `0.2.0-alpha.4` and retained `0.2.0-alpha.3` as the immutable predecessor/historical evidence.
+- Updated supported predecessor, rollback, expanded performance/resource evidence, hosted-input boundary, documentation index, project map, and Codex resume state.
+- No source, script, test, workflow, package metadata, version, release, setting, or remote state changed.
+- `check-v100-documentation-release-gates.ps1 -FailOnIssues` passed; the nested link audit checked 423 Markdown files and 231 local targets.
+- Standalone Markdown links passed; `ackit doctor` passed 13/13 checks; `ackit scan --ci` exited 0 with only the already-classified local findings; `git diff --check` passed.
+
+Commit: recorded after validation. The next task is TASK-0238.

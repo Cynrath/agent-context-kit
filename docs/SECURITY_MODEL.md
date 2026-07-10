@@ -71,7 +71,7 @@ TASK-0212 defines the current local policy for the two recurring post-alpha3 art
 
 Do not use broad `ignoredPaths`, baseline acceptance, or scanner suppression to make these classes disappear from output without a separate policy task proving the change cannot hide real secrets or release blockers.
 
-The scanner rule catalog, configurable allowlist foundation, and expanded scanner patterns are part of the published `0.2.0-alpha.3` package and current source. Stable `ACKIT` rule IDs and their category mapping are documented in `docs/SCANNER_RULES.md`; the latest additions are `ACKIT006` (`ProductionConfigLike`, High) for production configuration and `ACKIT007` (`DocumentationGap`, Medium) for documentation gaps.
+The scanner rule catalog, configurable allowlist foundation, and expanded scanner patterns are part of the published `0.2.0-alpha.4` package and current source. Stable `ACKIT` rule IDs and their category mapping are documented in `docs/SCANNER_RULES.md`; the latest additions are `ACKIT006` (`ProductionConfigLike`, High) for production configuration and `ACKIT007` (`DocumentationGap`, Medium) for documentation gaps.
 
 Scanner regression fixtures are synthetic and assembled to avoid committed live-looking credentials. The fixture matrix in `docs/SCANNER_FIXTURES.md` verifies both detection and known-noise boundaries without weakening Critical findings.
 

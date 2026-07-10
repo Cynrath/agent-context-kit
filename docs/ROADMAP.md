@@ -286,6 +286,11 @@ v0.2.0-alpha.4 is the current published release. Local v0.3/v0.4/v0.5 readiness 
 - TASK-0229: Sanitized Web UI dashboard screenshot committed at `docs/assets/screenshots/ackit-webui-preview-alpha4.webp`.
 - TASK-0230: V100 local contract and readiness gate rerun (all local gates PASS at HEAD `77748e7`).
 - TASK-0231: Post-alpha4 V100 cleanup and next roadmap selection (gap decision matrix created).
+- TASK-0232: Maintainer decision packet recorded; V100-06 closed from fresh reporting/ownership evidence and V100-02/08/09 decisions bounded.
+- TASK-0233: Mixed-corpus time, peak-memory, interruption, and unreadable-file evidence added; V100-07 local evidence expanded.
+- TASK-0234: Exact last source-impacting evidence base `b1604ae1e73017521d28e5a83f328bb1347406b6` selected without selecting a new version or publication.
+- TASK-0235: Conditional current-source contract freeze prepared; final candidate acceptance remains open.
+- TASK-0236: Final-pushed-HEAD `0.2.0-alpha.4` / predecessor `0.2.0-alpha.3` hosted RC inputs prepared without dispatch.
 
 ### Historical Context
 
@@ -294,29 +299,25 @@ v0.2.0-alpha.4 is the current published release. Local v0.3/v0.4/v0.5 readiness 
 - V0.5 covered optional LLM integration, prompt pack, and context export -- already shipped.
 - These labels are historical; naming future packages v0.3.0-alpha would conflict with existing usage.
 
-### Gap Bucket Summary (TASK-0231)
+### Gap Status After TASK-0236
 
 | Bucket | Count | Gaps |
 | --- | ---: | --- |
-| LOCAL_IMPLEMENTATION_OR_TESTABLE_EVIDENCE | 1 | V100-07 |
-| SECURITY_SUPPLY_CHAIN_MAINTAINER_DECISION | 4 | V100-02, V100-06, V100-08, V100-09 |
+| LOCAL_IMPLEMENTATION_OR_TESTABLE_EVIDENCE | 0 | V100-07 local evidence expanded; hosted final-RC confirmation remains |
+| SECURITY_SUPPLY_CHAIN_MAINTAINER_DECISION | 0 | V100-06 closed; V100-02/08/09 decisions recorded with explicit remaining boundaries |
 | REMOTE_RELEASE_OR_HOSTED_EVIDENCE | 6 | V100-01, V100-03, V100-04, V100-05, V100-09, V100-10 |
 | DOCUMENTATION_OR_PRESENTATION_FOLLOWUP | 1 | V100-12 |
 | DEFERRED_POST_V100 | 1 | V100-11 |
 
 ### Key Finding
 
-Only 1 gap (V100-07, P1 performance) is truly closeable with local-only implementation work. The remaining P0/P1 gaps are blocked on maintainer decisions or remote hosted evidence.
+The safe/local decision, performance, candidate-base, conditional-freeze, and hosted-input work is complete through TASK-0236. Remaining P0/P1 closure depends on final-candidate acceptance and manual hosted evidence; local success must not be relabeled as RC or 1.0 readiness.
 
 ### Recommended Next Track
 
-**Maintainer decision packet for V100 closure** -- compile V100-02 (CLI contract sign-off), V100-06 (security notification ownership), V100-08 (support lifecycle), and V100-09 (supply-chain decisions) into a single maintainer-reviewable document. This is the highest-leverage next step because these 4 maintainer decisions block the 6 remote-evidence gaps that depend on an RC candidate selection.
+Complete TASK-0237 documentation synchronization, then TASK-0238 final local audit and safe-chain closeout. After the authorized final push and its standard push-triggered CI complete, stop at manual `release-candidate-evidence.yml` dispatch. That dispatch and all version/package/tag/release work require separate explicit authorization.
 
-Once maintainer decisions are obtained, the next phase is RC candidate selection and remote evidence dispatch for V100-01, V100-03, V100-04, V100-05, V100-09, and V100-10.
-
-Local implementation of V100-07 (performance evidence expansion) can proceed in parallel.
-
-See `docs/tasks/TASK-0231-post-alpha4-v100-cleanup-and-next-roadmap-selection.md` for the full decision matrix.
+See `docs/V100_MAINTAINER_DECISION_PACKET.md`, `docs/V100_FINAL_CANDIDATE_LOCAL_SELECTION.md`, and `docs/V100_GAP_ANALYSIS.md` for the current decision and evidence boundaries.
 
 ## V100 Safe/Local Completion Chain
 

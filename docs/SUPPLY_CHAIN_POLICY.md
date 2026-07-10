@@ -26,7 +26,7 @@ Local review on 2026-06-13 found no vulnerable or deprecated direct/transitive p
 - Verify package ID, version, README, license expression, repository URLs, and tool command before publish.
 
 ## Signing, SBOM, And Provenance Decision
-The current published `0.2.0-alpha.3` package is available through NuGet.org and was verified by TASK-0206. Historical alpha.2 read-only verification found NuGet.org repository signing, no author signature, no SBOM in the package or GitHub Release assets, and no accessible GitHub provenance attestation for the exact package digest. Exact alpha.2 NuGet/release hashes and hosted recovery evidence remain in `docs/PUBLISHED_SUPPLY_CHAIN_STATUS.md`; alpha.3 package/release evidence remains in `docs/tasks/TASK-0206-alpha3-publish.md`.
+The current published `0.2.0-alpha.4` package is available through NuGet.org and was verified by TASK-0220. Historical alpha.2 read-only verification found NuGet.org repository signing, no author signature, no SBOM in the package or GitHub Release assets, and no accessible GitHub provenance attestation for the exact package digest. Exact historical NuGet/release hashes and hosted recovery evidence remain in `docs/PUBLISHED_SUPPLY_CHAIN_STATUS.md`; alpha.3 and alpha.4 package/release evidence remains in their dated task records.
 
 Packages with NuGet repository signatures are repository-signed by NuGet.org and must not be described as author-signed. Before 1.0 RC, the maintainer must make and record explicit decisions for:
 - NuGet package signing;

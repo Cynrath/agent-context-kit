@@ -9,27 +9,27 @@
 | 3 | Completed | TASK-0234 final-candidate local source selection | Select exact last source-impacting local evidence base | TASK-0233 | Candidate selection/V100/roadmap docs | SHA/path/input review | No version or publish |
 | 4 | Completed | TASK-0235 final-candidate local contract freeze preparation | Refresh conditional freeze and target-contract review | TASK-0234 | Freeze/CLI/JSON/schema/V100 docs | Contract/config/JSON/localization/V100 gates | Final acceptance pending |
 | 5 | Completed | TASK-0236 hosted RC evidence input preparation | Prepare dispatch-time post-push alpha4/alpha3 inputs | TASK-0235 | Hosted/RC/release/V100 evidence docs | Workflow/input static gates | Manual dispatch not executed |
-| 6 | Current | TASK-0237 documentation and handoff synchronization | Align all active sources and indexes | TASK-0232–0236 | Roadmap/queue/index/map/readiness/handoff docs | Markdown/tracked/V100/ACKit gates | Docs only |
-| 7 | Planned | TASK-0238 final local readiness audit and closeout | Complete local suite, one final push, one blocking CI wait | TASK-0237 | Final evidence/task/queue/handoff docs | Full local suite plus push-triggered CI | Next action is manual RC dispatch |
+| 6 | Completed | TASK-0237 documentation and handoff synchronization | Align all active sources and indexes | TASK-0232–0236 | Roadmap/queue/index/map/readiness/handoff docs | Markdown/tracked/V100/ACKit gates | Docs only |
+| 7 | Current | TASK-0238 final local readiness audit and closeout | Complete local suite, one final push, one blocking CI wait | TASK-0237 | Final evidence/task/queue/handoff docs | Full local suite plus push-triggered CI | Next action is manual RC dispatch |
 
 Execution rule: one local commit per completed task, no intermediate push, no manual workflow dispatch/rerun, and no release/version/settings mutation.
 
-## Active PROJECT-CONTROL-0109 Track
+## Historical PROJECT-CONTROL-0109 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 84 | In progress | PROJECT-CONTROL-0109 scan/export/hooks hardening + MCP prototype step 1 | Low | None | `docs/tasks/PROJECT-CONTROL-0109-...md` plus TASK-0177 through TASK-0186 task files; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Hook expansion, MCP transport prototype step 1, WebUI no-build polish, hosted check status reporter, SARIF roundtrip regression, prompt pack edge cases, catalog rule id stability, scan include/exclude glob filters, nightly local check workflow, and final validation all complete |
 
-## Active PROJECT-CONTROL-0108 Track
+## Historical PROJECT-CONTROL-0108 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 83 | Completed | PROJECT-CONTROL-0108 vibe-feature local product continuation | Low | None | `docs/tasks/PROJECT-CONTROL-0108-...md` plus TASK-0168 through TASK-0176 task files; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Post-0107 audit, Anthropic/Continue generate targets, safe `ackit hooks`, baseline diff, deterministic trim, watch mode, entropy guard, MCP stdio design, and final validation all complete |
 
-## Active PROJECT-CONTROL-0107 Track
+## Historical PROJECT-CONTROL-0107 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 82 | Completed | PROJECT-CONTROL-0107 docs-first local product continuation | Low | None | `docs/tasks/PROJECT-CONTROL-0107-...md` plus TASK-0159 through TASK-0167 task files; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Audit, severity guidance, config-check examples, baseline diff, SARIF completeness, accessibility polish, redaction hardening, sample gallery expansion, and final validation all complete |
 
-## Active PROJECT-CONTROL-0106 Track
+## Historical PROJECT-CONTROL-0106 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 75 | Completed | PROJECT-CONTROL-0106 repo rules and continuation sync | Low | None | `docs/tasks/PROJECT-CONTROL-0106-...md` plus TASK-0140 through TASK-0145 task files; agent instruction surfaces; queue and handoff docs | full local validation suite, hosted 3/3 | Push after validation | Agent rule sync, queue/handoff consistency, scanner rule doc consistency, instruction surface alignment, next work selection, and final validation all complete |
@@ -54,12 +54,12 @@ Execution rule: one local commit per completed task, no intermediate push, no ma
 | C9 | Completed | TASK-0157 safe domain and ignored paths starter config | Low | None | `docs/examples/config/safe-domains-and-ignored-paths.yml`, `docs/CONFIGURATION.md`, guard test | `dotnet test` green | Push after validation | Starter `safeDomains` and `ignoredPaths` set documented and tested |
 | C10 | Completed | TASK-0158 Turkish CLI locale fallback guard | Low | None | guard test | `dotnet test` green | Push after validation | Turkish CLI text is non-empty and distinct from English |
 
-## Active PROJECT-CONTROL-0105 Track
+## Historical PROJECT-CONTROL-0105 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 74 | Completed | PROJECT-CONTROL-0105 post-0104 audit and continuation | Low | None | PROJECT-CONTROL-0105 task file, queue and SARIF_OUTPUT.md updates, next TASK | full local validation suite, hosted 3/3 | Push after validation | 10-item 0104 audit closed and next safe task queued; 197/197 green |
 
-## Active PROJECT-CONTROL-0104 Track
+## Historical PROJECT-CONTROL-0104 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 70 | Completed | TASK-0135 issue template version placeholder sync | Low | None | four `.github/ISSUE_TEMPLATE/*.yml` | `git diff --check` and local gates | Push after validation | Templates show current `0.2.0-alpha.2` placeholder |
@@ -67,7 +67,7 @@ Execution rule: one local commit per completed task, no intermediate push, no ma
 | 72 | Completed | TASK-0137 scanner rule catalog extension | Low | None | Core catalog, focused tests, SCANNER_RULES.md | `dotnet test` 187/187 green, `ackit scan --ci` and `doctor` clean | Push after validation | `ACKIT006` and `ACKIT007` added with ruleId and Suppression coverage |
 | 73 | Completed | TASK-0138 issue template guard test and final audit sync | Low | None | new test, queue, NEXT_TASKS | `dotnet test` 192/192 green | Push after validation | CI guard against placeholder drift and final docs refresh |
 
-## Active PROJECT-CONTROL-0103 Track
+## Historical PROJECT-CONTROL-0103 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 61 | Completed | TASK-0126 release recovery verification | P0 | Complete | release workflow/scripts/tests/docs | local gates, 8/8, verify-existing run | Dispatch only; verifier read-only | Run `27478046088` green |
@@ -80,7 +80,7 @@ Execution rule: one local commit per completed task, no intermediate push, no ma
 | 68 | Completed | TASK-0133 next prerelease selection | P0 | `0.2.0-alpha.3` selected; publication deferred | scope/roadmap/changelog docs | contract/version gates | No | Smallest valid version selected without metadata bump |
 | 69 | Completed to safe boundary / NO-GO | TASK-0134 next prerelease release | P0 | Independent backup security owner and recovery authority remain unresolved | release decision/status files | local gates plus planning-commit 8/8 | No release write performed | Evidence-backed NO-GO; resume conditions recorded |
 
-## Active Authorized Alpha.2 Track
+## Historical Authorized Alpha.2 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 51 | Done locally | TASK-0116 documentation consistency/link audit | High | Complete | local Markdown gate/tests and active docs | focused test plus docs gates | Push after validation | Active wording and local links pass |
