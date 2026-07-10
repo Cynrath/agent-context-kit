@@ -8,10 +8,10 @@ Selection date: 2026-07-10. Selected by TASK-0239.
 | --- | --- |
 | Candidate version | `1.0.0-rc.1` |
 | Published predecessor | Immutable `0.2.0-alpha.4` |
-| Exact candidate commit | The TASK-0239 commit; captured after commit creation and used unchanged by TASK-0240 |
+| Exact candidate commit | `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` |
 | Prior local evidence base | `b1604ae1e73017521d28e5a83f328bb1347406b6` |
 | Publication authorized | No |
-| Final-candidate acceptance | Pending TASK-0240 hosted evidence and TASK-0241 decision |
+| Final-candidate acceptance | Accepted by TASK-0241 after hosted run `29118452246` |
 
 This record selects a real successor version rather than reusing the published alpha4 metadata. It does not publish NuGet, create/move a tag, create/edit a GitHub Release, dispatch `release.yml`, or establish provenance.
 
@@ -38,7 +38,7 @@ The sanitized generated content is frozen at `tests/fixtures/upgrade/v0.2.0-alph
 ```text
 CandidateVersion: 1.0.0-rc.1
 PredecessorVersion: 0.2.0-alpha.4
-CommitSha: exact TASK-0239 full SHA after commit/push
+CommitSha: 548b6affd0da25cb379ec1b153b1064fd5ff6f0b
 Required relation: CommitSha == HEAD == origin/master
 ```
 
@@ -60,9 +60,10 @@ Any post-candidate production source, test, script, workflow, package/version me
 ```text
 CANDIDATE_VERSION_SELECTED
 EXACT_PREDECESSOR_SELECTED
-LOCAL_PREPARATION_IN_PROGRESS
-OPEN_PENDING_HOSTED_RC_EVIDENCE
-OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE
+LOCAL_AND_STANDARD_CI_PASS
+HOSTED_RC_EVIDENCE_PASS
+FINAL_CANDIDATE_ACCEPTED_BY_TASK_0241
+CONDITIONAL_GO_FOR_SEPARATELY_AUTHORIZED_PUBLISH_TASK
 PUBLICATION_NOT_AUTHORIZED
 ```
 

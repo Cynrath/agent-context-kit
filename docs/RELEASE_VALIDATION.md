@@ -39,6 +39,25 @@ All jobs installed `0.2.0-alpha.4` and run-unique package `1.0.0-rc.1.ci.2911845
 
 Artifact/SARIF upload was disabled. No NuGet publication, tag, GitHub Release, `release.yml`, or provenance action occurred. Status: `HOSTED_RC_EVIDENCE_PASS / EXACT_CANDIDATE_SHA_VERIFIED / PUBLICATION_NOT_AUTHORIZED`.
 
+## V100 Final-Candidate Acceptance (TASK-0241)
+
+The exact candidate-to-evidence bridge is documentation/evidence/governance-only. TASK-0241 accepts the final candidate contract and closes V100-01 through V100-05 plus V100-07, V100-08, and V100-10; V100-06 remains closed. Open P0 gaps are 0.
+
+V100-09 remains `OPEN_PENDING_PUBLISH_PATH_PROVENANCE`; signing and SBOM bounded accepted risks remain active. V100-11 is deferred post-V100 and V100-12 retains its committed sanitized screenshot while docs-site/GitHub Pages activation remains deferred.
+
+Decision: `CONDITIONAL GO FOR A SEPARATELY AUTHORIZED PUBLISH TASK`. Candidate `1.0.0-rc.1` remains unpublished and published release remains `0.2.0-alpha.4`. Publication authorized: No.
+
+Final local acceptance validation passed on 2026-07-10:
+
+| Check | Result |
+| --- | --- |
+| ACKit | Installed `0.2.0-alpha.4`; doctor 13/13 PASS; scan exit 0 with classified Medium/Low findings only |
+| Source/build/test | Source `1.0.0-rc.1`; Release build 0 warnings/0 errors; 431/431 tests |
+| Unicode temp guard | 0 before and 0 after tests |
+| Final gates | V100 readiness/docs, CLI, config, JSON, localization, and RC local-readiness PASS |
+| Successful final RC-gate benchmark | 2,000 mixed files; 5.342s; 44.5 MiB; PASS against 30-second/512-MiB thresholds |
+| Documentation/hygiene | 428 Markdown files; 231 local targets; 0 broken; candidate bridge/diff clean; no tracked `.ackit/` |
+
 ## V100 Safe/Local Final Audit (TASK-0238)
 
 The single complete local closeout suite passed on 2026-07-10:

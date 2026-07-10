@@ -8,14 +8,14 @@ The hosted tuple is `commit_sha=548b6affd0da25cb379ec1b153b1064fd5ff6f0b`, `cand
 ## Local Evidence Matrix
 | Area | Local Evidence | Status | Remaining Blocker |
 | --- | --- | --- | --- |
-| Baseline policy | schema/fingerprint fixtures, explicit update, integrity checks, new/existing CI tests, JSON/SARIF/report/Web UI parity; exact candidate run `29118452246` passed with baseline entry count 0 on three OS | Hosted evidence passed | TASK-0241 exact-candidate acceptance |
-| Config compatibility | exact alpha4 generated/frozen fixture, hosted regeneration comparison, read-only `config-check`, no-auto-migration, and unchanged SHA-256 on three OS | Hosted predecessor evidence passed | TASK-0241 exact-candidate acceptance |
-| CLI/JSON/SARIF | contract tests, additive schema rules, exit-code parity, candidate-bound freeze, schemas/golden fixtures, direct hosted gates, and SARIF parse | Hosted machine-contract evidence passed | TASK-0241 final maintainer acceptance |
-| Performance | local interruption/unreadable-file proof plus hosted mixed corpus: Windows 1.019s/45.1 MiB, Ubuntu 0.910s/59.9 MiB, macOS 0.696s/53.8 MiB | Hosted thresholds passed | TASK-0241 runner-variance acceptance |
+| Baseline policy | schema/fingerprint fixtures, explicit update, integrity checks, new/existing CI tests, JSON/SARIF/report/Web UI parity; exact candidate run `29118452246` passed with baseline entry count 0 on three OS | CLOSED_BY_TASK_0241 | Reopen after candidate-impacting baseline-policy change |
+| Config compatibility | exact alpha4 generated/frozen fixture, hosted regeneration comparison, read-only `config-check`, no-auto-migration, and unchanged SHA-256 on three OS | HOSTED_PREDECESSOR_CONFIG_EVIDENCE_PASS / CLOSED_BY_TASK_0241 | Exact candidate/predecessor tuple only |
+| CLI/JSON/SARIF | contract tests, additive schema rules, exit-code parity, candidate-bound freeze, schemas/golden fixtures, direct hosted gates, and SARIF parse | FINAL_MACHINE_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241 | Reopen after machine-contract change |
+| Performance | local interruption/unreadable-file proof plus hosted mixed corpus: Windows 1.019s/45.1 MiB, Ubuntu 0.910s/59.9 MiB, macOS 0.696s/53.8 MiB | FINAL_RC_HOSTED_RESOURCE_EVIDENCE_PASS / CLOSED_BY_TASK_0241 | Maintain as tripwire, not SLA |
 | Security response | private reporting enabled; `Cynrath` primary and `ShadowFlameC` backup; coverage, non-public data rule, latest-pre-release fix scope, and non-SLA targets freshly reviewed by TASK-0232 | V100-06 CLOSED | recheck after owner/channel/support-policy change |
-| Runtime support | .NET 10 policy plus exact candidate success on Windows, Ubuntu/Linux, and macOS; latest-pre-release fix scope and unsupported surfaces recorded | Hosted final-RC confirmation passed | TASK-0241 final scope acceptance |
+| Runtime support | .NET 10 policy plus exact candidate success on Windows, Ubuntu/Linux, and macOS; latest-pre-release fix scope and unsupported surfaces recorded | FINAL_RC_CROSS_PLATFORM_CONFIRMATION_PASS / CLOSED_BY_TASK_0241 | Reopen after support-policy change |
 | Supply chain | OIDC/immutability/alignment/inspection/digest/signature/asset/upgrade/recovery baseline; recovery ownership reconciled; signing/SBOM accepted risks recorded | Maintainer decision recorded | hosted provenance on next authorized publish path |
-| Migration/localization | alpha4-to-RC upgrade/rollback guide, exact fixture, read-only diagnostics, no-auto-migration policy, 13-command EN/TR human/error/JSON parity matrix; hosted gates passed on three OS | Hosted evidence passed | TASK-0241 final acceptance |
+| Migration/localization | alpha4-to-RC upgrade/rollback guide, exact fixture, read-only diagnostics, no-auto-migration policy, 13-command EN/TR human/error/JSON parity matrix; hosted gates passed on three OS | FINAL_LOCALIZATION_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241 | Reopen after localization/contract change |
 
 ## TASK-0240 Hosted Result
 
@@ -66,7 +66,7 @@ The former xUnit test-tooling warning is resolved locally. Remaining supply-chai
 - Record dependency vulnerability/deprecation review with the release date.
 - Complete TASK-0241 exact-candidate acceptance and approve `docs/MAINTAINER_RC_DECISION.md`; publication remains separately unauthorized.
 
-The executed tuple and hosted result are in `docs/RC_HOSTED_EVIDENCE.md`. Current status: `HOSTED_RC_EVIDENCE_PASS / EXACT_CANDIDATE_SHA_VERIFIED / OPEN_PENDING_TASK_0241_ACCEPTANCE / PUBLICATION_NOT_AUTHORIZED`.
+The executed tuple and hosted result are in `docs/RC_HOSTED_EVIDENCE.md`. Current status: `HOSTED_RC_EVIDENCE_PASS / EXACT_CANDIDATE_SHA_VERIFIED / FINAL_CANDIDATE_ACCEPTED_BY_TASK_0241 / CONDITIONAL_GO / PUBLICATION_NOT_AUTHORIZED`.
 
 ## TASK-0238 Final Safe/Local Audit
 

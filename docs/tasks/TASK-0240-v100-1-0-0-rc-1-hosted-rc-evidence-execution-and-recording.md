@@ -2,7 +2,7 @@
 
 ## Status
 
-Completed locally; hosted evidence passed and the evidence commit is pending creation.
+Completed and committed locally as `fd2ce8d185dfe351e402fb458a9acd9403c439ea`; push is intentionally deferred until TASK-0241 joins it.
 
 ## Purpose
 

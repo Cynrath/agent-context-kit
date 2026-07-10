@@ -51,4 +51,4 @@ Decision date: 2026-07-10. The V100 minimum baseline is OIDC Trusted Publishing,
 
 Author signing and SBOM remain bounded accepted risks within the 2026-06-14 through 2026-09-30 review scope. Status: `MAINTAINER_DECISION_RECORDED`, `RECOVERY_OWNERSHIP_RECONCILED`, `ACCEPTED_RISK_RECORDED_FOR_SIGNING_AND_SBOM`, and `OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE`.
 
-TASK-0239 selects `1.0.0-rc.1` but does not execute the publish path. Exact package/release attestation remains `OPEN_PENDING_PUBLISH_PATH_PROVENANCE`; only a separately authorized OIDC TASK-0242 may create and verify it.
+TASK-0241 conditionally accepts `1.0.0-rc.1` but does not execute the publish path. Status remains `MAINTAINER_DECISION_RECORDED / RECOVERY_OWNERSHIP_RECONCILED / SIGNING_AND_SBOM_ACCEPTED_RISK_ACTIVE / OPEN_PENDING_PUBLISH_PATH_PROVENANCE`; only a separately authorized OIDC TASK-0242 may create and verify exact package/release attestation.

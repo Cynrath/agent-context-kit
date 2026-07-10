@@ -12,9 +12,9 @@
 - Pre-1.0 command/schema changes may occur, but breaking changes require changelog and migration notes.
 - Deprecation should be announced for at least one published pre-release when practical.
 
-TASK-0232 records this current shipped policy as the V100 support baseline. Status: `MAINTAINER_DECISION_RECORDED` and `OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION`.
+TASK-0232 records this policy as the V100 support baseline. TASK-0240 exact-candidate evidence passed on Windows, Ubuntu, and macOS; TASK-0241 accepts the unchanged support scope. Status: `FINAL_RC_CROSS_PLATFORM_CONFIRMATION_PASS / CLOSED_BY_TASK_0241`.
 
-TASK-0239 selects `1.0.0-rc.1` for the required Windows/Ubuntu/macOS confirmation. Published `0.2.0-alpha.4` remains the upgrade/rollback predecessor until publication is separately authorized.
+Exact candidate `1.0.0-rc.1` at `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` passed the required Windows/Ubuntu/macOS confirmation in run `29118452246`. Published `0.2.0-alpha.4` remains the upgrade/rollback predecessor until publication is separately authorized.
 
 ## 1.0 Target Policy
 Before 1.0 GA, freeze:

@@ -4,13 +4,13 @@
 
 Decision date: 2026-07-10. Maintainer: `Cynrath`. Repository: `Cynrath/agent-context-kit`.
 
-This packet records the maintainer-authorized policy decisions for V100-02, V100-06, V100-08, and V100-09. TASK-0239 selects `1.0.0-rc.1` for evidence without authorizing publication. It does not dispatch a workflow, create or move a tag, mutate a GitHub Release, change repository/security/collaborator settings, publish an SBOM or attestation, or perform package recovery.
+This packet records the maintainer-authorized policy decisions and TASK-0241 final acceptance for V100-02, V100-06, V100-08, and V100-09. Exact candidate `1.0.0-rc.1` passed hosted run `29118452246`; publication remains unauthorized. No tag, GitHub Release, repository/security/collaborator setting, SBOM, attestation, or package recovery action is performed.
 
 ## Verified Decision Inputs
 
 - Current published release and exact RC predecessor: immutable `AgentContextKit 0.2.0-alpha.4`; older `0.2.0-alpha.3` evidence remains historical.
 - TASK-0239 entry HEAD: `5c1a7782579f1bdc54a0d3706c886108382914cb`.
-- Selected candidate: `1.0.0-rc.1`; exact candidate SHA is the TASK-0239 commit after creation.
+- Selected candidate: `1.0.0-rc.1`; exact candidate SHA `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; hosted run `29118452246`.
 - Installed tool: `AgentContextKit 0.2.0-alpha.4`.
 - Private vulnerability reporting: freshly verified `enabled: true` on 2026-07-10 with `scripts/check-private-vulnerability-reporting.ps1 -RequireEnabled`.
 - Primary security triage owner: `Cynrath`.
@@ -43,10 +43,11 @@ Localized human-readable text is not byte-for-byte stable. Localization must not
 
 ```text
 MAINTAINER_DECISION_RECORDED
-OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE
+FINAL_CANDIDATE_CONTRACT_ACCEPTED
+CLOSED_BY_TASK_0241
 ```
 
-The decision fixes the target contract; it does not replace candidate-specific gate reruns or final maintainer acceptance.
+The decision and TASK-0241 acceptance bind the target contract to the exact candidate. Any candidate-impacting change reopens the freeze.
 
 ## V100-06 — Security Response Ownership
 
@@ -102,10 +103,11 @@ V100-06 is closed for the current repository state. Reopen it after an owner, no
 
 ```text
 MAINTAINER_DECISION_RECORDED
-OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION
+FINAL_RC_CROSS_PLATFORM_CONFIRMATION_PASS
+CLOSED_BY_TASK_0241
 ```
 
-The policy is approved; the selected final candidate still requires the supported three-OS hosted rerun.
+The policy is approved and exact candidate run `29118452246` passed the supported three-OS matrix.
 
 ## V100-09 — Supply Chain And Recovery
 
@@ -134,17 +136,17 @@ Author signing and SBOM remain documented accepted risks within their current da
 MAINTAINER_DECISION_RECORDED
 RECOVERY_OWNERSHIP_RECONCILED
 ACCEPTED_RISK_RECORDED_FOR_SIGNING_AND_SBOM
-OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE
+SIGNING_AND_SBOM_ACCEPTED_RISK_ACTIVE
+OPEN_PENDING_PUBLISH_PATH_PROVENANCE
 ```
 
 ## Resulting Boundary
 
-- V100-06 is closed.
-- V100-02 remains open pending final-candidate acceptance.
-- V100-08 remains open pending final-RC cross-platform confirmation.
-- V100-09 remains open pending hosted provenance evidence.
-- V100-07 local evidence expansion proceeds in TASK-0233.
-- Candidate preparation proceeds in TASK-0239; hosted and final acceptance remain TASK-0240/TASK-0241.
+- V100-02, V100-06, and V100-08 are closed.
+- V100-09 remains open pending publish-path provenance.
+- V100-07 and V100-10 are closed by exact candidate evidence and TASK-0241 acceptance as recorded in the gap register.
+- Open P0 gaps: 0.
+- Decision: `CONDITIONAL GO FOR A SEPARATELY AUTHORIZED PUBLISH TASK`.
 - No `1.0.0` GA or published-RC claim is made.
 
-The single authorized remote evidence action is TASK-0240 manual `release-candidate-evidence.yml` dispatch. Publication, tagging, release creation, and provenance creation remain separate TASK-0242 boundaries. Publication authorized: No.
+The single authorized remote evidence action completed as TASK-0240 run `29118452246`. Publication, tagging, release creation, and provenance creation remain separate TASK-0242 boundaries. Publication authorized: No.

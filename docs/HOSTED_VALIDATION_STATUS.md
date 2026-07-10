@@ -12,7 +12,7 @@ TASK-0240 dispatched `release-candidate-evidence.yml` exactly once. Run [`291184
 
 Exact predecessor install/config fixture comparison, candidate install, valid/no-migration config-check, unchanged config hash, baseline, CLI/config/JSON/localization contract gates, SARIF parse, final scan, and 30-second/512-MiB resource thresholds passed on all runners. Artifact and SARIF uploads were disabled. No package, tag, release, release-workflow, or provenance publication occurred.
 
-State: `HOSTED_RC_EVIDENCE_PASS / EXACT_CANDIDATE_SHA_VERIFIED / PUBLICATION_NOT_AUTHORIZED`. TASK-0241 final acceptance remains required. Historical results below remain valid only for their exact commits.
+State: `HOSTED_RC_EVIDENCE_PASS / EXACT_CANDIDATE_SHA_VERIFIED / FINAL_CANDIDATE_ACCEPTED_BY_TASK_0241 / PUBLICATION_NOT_AUTHORIZED`. Historical results below remain valid only for their exact commits.
 
 ## Historical Published-Release Evidence
 

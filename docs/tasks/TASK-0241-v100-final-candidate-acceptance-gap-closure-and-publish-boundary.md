@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned; depends on successful exact-candidate TASK-0240 hosted evidence.
+Final candidate accepted and final local validation passed; commit, joint push, and standard CI follow-through pending.
 
 ## Purpose
 
@@ -10,7 +10,7 @@ Evaluate every V100 gap against the exact TASK-0239 candidate and TASK-0240 host
 
 ## Entry state
 
-- Candidate: `1.0.0-rc.1` at the exact TASK-0239 hosted SHA.
+- Candidate: `1.0.0-rc.1` at exact TASK-0239 hosted SHA `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`.
 - Predecessor: published immutable `0.2.0-alpha.4`.
 - TASK-0240 must report successful three-OS hosted RC evidence for that exact SHA.
 - TASK-0240 and TASK-0241 diffs from the hosted candidate must remain documentation/evidence/governance-only.
@@ -117,4 +117,19 @@ Before push, normally revert/correct the relevant local docs commit. After push,
 
 ## Completion notes
 
-Pending TASK-0240 evidence.
+TASK-0241 acceptance was recorded on 2026-07-10 from exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` and hosted run `29118452246`:
+
+- the candidate-to-TASK-0240 bridge contains documentation/evidence/governance paths only and passes `git diff --check`
+- V100-01 through V100-05 close from exact local/standard/hosted evidence and explicit acceptance; V100-06 remains closed
+- V100-07 closes after three-OS time/memory thresholds and local interruption/unreadable-file evidence review
+- V100-08 closes after exact-candidate Windows/Ubuntu/macOS confirmation under the unchanged .NET 10 support policy
+- V100-10 closes after exact-candidate localization parity and JSON-invariance evidence
+- V100-09 remains `OPEN_PENDING_PUBLISH_PATH_PROVENANCE`; author signing and SBOM accepted-risk dispositions remain active
+- V100-11 remains deferred post-V100; V100-12 retains the sanitized screenshot and deferred docs-site/GitHub Pages state
+- open P0 gaps are 0 and the decision is `CONDITIONAL GO FOR A SEPARATELY AUTHORIZED PUBLISH TASK`
+- publication authorized: No
+- final source CLI reports `AgentContextKit 1.0.0-rc.1`; Release build passed with 0 warnings/0 errors; tests passed 431/431; Windows Unicode temp guard remained 0 before/after
+- all V100/docs/CLI/config/JSON/localization/RC-readiness gates passed after retaining the required historical freeze markers; the final successful RC-gate benchmark was 5.342 seconds / 44.5 MiB
+- final Markdown audit covered 428 files and 231 local targets with zero broken targets; diff/bridge checks pass and no `.ackit/` file is tracked
+
+The acceptance commit must remain documentation/evidence/governance-only. The prescribed final local suite, separate TASK-0241 commit, joint TASK-0240/TASK-0241 push, final standard CI, and clean synchronization verification complete the task operationally. TASK-0242 is not created or executed.

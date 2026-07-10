@@ -1,11 +1,13 @@
 # Release-Candidate Contract Freeze
 
 ## Status
-Conditional local freeze bound to candidate `1.0.0-rc.1` on 2026-07-10 by TASK-0239. This document records the V100 target contract surface selected for exact local and hosted validation; it does not record final-candidate acceptance, approve publication, or close hosted blockers.
+Final-candidate contract accepted for `1.0.0-rc.1` on 2026-07-10 by TASK-0241, bound to exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` and hosted run `29118452246`. This acceptance does not approve publication or prove publish-path provenance.
 
-The exact source/workflow/test/package-metadata candidate is the TASK-0239 commit. Current source/package metadata is `1.0.0-rc.1`; the immutable published predecessor and current public release are `0.2.0-alpha.4`. The earlier base `b1604ae1e73017521d28e5a83f328bb1347406b6` remains historical local evidence.
+The earlier `Conditional local freeze` status is retained as historical workflow vocabulary; TASK-0241 advances it to exact final-candidate acceptance without changing the frozen contract.
 
-TASK-0232 records the current shipped/documented surface as the V100 target contract. Status: `MAINTAINER_DECISION_RECORDED` and `OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE`.
+The exact source/workflow/test/package-metadata candidate is `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`. Current source/package metadata is `1.0.0-rc.1`; the immutable published predecessor and current public release are `0.2.0-alpha.4`. The earlier base `b1604ae1e73017521d28e5a83f328bb1347406b6` remains historical local evidence.
+
+TASK-0232 records the target contract; TASK-0240 passed its exact hosted gates; TASK-0241 status is `FINAL_CANDIDATE_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241`.
 
 ## Frozen Contract Inventory
 | Contract | Frozen Value | Normative Detail |
@@ -46,12 +48,12 @@ Any breaking change after this freeze requires a new task that reopens the contr
 - TASK-0239 selects `1.0.0-rc.1`, preserves the frozen behavior surface, adds exact alpha4 config generation/fixture coverage, and makes the hosted workflow run the CLI/config/JSON/localization gates directly.
 
 ## Evidence Not Yet Complete
-- Green hosted `release-candidate-evidence` jobs on Windows, Ubuntu, and macOS for the exact pushed TASK-0239 candidate SHA.
-- Final maintainer acceptance of the candidate-specific CLI/config/JSON/baseline/SARIF/localization review.
 - Hosted provenance/attestation evidence on the next separately authorized publish path.
-- Final candidate acceptance in TASK-0241; tag, GitHub pre-release, NuGet publication, and post-publish smoke remain in a later separately authorized task.
+- Tag, GitHub pre-release, NuGet publication, and post-publish smoke in a later separately authorized task.
 
 Private vulnerability reporting and primary/backup security ownership are complete for the current repository state. Signing and SBOM have dated accepted-risk dispositions; recovery ownership is reconciled. Those decisions do not replace the remaining hosted/final-candidate evidence.
 
 ## Freeze Decision
-The V100 target contract is prepared under a conditional local freeze for `1.0.0-rc.1`. V100-02 remains `OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE` until TASK-0241. Publication is prohibited through TASK-0241 even if local and hosted evidence passes. `PUBLISH AUTHORIZATION REQUIRED` remains the separate TASK-0242 boundary.
+The V100 target contract is accepted for exact candidate `1.0.0-rc.1`; V100-02 is `FINAL_CANDIDATE_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241`. Publication remains prohibited in TASK-0241. `PUBLISH AUTHORIZATION REQUIRED` remains the separate TASK-0242 boundary.
+
+Publication is prohibited through TASK-0241. This statement is the unchanged safety boundary, not a claim that the final candidate lacks contract acceptance.

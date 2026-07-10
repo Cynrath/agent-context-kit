@@ -3,8 +3,8 @@
 ## Current V100 `1.0.0-rc.1` Chain
 
 1. COMPLETED — TASK-0239: exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` is pushed; 431/431 local and standard CI runs `29118331264`, `29118331259`, `29118331258` are green.
-2. COMPLETED LOCALLY — TASK-0240: exactly one dispatch produced successful hosted run `29118452246` on Windows, Ubuntu, and macOS; record and commit the evidence without pushing.
-3. CURRENT — TASK-0241: enforce the docs-only candidate bridge, evaluate every V100 gap, record conditional acceptance only if supported, run final validation, create a separate docs commit, push TASK-0240/0241 together once, and wait for final standard CI.
+2. COMPLETED / COMMITTED LOCALLY — TASK-0240: exactly one dispatch produced successful hosted run `29118452246` on Windows, Ubuntu, and macOS; evidence commit is `fd2ce8d` and remains unpushed until the joint final push.
+3. LOCAL COMPLETE / COMMIT PENDING — TASK-0241: docs-only bridge passed; open P0 gaps are 0; conditional GO is recorded; V100-09 remains open pending publish-path provenance; source/build/test/Unicode/all gates/Markdown validation passed. Create the separate commit, push TASK-0240/0241 together once, and wait for final standard CI.
 
 Stop boundary: `TASK-0242: Authorized 1.0.0-rc.1 OIDC publication and provenance verification` requires a separate explicit prompt. No NuGet publish, `release.yml`, tag/GitHub Release, provenance publication, upload, settings/security/collaborator mutation, `.ackit/` commit, force push, published-RC claim, or GA-readiness claim is authorized now.
 

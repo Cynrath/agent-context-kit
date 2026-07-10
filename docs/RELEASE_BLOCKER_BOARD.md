@@ -1,19 +1,26 @@
 # Release Blocker Board
 
-Current status date: 2026-07-10. `0.2.0-alpha.3` and `0.2.0-alpha.4` are published and immutable. TASK-0239 selects source candidate `1.0.0-rc.1` without publication. The alpha3 table below is retained as historical release evidence; current V100 decisions are summarized first.
+Current status date: 2026-07-10. `0.2.0-alpha.3` and `0.2.0-alpha.4` are published and immutable. TASK-0241 accepts exact source candidate `1.0.0-rc.1` for a separately authorized publish task; it remains unpublished. The alpha3 table below is retained as historical release evidence; current V100 decisions are summarized first.
 
 ## Current V100 Decision Boundary
 
 | V100 item | Current status | Remaining boundary |
 | --- | --- | --- |
-| V100-02 CLI contract | MAINTAINER_DECISION_RECORDED | OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE |
+| V100-01 baseline-aware CI | CLOSED_BY_TASK_0241 | Reopen after candidate-impacting change |
+| V100-02 CLI contract | FINAL_CANDIDATE_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241 | Reopen after breaking contract change |
+| V100-03 predecessor config | HOSTED_PREDECESSOR_CONFIG_EVIDENCE_PASS / CLOSED_BY_TASK_0241 | Exact SHA/version tuple only |
+| V100-04 JSON/SARIF | FINAL_MACHINE_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241 | Reopen after machine-contract change |
+| V100-05 upgrade compatibility | HOSTED_UPGRADE_EVIDENCE_PASS / CLOSED_BY_TASK_0241 | Exact SHA/version tuple only |
 | V100-06 security response | CLOSED | Reopen after owner/channel/support-policy change |
-| V100-08 support lifecycle | MAINTAINER_DECISION_RECORDED | OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION |
-| V100-09 supply chain | RECOVERY_OWNERSHIP_RECONCILED; signing/SBOM accepted risks recorded | OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE |
-| Candidate version | `1.0.0-rc.1` selected; predecessor `0.2.0-alpha.4` | TASK-0239 local/CI, TASK-0240 hosted evidence, TASK-0241 acceptance |
+| V100-07 resources | FINAL_RC_HOSTED_RESOURCE_EVIDENCE_PASS / CLOSED_BY_TASK_0241 | Regression tripwire, not SLA |
+| V100-08 support lifecycle | FINAL_RC_CROSS_PLATFORM_CONFIRMATION_PASS / CLOSED_BY_TASK_0241 | Reopen after support-policy change |
+| V100-09 supply chain | MAINTAINER_DECISION_RECORDED; RECOVERY_OWNERSHIP_RECONCILED; SIGNING_AND_SBOM_ACCEPTED_RISK_ACTIVE | OPEN_PENDING_PUBLISH_PATH_PROVENANCE |
+| V100-10 localization | FINAL_LOCALIZATION_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241 | Reopen after localization/contract change |
+| Candidate version | `1.0.0-rc.1` accepted at `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; predecessor `0.2.0-alpha.4` | CONDITIONAL GO for separately authorized publish task |
+| Open P0 gaps | `0` | V100-09 is a publish-path P1 boundary |
 | Publication | NOT AUTHORIZED | Separate explicit TASK-0242 only |
 
-See `docs/V100_MAINTAINER_DECISION_PACKET.md`. No V100 decision authorizes a version bump, workflow dispatch, package/tag/release mutation, repository settings change, or 1.0/V100 RC readiness claim.
+See `docs/V100_MAINTAINER_DECISION_PACKET.md`. Conditional GO does not authorize `release.yml`, NuGet, package/tag/release mutation, repository settings changes, publish provenance, or 1.0 GA readiness claims.
 
 ## Historical Alpha3 Blocker Table
 

@@ -2,11 +2,11 @@
 
 ## Active V100 Release-Candidate Chain
 
-- TASK-0239 is current: select and locally prove source/package candidate `1.0.0-rc.1` against published predecessor `0.2.0-alpha.4`, then push the exact candidate and require standard CI.
-- TASK-0240 is planned: perform the single authorized manual `release-candidate-evidence.yml` dispatch for that exact SHA and record three-OS evidence.
-- TASK-0241 is planned: accept only evidence-backed V100 gaps, preserve V100-09 pending publish-path provenance, push the docs/evidence successors, and require final standard CI.
+- TASK-0239 is complete at exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; local/package evidence and candidate standard CI passed.
+- TASK-0240 is complete locally: single authorized run `29118452246` passed on Windows, Ubuntu, and macOS; evidence commit `fd2ce8d` awaits the joint final push.
+- TASK-0241 conditionally accepts the final candidate with open P0 gaps 0, closes the evidence-backed target gaps, preserves V100-09 pending publish-path provenance, and is completing final validation/push/CI.
 - Published release remains `0.2.0-alpha.4`. The chain explicitly prohibits NuGet publication, `release.yml`, tags, GitHub Releases, provenance publication, uploads, settings changes, and GA-readiness claims.
-- The next possible task is TASK-0242 OIDC publication/provenance verification, but it must not be created or executed without a separate explicit authorization.
+- The next possible task is TASK-0242 OIDC publication/provenance verification, but it must not be created or executed without a separate explicit authorization: `PUBLISH AUTHORIZATION REQUIRED`.
 
 ## v0.1.0-alpha
 - Solution foundation.
