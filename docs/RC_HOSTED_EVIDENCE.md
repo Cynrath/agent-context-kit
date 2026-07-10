@@ -4,6 +4,65 @@
 `.github/workflows/release-candidate-evidence.yml` is a manual-only Windows, Ubuntu, and macOS evidence workflow for a future release-candidate decision. It does not publish or approve a release.
 
 ## Current Hosted Status
+
+### V100 Final-Candidate Input Preparation (TASK-0236 — Not Dispatched)
+
+TASK-0236 prepares, but does not dispatch, the next manual hosted RC evidence input:
+
+| Input | Dispatch-time value |
+| --- | --- |
+| `commit_sha` | Final pushed `origin/master`, equal to local `HEAD` after the one allowed push |
+| `candidate_version` | `0.2.0-alpha.4` |
+| `predecessor_version` | `0.2.0-alpha.3` |
+| Source-impacting evidence base | `b1604ae1e73017521d28e5a83f328bb1347406b6` |
+
+The workflow will build a run-unique local package such as `0.2.0-alpha.4.ci.<run-id>`; it must not publish, replace, or mutate the immutable `0.2.0-alpha.4` package. The final pushed HEAD is eligible only after the bridge review proves every commit after `b1604ae1e73017521d28e5a83f328bb1347406b6` is docs/evidence/governance-only.
+
+Pre-dispatch validation after the single final push:
+
+```powershell
+git fetch origin master --prune
+
+$commitSha = (git rev-parse origin/master).Trim()
+$localHead = (git rev-parse HEAD).Trim()
+if ($localHead -ne $commitSha) {
+    throw 'Local HEAD and origin/master must match before hosted RC dispatch.'
+}
+
+git diff --name-status b1604ae1e73017521d28e5a83f328bb1347406b6..HEAD
+
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/check-release-candidate-inputs.ps1 `
+  -CommitSha $commitSha `
+  -CandidateVersion 0.2.0-alpha.4 `
+  -PredecessorVersion 0.2.0-alpha.3 `
+  -RequireOriginMaster
+```
+
+First remaining authorization boundary — run only after explicit maintainer approval:
+
+```powershell
+gh workflow run release-candidate-evidence.yml `
+  --repo Cynrath/agent-context-kit `
+  --ref master `
+  -f commit_sha=$commitSha `
+  -f candidate_version=0.2.0-alpha.4 `
+  -f predecessor_version=0.2.0-alpha.3
+```
+
+Expected evidence to record after an authorized run:
+
+- workflow run ID/URL, event, branch, and exact head SHA;
+- Windows, Ubuntu, and macOS job IDs/conclusions;
+- actual discovered test count and zero-warning/zero-error build result;
+- predecessor install and source run-unique package version;
+- config hash/`config-check`, baseline, SARIF, and clean-scan results;
+- mixed-corpus distribution, elapsed seconds, peak working set, time/memory threshold results from TASK-0233's expanded script;
+- confirmation that artifact and SARIF upload remain disabled.
+
+The interruption/unreadable-file results are local deterministic evidence; the current hosted workflow invokes the default mixed/time/memory benchmark and does not claim graceful in-process cancellation.
+
+Status: `HOSTED_INPUT_PREPARED`, `NOT_DISPATCHED`, `OPEN_PENDING_MANUAL_WORKFLOW_DISPATCH`.
+
 TASK-0128 completed the hardened workflow and exact hosted run. Run [27478635057](https://github.com/Cynrath/agent-context-kit/actions/runs/27478635057) passed on Windows, Ubuntu, and macOS for exact commit `4c4fa64ff34287dff01818d52f49b521efb3176d`, predecessor `0.2.0-alpha.1`, and source candidate `0.2.0-alpha.2.ci.27478635057`.
 
 TASK-0205 verified hosted `0.2.0-alpha.3` release-candidate evidence with `gh`. Run [27868539971](https://github.com/Cynrath/agent-context-kit/actions/runs/27868539971) passed on Windows, Ubuntu, and macOS for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`, predecessor `0.2.0-alpha.2`, and source candidate package `0.2.0-alpha.3.ci.27868539971`.

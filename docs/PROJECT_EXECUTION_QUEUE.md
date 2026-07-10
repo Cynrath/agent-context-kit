@@ -8,8 +8,8 @@
 | 2 | Completed | TASK-0233 performance and resource evidence expansion | Mixed corpus, peak memory, interruption, unreadable-file evidence | TASK-0232 | Performance script/test/policy/evidence docs | Focused test, Release build, benchmark, RC gate | Hosted confirmation pending |
 | 3 | Completed | TASK-0234 final-candidate local source selection | Select exact last source-impacting local evidence base | TASK-0233 | Candidate selection/V100/roadmap docs | SHA/path/input review | No version or publish |
 | 4 | Completed | TASK-0235 final-candidate local contract freeze preparation | Refresh conditional freeze and target-contract review | TASK-0234 | Freeze/CLI/JSON/schema/V100 docs | Contract/config/JSON/localization/V100 gates | Final acceptance pending |
-| 5 | Current | TASK-0236 hosted RC evidence input preparation | Prepare dispatch-time post-push alpha4/alpha3 inputs | TASK-0235 | Hosted/RC/release/V100 evidence docs | Workflow/input static gates | Manual dispatch not executed |
-| 6 | Planned | TASK-0237 documentation and handoff synchronization | Align all active sources and indexes | TASK-0232–0236 | Roadmap/queue/index/map/readiness/handoff docs | Markdown/tracked/V100/ACKit gates | Docs only |
+| 5 | Completed | TASK-0236 hosted RC evidence input preparation | Prepare dispatch-time post-push alpha4/alpha3 inputs | TASK-0235 | Hosted/RC/release/V100 evidence docs | Workflow/input static gates | Manual dispatch not executed |
+| 6 | Current | TASK-0237 documentation and handoff synchronization | Align all active sources and indexes | TASK-0232–0236 | Roadmap/queue/index/map/readiness/handoff docs | Markdown/tracked/V100/ACKit gates | Docs only |
 | 7 | Planned | TASK-0238 final local readiness audit and closeout | Complete local suite, one final push, one blocking CI wait | TASK-0237 | Final evidence/task/queue/handoff docs | Full local suite plus push-triggered CI | Next action is manual RC dispatch |
 
 Execution rule: one local commit per completed task, no intermediate push, no manual workflow dispatch/rerun, and no release/version/settings mutation.

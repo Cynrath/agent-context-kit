@@ -1,5 +1,17 @@
 # Hosted Validation Status
 
+## V100 Final-Candidate Hosted Input — Prepared, Not Run
+
+TASK-0236 prepares the next manual `release-candidate-evidence.yml` tuple without dispatching it:
+
+- dispatch-time commit: final pushed `origin/master`, equal to local `HEAD`;
+- current source metadata: `0.2.0-alpha.4`;
+- predecessor: published immutable `0.2.0-alpha.3`;
+- source-impacting local evidence base: `b1604ae1e73017521d28e5a83f328bb1347406b6`;
+- state: `HOSTED_INPUT_PREPARED / NOT_DISPATCHED / OPEN_PENDING_MANUAL_WORKFLOW_DISPATCH`.
+
+No V100 final-candidate run ID or hosted result exists yet. Historical results below remain valid only for their exact commits and must not be relabeled as final-candidate evidence.
+
 TASK-0206 completed `0.2.0-alpha.3` publication after refreshed hosted RC evidence. NuGet package verification, global tool install smoke, tag `v0.2.0-alpha.3`, and GitHub prerelease `v0.2.0-alpha.3` are complete. The alpha.2 recovery, supply-chain, and hosted RC hardening evidence below remains historical for that release.
 
 ## Current Alpha.3 Publication Evidence

@@ -113,4 +113,4 @@ Completed on 2026-07-10.
 - V100-02 remains `MAINTAINER_DECISION_RECORDED / LOCAL_FREEZE_PREPARED / OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE`.
 - No version, package, tag, release, workflow, remote state, or final acceptance changed.
 
-Commit: recorded after creation. The next task is TASK-0236.
+Commit: `683eec7`. The next task is TASK-0236.

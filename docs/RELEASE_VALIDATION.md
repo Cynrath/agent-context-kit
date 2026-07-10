@@ -16,6 +16,23 @@ TASK-0233 replaced the uniform timing-only local fixture with a default 2,000-fi
 
 This is local machine-specific regression evidence, not a production SLA. V100-07 remains open pending the selected final-candidate three-OS hosted rerun.
 
+## V100 Hosted RC Input Preparation (TASK-0236)
+
+No workflow was dispatched. Local static/input validation uses:
+
+```powershell
+$head = (git rev-parse HEAD).Trim()
+
+powershell -ExecutionPolicy Bypass -File scripts/check-release-candidate-workflow.ps1 -FailOnIssues
+powershell -ExecutionPolicy Bypass -File scripts/test-release-candidate-inputs.ps1
+powershell -ExecutionPolicy Bypass -File scripts/check-release-candidate-inputs.ps1 `
+  -CommitSha $head `
+  -CandidateVersion 0.2.0-alpha.4 `
+  -PredecessorVersion 0.2.0-alpha.3
+```
+
+The authoritative post-push `-RequireOriginMaster` and manual `gh workflow run` commands are in `docs/RC_HOSTED_EVIDENCE.md`. The dispatch remains the first explicit authorization boundary.
+
 ## v0.2.0-alpha.4 Local Gate Refresh (TASK-0230)
 
 TASK-0230 ran all local V100 contract/readiness gates against the current source at HEAD `583b62e` on 2026-06-27.

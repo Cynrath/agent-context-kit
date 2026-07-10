@@ -3,6 +3,8 @@
 ## Status
 Local evidence preparation includes TASK-0084 through TASK-0096 baseline/config hardening, dependency cleanup, the manual hosted evidence workflow design, machine-readable contract assets, localization parity gates, a security/supply-chain maintainer evidence handoff, a consolidated local-readiness gate, and a conditional local contract freeze. This document does not approve a release candidate or 1.0 GA.
 
+TASK-0236 prepares the future final pushed HEAD input as `candidate_version=0.2.0-alpha.4` and `predecessor_version=0.2.0-alpha.3`. It does not dispatch the workflow. The exact commit is resolved from `origin/master` only after the one final push and docs-only bridge review.
+
 ## Local Evidence Matrix
 | Area | Local Evidence | Status | Remaining Blocker |
 | --- | --- | --- | --- |
@@ -55,6 +57,8 @@ The former xUnit test-tooling warning is resolved locally. Remaining supply-chai
 - Select/version a release candidate, create tag/GitHub pre-release, publish NuGet only in a dedicated approved release task.
 - Record dependency vulnerability/deprecation review with the release date.
 - Complete and approve `docs/MAINTAINER_RC_DECISION.md`; the current decision remains NO-GO for RC publication.
+
+Copy-ready pre-dispatch validation and dispatch commands are in `docs/RC_HOSTED_EVIDENCE.md`. Status: `HOSTED_INPUT_PREPARED / NOT_DISPATCHED / OPEN_PENDING_MANUAL_WORKFLOW_DISPATCH`.
 
 ## Decision Rule
 Do not call the project 1.0 RC-ready while any P0 gap in `docs/V100_GAP_ANALYSIS.md` remains open. P1 gaps require completion or an explicit dated maintainer risk acceptance before 1.0 GA.

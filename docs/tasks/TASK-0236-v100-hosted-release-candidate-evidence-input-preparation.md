@@ -103,4 +103,13 @@ Revert the TASK-0236 commit; no remote state exists to roll back.
 
 ## Completion notes
 
-Planned. Hosted run IDs/results remain intentionally absent.
+Completed on 2026-07-10.
+
+- Prepared dispatch-time inputs: final pushed `origin/master`, `candidate_version=0.2.0-alpha.4`, `predecessor_version=0.2.0-alpha.3`.
+- Preserved source-impacting base `b1604ae1e73017521d28e5a83f328bb1347406b6` and the required docs-only bridge review.
+- Documented run-unique package semantics so immutable alpha4 cannot be replaced or republished.
+- Added exact post-push validation, manual dispatch, evidence-capture, and failure-boundary guidance.
+- Local workflow static gate, positive/negative input fixtures, and alpha4/alpha3 current-HEAD input validation all passed.
+- No `gh workflow run`, workflow rerun, package/tag/release/settings/secret/provenance mutation, or hosted result claim occurred.
+
+Commit: recorded after creation. The next task is TASK-0237.
