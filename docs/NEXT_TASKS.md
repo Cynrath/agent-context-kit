@@ -6,9 +6,9 @@ TASK-0239 through TASK-0241 are the complete authorized candidate-preparation, h
 
 | Order | Task | Status | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
-| 1 | TASK-0239 `1.0.0-rc.1` candidate selection and release preparation | CURRENT | Select candidate metadata, exact alpha4 predecessor evidence, hosted contract gates, draft release records, and local package proof | TASK-0238 | Full local suite, candidate package/install smoke, dependency review, standard CI | One normal candidate push; no dispatch/publish/tag/release |
-| 2 | TASK-0240 hosted RC evidence execution and recording | PLANNED | Dispatch the authorized workflow once for the exact TASK-0239 SHA and record three-OS evidence | TASK-0239 standard CI green | Exact input gate plus one blocking hosted run | Exactly one `release-candidate-evidence.yml` dispatch; no uploads/publication |
-| 3 | TASK-0241 final-candidate acceptance and publish boundary | PLANNED | Reconcile every V100 gap, record conditional decision, push evidence/docs, and wait for final CI | TASK-0240 PASS | Bridge review, full local suite, final standard CI | Normal final docs push; stop before TASK-0242 |
+| 1 | TASK-0239 `1.0.0-rc.1` candidate selection and release preparation | COMPLETED | Candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` prepared and pushed | TASK-0238 | 431/431 local plus standard runs `29118331264`, `29118331259`, `29118331258` | One normal candidate push completed; no publication |
+| 2 | TASK-0240 hosted RC evidence execution and recording | COMPLETED LOCALLY | Exact-SHA three-OS evidence run `29118452246` passed after one authorized dispatch | TASK-0239 standard CI green | Exact input gate plus one blocking hosted run | One RC dispatch completed; no uploads/publication; docs commit pending |
+| 3 | TASK-0241 final-candidate acceptance and publish boundary | CURRENT | Reconcile every V100 gap, record conditional decision, push evidence/docs, and wait for final CI | TASK-0240 PASS | Bridge review, full local suite, final standard CI | Normal final docs push; stop before TASK-0242 |
 
 Candidate `1.0.0-rc.1` is only proposed/prepared; published release remains `0.2.0-alpha.4`. TASK-0239 through TASK-0241 do not authorize NuGet publication, `release.yml`, tag/GitHub Release mutation, provenance publication, settings/security/collaborator changes, uploads, force push, or GA-readiness claims.
 

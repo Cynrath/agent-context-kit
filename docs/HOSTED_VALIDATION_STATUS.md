@@ -1,16 +1,18 @@
 # Hosted Validation Status
 
-## V100 `1.0.0-rc.1` Hosted Input — Prepared, Not Run
+## V100 `1.0.0-rc.1` Hosted Evidence — PASS
 
-TASK-0239 prepares the exact `release-candidate-evidence.yml` tuple without dispatching it:
+TASK-0240 dispatched `release-candidate-evidence.yml` exactly once. Run [`29118452246`](https://github.com/Cynrath/agent-context-kit/actions/runs/29118452246) completed successfully for `master`, event `workflow_dispatch`, exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`, candidate `1.0.0-rc.1`, predecessor `0.2.0-alpha.4`, and run-unique package `1.0.0-rc.1.ci.29118452246`.
 
-- dispatch-time commit: exact TASK-0239 candidate SHA, equal to local `HEAD` and `origin/master`;
-- candidate/source metadata: `1.0.0-rc.1`;
-- predecessor: published immutable `0.2.0-alpha.4`;
-- exact predecessor config: alpha4-generated fixture plus hosted regeneration comparison;
-- state: `CANDIDATE_INPUT_PREPARED / NOT_DISPATCHED / OPEN_PENDING_SINGLE_AUTHORIZED_WORKFLOW_DISPATCH / PUBLICATION_NOT_AUTHORIZED`.
+| Runner | Job | Build/tests | Resource tripwire | Result |
+| --- | ---: | --- | --- | --- |
+| `windows-2025` | `86447580477` | 0 warnings/errors; 431/431 | 1.019s / 45.1 MiB | SUCCESS |
+| `ubuntu-latest` | `86447580502` | 0 warnings/errors; 431/431 | 0.910s / 59.9 MiB | SUCCESS |
+| `macos-latest` | `86447580508` | 0 warnings/errors; 431/431 | 0.696s / 53.8 MiB | SUCCESS |
 
-No V100 final-candidate run ID or hosted result exists yet. Historical results below remain valid only for their exact commits and must not be relabeled as final-candidate evidence.
+Exact predecessor install/config fixture comparison, candidate install, valid/no-migration config-check, unchanged config hash, baseline, CLI/config/JSON/localization contract gates, SARIF parse, final scan, and 30-second/512-MiB resource thresholds passed on all runners. Artifact and SARIF uploads were disabled. No package, tag, release, release-workflow, or provenance publication occurred.
+
+State: `HOSTED_RC_EVIDENCE_PASS / EXACT_CANDIDATE_SHA_VERIFIED / PUBLICATION_NOT_AUTHORIZED`. TASK-0241 final acceptance remains required. Historical results below remain valid only for their exact commits.
 
 ## Historical Published-Release Evidence
 

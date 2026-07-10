@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned; depends on TASK-0239 candidate push and exact-SHA standard CI success.
+Completed locally; hosted evidence passed and the evidence commit is pending creation.
 
 ## Purpose
 
@@ -12,7 +12,7 @@ Use the single authorized manual dispatch of `release-candidate-evidence.yml` to
 
 - Candidate version: `1.0.0-rc.1`.
 - Published predecessor: `0.2.0-alpha.4`.
-- Candidate SHA: exact TASK-0239 commit, to be recorded after creation and push.
+- Candidate SHA: `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`.
 - Local HEAD and `origin/master` must match; working tree must be clean; the three standard candidate workflows must be green.
 
 ## Dependencies
@@ -123,4 +123,14 @@ Correct evidence with a normal follow-up docs commit. Hosted run history is immu
 
 ## Completion notes
 
-Pending the exact TASK-0239 candidate and authorized hosted run.
+Completed on 2026-07-10 with exactly one manual dispatch:
+
+- workflow run: `29118452246`, `workflow_dispatch`, branch `master`, [run URL](https://github.com/Cynrath/agent-context-kit/actions/runs/29118452246)
+- exact candidate: `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; candidate `1.0.0-rc.1`; predecessor `0.2.0-alpha.4`; run-unique package `1.0.0-rc.1.ci.29118452246`
+- Windows job `86447580477`, Ubuntu job `86447580502`, and macOS job `86447580508` all completed successfully
+- every runner built with 0 warnings/0 errors and passed 431/431 tests with 0 failed and 0 skipped
+- predecessor and candidate installs, exact alpha4 config fixture match, valid/no-migration config-check, unchanged raw config SHA-256 `0868078DFFF7DF6FA095D741F3EFA3AC52EEEAA6565CB9E3BACDE63C12579D2A`, baseline entry count 0, JSON contract gates, SARIF parse, localization/contract gates, and final scan passed on every runner
+- mixed-corpus results passed 30-second/512-MiB thresholds: Windows 1.019s/45.1 MiB, Ubuntu 0.910s/59.9 MiB, macOS 0.696s/53.8 MiB
+- artifact upload and SARIF upload were disabled; the read-only workflow performed no package, tag, release, or provenance publication
+
+Status: `HOSTED_RC_EVIDENCE_PASS / EXACT_CANDIDATE_SHA_VERIFIED / PUBLICATION_NOT_AUTHORIZED`. The one downloaded log remains in a disposable temp path and is not committed. TASK-0241 is now the acceptance boundary.

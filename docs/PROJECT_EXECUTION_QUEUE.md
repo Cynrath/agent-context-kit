@@ -4,9 +4,9 @@
 
 | Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Current | TASK-0239 candidate version selection and release preparation | Select `1.0.0-rc.1`, exact alpha4 predecessor evidence, hosted gates, and local candidate package | TASK-0238 | Version/package/workflow/script/test/fixture/release-plan/evidence/handoff files | Full local/package/dependency suite plus candidate standard CI | One normal push; no manual dispatch/publication |
-| 2 | Planned | TASK-0240 hosted RC evidence execution and recording | Run the single authorized exact-SHA three-OS evidence workflow and record actual values | TASK-0239 green | Hosted/validation/V100/queue/handoff docs | Input gate plus one dispatch/watch/view/log sequence | One RC workflow dispatch; read-only/no upload |
-| 3 | Planned | TASK-0241 final acceptance, gap closure, and publish boundary | Accept only evidenced gaps, record conditional decision, final docs push and CI | TASK-0240 PASS | V100/decision/release/queue/handoff docs | Docs-only bridge, full local suite, final standard CI | Stop at separate TASK-0242 authorization |
+| 1 | Completed | TASK-0239 candidate version selection and release preparation | Exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` prepared and pushed | TASK-0238 | Version/package/workflow/script/test/fixture/release-plan/evidence/handoff files | 431/431 local; standard CI `29118331264`, `29118331259`, `29118331258` green | One normal push completed; no publication |
+| 2 | Completed locally | TASK-0240 hosted RC evidence execution and recording | Single authorized run `29118452246` passed on all three operating systems | TASK-0239 green | Hosted/validation/V100/queue/handoff docs | Exact input plus one dispatch/watch/view/log sequence passed | One RC workflow dispatch completed; read-only/no upload |
+| 3 | Current | TASK-0241 final acceptance, gap closure, and publish boundary | Accept only evidenced gaps, record conditional decision, final docs push and CI | TASK-0240 PASS | V100/decision/release/queue/handoff docs | Docs-only bridge, full local suite, final standard CI | Stop at separate TASK-0242 authorization |
 
 Execution rule: TASK-0239 has one candidate commit/push; TASK-0240 and TASK-0241 have separate commits pushed together once. Exactly one manual RC dispatch is authorized. No NuGet/tag/GitHub Release/release-workflow/provenance/settings/upload action is authorized.
 

@@ -2,9 +2,9 @@
 
 ## Current V100 `1.0.0-rc.1` Chain
 
-1. CURRENT — TASK-0239: local candidate preparation is green (431/431, all gates, dependency/package/upgrade/resource/Markdown evidence); create and push the exact `1.0.0-rc.1` candidate commit, then wait for exact-SHA standard CI.
-2. PLANNED — TASK-0240: validate exact clean/synchronized inputs, dispatch `release-candidate-evidence.yml` exactly once, wait/view/log once, record actual three-OS evidence, and create a local docs commit without pushing.
-3. PLANNED — TASK-0241: enforce docs-only candidate bridge, evaluate every V100 gap, record conditional acceptance only if supported, run final validation, create a separate docs commit, push TASK-0240/0241 together once, and wait for final standard CI.
+1. COMPLETED — TASK-0239: exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` is pushed; 431/431 local and standard CI runs `29118331264`, `29118331259`, `29118331258` are green.
+2. COMPLETED LOCALLY — TASK-0240: exactly one dispatch produced successful hosted run `29118452246` on Windows, Ubuntu, and macOS; record and commit the evidence without pushing.
+3. CURRENT — TASK-0241: enforce the docs-only candidate bridge, evaluate every V100 gap, record conditional acceptance only if supported, run final validation, create a separate docs commit, push TASK-0240/0241 together once, and wait for final standard CI.
 
 Stop boundary: `TASK-0242: Authorized 1.0.0-rc.1 OIDC publication and provenance verification` requires a separate explicit prompt. No NuGet publish, `release.yml`, tag/GitHub Release, provenance publication, upload, settings/security/collaborator mutation, `.ackit/` commit, force push, published-RC claim, or GA-readiness claim is authorized now.
 

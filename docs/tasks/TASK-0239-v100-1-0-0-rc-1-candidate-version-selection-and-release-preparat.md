@@ -2,7 +2,7 @@
 
 ## Status
 
-Candidate prepared locally; exact commit, push, and standard CI pending.
+Completed; exact candidate committed, pushed, synchronized, and standard CI green.
 
 ## Purpose
 
@@ -141,4 +141,4 @@ Local preparation completed on 2026-07-10:
 - the RC readiness benchmark passed at 5.691 seconds and 45.1 MiB; the independent 2,000-file mixed benchmark passed at 4.193 seconds and 44.6 MiB against 30-second/512-MiB thresholds
 - the local Markdown audit checked 428 files and 231 local targets with zero broken targets
 
-The exact candidate SHA, one push, and its three standard CI run IDs are recorded by TASK-0240 after the immutable TASK-0239 commit passes hosted standard CI. Publication remains unauthorized.
+The exact candidate is `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`. It was pushed once to `master`, synchronized with `origin/master`, and passed `ci` run `29118331264`, `cross-platform-smoke` run `29118331259`, and `cross-platform-source-smoke` run `29118331258`. Publication remains unauthorized.

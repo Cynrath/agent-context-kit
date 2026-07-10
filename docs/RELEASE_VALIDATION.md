@@ -25,6 +25,20 @@ Disposable local package artifacts were removed. Their exact local validation si
 
 Publication authorized: No. No tag, GitHub Release, NuGet publish, `release.yml` dispatch, artifact/SARIF upload, or provenance action is part of TASK-0239 through TASK-0241.
 
+## V100 `1.0.0-rc.1` Hosted RC Evidence (TASK-0240)
+
+The single authorized manual dispatch produced successful [`release-candidate-evidence` run `29118452246`](https://github.com/Cynrath/agent-context-kit/actions/runs/29118452246) for exact TASK-0239 candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`, candidate `1.0.0-rc.1`, predecessor `0.2.0-alpha.4`, branch `master`, and event `workflow_dispatch`.
+
+| Runner | Job | Build/tests | Package/config/machine contracts | Resource tripwire | Result |
+| --- | ---: | --- | --- | --- | --- |
+| Windows 2025 | `86447580477` | 0 warnings/errors; 431/431 | PASS | 1.019s / 45.1 MiB | SUCCESS |
+| Ubuntu latest | `86447580502` | 0 warnings/errors; 431/431 | PASS | 0.910s / 59.9 MiB | SUCCESS |
+| macOS latest | `86447580508` | 0 warnings/errors; 431/431 | PASS | 0.696s / 53.8 MiB | SUCCESS |
+
+All jobs installed `0.2.0-alpha.4` and run-unique package `1.0.0-rc.1.ci.29118452246`; matched the exact predecessor fixture; reported config `valid`, migration `False`, unchanged config SHA-256 `0868078DFFF7DF6FA095D741F3EFA3AC52EEEAA6565CB9E3BACDE63C12579D2A`; passed baseline count 0, frozen CLI/config/JSON/localization gates, SARIF parse, and final scan; and stayed below 30 seconds/512 MiB.
+
+Artifact/SARIF upload was disabled. No NuGet publication, tag, GitHub Release, `release.yml`, or provenance action occurred. Status: `HOSTED_RC_EVIDENCE_PASS / EXACT_CANDIDATE_SHA_VERIFIED / PUBLICATION_NOT_AUTHORIZED`.
+
 ## V100 Safe/Local Final Audit (TASK-0238)
 
 The single complete local closeout suite passed on 2026-07-10:
