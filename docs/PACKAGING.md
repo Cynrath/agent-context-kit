@@ -8,7 +8,7 @@ Current package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.
 Important fields:
 - `PackageId`: `AgentContextKit`
 - `ToolCommandName`: `ackit`
-- `Version`: `0.2.0-alpha.4` (published); previous published package was `0.2.0-alpha.3`
+- `Version`: `1.0.0-rc.1` (prepared source candidate, not published); current published package is `0.2.0-alpha.4`
 - `Authors`: `Cynrath`
 - `PackageLicenseExpression`: `MIT`
 - `PackageReadmeFile`: `README.nuget.md`
@@ -78,7 +78,7 @@ Publication evidence:
 - Tag `v0.2.0-alpha.4` and GitHub prerelease `v0.2.0-alpha.4` target `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
 
 ## OIDC NuGet Publish
-Version `0.2.0-alpha.4` has been published and install-verified. Version `0.2.0-alpha.3` is the verified predecessor. Future versions are published only from the reviewed exact commit after all gates pass, using the manual `.github/workflows/release.yml` workflow and the preconfigured `nuget-release` environment.
+Version `0.2.0-alpha.4` has been published and install-verified. It is the exact predecessor for prepared candidate `1.0.0-rc.1`. Future publication is allowed only from the reviewed exact commit after all gates pass and a separate authorization, using the manual `.github/workflows/release.yml` workflow and the preconfigured `nuget-release` environment.
 
 The workflow uses NuGet Trusted Publishing through `NuGet/login@v1`. API keys, repository secrets for package credentials, local environment credentials, and credential-bearing `NuGet.Config` files are prohibited.
 

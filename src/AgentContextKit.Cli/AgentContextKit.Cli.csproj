@@ -12,7 +12,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>ackit</ToolCommandName>
     <PackageId>AgentContextKit</PackageId>
-    <Version>0.2.0-alpha.4</Version>
+    <Version>1.0.0-rc.1</Version>
     <Authors>Cynrath</Authors>
     <Company>Cynrath</Company>
     <Copyright>Copyright (c) 2026 Cynrath</Copyright>
@@ -20,7 +20,7 @@
     <PackageReadmeFile>README.nuget.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>ai;coding-agent;context;security;cli;oss</PackageTags>
-    <PackageReleaseNotes>0.2.0-alpha.4: ships dedicated NuGet package README rendering via README.nuget.md and preserves alpha3 CLI behavior.</PackageReleaseNotes>
+    <PackageReleaseNotes>1.0.0-rc.1 candidate: freezes the CLI, config, baseline, JSON, SARIF, localization, security-ownership, and upgrade contracts for final hosted validation. Publication and publish-path provenance remain pending.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/Cynrath/agent-context-kit</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Cynrath/agent-context-kit</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

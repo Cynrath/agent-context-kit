@@ -10,12 +10,12 @@ on:
       candidate_version:
         description: Source package version expected at the exact commit
         required: true
-        default: 0.2.0-alpha.4
+        default: 1.0.0-rc.1
         type: string
       predecessor_version:
         description: Published predecessor package used for upgrade evidence
         required: true
-        default: 0.2.0-alpha.3
+        default: 0.2.0-alpha.4
         type: string
 
 permissions:
@@ -77,6 +77,18 @@ jobs:
           dotnet build AgentContextKit.sln -c Release --no-restore
           dotnet test AgentContextKit.sln -c Release --no-build
 
+      - name: Run frozen contract gates
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+
+          & ./scripts/check-cli-contract.ps1 -FailOnIssues
+          & ./scripts/check-config-generated-conventions.ps1 -FailOnIssues
+          & ./scripts/check-json-contract-assets.ps1 -FailOnIssues
+          & ./scripts/check-localization-parity.ps1 -FailOnIssues
+          Write-Host "FROZEN_CONTRACT_GATES=PASS"
+
       - name: Install predecessor and source candidate
         shell: pwsh
         run: |
@@ -113,9 +125,28 @@ jobs:
           $ErrorActionPreference = "Stop"
           $PSNativeCommandUseErrorActionPreference = $true
 
+          $generatedConfigRoot = Join-Path $env:RUNNER_TEMP "ackit-predecessor-generated-config"
           $demoRoot = Join-Path $env:RUNNER_TEMP "ackit-rc-upgrade"
+          $fixturePath = Join-Path $env:GITHUB_WORKSPACE "tests/fixtures/upgrade/v0.2.0-alpha.4-config.yml"
+          New-Item -ItemType Directory -Force -Path $generatedConfigRoot | Out-Null
+
+          Push-Location $generatedConfigRoot
+          try {
+            git init --quiet
+            & $env:PREDECESSOR_ACKIT init --lang tr
+            $generatedConfig = (Get-Content -Raw ".ackit/config.yml") -replace "`r`n", "`n"
+            $frozenFixture = (Get-Content -Raw $fixturePath) -replace "`r`n", "`n"
+            if ($generatedConfig.TrimEnd() -ne $frozenFixture.TrimEnd()) {
+              throw "Published predecessor generated config does not match the exact alpha4 fixture."
+            }
+            Write-Host "PREDECESSOR_CONFIG_FIXTURE_MATCH=PASS"
+          }
+          finally {
+            Pop-Location
+          }
+
           New-Item -ItemType Directory -Force -Path (Join-Path $demoRoot ".ackit") | Out-Null
-          Copy-Item "tests/fixtures/upgrade/v0.2.0-alpha.1-config.yml" (Join-Path $demoRoot ".ackit/config.yml")
+          Copy-Item $fixturePath (Join-Path $demoRoot ".ackit/config.yml")
           Set-Content -Path (Join-Path $demoRoot "README.md") -Value "# Release candidate fixture"
           Set-Content -Path (Join-Path $demoRoot "LICENSE") -Value "MIT"
           Set-Content -Path (Join-Path $demoRoot "SECURITY.md") -Value "# Security"
@@ -125,6 +156,7 @@ jobs:
           try {
             git init
             $configHashBefore = (Get-FileHash ".ackit/config.yml" -Algorithm SHA256).Hash
+            Write-Host "CONFIG_SHA256_BEFORE=$configHashBefore"
 
             & $env:PREDECESSOR_ACKIT version
             $predecessorScan = & $env:PREDECESSOR_ACKIT scan --json | ConvertFrom-Json
@@ -142,6 +174,8 @@ jobs:
             if ($configCheck.exitCode -ne 0 -or $configCheck.config.status -ne "valid") {
               throw "Source candidate config compatibility check failed."
             }
+            Write-Host "CONFIG_CHECK_STATUS=$($configCheck.config.status)"
+            Write-Host "CONFIG_MIGRATION_REQUIRED=$($configCheck.config.migrationRequired)"
 
             & $env:CANDIDATE_ACKIT scan --ci
             & $env:CANDIDATE_ACKIT baseline --output .ackit-baseline.json
@@ -149,16 +183,22 @@ jobs:
             if ($baselineScan.exitCode -ne 0 -or $null -eq $baselineScan.baseline) {
               throw "Baseline-aware source candidate scan failed."
             }
+            Write-Host "BASELINE_STATUS=PASS"
+            Write-Host "BASELINE_ENTRY_COUNT=$($baselineScan.baseline.entryCount)"
 
             & $env:CANDIDATE_ACKIT sarif --output .ackit/reports/rc-evidence.sarif --baseline .ackit-baseline.json
             Get-Content -Raw ".ackit/reports/rc-evidence.sarif" | ConvertFrom-Json | Out-Null
+            Write-Host "SARIF_PARSE=PASS"
 
             $configHashAfter = (Get-FileHash ".ackit/config.yml" -Algorithm SHA256).Hash
+            Write-Host "CONFIG_SHA256_AFTER=$configHashAfter"
             if ($configHashBefore -ne $configHashAfter) {
               throw "Config content changed during upgrade evidence checks."
             }
+            Write-Host "CONFIG_HASH_UNCHANGED=PASS"
 
             & $env:CANDIDATE_ACKIT scan --ci
+            Write-Host "FINAL_SCAN=PASS"
           }
           finally {
             Pop-Location

@@ -26,7 +26,7 @@ AgentContextKit is an offline-first .NET CLI that prepares repositories for safe
 - Automatic publishing from push or pull-request events.
 
 ## Next Product Direction
-The published alpha.4 package includes baseline-aware CI policy, configuration diagnostics, MCP stdio, `ackit watch`, `diff`, `trim`, `README.nuget.md` NuGet README rendering, and the ACKit-first dogfood workflow. The next package scope remains maintainer-reviewed; `docs/V030_ROADMAP_DECISION.md` remains a planning input rather than a release commitment.
+The published alpha.4 package includes baseline-aware CI policy, configuration diagnostics, MCP stdio, `ackit watch`, `diff`, `trim`, `README.nuget.md` NuGet README rendering, and the ACKit-first dogfood workflow. Source candidate `1.0.0-rc.1` freezes that reviewed surface for exact local and hosted validation; it is not published and requires a separately authorized OIDC publish task.
 
 ## Future Optional LLM Scope
 v0.5 may add optional LLM-assisted workflows, but the default product remains offline-first. Any future provider integration must require explicit user consent, dry-run context review, safe secret handling, and local auditability before remote calls or context export.
@@ -38,7 +38,7 @@ v0.5 may add optional LLM-assisted workflows, but the default product remains of
 - Teams cleaning private projects before public release.
 
 ## Current Commands
-This list describes current source and the published `0.2.0-alpha.4` package.
+This list describes source candidate `1.0.0-rc.1` and the compatible published `0.2.0-alpha.4` package surface.
 
 - `init`
 - `scan`

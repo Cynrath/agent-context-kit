@@ -56,6 +56,8 @@ $requiredPaths = @(
     @{ Path = "docs\RELEASE_CANDIDATE_EVIDENCE.md"; Description = "Release-candidate evidence matrix" },
     @{ Path = "docs\RELEASE_CANDIDATE_CONTRACT_FREEZE.md"; Description = "Release-candidate contract freeze" },
     @{ Path = "docs\MAINTAINER_RC_DECISION.md"; Description = "Maintainer release-candidate decision" },
+    @{ Path = "docs\V100_RC1_RELEASE_PLAN.md"; Description = "V100 RC1 release plan" },
+    @{ Path = "docs\RELEASE_BODY_V100_RC1.md"; Description = "V100 RC1 draft release body" },
     @{ Path = "docs\SECURITY_SUPPLY_CHAIN_EVIDENCE.md"; Description = "Security/supply-chain evidence register" },
     @{ Path = "docs\MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md"; Description = "Maintainer security/supply-chain handoff" },
     @{ Path = "docs\schemas\ackit-command-output-v2.schema.json"; Description = "Command output schema" },
@@ -64,7 +66,8 @@ $requiredPaths = @(
     @{ Path = "tests\fixtures\contracts\command-output-v2-golden.json"; Description = "Command output golden fixture" },
     @{ Path = "tests\fixtures\contracts\baseline-v1-golden.json"; Description = "Baseline golden fixture" },
     @{ Path = "tests\fixtures\contracts\sarif-profile-v1-golden.json"; Description = "SARIF golden fixture" },
-    @{ Path = "tests\fixtures\upgrade\v0.2.0-alpha.1-config.yml"; Description = "Published config fixture" },
+    @{ Path = "tests\fixtures\upgrade\v0.2.0-alpha.1-config.yml"; Description = "Historical alpha1 config fixture" },
+    @{ Path = "tests\fixtures\upgrade\v0.2.0-alpha.4-config.yml"; Description = "Exact published predecessor config fixture" },
     @{ Path = "tests\fixtures\upgrade\baseline-schema-v1.json"; Description = "Baseline schema fixture" },
     @{ Path = "tests\AgentContextKit.Tests\ReleaseCandidateEvidenceTests.cs"; Description = "Compatibility tests" },
     @{ Path = "tests\AgentContextKit.Tests\JsonContractAssetTests.cs"; Description = "Machine-readable contract asset tests" },
@@ -79,17 +82,18 @@ foreach ($entry in $requiredPaths) {
     Require-Path -RelativePath $entry.Path -Description $entry.Description
 }
 
-Require-Text -RelativePath "docs\UPGRADE_COMPATIBILITY.md" -Needle "0.2.0-alpha.1" -Description "Supported predecessor"
+Require-Text -RelativePath "docs\UPGRADE_COMPATIBILITY.md" -Needle "0.2.0-alpha.4" -Description "Selected published predecessor"
 Require-Text -RelativePath "docs\UPGRADE_COMPATIBILITY.md" -Needle "Rollback" -Description "Upgrade rollback guidance"
 Require-Text -RelativePath "docs\PERFORMANCE_POLICY.md" -Needle "not a production SLA" -Description "Performance non-SLA boundary"
 Require-Text -RelativePath "docs\SECURITY_RESPONSE_READINESS.md" -Needle "Primary and backup security notification ownership are recorded and freshly reviewed" -Description "Security notification ownership completion"
 Require-Text -RelativePath "docs\SUPPORT_LIFECYCLE.md" -Needle ".NET 10" -Description "Runtime lifecycle baseline"
 Require-Text -RelativePath "docs\SUPPLY_CHAIN_POLICY.md" -Needle "Signing, SBOM, And Provenance Decision" -Description "Supply-chain decision boundary"
-Require-Text -RelativePath "docs\RELEASE_CANDIDATE_EVIDENCE.md" -Needle "Do not call the project 1.0 RC-ready" -Description "RC decision rule"
+Require-Text -RelativePath "docs\RELEASE_CANDIDATE_EVIDENCE.md" -Needle "Publication authorized: No" -Description "RC publication boundary"
 Require-Text -RelativePath "docs\RELEASE_CANDIDATE_CONTRACT_FREEZE.md" -Needle "Conditional local freeze" -Description "Conditional contract freeze status"
-Require-Text -RelativePath "docs\RELEASE_CANDIDATE_CONTRACT_FREEZE.md" -Needle "NO-GO for RC publication" -Description "Contract freeze publication boundary"
+Require-Text -RelativePath "docs\RELEASE_CANDIDATE_CONTRACT_FREEZE.md" -Needle "Publication is prohibited through TASK-0241" -Description "Contract freeze publication boundary"
 Require-Text -RelativePath "docs\RELEASE_CANDIDATE_CONTRACT_FREEZE.md" -Needle "sha256-rule-path-location-occurrence-v1" -Description "Frozen baseline fingerprint algorithm"
-Require-Text -RelativePath "docs\MAINTAINER_RC_DECISION.md" -Needle "NO-GO for release-candidate publication" -Description "Maintainer current decision"
+Require-Text -RelativePath "docs\MAINTAINER_RC_DECISION.md" -Needle "Publication authorized: No" -Description "Maintainer publication boundary"
+Require-Text -RelativePath "docs\MAINTAINER_RC_DECISION.md" -Needle "PUBLISH AUTHORIZATION REQUIRED" -Description "Separate publish authorization boundary"
 Require-Text -RelativePath "docs\MAINTAINER_RC_DECISION.md" -Needle "Remote-Write Boundary" -Description "Maintainer remote-write boundary"
 
 Push-Location $repoRoot

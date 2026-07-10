@@ -1,6 +1,6 @@
 # Release Blocker Board
 
-Current status date: 2026-07-10. `0.2.0-alpha.3` and `0.2.0-alpha.4` are published and immutable. The alpha3 table below is retained as historical release evidence; current V100 decisions are summarized first.
+Current status date: 2026-07-10. `0.2.0-alpha.3` and `0.2.0-alpha.4` are published and immutable. TASK-0239 selects source candidate `1.0.0-rc.1` without publication. The alpha3 table below is retained as historical release evidence; current V100 decisions are summarized first.
 
 ## Current V100 Decision Boundary
 
@@ -10,6 +10,8 @@ Current status date: 2026-07-10. `0.2.0-alpha.3` and `0.2.0-alpha.4` are publish
 | V100-06 security response | CLOSED | Reopen after owner/channel/support-policy change |
 | V100-08 support lifecycle | MAINTAINER_DECISION_RECORDED | OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION |
 | V100-09 supply chain | RECOVERY_OWNERSHIP_RECONCILED; signing/SBOM accepted risks recorded | OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE |
+| Candidate version | `1.0.0-rc.1` selected; predecessor `0.2.0-alpha.4` | TASK-0239 local/CI, TASK-0240 hosted evidence, TASK-0241 acceptance |
+| Publication | NOT AUTHORIZED | Separate explicit TASK-0242 only |
 
 See `docs/V100_MAINTAINER_DECISION_PACKET.md`. No V100 decision authorizes a version bump, workflow dispatch, package/tag/release mutation, repository settings change, or 1.0/V100 RC readiness claim.
 

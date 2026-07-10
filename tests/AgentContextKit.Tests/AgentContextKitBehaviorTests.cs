@@ -1478,7 +1478,7 @@ public sealed class CliJsonAndMetadataTests
 
         Assert.Equal(0, result.ExitCode);
         Assert.True(result.Output.Contains("Usage:", StringComparison.Ordinal) ||
-                    result.Output.Contains("AgentContextKit 0.2.0-alpha.4", StringComparison.Ordinal));
+                    result.Output.Contains("AgentContextKit 1.0.0-rc.1", StringComparison.Ordinal));
     }
 
     [Theory]
@@ -1718,7 +1718,7 @@ public sealed class CliJsonAndMetadataTests
 
         Assert.Equal(0, result.ExitCode);
         Assert.Equal(2, json?["schemaVersion"]?.GetValue<int>());
-        Assert.Equal("0.2.0-alpha.4", json?["toolVersion"]?.GetValue<string>());
+        Assert.Equal("1.0.0-rc.1", json?["toolVersion"]?.GetValue<string>());
         Assert.False(string.IsNullOrWhiteSpace(json?["generatedAtUtc"]?.GetValue<string>()));
         Assert.Equal("scan", json?["command"]?.GetValue<string>());
         Assert.False(json?["ciMode"]?.GetValue<bool>());
@@ -2118,7 +2118,7 @@ public sealed class CliJsonAndMetadataTests
 
         Assert.Equal(0, result.ExitCode);
         Assert.Equal(2, json?["schemaVersion"]?.GetValue<int>());
-        Assert.Equal("0.2.0-alpha.4", json?["toolVersion"]?.GetValue<string>());
+        Assert.Equal("1.0.0-rc.1", json?["toolVersion"]?.GetValue<string>());
         Assert.False(string.IsNullOrWhiteSpace(json?["generatedAtUtc"]?.GetValue<string>()));
         Assert.Equal("doctor", json?["command"]?.GetValue<string>());
         Assert.False(string.IsNullOrWhiteSpace(json?["repositoryName"]?.GetValue<string>()));
@@ -2138,7 +2138,7 @@ public sealed class CliJsonAndMetadataTests
 
         Assert.Equal(2, result.ExitCode);
         Assert.Equal(2, json?["schemaVersion"]?.GetValue<int>());
-        Assert.Equal("0.2.0-alpha.4", json?["toolVersion"]?.GetValue<string>());
+        Assert.Equal("1.0.0-rc.1", json?["toolVersion"]?.GetValue<string>());
         Assert.False(string.IsNullOrWhiteSpace(json?["generatedAtUtc"]?.GetValue<string>()));
         Assert.Equal("redact-check", json?["command"]?.GetValue<string>());
         Assert.False(string.IsNullOrWhiteSpace(json?["repositoryName"]?.GetValue<string>()));
@@ -2175,8 +2175,8 @@ public sealed class CliJsonAndMetadataTests
         Assert.Contains("<Authors>Cynrath</Authors>", projectFile);
         Assert.Contains("<Company>Cynrath</Company>", projectFile);
         Assert.Contains("<Copyright>Copyright (c) 2026 Cynrath</Copyright>", projectFile);
-        Assert.Contains("<Version>0.2.0-alpha.4</Version>", projectFile);
-        Assert.Contains("ships dedicated NuGet package README rendering via README.nuget.md", projectFile);
+        Assert.Contains("<Version>1.0.0-rc.1</Version>", projectFile);
+        Assert.Contains("freezes the CLI, config, baseline, JSON, SARIF, localization", projectFile);
         Assert.Contains("<PackageProjectUrl>https://github.com/Cynrath/agent-context-kit</PackageProjectUrl>", projectFile);
         Assert.Contains("<RepositoryUrl>https://github.com/Cynrath/agent-context-kit</RepositoryUrl>", projectFile);
         Assert.Contains("<RepositoryType>git</RepositoryType>", projectFile);
@@ -2214,7 +2214,7 @@ public sealed class CliJsonAndMetadataTests
     {
         Assert.NotNull(json);
         Assert.Equal(2, json["schemaVersion"]?.GetValue<int>());
-        Assert.Equal("0.2.0-alpha.4", json["toolVersion"]?.GetValue<string>());
+        Assert.Equal("1.0.0-rc.1", json["toolVersion"]?.GetValue<string>());
         Assert.Equal(command, json["command"]?.GetValue<string>());
         Assert.True(DateTimeOffset.TryParse(json["generatedAtUtc"]?.GetValue<string>(), out _));
     }

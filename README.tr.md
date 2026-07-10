@@ -16,6 +16,8 @@ Public repository URL: `https://github.com/Cynrath/agent-context-kit`
 
 Current release: `v0.2.0-alpha.4` GitHub ve NuGet uzerinde pre-release olarak yayinlandi; global tool kurulumu dogrulandi. Publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
 
+Hazirlanan kaynak adayi: `1.0.0-rc.1` lokal/hosted dogrulama icin secildi; henuz yayinlanmadi ve NuGet uzerinden kurulamaz. Asagidaki yayinlanmis paket kurulum komutlari `0.2.0-alpha.4` olarak kalir.
+
 Varsayılan komutlar repository içeriğini yerelde işler; repository upload, AI API çağrısı, telemetry veya harici araç çalıştırma yapmaz. Ayrıntı: [Varsayılan No-Network Politikası](docs/NO_NETWORK_DEFAULT_POLICY.md).
 
 Kaynak notu: yayinlanmis `0.2.0-alpha.4` NuGet paketi `ackit sarif` komutunu icerir. `0.2.0-alpha.3` onceki release olarak kalir.

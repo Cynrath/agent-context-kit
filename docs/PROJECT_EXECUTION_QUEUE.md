@@ -1,18 +1,14 @@
 # Project Execution Queue
 
-## V100 Safe/Local Completion Track — Local Closeout Complete
+## V100 `1.0.0-rc.1` Candidate Track — Active
 
 | Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Completed | TASK-0232 maintainer decision packet and source-of-truth reconciliation | Record authorized V100 decisions and reconcile current security/recovery/CLI truth | TASK-0231 | Decision packet, V100/security/contract/queue/handoff docs | ACKit, CLI, security/supply-chain, V100, Markdown gates | No remote setting/owner/release mutation |
-| 2 | Completed | TASK-0233 performance and resource evidence expansion | Mixed corpus, peak memory, interruption, unreadable-file evidence | TASK-0232 | Performance script/test/policy/evidence docs | Focused test, Release build, benchmark, RC gate | Hosted confirmation pending |
-| 3 | Completed | TASK-0234 final-candidate local source selection | Select exact last source-impacting local evidence base | TASK-0233 | Candidate selection/V100/roadmap docs | SHA/path/input review | No version or publish |
-| 4 | Completed | TASK-0235 final-candidate local contract freeze preparation | Refresh conditional freeze and target-contract review | TASK-0234 | Freeze/CLI/JSON/schema/V100 docs | Contract/config/JSON/localization/V100 gates | Final acceptance pending |
-| 5 | Completed | TASK-0236 hosted RC evidence input preparation | Prepare dispatch-time post-push alpha4/alpha3 inputs | TASK-0235 | Hosted/RC/release/V100 evidence docs | Workflow/input static gates | Manual dispatch not executed |
-| 6 | Completed | TASK-0237 documentation and handoff synchronization | Align all active sources and indexes | TASK-0232–0236 | Roadmap/queue/index/map/readiness/handoff docs | Markdown/tracked/V100/ACKit gates | Docs only |
-| 7 | Local complete; final push/CI pending | TASK-0238 final local readiness audit and closeout | Complete local suite, one final push, one blocking CI wait | TASK-0237 | Final evidence/task/queue/handoff docs | Full local suite PASS; push-triggered CI follows commit | Next action is manual RC dispatch |
+| 1 | Current | TASK-0239 candidate version selection and release preparation | Select `1.0.0-rc.1`, exact alpha4 predecessor evidence, hosted gates, and local candidate package | TASK-0238 | Version/package/workflow/script/test/fixture/release-plan/evidence/handoff files | Full local/package/dependency suite plus candidate standard CI | One normal push; no manual dispatch/publication |
+| 2 | Planned | TASK-0240 hosted RC evidence execution and recording | Run the single authorized exact-SHA three-OS evidence workflow and record actual values | TASK-0239 green | Hosted/validation/V100/queue/handoff docs | Input gate plus one dispatch/watch/view/log sequence | One RC workflow dispatch; read-only/no upload |
+| 3 | Planned | TASK-0241 final acceptance, gap closure, and publish boundary | Accept only evidenced gaps, record conditional decision, final docs push and CI | TASK-0240 PASS | V100/decision/release/queue/handoff docs | Docs-only bridge, full local suite, final standard CI | Stop at separate TASK-0242 authorization |
 
-Execution rule: one local commit per completed task, no intermediate push, no manual workflow dispatch/rerun, and no release/version/settings mutation.
+Execution rule: TASK-0239 has one candidate commit/push; TASK-0240 and TASK-0241 have separate commits pushed together once. Exactly one manual RC dispatch is authorized. No NuGet/tag/GitHub Release/release-workflow/provenance/settings/upload action is authorized.
 
 ## Historical PROJECT-CONTROL-0109 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |

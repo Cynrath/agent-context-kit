@@ -5,7 +5,7 @@ namespace AgentContextKit.Cli;
 
 public static class Program
 {
-    private const string Version = "0.2.0-alpha.4";
+    private const string Version = "1.0.0-rc.1";
     private const string DefaultBaselinePath = ".ackit-baseline.json";
     private const int JsonSchemaVersion = 2;
     private const int ExitSuccess = 0;

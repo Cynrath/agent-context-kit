@@ -245,8 +245,13 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           $version = "${{ inputs.version }}"
           $tagName = "v$version"
-          $notesTag = $version -replace '\.', '_' -replace '-', '_'
-          $notesFile = "docs/RELEASE_BODY_V020_$($notesTag.ToUpperInvariant()).md"
+          if ($version -eq "1.0.0-rc.1") {
+            $notesFile = "docs/RELEASE_BODY_V100_RC1.md"
+          }
+          else {
+            $notesTag = $version -replace '\.', '_' -replace '-', '_'
+            $notesFile = "docs/RELEASE_BODY_V020_$($notesTag.ToUpperInvariant()).md"
+          }
           if (-not (Test-Path $notesFile -PathType Leaf)) {
             throw "Release body file not found: $notesFile. Create a version-specific body file at this path before release."
           }

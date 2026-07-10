@@ -14,6 +14,8 @@
 
 TASK-0232 records this current shipped policy as the V100 support baseline. Status: `MAINTAINER_DECISION_RECORDED` and `OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION`.
 
+TASK-0239 selects `1.0.0-rc.1` for the required Windows/Ubuntu/macOS confirmation. Published `0.2.0-alpha.4` remains the upgrade/rollback predecessor until publication is separately authorized.
+
 ## 1.0 Target Policy
 Before 1.0 GA, freeze:
 - minimum .NET SDK/runtime and supported OS versions;

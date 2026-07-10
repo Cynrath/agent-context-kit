@@ -1,16 +1,12 @@
 # Next Steps
 
-## Current V100 Chain
+## Current V100 `1.0.0-rc.1` Chain
 
-1. COMPLETED — TASK-0232: V100 decisions recorded, V100-06 closed, security/recovery truth reconciled, and current CLI alpha4 references corrected.
-2. COMPLETED — TASK-0233: mixed-corpus/time/memory/interruption/unreadable-file evidence passed; V100-07 awaits final-RC hosted confirmation.
-3. COMPLETED — TASK-0234: source-impacting evidence base `b1604ae1e73017521d28e5a83f328bb1347406b6` selected; no version/publication selected.
-4. COMPLETED — TASK-0235: alpha4/current-source conditional contract freeze prepared; final acceptance remains open.
-5. COMPLETED — TASK-0236: post-push final-HEAD `0.2.0-alpha.4` / `0.2.0-alpha.3` hosted RC inputs prepared; no dispatch.
-6. COMPLETED — TASK-0237: roadmap, queue, index, readiness, current-package/predecessor, and handoff sources synchronized; historical evidence relabeled without rewriting its facts.
-7. LOCAL COMPLETE — TASK-0238: full suite PASS (430/430, all gates, Unicode guard, performance, Markdown and `.ackit` hygiene). Create the closeout commit, push all commits once, and wait for final push-triggered CI once.
+1. CURRENT — TASK-0239: local candidate preparation is green (431/431, all gates, dependency/package/upgrade/resource/Markdown evidence); create and push the exact `1.0.0-rc.1` candidate commit, then wait for exact-SHA standard CI.
+2. PLANNED — TASK-0240: validate exact clean/synchronized inputs, dispatch `release-candidate-evidence.yml` exactly once, wait/view/log once, record actual three-OS evidence, and create a local docs commit without pushing.
+3. PLANNED — TASK-0241: enforce docs-only candidate bridge, evaluate every V100 gap, record conditional acceptance only if supported, run final validation, create a separate docs commit, push TASK-0240/0241 together once, and wait for final standard CI.
 
-First remaining authorization boundary: manual `release-candidate-evidence.yml` dispatch. No NuGet publish, tag/release mutation, version bump, workflow dispatch/rerun, repository/security/collaborator settings change, destructive recovery, `.ackit/` artifact commit, force push, or 1.0/V100 RC readiness claim.
+Stop boundary: `TASK-0242: Authorized 1.0.0-rc.1 OIDC publication and provenance verification` requires a separate explicit prompt. No NuGet publish, `release.yml`, tag/GitHub Release, provenance publication, upload, settings/security/collaborator mutation, `.ackit/` commit, force push, published-RC claim, or GA-readiness claim is authorized now.
 
 PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 completed TASK-0177 through TASK-0180, then inserted user-prioritized TASK-0187 before TASK-0181 to audit and harden the visible `nuget-release` failed deployments without release/tag/NuGet/deployment mutation.
 

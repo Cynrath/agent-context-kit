@@ -48,6 +48,7 @@ $required = @(
     "scripts/test-supply-chain-workflow.ps1",
     "scripts/check-local-markdown-links.ps1",
     "scripts/verify-release.ps1",
+    "docs/RELEASE_BODY_V100_RC1.md",
     'git tag --list $tagName',
     "gh release list"
 )
@@ -88,6 +89,10 @@ else {
 
 foreach ($marker in @("if: inputs.operation == 'publish'", "environment: nuget-release", "contents: write", "id-token: write", "attestations: write", "NuGet/login@v1", "user: Cyranth", "steps.login.outputs.NUGET_API_KEY", "dotnet nuget push", "gh release create", "actions/attest@v4", "gh attestation verify", "ackit-attestation-subject")) {
     if (-not $publishBlock.Contains($marker)) { $issues.Add("Publish permission/operation marker missing: $marker") | Out-Null }
+}
+
+foreach ($marker in @('$version -eq "1.0.0-rc.1"', '$notesFile = "docs/RELEASE_BODY_V100_RC1.md"')) {
+    if (-not $publishBlock.Contains($marker)) { $issues.Add("V100 RC1 release body mapping missing: $marker") | Out-Null }
 }
 
 if ([regex]::IsMatch($publishBlock, "(?m)^\s*powershell(\s|$)")) {

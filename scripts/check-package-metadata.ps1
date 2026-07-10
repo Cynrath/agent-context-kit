@@ -1,5 +1,5 @@
 param(
-    [string]$ExpectedVersion = "0.2.0-alpha.4",
+    [string]$ExpectedVersion = "1.0.0-rc.1",
     [switch]$FailOnIssues
 )
 

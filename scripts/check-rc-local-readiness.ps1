@@ -91,11 +91,11 @@ foreach ($entry in $requiredPaths) {
     Require-Path -RelativePath $entry.Path -Description $entry.Description
 }
 
-Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "LOCAL READY / REMOTE NO-GO" -Description "Local-versus-remote decision"
-Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "428/428 tests" -Description "Validated test count"
+Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "Publication authorized: No" -Description "Local-versus-publication decision"
+Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "431/431 tests" -Description "Validated test count"
 Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "PENDING MAINTAINER" -Description "Maintainer evidence boundary"
 Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "docs/V100_GAP_ANALYSIS.md" -Description "Open gap source of truth"
-Require-Text -RelativePath "docs\MAINTAINER_RC_DECISION.md" -Needle "NO-GO for release-candidate publication" -Description "Maintainer NO-GO decision"
+Require-Text -RelativePath "docs\MAINTAINER_RC_DECISION.md" -Needle "Publication authorized: No" -Description "Maintainer publication boundary"
 Require-Text -RelativePath "docs\V100_GAP_ANALYSIS.md" -Needle "AgentContextKit is **not ready for 1.0 general availability**" -Description "1.0 GA blocker statement"
 Require-Text -RelativePath "docs\HOSTED_VALIDATION_STATUS.md" -Needle "4c4fa64ff34287dff01818d52f49b521efb3176d" -Description "Hosted evidence commit"
 Require-Text -RelativePath "docs\HOSTED_VALIDATION_STATUS.md" -Needle "27478635057" -Description "Successful manual RC workflow run"

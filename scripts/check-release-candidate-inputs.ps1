@@ -1,7 +1,7 @@
 param(
     [string]$CommitSha,
     [string]$CandidateVersion,
-    [string]$PredecessorVersion = "0.2.0-alpha.2",
+    [string]$PredecessorVersion = "0.2.0-alpha.4",
     [switch]$RequireOriginMaster
 )
 

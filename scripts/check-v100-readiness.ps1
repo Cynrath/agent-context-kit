@@ -107,6 +107,8 @@ $requiredPaths = @(
     @{ Path = "docs\V100_READINESS.md"; Description = "v1.0 final readiness docs" },
     @{ Path = "docs\V100_GAP_ANALYSIS.md"; Description = "current v1.0 gap analysis" },
     @{ Path = "docs\V100_MAINTAINER_DECISION_PACKET.md"; Description = "V100 maintainer decision packet" },
+    @{ Path = "docs\V100_RC1_RELEASE_PLAN.md"; Description = "V100 RC1 release plan" },
+    @{ Path = "docs\RELEASE_BODY_V100_RC1.md"; Description = "V100 RC1 draft release body" },
     @{ Path = "docs\UPGRADE_COMPATIBILITY.md"; Description = "upgrade compatibility policy" },
     @{ Path = "docs\PERFORMANCE_POLICY.md"; Description = "performance policy" },
     @{ Path = "docs\SECURITY_RESPONSE_READINESS.md"; Description = "security response readiness" },
@@ -156,7 +158,8 @@ $requiredPaths = @(
     @{ Path = "src\AgentContextKit.Cli\AgentContextKit.Cli.csproj"; Description = "CLI package project" },
     @{ Path = "tests\AgentContextKit.Tests\ReleaseCandidateEvidenceTests.cs"; Description = "release-candidate evidence tests" },
     @{ Path = "tests\AgentContextKit.Tests\LocalizationParityTests.cs"; Description = "localization parity tests" },
-    @{ Path = "tests\fixtures\upgrade\v0.2.0-alpha.1-config.yml"; Description = "published config compatibility fixture" },
+    @{ Path = "tests\fixtures\upgrade\v0.2.0-alpha.1-config.yml"; Description = "historical alpha1 config compatibility fixture" },
+    @{ Path = "tests\fixtures\upgrade\v0.2.0-alpha.4-config.yml"; Description = "exact published predecessor config fixture" },
     @{ Path = "tests\fixtures\upgrade\baseline-schema-v1.json"; Description = "baseline schema compatibility fixture" }
 )
 
@@ -276,10 +279,10 @@ foreach ($needle in $gapAnalysisNeedles) {
 }
 
 foreach ($needle in @(
-    "OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE",
+    "CLI And Machine-Readable Contract",
     "DONE_CRITERIA_FRESHLY_VERIFIED",
-    "OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION",
-    "OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE"
+    "Runtime And Support Lifecycle",
+    "Supply Chain And Recovery"
 )) {
     Require-Text -Content $v100DecisionPacket -Needle $needle -Description "V100 decision packet marker $needle"
 }
@@ -289,7 +292,7 @@ $rcContractFreezeNeedles = @(
     "Frozen Contract Inventory",
     "Compatibility Rules",
     "Evidence Not Yet Complete",
-    "NO-GO for RC publication"
+    "Publication is prohibited through TASK-0241"
 )
 
 foreach ($needle in $rcContractFreezeNeedles) {
@@ -297,7 +300,8 @@ foreach ($needle in $rcContractFreezeNeedles) {
 }
 
 $maintainerRcDecisionNeedles = @(
-    "NO-GO for release-candidate publication",
+    "Publication authorized: No",
+    "PUBLISH AUTHORIZATION REQUIRED",
     "Decision Inputs",
     "GO Conditions",
     "NO-GO Triggers",

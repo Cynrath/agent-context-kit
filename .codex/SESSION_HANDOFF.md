@@ -1,19 +1,16 @@
 # AgentContextKit Session Handoff
 
-## Active V100 Safe/Local Chain
+## Active V100 `1.0.0-rc.1` Candidate Chain
 
-- Starting state verified on 2026-07-10: clean `master`, local/origin HEAD `23534f83ce29d068145c91723015c0d655401326`, published `0.2.0-alpha.4`, no open PRs/issues, `ShadowFlameC` repository permission `write`, historical runs `28303133199`, `28303133194`, and `28303133198` successful.
-- ACKit preflight: installed `0.2.0-alpha.4`; doctor 13/13 PASS; scan exit 0. `ackit task --help` is not supported by this parser and returned the expected missing-title exit 1; do not repeat it.
-- All task files TASK-0232 through TASK-0238 were created with `ackit task` before implementation and fully planned.
-- TASK-0232 completed locally: V100 decision packet added; V100-06 closed from fresh `enabled: true` plus backup `write` evidence; V100-02/08/09 decisions recorded with final-candidate/hosted boundaries; current security/recovery/CLI sources reconciled. Focused gates passed.
-- TASK-0233 completed locally: mixed 2,000-file scan passed at 5.185 seconds and 44.6 MiB peak working set; interruption and unreadable-file evidence passed; focused tests 2/2 and full RC evidence gate passed. V100-07 now awaits final-RC hosted confirmation.
-- TASK-0234 completed locally: exact source-impacting evidence base `b1604ae1e73017521d28e5a83f328bb1347406b6`; alpha4/alpha3 input validation PASS; no version or publication selected; later commits constrained to docs/evidence/governance-only.
-- TASK-0235 completed locally: conditional freeze refreshed against source base `b1604ae1e73017521d28e5a83f328bb1347406b6`; focused CLI/config/JSON/localization/V100 documentation gates passed; V100-02 remains pending final acceptance.
-- TASK-0236 completed locally at commit `6aa5a6b`: post-push final HEAD / `0.2.0-alpha.4` / predecessor `0.2.0-alpha.3` input packet prepared; workflow/input static checks passed; no workflow was dispatched.
-- TASK-0237 completed locally: active roadmap/queue/index/map/readiness/release/handoff sources synchronized; current package is alpha4 and alpha3 is the immutable predecessor; historical evidence was preserved and relabeled. Documentation gates passed.
-- TASK-0238 local suite passed: ACKit alpha4; doctor 13/13; scan exit 0; Release build 0 warnings/0 errors; 430/430 tests; Unicode guard clean; all required gates; RC benchmark 5.432s/44.8 MiB; standalone benchmark 4.620s/44.5 MiB; Markdown/diff/`.ackit` hygiene clean.
-- Current action: create the TASK-0238 closeout commit, perform the one protected final push, then use the one prescribed blocking final-HEAD CI block.
-- First remaining authorization boundary after local closeout: manual `release-candidate-evidence.yml` dispatch. No version, publish, tag, release, settings, owner, secret, advisory, destructive recovery, workflow dispatch/rerun, or force push is authorized.
+- Entry verified on 2026-07-10: clean `master`; local/origin HEAD `5c1a7782579f1bdc54a0d3706c886108382914cb`; published `0.2.0-alpha.4`; no open PRs/issues; historical standard runs `29107940364`, `29107940251`, and `29107940236` succeeded.
+- `1.0.0-rc.1` is available: no matching Git tag, GitHub Release, or NuGet version exists. Nothing was reserved, tagged, released, or published.
+- ACKit preflight: installed `0.2.0-alpha.4`; doctor 13/13 PASS; scan exit 0 with no Critical/High blocker. `ackit task --help` is unsupported by this parser and returned missing-title exit 1; do not repeat it.
+- TASK-0239, TASK-0240, and TASK-0241 were created with `ackit task` and fully planned before implementation.
+- TASK-0239 is current: prepare source/package candidate `1.0.0-rc.1`, exact predecessor `0.2.0-alpha.4` evidence, hosted contract gates, draft release records, dependency review, and local package proof; then commit/push once and wait for candidate standard CI.
+- TASK-0239 local preparation is complete: source/package/runtime and source-smoke fields report RC1; exact alpha4 generated-config fixture/test and hosted direct contract gates are added; release workflow maps RC1 to its draft body; dependency reviews are clean; Release build is 0/0; tests pass 431/431; Unicode guard is 0/0; disposable package metadata/hygiene/install and alpha4-to-RC config/baseline/SARIF smoke pass. All contract/readiness gates pass; RC-gate resource evidence is 5.691s/45.1 MiB, standalone evidence is 4.193s/44.6 MiB, and 428-file Markdown audit is clean. Candidate commit/push and exact-SHA standard CI remain.
+- TASK-0240 is planned: after exact candidate CI succeeds, dispatch `release-candidate-evidence.yml` exactly once, wait once, record actual three-OS evidence, and create an unpushed docs commit.
+- TASK-0241 is planned: verify the docs-only evidence bridge, reconcile each V100 gap, run final validation, create a separate docs commit, push TASK-0240/0241 together, and wait for final standard CI.
+- Stop after TASK-0241 at `PUBLISH AUTHORIZATION REQUIRED`. No NuGet publication, `release.yml`, tag/GitHub Release, provenance publication, upload, settings/security/collaborator mutation, force push, or GA claim is authorized.
 
 ## Project Purpose
 AgentContextKit is an offline-first, security-first, docs-first, task-first .NET CLI for developers who use AI coding agents. It analyzes repositories, detects stacks and hygiene gaps, generates safe context/workflow files for multiple agents, and reports secret/PII/brand leakage risks before public release or AI context export.

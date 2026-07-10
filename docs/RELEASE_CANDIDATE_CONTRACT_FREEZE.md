@@ -1,9 +1,9 @@
 # Release-Candidate Contract Freeze
 
 ## Status
-Conditional local freeze refreshed on 2026-07-10 by TASK-0235. This document records the V100 target contract surface that passed local preparation; it does not select a release-candidate version, record final-candidate acceptance, approve publication, or close hosted blockers.
+Conditional local freeze bound to candidate `1.0.0-rc.1` on 2026-07-10 by TASK-0239. This document records the V100 target contract surface selected for exact local and hosted validation; it does not record final-candidate acceptance, approve publication, or close hosted blockers.
 
-The selected source-impacting local evidence base is `b1604ae1e73017521d28e5a83f328bb1347406b6`. Current source/package metadata and the immutable published release are `0.2.0-alpha.4`; `0.2.0-alpha.3` is the hosted predecessor input. No new version is selected.
+The exact source/workflow/test/package-metadata candidate is the TASK-0239 commit. Current source/package metadata is `1.0.0-rc.1`; the immutable published predecessor and current public release are `0.2.0-alpha.4`. The earlier base `b1604ae1e73017521d28e5a83f328bb1347406b6` remains historical local evidence.
 
 TASK-0232 records the current shipped/documented surface as the V100 target contract. Status: `MAINTAINER_DECISION_RECORDED` and `OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE`.
 
@@ -19,7 +19,7 @@ TASK-0232 records the current shipped/documented surface as the V100 target cont
 | SARIF | SARIF `2.1.0`; repository-relative paths; no raw scanner match values; local machine-readable profile | `docs/SARIF_OUTPUT.md`, `docs/schemas/ackit-sarif-profile-v1.schema.json` |
 | Scanner rules | Stable `ACKIT` rule IDs and Critical suppression boundary | `docs/SCANNER_RULES.md`, `docs/SECURITY_MODEL.md` |
 | Generated files | Repository-relative paths; skip existing files by default; local `.ackit/` artifacts ignored | `docs/CONFIG_GENERATED_CONVENTIONS.md` |
-| Upgrade predecessor | Published immutable `AgentContextKit` `0.2.0-alpha.3` for the next hosted input | `docs/V100_FINAL_CANDIDATE_LOCAL_SELECTION.md`, `docs/RC_HOSTED_EVIDENCE.md` |
+| Upgrade predecessor | Published immutable `AgentContextKit` `0.2.0-alpha.4`; exact generated config fixture plus hosted regeneration comparison | `docs/V100_FINAL_CANDIDATE_LOCAL_SELECTION.md`, `docs/UPGRADE_COMPATIBILITY.md`, `docs/RC_HOSTED_EVIDENCE.md` |
 | Safety boundary | Offline-first; no repository upload, telemetry, automatic redaction, remote LLM call, publish, tag, or push | `docs/CLI_CONTRACT.md`, `docs/SECURITY_MODEL.md` |
 
 ## Compatibility Rules
@@ -43,14 +43,15 @@ Any breaking change after this freeze requires a new task that reopens the contr
 - TASK-0233 expanded the 2,000-file local tripwire to a mixed corpus: 5.185 seconds, 44.6 MiB peak working set, interruption PASS, unreadable-file focused tests 2/2.
 - TASK-0234 selected exact source-impacting evidence base `b1604ae1e73017521d28e5a83f328bb1347406b6` and validated alpha4/alpha3 candidate inputs locally.
 - TASK-0235 reran CLI, config/generated conventions, JSON assets, localization parity, and V100 documentation gates.
+- TASK-0239 selects `1.0.0-rc.1`, preserves the frozen behavior surface, adds exact alpha4 config generation/fixture coverage, and makes the hosted workflow run the CLI/config/JSON/localization gates directly.
 
 ## Evidence Not Yet Complete
-- Green hosted `release-candidate-evidence` runs on Windows, Ubuntu, and macOS for the final pushed docs-only successor to the selected source base.
+- Green hosted `release-candidate-evidence` jobs on Windows, Ubuntu, and macOS for the exact pushed TASK-0239 candidate SHA.
 - Final maintainer acceptance of the candidate-specific CLI/config/JSON/baseline/SARIF/localization review.
 - Hosted provenance/attestation evidence on the next separately authorized publish path.
-- Candidate version selection, package diff review, tag, GitHub pre-release, NuGet publication, and post-publish smoke in later authorized tasks.
+- Final candidate acceptance in TASK-0241; tag, GitHub pre-release, NuGet publication, and post-publish smoke remain in a later separately authorized task.
 
 Private vulnerability reporting and primary/backup security ownership are complete for the current repository state. Signing and SBOM have dated accepted-risk dispositions; recovery ownership is reconciled. Those decisions do not replace the remaining hosted/final-candidate evidence.
 
 ## Freeze Decision
-The V100 target contract is prepared under a conditional local freeze. V100-02 remains `OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE`. The project remains **NO-GO for RC publication** until the conditions in `docs/MAINTAINER_RC_DECISION.md` are satisfied and recorded by the maintainer.
+The V100 target contract is prepared under a conditional local freeze for `1.0.0-rc.1`. V100-02 remains `OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE` until TASK-0241. Publication is prohibited through TASK-0241 even if local and hosted evidence passes. `PUBLISH AUTHORIZATION REQUIRED` remains the separate TASK-0242 boundary.

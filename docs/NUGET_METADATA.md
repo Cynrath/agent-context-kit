@@ -3,7 +3,7 @@
 AgentContextKit package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj`.
 
 ## Current Status
-`AgentContextKit` `0.2.0-alpha.4` is published through the authorized OIDC release workflow. The previous NuGet package version was `AgentContextKit` `0.2.0-alpha.3`.
+Source/package metadata is prepared as `AgentContextKit` `1.0.0-rc.1`, but it is not published. `AgentContextKit` `0.2.0-alpha.4` remains the current published package and exact hosted predecessor; `0.2.0-alpha.3` is older historical evidence.
 
 Shared package metadata:
 - `RepositoryUrl` is `https://github.com/Cynrath/agent-context-kit`.
@@ -78,7 +78,7 @@ AgentContextKit 0.2.0-alpha.4
 - `PackAsTool`: `true`
 - `ToolCommandName`: `ackit`
 - `PackageId`: `AgentContextKit`
-- `Version`: `0.2.0-alpha.4`
+- `Version`: `1.0.0-rc.1` in current source; published install examples remain `0.2.0-alpha.4` until a separately authorized publish completes
 - `Authors`: `Cynrath`
 - `Company`: `Cynrath`
 - `PackageReadmeFile`: `README.nuget.md`

@@ -24,7 +24,7 @@ During development, run the CLI through:
 dotnet run --project src/AgentContextKit.Cli -- <command>
 ```
 
-Current package note: `ackit sarif` is part of the current source command surface and the published `0.2.0-alpha.4` NuGet global tool. Published alpha3 references elsewhere are historical predecessor evidence.
+Current package note: source candidate `1.0.0-rc.1` preserves the command surface that includes `ackit sarif`; the currently published NuGet global tool remains `0.2.0-alpha.4` until a separately authorized publication task. Alpha3 references elsewhere are historical evidence.
 
 ## Stable Command Surface
 The v1.0 target command surface is:
@@ -54,7 +54,7 @@ ackit help
 ```
 
 ## Stability Rules
-- TASK-0232 records the current shipped/documented surface as the V100 target contract. Final-candidate acceptance and candidate-specific reruns remain pending.
+- TASK-0232 records the shipped/documented surface as the V100 target contract. TASK-0239 selects `1.0.0-rc.1` for candidate-specific local and hosted reruns; final acceptance remains pending until TASK-0241.
 - Keep command names stable before v1.0 release.
 - Keep JSON schema version 2 envelope fields stable: `schemaVersion`, `toolVersion`, `generatedAtUtc`, and `command`.
 - Treat new JSON properties as additive; breaking removals, renames, type changes, or semantic changes require a schema version increment.
@@ -66,7 +66,7 @@ ackit help
 - Keep command identifiers, scanner rule IDs, config diagnostic IDs, exit semantics, and the documented SARIF profile stable within the same target contract.
 - Localized human-readable prose is not byte-for-byte stable; localization must not change technical tokens or machine-readable contracts.
 
-The selected local source-impacting evidence base for this preparation is `b1604ae1e73017521d28e5a83f328bb1347406b6`. Later docs/evidence/governance-only commits use the bridge policy in `docs/V100_FINAL_CANDIDATE_LOCAL_SELECTION.md`; any later behavior change reopens the selection and freeze.
+The selected exact source-impacting candidate is the TASK-0239 commit containing version/workflow/fixture/test preparation. TASK-0240 and TASK-0241 must remain docs/evidence/governance-only; any later behavior change invalidates hosted evidence and reopens the selection and freeze.
 
 ## Global Options
 - `--lang en|tr`: selects English or Turkish output/templates where supported. Unknown language values fall back to English.

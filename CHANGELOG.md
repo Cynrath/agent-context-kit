@@ -6,6 +6,22 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] - Prepared, not published
+
+### Candidate scope
+- Freezes the reviewed CLI command/option surface, exit semantics, config schema `1`, baseline schema `1`, JSON schema `2`, SARIF `2.1.0` profile, stable rule/diagnostic identifiers, and generated-file conventions for exact-candidate validation.
+- Preserves read-only config diagnostics, no automatic config migration, deterministic baseline fingerprints, language-independent machine output, and offline-first behavior.
+- Records `Cynrath` as primary security owner and `ShadowFlameC` as backup notification/recovery owner without changing repository or package ownership.
+- Expands final-candidate performance/resource evidence to a 2,000-file mixed corpus with time and peak-working-set thresholds plus interruption and unreadable-file regression coverage.
+- Preserves English/Turkish help, error, exit, and JSON semantic parity while allowing localized human prose to improve.
+- Validates the upgrade path from published immutable predecessor `0.2.0-alpha.4` to a run-unique `1.0.0-rc.1` source candidate without rewriting predecessor config.
+
+### Known limitations
+- `1.0.0-rc.1` is prepared in source only and is not available from NuGet or as a GitHub Release until a separately authorized publish task completes.
+- Author signing and SBOM publication remain documented bounded accepted risks; neither is claimed as implemented.
+- Hosted publish-path provenance is pending. It can be created and verified only for the exact release package during a future authorized OIDC publish workflow.
+- External adoption evidence remains limited, and hosted documentation/GitHub Pages remains deferred.
+
 ### Added
 - Added a dedicated pure-Markdown `README.nuget.md` package README and package metadata wiring so nuget.org does not render GitHub README HTML as raw text.
 - Added agent-facing documentation for the split between GitHub `README.md` and NuGet `README.nuget.md` ownership.

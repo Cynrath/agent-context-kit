@@ -5,6 +5,38 @@ namespace AgentContextKit.Tests;
 public sealed class ReleaseCandidateEvidenceTests
 {
     [Fact]
+    public void PublishedV020Alpha4GeneratedConfigFixtureMatchesFrozenWriterAndRemainsValid()
+    {
+        using var repo = TempRepository.Create();
+        var fixture = File.ReadAllText(Path.Combine(
+            LocateRepositoryRoot(),
+            "tests",
+            "fixtures",
+            "upgrade",
+            "v0.2.0-alpha.4-config.yml"));
+
+        var writer = new AckitConfigWriter(new PhysicalFileSystem());
+        writer.WriteDefaultIfMissing(repo.Path, LanguageCode.Turkish);
+        var generated = File.ReadAllText(Path.Combine(repo.Path, ".ackit", "config.yml"));
+
+        Assert.Equal(NormalizeNewlines(fixture).TrimEnd(), NormalizeNewlines(generated).TrimEnd());
+
+        var config = new AckitConfigReader(new PhysicalFileSystem()).Read(repo.Path);
+        var diagnostics = new AckitConfigValidator().Validate(fixture);
+
+        Assert.Equal(1, config.SchemaVersion);
+        Assert.Equal("tr", config.DefaultLanguage.Value);
+        Assert.Empty(config.BrandKeywords);
+        Assert.Empty(config.PiiKeywords);
+        Assert.Contains(".ackit/context-exports/", config.IgnorePaths);
+        Assert.Contains(".sql", config.RiskExtensions);
+        Assert.Empty(config.SafeDomains);
+        Assert.Empty(config.IgnoredPaths);
+        Assert.Empty(config.IgnoredFindingIds);
+        Assert.False(diagnostics.HasErrors);
+    }
+
+    [Fact]
     public void PublishedV020Alpha1ConfigFixtureRemainsReadableAndValid()
     {
         using var repo = TempRepository.Create();
@@ -67,5 +99,10 @@ public sealed class ReleaseCandidateEvidenceTests
         }
 
         throw new InvalidOperationException("Repository root could not be located.");
+    }
+
+    private static string NormalizeNewlines(string value)
+    {
+        return value.Replace("\r\n", "\n", StringComparison.Ordinal);
     }
 }

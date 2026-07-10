@@ -4,12 +4,13 @@
 
 Decision date: 2026-07-10. Maintainer: `Cynrath`. Repository: `Cynrath/agent-context-kit`.
 
-This packet records the maintainer-authorized policy decisions for V100-02, V100-06, V100-08, and V100-09. It is a metadata-only local record. It does not select or publish a release version, dispatch a workflow, create or move a tag, mutate a GitHub Release, change repository/security/collaborator settings, publish an SBOM or attestation, or perform package recovery.
+This packet records the maintainer-authorized policy decisions for V100-02, V100-06, V100-08, and V100-09. TASK-0239 selects `1.0.0-rc.1` for evidence without authorizing publication. It does not dispatch a workflow, create or move a tag, mutate a GitHub Release, change repository/security/collaborator settings, publish an SBOM or attestation, or perform package recovery.
 
 ## Verified Decision Inputs
 
-- Current published release: `AgentContextKit 0.2.0-alpha.4`; immutable predecessor: `0.2.0-alpha.3`.
-- Starting source HEAD: `23534f83ce29d068145c91723015c0d655401326`.
+- Current published release and exact RC predecessor: immutable `AgentContextKit 0.2.0-alpha.4`; older `0.2.0-alpha.3` evidence remains historical.
+- TASK-0239 entry HEAD: `5c1a7782579f1bdc54a0d3706c886108382914cb`.
+- Selected candidate: `1.0.0-rc.1`; exact candidate SHA is the TASK-0239 commit after creation.
 - Installed tool: `AgentContextKit 0.2.0-alpha.4`.
 - Private vulnerability reporting: freshly verified `enabled: true` on 2026-07-10 with `scripts/check-private-vulnerability-reporting.ps1 -RequireEnabled`.
 - Primary security triage owner: `Cynrath`.
@@ -143,6 +144,7 @@ OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE
 - V100-08 remains open pending final-RC cross-platform confirmation.
 - V100-09 remains open pending hosted provenance evidence.
 - V100-07 local evidence expansion proceeds in TASK-0233.
-- No 1.0 or V100 RC readiness claim is made.
+- Candidate preparation proceeds in TASK-0239; hosted and final acceptance remain TASK-0240/TASK-0241.
+- No `1.0.0` GA or published-RC claim is made.
 
-The first future remote authorization boundary after the safe/local chain is manual `release-candidate-evidence.yml` dispatch. Publication, versioning, tagging, release creation, and provenance creation remain separate later boundaries.
+The single authorized remote evidence action is TASK-0240 manual `release-candidate-evidence.yml` dispatch. Publication, tagging, release creation, and provenance creation remain separate TASK-0242 boundaries. Publication authorized: No.

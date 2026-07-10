@@ -86,6 +86,8 @@ $criticalDocs = @(
     "docs\V100_DOCUMENTATION_RELEASE_GATE_FREEZE.md",
     "docs\V100_READINESS.md",
     "docs\V100_GAP_ANALYSIS.md",
+    "docs\V100_RC1_RELEASE_PLAN.md",
+    "docs\RELEASE_BODY_V100_RC1.md",
     "docs\RELEASE_CANDIDATE_CONTRACT_FREEZE.md",
     "docs\MAINTAINER_RC_DECISION.md",
     "docs\RC_LOCAL_READINESS.md",
@@ -206,7 +208,9 @@ $releaseValidationDocs = @(
     "PUBLIC_RELEASE_GATES.md",
     "MAINTAINER_RELEASE_HANDOFF.md",
     "RELEASE_CANDIDATE_CONTRACT_FREEZE.md",
-    "MAINTAINER_RC_DECISION.md"
+    "MAINTAINER_RC_DECISION.md",
+    "V100_RC1_RELEASE_PLAN.md",
+    "RELEASE_BODY_V100_RC1.md"
 )
 
 foreach ($doc in $releaseValidationDocs) {

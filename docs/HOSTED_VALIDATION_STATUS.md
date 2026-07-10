@@ -1,14 +1,14 @@
 # Hosted Validation Status
 
-## V100 Final-Candidate Hosted Input — Prepared, Not Run
+## V100 `1.0.0-rc.1` Hosted Input — Prepared, Not Run
 
-TASK-0236 prepares the next manual `release-candidate-evidence.yml` tuple without dispatching it:
+TASK-0239 prepares the exact `release-candidate-evidence.yml` tuple without dispatching it:
 
-- dispatch-time commit: final pushed `origin/master`, equal to local `HEAD`;
-- current source metadata: `0.2.0-alpha.4`;
-- predecessor: published immutable `0.2.0-alpha.3`;
-- source-impacting local evidence base: `b1604ae1e73017521d28e5a83f328bb1347406b6`;
-- state: `HOSTED_INPUT_PREPARED / NOT_DISPATCHED / OPEN_PENDING_MANUAL_WORKFLOW_DISPATCH`.
+- dispatch-time commit: exact TASK-0239 candidate SHA, equal to local `HEAD` and `origin/master`;
+- candidate/source metadata: `1.0.0-rc.1`;
+- predecessor: published immutable `0.2.0-alpha.4`;
+- exact predecessor config: alpha4-generated fixture plus hosted regeneration comparison;
+- state: `CANDIDATE_INPUT_PREPARED / NOT_DISPATCHED / OPEN_PENDING_SINGLE_AUTHORIZED_WORKFLOW_DISPATCH / PUBLICATION_NOT_AUTHORIZED`.
 
 No V100 final-candidate run ID or hosted result exists yet. Historical results below remain valid only for their exact commits and must not be relabeled as final-candidate evidence.
 

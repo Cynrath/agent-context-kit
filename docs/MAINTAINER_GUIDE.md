@@ -112,6 +112,6 @@ Use `docs/ISSUE_BACKLOG.md` for the first copy-ready issue set. Issue creation i
 ## Current Release
 `v0.2.0-alpha.4` is published on GitHub and NuGet as a pre-release at final publish SHA `98cdf9723a509a347bd0403f6373dafe81ba03fb`. Global tool install, immutable release verification, and published/source smoke evidence are complete. `v0.2.0-alpha.3` remains the immutable published predecessor.
 
-Current source metadata is `0.2.0-alpha.4`. TASK-0220 synced release evidence after publication; TASK-0236 prepares a future manual final-candidate hosted input without dispatching it.
+Current source metadata is prepared candidate `1.0.0-rc.1`; the current published package and exact hosted predecessor remain `0.2.0-alpha.4`. TASK-0239 prepares the candidate without dispatching or publishing it.
 
 For historical release-note evidence, use the version-specific release task and immutable GitHub prerelease. Do not reuse an older release body as a current alpha4 source of truth.

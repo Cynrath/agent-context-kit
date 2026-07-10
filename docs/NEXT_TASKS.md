@@ -1,20 +1,16 @@
 # Next Tasks
 
-## V100 Safe/Local Completion Chain — Local Closeout Complete
+## V100 `1.0.0-rc.1` Candidate Chain — Active
 
-The user-authorized TASK-0232 through TASK-0238 safe/local work and full local validation are complete. All task files were created with `ackit task` before implementation and each task has one local commit. The final push and its standard push-triggered CI are executed after the closeout commit; the first subsequent authorization boundary is manual hosted RC workflow dispatch.
+TASK-0239 through TASK-0241 are the complete authorized candidate-preparation, hosted-evidence, and final-acceptance chain. All three task files were created with `ackit task` and fully planned before candidate implementation. The chain stops at publication authorization.
 
 | Order | Task | Status | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
-| 1 | TASK-0232 maintainer decision packet and source-of-truth reconciliation | COMPLETED | Record V100-02/06/08/09 decisions, reconcile security/recovery records, correct current CLI references | TASK-0231 | CLI, security/supply-chain, V100, Markdown and ACKit gates | No settings, owner, package, release, or workflow mutation |
-| 2 | TASK-0233 performance and resource evidence expansion | COMPLETED | Add mixed-corpus, peak-memory, interruption, and unreadable-file evidence | TASK-0232 | Focused tests, Release build, expanded benchmark, RC evidence gate | Hosted confirmation remains pending |
-| 3 | TASK-0234 final-candidate local source selection and preparation | COMPLETED | Select the exact last source-impacting local commit as evidence base | TASK-0233 | SHA/path review and candidate input validation | No version bump or publish |
-| 4 | TASK-0235 final-candidate local contract freeze preparation | COMPLETED | Refresh the conditional freeze against the selected base and target contract | TASK-0234 | CLI/config/JSON/localization/V100 doc gates | Final acceptance remains pending |
-| 5 | TASK-0236 hosted RC evidence input preparation | COMPLETED | Prepare exact post-push alpha4/alpha3 dispatch inputs and evidence schema | TASK-0235 | Workflow/input static tests | Manual workflow dispatch is not executed |
-| 6 | TASK-0237 documentation and handoff synchronization | COMPLETED | Synchronize roadmap, queues, indexes, readiness, and `.codex` state | TASK-0232–0236 | Markdown, tracked/untracked, V100 docs, ACKit | Documentation only |
-| 7 | TASK-0238 final local readiness audit and safe-chain closeout | LOCAL COMPLETE; FINAL PUSH/CI PENDING | Complete local suite, close local chain, push once, wait for final CI | TASK-0237 | Complete goal-defined validation PASS; final CI follows the commit | Next boundary: manual hosted RC dispatch |
+| 1 | TASK-0239 `1.0.0-rc.1` candidate selection and release preparation | CURRENT | Select candidate metadata, exact alpha4 predecessor evidence, hosted contract gates, draft release records, and local package proof | TASK-0238 | Full local suite, candidate package/install smoke, dependency review, standard CI | One normal candidate push; no dispatch/publish/tag/release |
+| 2 | TASK-0240 hosted RC evidence execution and recording | PLANNED | Dispatch the authorized workflow once for the exact TASK-0239 SHA and record three-OS evidence | TASK-0239 standard CI green | Exact input gate plus one blocking hosted run | Exactly one `release-candidate-evidence.yml` dispatch; no uploads/publication |
+| 3 | TASK-0241 final-candidate acceptance and publish boundary | PLANNED | Reconcile every V100 gap, record conditional decision, push evidence/docs, and wait for final CI | TASK-0240 PASS | Bridge review, full local suite, final standard CI | Normal final docs push; stop before TASK-0242 |
 
-No task in this chain authorizes a version bump, NuGet publish, tag/release mutation, workflow dispatch/rerun, GitHub settings/security/collaborator change, destructive recovery, force push, or a V100 RC/1.0 readiness claim.
+Candidate `1.0.0-rc.1` is only proposed/prepared; published release remains `0.2.0-alpha.4`. TASK-0239 through TASK-0241 do not authorize NuGet publication, `release.yml`, tag/GitHub Release mutation, provenance publication, settings/security/collaborator changes, uploads, force push, or GA-readiness claims.
 
 ## Historical Execution Record
 

@@ -546,7 +546,7 @@ public static class TemplateCatalog
             ["en"] = """
             {
               "name": "agent-context-kit",
-              "version": "0.2.0-alpha.4",
+              "version": "1.0.0-rc.1",
               "schema": "v1",
               "models": [],
               "tabAutocompleteModel": null,
@@ -564,7 +564,7 @@ public static class TemplateCatalog
             ["tr"] = """
             {
               "name": "agent-context-kit",
-              "version": "0.2.0-alpha.4",
+              "version": "1.0.0-rc.1",
               "schema": "v1",
               "models": [],
               "tabAutocompleteModel": null,

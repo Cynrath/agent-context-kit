@@ -1,64 +1,69 @@
-# V100 Final-Candidate Local Source Selection
+# V100 Final-Candidate Selection
 
 ## Selection
 
-Selection date: 2026-07-10.
+Selection date: 2026-07-10. Selected by TASK-0239.
 
 | Field | Value |
 | --- | --- |
-| Source-impacting local evidence base | `b1604ae1e73017521d28e5a83f328bb1347406b6` |
-| Commit title | `test: expand TASK-0233 V100 resource evidence` |
-| Current source/package metadata | `0.2.0-alpha.4` |
-| Hosted predecessor input | Published immutable `0.2.0-alpha.3` |
-| Release version selected | None |
+| Candidate version | `1.0.0-rc.1` |
+| Published predecessor | Immutable `0.2.0-alpha.4` |
+| Exact candidate commit | The TASK-0239 commit; captured after commit creation and used unchanged by TASK-0240 |
+| Prior local evidence base | `b1604ae1e73017521d28e5a83f328bb1347406b6` |
 | Publication authorized | No |
-| Final-candidate acceptance | Pending |
+| Final-candidate acceptance | Pending TASK-0240 hosted evidence and TASK-0241 decision |
 
-This record selects the last planned source/script/test-impacting commit in the TASK-0232–0238 safe/local chain as the local V100 evidence base. It does not create a new package version, reuse or replace the published alpha4 package, approve a release candidate, dispatch a workflow, or authorize publication.
+This record selects a real successor version rather than reusing the published alpha4 metadata. It does not publish NuGet, create/move a tag, create/edit a GitHub Release, dispatch `release.yml`, or establish provenance.
 
-## Source-Impact Review
+## Candidate Scope
 
-TASK-0233 changed the performance benchmark and added focused resource-evidence tests:
+TASK-0239 is the source/workflow/test/package-metadata candidate boundary. It changes:
 
-- `scripts/measure-scan-performance.ps1`;
-- `tests/AgentContextKit.Tests/PerformanceResourceEvidenceTests.cs`.
+- source/package/runtime version reporting to `1.0.0-rc.1`;
+- source-package smoke and manual RC defaults;
+- exact alpha4 predecessor config fixture and compatibility coverage;
+- read-only hosted CLI/config/JSON/localization gates and evidence markers;
+- package/release plan, draft release body, changelog, and current candidate documentation.
 
-The same commit updated only supporting V100 performance, task, queue, release-evidence, and handoff documentation. The source-impacting behavior is the mixed-corpus/time/peak-working-set/interruption benchmark contract plus unreadable-file test coverage.
+No CLI command, option, exit, config schema, baseline fingerprint, JSON schema, SARIF profile, generated-file behavior, offline-first behavior, or localization technical token is intentionally changed.
 
-TASK-0234 through TASK-0238 are constrained to contract preparation, hosted-input documentation, source-of-truth synchronization, and final evidence/closeout. If any later task changes source, test behavior, scripts, package metadata, or workflows, this selection must be reopened and moved to the later source-impacting commit.
+## Exact Predecessor Config Evidence
 
-## Input Validation
+Installed `AgentContextKit 0.2.0-alpha.4` generated `.ackit/config.yml` twice in a disposable Git repository with `ackit init --lang tr`. The second invocation skipped the existing file and the SHA-256 remained `4BB20E4CC303D6E288AA4BF6DB2D4847CC76D505E8A1E2DE7FC4716D6D1799BC` on the local Windows evidence host.
 
-The local input checker passed for:
+The sanitized generated content is frozen at `tests/fixtures/upgrade/v0.2.0-alpha.4-config.yml`. The alpha1 fixture remains historical regression coverage. The hosted workflow regenerates the alpha4 config with the installed predecessor, compares normalized content with the exact fixture, and then verifies candidate config hash immutability and `config-check` behavior.
+
+## Candidate Input Contract
 
 ```text
-CommitSha: b1604ae1e73017521d28e5a83f328bb1347406b6
-CandidateVersion: 0.2.0-alpha.4
-PredecessorVersion: 0.2.0-alpha.3
-Result: PASS
+CandidateVersion: 1.0.0-rc.1
+PredecessorVersion: 0.2.0-alpha.4
+CommitSha: exact TASK-0239 full SHA after commit/push
+Required relation: CommitSha == HEAD == origin/master
 ```
 
-The `0.2.0-alpha.4` value is current source metadata used by the hosted evidence workflow to build a run-unique local candidate package such as `0.2.0-alpha.4.ci.<run-id>`. It is not a new release version and must not be published over the immutable alpha4 package.
+The hosted workflow creates a local run-unique package `1.0.0-rc.1.ci.<run-id>`. It cannot upload or publish that package.
 
-## Docs-Only Bridge Policy
+## Post-Candidate Bridge Policy
 
-The manual hosted workflow requires `commit_sha == HEAD == origin/master`. Therefore the future dispatch must use the final pushed HEAD, not the pre-push local SHA above. The final HEAD may be treated as a docs/evidence/governance-only successor to `b1604ae1e73017521d28e5a83f328bb1347406b6` only if final diff review proves that no later source, script, test, workflow, package metadata, or version file changed.
-
-Required final bridge review:
+TASK-0240 and TASK-0241 must remain documentation/evidence/governance-only. Before final acceptance:
 
 ```powershell
-git diff --name-status b1604ae1e73017521d28e5a83f328bb1347406b6..HEAD
-git diff --check b1604ae1e73017521d28e5a83f328bb1347406b6..HEAD
+git diff --name-status <TASK-0239-candidate-sha>..HEAD
+git diff --check <TASK-0239-candidate-sha>..HEAD
 ```
+
+Any post-candidate production source, test, script, workflow, package/version metadata, schema, or behavioral fixture change invalidates TASK-0240 evidence and requires a new candidate SHA and hosted run.
 
 ## Status
 
 ```text
-LOCAL_SOURCE_BASE_SELECTED
-NO_VERSION_SELECTED
-NO_PUBLICATION_AUTHORIZED
-OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE
+CANDIDATE_VERSION_SELECTED
+EXACT_PREDECESSOR_SELECTED
+LOCAL_PREPARATION_IN_PROGRESS
 OPEN_PENDING_HOSTED_RC_EVIDENCE
+OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE
+PUBLICATION_NOT_AUTHORIZED
 ```
 
-The first remaining remote authorization boundary after the safe/local chain is manual `release-candidate-evidence.yml` dispatch for the final pushed HEAD.
+Publication is prohibited through TASK-0241. A later TASK-0242 requires separate explicit authorization.

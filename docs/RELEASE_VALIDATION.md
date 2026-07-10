@@ -1,5 +1,30 @@
 # Release Validation
 
+## V100 `1.0.0-rc.1` Candidate Preparation (TASK-0239)
+
+Candidate `1.0.0-rc.1` is prepared against published predecessor `0.2.0-alpha.4`. The normative plan is `docs/V100_RC1_RELEASE_PLAN.md`; the unpublished draft release body is `docs/RELEASE_BODY_V100_RC1.md`. Public install guidance remains pinned to published alpha4.
+
+TASK-0239 adds exact alpha4 generated-config fixture/regeneration coverage, direct hosted CLI/config/JSON/localization gates, run-unique candidate packaging, source/package version alignment, and future release-body routing. Dependency, local package/install, full-suite, Unicode, resource, and hygiene checks completed locally; exact candidate standard CI is recorded after the candidate push.
+
+Local evidence completed so far on 2026-07-10:
+
+| Check | Result |
+| --- | --- |
+| Dependency review | No vulnerable direct/transitive package; no deprecated package; sources available |
+| Restore/build/test | PASS; 0 warnings, 0 errors, 431/431 tests |
+| Unicode temp guard | PASS; 0 before and 0 after tests |
+| Package | ID/version/repository/license/README/symbols/12-entry nupkg/6-entry snupkg verified; hygiene PASS |
+| Isolated candidate | `AgentContextKit 1.0.0-rc.1`; help/version PASS |
+| Alpha4-to-RC behavior | Published predecessor install, generated config hash `4BB20E4C...D1799BC`, candidate config valid/no migration, hash unchanged, baseline/SARIF/final scan PASS |
+| Contract/readiness gates | V100, documentation/release, CLI, config, JSON, localization, security/supply-chain, RC workflow/input, and RC local-readiness PASS |
+| RC-gate benchmark | 2,000 mixed files; 5.691s; 45.1 MiB; PASS against 30-second/512-MiB thresholds |
+| Standalone benchmark | 2,000 mixed files; 4.193s; 44.6 MiB; PASS against 30-second/512-MiB thresholds |
+| Markdown links | 428 Markdown files; 231 local targets; 0 broken |
+
+Disposable local package artifacts were removed. Their exact local validation sizes/hashes are recorded in `docs/V100_RC1_RELEASE_PLAN.md`; future publish artifacts require fresh exact digests.
+
+Publication authorized: No. No tag, GitHub Release, NuGet publish, `release.yml` dispatch, artifact/SARIF upload, or provenance action is part of TASK-0239 through TASK-0241.
+
 ## V100 Safe/Local Final Audit (TASK-0238)
 
 The single complete local closeout suite passed on 2026-07-10:
@@ -32,7 +57,7 @@ TASK-0233 replaced the uniform timing-only local fixture with a default 2,000-fi
 
 This is local machine-specific regression evidence, not a production SLA. V100-07 remains open pending the selected final-candidate three-OS hosted rerun.
 
-## V100 Hosted RC Input Preparation (TASK-0236)
+## V100 Hosted RC Input Preparation (TASK-0239)
 
 No workflow was dispatched. Local static/input validation uses:
 
@@ -43,11 +68,11 @@ powershell -ExecutionPolicy Bypass -File scripts/check-release-candidate-workflo
 powershell -ExecutionPolicy Bypass -File scripts/test-release-candidate-inputs.ps1
 powershell -ExecutionPolicy Bypass -File scripts/check-release-candidate-inputs.ps1 `
   -CommitSha $head `
-  -CandidateVersion 0.2.0-alpha.4 `
-  -PredecessorVersion 0.2.0-alpha.3
+  -CandidateVersion 1.0.0-rc.1 `
+  -PredecessorVersion 0.2.0-alpha.4
 ```
 
-The authoritative post-push `-RequireOriginMaster` and manual `gh workflow run` commands are in `docs/RC_HOSTED_EVIDENCE.md`. The dispatch remains the first explicit authorization boundary.
+The authoritative post-push `-RequireOriginMaster` and one authorized manual `gh workflow run` command are in `docs/RC_HOSTED_EVIDENCE.md`. Publication remains a later separate authorization boundary.
 
 ## v0.2.0-alpha.4 Local Gate Refresh (TASK-0230)
 

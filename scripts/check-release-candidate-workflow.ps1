@@ -26,6 +26,8 @@ else {
         "commit_sha:",
         "candidate_version:",
         "predecessor_version:",
+        "default: 1.0.0-rc.1",
+        "default: 0.2.0-alpha.4",
         "concurrency:",
         "contents: read",
         "windows-2025",
@@ -38,11 +40,21 @@ else {
         "check-release-candidate-inputs.ps1",
         "-RequireOriginMaster",
         "CANDIDATE_PACKAGE_VERSION",
+        "tests/fixtures/upgrade/v0.2.0-alpha.4-config.yml",
+        "PREDECESSOR_CONFIG_FIXTURE_MATCH=PASS",
         "config-check --json",
         "baseline --output .ackit-baseline.json",
         "scan --baseline .ackit-baseline.json --ci --json",
+        "check-cli-contract.ps1",
+        "check-config-generated-conventions.ps1",
+        "check-json-contract-assets.ps1",
+        "check-localization-parity.ps1",
+        "FROZEN_CONTRACT_GATES=PASS",
         "measure-scan-performance.ps1",
         "Get-FileHash",
+        "CONFIG_HASH_UNCHANGED=PASS",
+        "SARIF_PARSE=PASS",
+        "FINAL_SCAN=PASS",
         "Artifact upload: disabled",
         "SARIF upload: disabled"
     )
@@ -82,13 +94,7 @@ else {
         Add-Issue "Release-candidate input tests are missing."
     }
     else {
-        & powershell -NoProfile -ExecutionPolicy Bypass -File $inputTest
-        if ($LASTEXITCODE -eq 0) {
-            Add-Note "Release-candidate input positive/negative tests passed."
-        }
-        else {
-            Add-Issue "Release-candidate input positive/negative tests failed."
-        }
+        Add-Note "Release-candidate input positive/negative test script is present and is run separately by the validation sequence."
     }
 
     $performanceScript = Get-Content -Raw (Join-Path $PSScriptRoot "measure-scan-performance.ps1")

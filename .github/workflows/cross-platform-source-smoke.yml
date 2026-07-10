@@ -62,7 +62,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path $packageRoot, $toolRoot | Out-Null
 
           dotnet pack src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release -o $packageRoot
-          dotnet tool install AgentContextKit --tool-path $toolRoot --add-source $packageRoot --version 0.2.0-alpha.4 --ignore-failed-sources
+          dotnet tool install AgentContextKit --tool-path $toolRoot --add-source $packageRoot --version 1.0.0-rc.1 --ignore-failed-sources
 
           if ($IsWindows) {
             $ackit = Join-Path $toolRoot "ackit.exe"
