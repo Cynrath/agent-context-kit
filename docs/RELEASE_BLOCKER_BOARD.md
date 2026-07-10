@@ -1,6 +1,19 @@
 # Release Blocker Board
 
-Status date: 2026-06-20. Decision boundary: local `0.2.0-alpha.3` release candidate prepared by TASK-0203; hosted RC evidence passed in TASK-0205 for exact commit `beaa14deed3dbc55ac98d216679f9a9799261801`; publication remains unperformed and requires a separate authorized publish task.
+Current status date: 2026-07-10. `0.2.0-alpha.3` and `0.2.0-alpha.4` are published and immutable. The alpha3 table below is retained as historical release evidence; current V100 decisions are summarized first.
+
+## Current V100 Decision Boundary
+
+| V100 item | Current status | Remaining boundary |
+| --- | --- | --- |
+| V100-02 CLI contract | MAINTAINER_DECISION_RECORDED | OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE |
+| V100-06 security response | CLOSED | Reopen after owner/channel/support-policy change |
+| V100-08 support lifecycle | MAINTAINER_DECISION_RECORDED | OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION |
+| V100-09 supply chain | RECOVERY_OWNERSHIP_RECONCILED; signing/SBOM accepted risks recorded | OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE |
+
+See `docs/V100_MAINTAINER_DECISION_PACKET.md`. No V100 decision authorizes a version bump, workflow dispatch, package/tag/release mutation, repository settings change, or 1.0/V100 RC readiness claim.
+
+## Historical Alpha3 Blocker Table
 
 | Blocker ID | Category | Priority | Current status | Owner role | Evidence required | Remote write? | Decision options / accepted risk | Review date | Release impact | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -19,7 +32,7 @@ Status date: 2026-06-20. Decision boundary: local `0.2.0-alpha.3` release candid
 - `TBD` is a placeholder, not a due-date commitment.
 - An accepted-risk option is not accepted until the decision register has decision, rationale, owner role, evidence, review date, and exact release scope.
 - Local docs/tests/gates cannot mark a remote/security/package blocker done.
-- The current published `v0.2.0-alpha.2` remains unaffected; this board governs future candidate decisions.
+- The historical published releases remain immutable. Current V100 decisions are governed by the section at the top of this file and `docs/V100_GAP_ANALYSIS.md`.
 
 ## TASK-0198 Evidence Boundary
 

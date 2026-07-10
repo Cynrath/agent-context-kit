@@ -42,6 +42,10 @@ Documentation review on 2026-06-14 confirmed the procedure preserves immutable p
 ## Review Cadence
 Review before each release candidate and after any owner, publishing, recovery, or security-notification change.
 
+## TASK-0232 V100 Reconciliation
+
+Review date: 2026-07-10. The current recovery decision remains: `Cynrath` is decision owner, `Cyranth` is the primary NuGet/package owner identity, and `ShadowFlameC` is the backup package recovery owner. The V100-09 baseline requires immutable versions, no package replacement or tag movement, verified commit/tag/release/package alignment, digests, repository-signature and release-asset checks, upgrade/rollback evidence, and a fixed successor for recovery. No destructive action was executed for this review.
+
 ## TASK-0201 Closure Preflight
 
 2026-06-20 TASK-0201 preflight result: `RB-008` remained open/partial before TASK-0202 maintainer evidence.

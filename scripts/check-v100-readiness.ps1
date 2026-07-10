@@ -106,6 +106,7 @@ $requiredPaths = @(
     @{ Path = "docs\V100_DOCUMENTATION_RELEASE_GATE_FREEZE.md"; Description = "v1.0 documentation/release gate freeze" },
     @{ Path = "docs\V100_READINESS.md"; Description = "v1.0 final readiness docs" },
     @{ Path = "docs\V100_GAP_ANALYSIS.md"; Description = "current v1.0 gap analysis" },
+    @{ Path = "docs\V100_MAINTAINER_DECISION_PACKET.md"; Description = "V100 maintainer decision packet" },
     @{ Path = "docs\UPGRADE_COMPATIBILITY.md"; Description = "upgrade compatibility policy" },
     @{ Path = "docs\PERFORMANCE_POLICY.md"; Description = "performance policy" },
     @{ Path = "docs\SECURITY_RESPONSE_READINESS.md"; Description = "security response readiness" },
@@ -170,6 +171,7 @@ $projectMap = Get-FileText "docs\PROJECT_MAP.md"
 $changelog = Get-FileText "CHANGELOG.md"
 $readinessDoc = Get-FileText "docs\V100_READINESS.md"
 $gapAnalysis = Get-FileText "docs\V100_GAP_ANALYSIS.md"
+$v100DecisionPacket = Get-FileText "docs\V100_MAINTAINER_DECISION_PACKET.md"
 $rcContractFreeze = Get-FileText "docs\RELEASE_CANDIDATE_CONTRACT_FREEZE.md"
 $maintainerRcDecision = Get-FileText "docs\MAINTAINER_RC_DECISION.md"
 $freezeDoc = Get-FileText "docs\V100_DOCUMENTATION_RELEASE_GATE_FREEZE.md"
@@ -271,6 +273,15 @@ $gapAnalysisNeedles = @(
 
 foreach ($needle in $gapAnalysisNeedles) {
     Require-Text -Content $gapAnalysis -Needle $needle -Description "Gap analysis section $needle"
+}
+
+foreach ($needle in @(
+    "OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE",
+    "DONE_CRITERIA_FRESHLY_VERIFIED",
+    "OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION",
+    "OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE"
+)) {
+    Require-Text -Content $v100DecisionPacket -Needle $needle -Description "V100 decision packet marker $needle"
 }
 
 $rcContractFreezeNeedles = @(

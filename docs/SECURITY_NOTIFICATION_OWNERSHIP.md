@@ -28,6 +28,12 @@ No private email address, reporter identity, advisory content, notification endp
 ## Completion Boundary
 Private reporting is enabled and TASK-0202 records independent backup notification coverage. `RB-003` is closed for planned `0.2.0-alpha.3` release-preparation entry. A fake advisory must not be created solely to test notification delivery.
 
+## TASK-0232 V100-06 Reverification
+
+On 2026-07-10, private reporting was freshly rechecked as `enabled: true`, and `ShadowFlameC` repository permission was freshly read as `write`. Together with the recorded primary/backup coverage path, public-sensitive-data prohibition, latest-pre-release security-fix scope, and 3/7-business-day non-SLA response targets, the exact V100-06 done criteria are satisfied. Status: `MAINTAINER_DECISION_RECORDED`, `DONE_CRITERIA_FRESHLY_VERIFIED`, `CLOSED`.
+
+Reopen V100-06 after an owner, notification, disclosure-channel, or support-policy change. Do not create a fake advisory or store private contact/report data for reverification.
+
 ## TASK-0201 Closure Preflight
 
 2026-06-20 TASK-0201 preflight result: `RB-003` remained open/partial before TASK-0202 maintainer evidence.

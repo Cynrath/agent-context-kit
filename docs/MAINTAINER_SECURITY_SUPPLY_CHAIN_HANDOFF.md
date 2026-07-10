@@ -23,7 +23,7 @@ Read-only verification:
 gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2026-03-10" repos/Cynrath/agent-context-kit/private-vulnerability-reporting
 ```
 
-The setting blocker is closed. Do not treat it as complete operational readiness until primary and backup notification owners are recorded.
+The setting blocker is closed. TASK-0202 recorded primary and backup notification owners; TASK-0232 freshly verified the current channel and backup collaborator permission. Recheck after owner/security-setting changes and before final candidate acceptance.
 
 ## 2. Final-Candidate Dependency Review
 Run on the exact candidate commit:
@@ -76,7 +76,7 @@ Choose one path:
 - Record `Provenance decision: DEFER` with owner, reason, release scope, compensating package hash/content review, and next review date.
 
 ## 6. Bad-Package Recovery Acceptance
-The project procedure is accepted in `docs/PACKAGE_RECOVERY.md`. `Cynrath` owns the decision, but the public NuGet owner identity is `Cyranth`; TASK-0131 must verify or disposition execution authority. No backup recovery owner is assigned.
+The project procedure is accepted in `docs/PACKAGE_RECOVERY.md`. `Cynrath` owns the decision, the public NuGet owner identity is `Cyranth`, and `ShadowFlameC` is the recorded backup package recovery owner. TASK-0232 reconciles this current state without testing destructive authority. Unlist, deprecate, account-recovery, and successor-release actions remain incident-only maintainer operations.
 
 The accepted procedure must:
 

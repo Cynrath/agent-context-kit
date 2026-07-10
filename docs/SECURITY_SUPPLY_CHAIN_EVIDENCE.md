@@ -14,7 +14,25 @@ Local evidence register prepared on 2026-06-12. Published `0.2.0-alpha.2` packag
 - `ACCEPTED RISK`: explicit dated owner acceptance with scope and review date.
 - `VERIFIED MAINTAINER`: completed remote/credentialed action with non-sensitive evidence metadata.
 
-## Evidence Register
+## Current V100 Decision Reconciliation (TASK-0232)
+
+Reviewed on 2026-07-10 against current repository docs and read-only GitHub state.
+
+| Area | Current V100 Status | Evidence Boundary | Remaining Evidence |
+| --- | --- | --- | --- |
+| Security notification ownership | VERIFIED MAINTAINER / V100-06 CLOSED | `Cynrath` primary; `ShadowFlameC` backup; fresh repository `write` permission and private reporting `enabled: true`; metadata-only coverage record | Reopen after owner/channel/support-policy change |
+| V100 CLI contract | MAINTAINER DECISION RECORDED | Current shipped/documented command, JSON, schema, ID, exit, and SARIF surface is the target contract | Final-candidate acceptance |
+| Runtime/support lifecycle | MAINTAINER DECISION RECORDED | .NET 10; Windows, Ubuntu/Linux, macOS; latest pre-release planned fixes; predecessor retained | Final-RC three-OS confirmation |
+| Package recovery | RECOVERY OWNERSHIP RECONCILED | `Cynrath` decision owner; `Cyranth` primary NuGet identity; `ShadowFlameC` backup recovery owner; immutable-successor procedure | Recheck after owner/recovery change; no destructive test |
+| Author signing | ACCEPTED RISK | 2026-06-14 bounded deferral remains in force through 2026-09-30 | Revisit by expiry or next pre-release review |
+| SBOM | ACCEPTED RISK | 2026-06-14 bounded deferral remains in force through 2026-09-30 | Revisit by expiry or next pre-release review |
+| Build/package provenance | IMPLEMENTED LOCALLY / HOSTED PENDING | Future authorized publish path contains the control; immutable alpha2/alpha3/alpha4 history is not retroactively changed | Hosted attestation evidence on next authorized publish path |
+
+See `docs/V100_MAINTAINER_DECISION_PACKET.md` for exact policy text and status tokens.
+
+## Historical 2026-06-14 Evidence Register
+
+The following table preserves the original TASK-0095/TASK-0132 baseline and its exact gate markers. TASK-0202 and TASK-0232 supersede the historical partial ownership/recovery rows for current-state decisions; the table is not the current V100 status.
 | Area | Current Status | Local Evidence | Maintainer Evidence Required | RC Effect |
 | --- | --- | --- | --- | --- |
 | Private vulnerability reporting | VERIFIED MAINTAINER: ENABLED on 2026-06-14 | Authenticated enablement, independent GET `enabled: true`, and public Security-page entry-point verification; no advisory was created | Recheck before a future RC and after material repository ownership/security-setting changes | Complete for current repository state |
@@ -45,7 +63,7 @@ Maintainer: Cynrath
 
 Private vulnerability reporting: ENABLED (verified 2026-06-14)
 Verification reference: GitHub repository private-reporting GET plus public Security-page entry point
-Security notification primary/backup owner: Cynrath / UNASSIGNED
+Security notification primary/backup owner: Cynrath / ShadowFlameC
 
 Dependency review date and result:
 Package signing decision: SIGN / DEFER
@@ -54,7 +72,7 @@ SBOM decision: PUBLISH / DEFER
 SBOM format, digest, and publication reference:
 Provenance decision: ATTEST / DEFER
 Attestation run, subject digest, and verification reference:
-Bad-package recovery owner and accepted procedure: Cynrath / docs/PACKAGE_RECOVERY.md; NuGet authority pending
+Bad-package recovery owner and accepted procedure: Cynrath primary decision owner / ShadowFlameC backup recovery owner / docs/PACKAGE_RECOVERY.md; destructive actions remain incident-only
 
 Open risks:
 Next review date:

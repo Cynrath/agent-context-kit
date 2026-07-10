@@ -1,5 +1,11 @@
 # AgentContextKit Context Pack
 
+## Active V100 Safe/Local Completion Chain
+
+Verified entry state: clean `master` at `23534f83ce29d068145c91723015c0d655401326`, equal to `origin/master`; published release `0.2.0-alpha.4`; no open PRs/issues; `ShadowFlameC` has repository `write` permission; prior push-triggered CI is green. ACKit is `0.2.0-alpha.4`, doctor 13/13 PASS, scan exit 0.
+
+TASK-0232 through TASK-0238 were created with `ackit task` before implementation. TASK-0232 completed locally: V100-06 closed from fresh channel/backup evidence, V100-02/08/09 decisions recorded, and current security/recovery/CLI truth reconciled. Current task is TASK-0233. Execute the remaining chain continuously with one local commit per task and no intermediate push. After the final local audit, push once and wait for `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` through the prescribed single blocking sequence. Stop at manual hosted RC workflow dispatch; do not mutate versions, packages, tags, releases, workflows, repository/security/collaborator settings, secrets, advisories, or recovery state.
+
 ## Project
 AgentContextKit (`ackit`) is an offline-first .NET 10 CLI for AI-assisted repository context generation, task-first workflow docs, and secret/PII/brand leakage risk reporting.
 
@@ -13,7 +19,7 @@ TASK-0225 completed: post-alpha4 roadmap triage and next-work selection. No bloc
 
 TASK-0226 completed: post-alpha4 code quality refresh. No blocking findings.
 
-Current task: TASK-0231 post-alpha4 V100 cleanup and next roadmap selection. Classify remaining V100 gaps into actionable buckets (LOCAL_IMPLEMENTATION, MAINTAINER_DECISION, REMOTE_EVIDENCE, DOCS_FOLLOWUP, DEFERRED), write decision matrix, and recommend next roadmap path.
+Historical checkpoint: TASK-0231 completed the post-alpha4 V100 cleanup and selected the TASK-0232 decision packet. The active chain is recorded at the top of this file.
 
 TASK-0213 completed published-package workflow pin/status sync. Plan commit `647853c`; implementation commit `a18152d`. The active `.github/workflows/cross-platform-smoke.yml` workflow is the current published-package smoke workflow, so its `dotnet tool install --global AgentContextKit` pin was updated from historical `0.2.0-alpha.2` to current published `0.2.0-alpha.3`. Documentation-only examples already used alpha3. README.tr, release validation, maintainer guide, and maintainer handoff status text record the sync. Historical/predecessor alpha2 references remain intact. Validation passed with `ackit --version`, `ackit doctor`, `ackit scan --ci`, `git diff --check`, Markdown completeness guard, localization parity, release workflow static gate, focused pin grep, and `dotnet test AgentContextKit.sln -c Release --no-build` (`428/428`).
 
@@ -239,7 +245,7 @@ powershell -ExecutionPolicy Bypass -File scripts/verify-release.ps1
 - TASK-0095 is complete locally with `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md`, `docs/MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md`, and `scripts/check-security-supply-chain-evidence.ps1`. Dependency reviews, 178/178 tests, local package verification, all integrated gates, clean hygiene, and a 3.368-second benchmark pass. All remote security settings and signing/SBOM/provenance/recovery actions remain explicitly pending maintainer evidence.
 - TASK-0096 is complete locally. `docs/RC_LOCAL_READINESS.md` and `scripts/check-rc-local-readiness.ps1` consolidate the final local evidence under `LOCAL READY / REMOTE NO-GO`; 178/178 tests, dependency review, package verification, hygiene, all local gates, and a 3.495-second benchmark pass. Hosted and maintainer-only gaps remain open.
 - Remote `master` includes `37d5220`. TASK-0097 records that standard `ci`, published-package smoke, and source-package smoke passed for that exact commit while the dedicated manual RC evidence workflow has zero runs. Full local validation remains green at 178/178 tests with a 3.716-second benchmark.
-- TASK-0098 is complete locally from read-only GitHub REST evidence that private vulnerability reporting is disabled on 2026-06-13. Activation and notification ownership remain P0 maintainer actions.
+- Historical TASK-0098 evidence recorded private reporting as disabled on 2026-06-13. TASK-0129 later enabled it, TASK-0202 completed ownership, and TASK-0232 freshly reverified the current closed V100-06 state.
 - TASK-0099 is complete locally. The published `0.2.0-alpha.1` package/release is NuGet.org repository-signed with no observed author signature, no package/release SBOM, no accessible GitHub package attestation, and public NuGet owner profile `Cyranth` versus project persona `Cynrath`; remediation remains maintainer-only.
 - TASK-0100 completed a separate local-only ecosystem intelligence track reset. Related OSS tools are compared by verified license, offline behavior, API/network boundary, outputs, overlap, complementary value, privacy, maturity, and conservative integration mode; no dependency or adapter is added.
 - TASK-0100 validation passed with 178/178 tests, clean source scan/doctor, parsed JSON/SARIF, sample smoke, clean hygiene, readiness/security/supply-chain gates, and local package verification.

@@ -210,7 +210,7 @@ The consolidated local RC decision is defined in [RC_LOCAL_READINESS.md](RC_LOCA
 
 Hosted standard workflow evidence is recorded in [HOSTED_VALIDATION_STATUS.md](HOSTED_VALIDATION_STATUS.md). It proves current CI and source/published package smoke on commit `37d5220`; it does not substitute for the unrun manual RC evidence workflow.
 
-Private vulnerability reporting status is recorded in [PRIVATE_VULNERABILITY_REPORTING_STATUS.md](PRIVATE_VULNERABILITY_REPORTING_STATUS.md). Enablement and the public entry point were independently verified on 2026-06-14; primary and backup notification ownership remain a P0 operational action.
+Private vulnerability reporting status is recorded in [PRIVATE_VULNERABILITY_REPORTING_STATUS.md](PRIVATE_VULNERABILITY_REPORTING_STATUS.md). Enablement and the public entry point were independently verified on 2026-06-14 and freshly rechecked on 2026-07-10; TASK-0202/TASK-0232 record current primary/backup ownership and close V100-06.
 
 Published package/release supply-chain status is recorded in [PUBLISHED_SUPPLY_CHAIN_STATUS.md](PUBLISHED_SUPPLY_CHAIN_STATUS.md). That dated audit covers the predecessor `0.2.0-alpha.1` package: valid NuGet.org repository signature, no observed author signature, no package/release SBOM, no accessible GitHub package attestation, and a NuGet owner profile that differs from the project persona. A matching alpha.2 supply-chain re-audit remains a follow-up rather than an inferred result.
 
@@ -227,7 +227,7 @@ dotnet list AgentContextKit.sln package --deprecated
 
 The 2026-06-12 post-migration review found no vulnerable or deprecated direct/transitive packages. TASK-0091 replaced Legacy `xunit` `2.9.3` with `xunit.v3` `3.2.2`, updated the Visual Studio runner to `3.1.5`, and preserved 169/169 passing tests.
 
-The `sarif` command is available in current source and in the published NuGet `0.2.0-alpha.3` global tool.
+The `sarif` command is available in current source and in the published NuGet `0.2.0-alpha.4` global tool.
 
 ## Local v0.2.0-alpha.3 Candidate Package Validation
 Use temporary directories outside the repository:
@@ -587,7 +587,7 @@ Hosted workflow validation is complete for the latest TASK-0056 push. Future wor
 See [MAINTAINER_RELEASE_HANDOFF.md](MAINTAINER_RELEASE_HANDOFF.md) for published release status and follow-up guidance.
 
 ## Baseline Validation
-The published NuGet `0.2.0-alpha.3` package includes the explicit baseline workflow added by TASK-0086.
+The published NuGet `0.2.0-alpha.4` package includes the explicit baseline workflow added by TASK-0086.
 
 ```powershell
 dotnet run --project src/AgentContextKit.Cli -- baseline --output .ackit-baseline.json

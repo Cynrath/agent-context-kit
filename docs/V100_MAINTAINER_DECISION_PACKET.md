@@ -1,0 +1,148 @@
+# V100 Maintainer Decision Packet
+
+## Status
+
+Decision date: 2026-07-10. Maintainer: `Cynrath`. Repository: `Cynrath/agent-context-kit`.
+
+This packet records the maintainer-authorized policy decisions for V100-02, V100-06, V100-08, and V100-09. It is a metadata-only local record. It does not select or publish a release version, dispatch a workflow, create or move a tag, mutate a GitHub Release, change repository/security/collaborator settings, publish an SBOM or attestation, or perform package recovery.
+
+## Verified Decision Inputs
+
+- Current published release: `AgentContextKit 0.2.0-alpha.4`; immutable predecessor: `0.2.0-alpha.3`.
+- Starting source HEAD: `23534f83ce29d068145c91723015c0d655401326`.
+- Installed tool: `AgentContextKit 0.2.0-alpha.4`.
+- Private vulnerability reporting: freshly verified `enabled: true` on 2026-07-10 with `scripts/check-private-vulnerability-reporting.ps1 -RequireEnabled`.
+- Primary security triage owner: `Cynrath`.
+- Backup security notification owner and backup maintainer contact: `ShadowFlameC`; repository permission freshly verified as `write` on 2026-07-10 through the GitHub collaborator permission endpoint.
+- Backup package recovery ownership: recorded by TASK-0202 and `docs/PACKAGE_RECOVERY.md`. No destructive NuGet action was used as a test.
+- Author signing and SBOM: dated bounded accepted risks remain in force through the next pre-release review or 2026-09-30.
+- Provenance: implemented locally for the next authorized publish path; hosted evidence remains unavailable until that path is executed.
+
+No private contact information, report content, credentials, tokens, recovery material, or private endpoints are stored here.
+
+## V100-02 — CLI And Machine-Readable Contract
+
+### Decision
+
+The current shipped and documented CLI surface is the V100 target contract.
+
+Machine-readable stability includes:
+
+- command and option names and meanings;
+- JSON envelope fields and command-specific required fields;
+- JSON schemas and their versioning rules;
+- command identifiers and machine-readable status tokens;
+- scanner rule IDs and config diagnostic IDs;
+- exit-code semantics;
+- the AgentContextKit SARIF `2.1.0` profile expectations.
+
+Localized human-readable text is not byte-for-byte stable. Localization must not change command/option names, JSON fields, schema/status tokens, rule/diagnostic IDs, paths, severity names, or exit decisions.
+
+### Status
+
+```text
+MAINTAINER_DECISION_RECORDED
+OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE
+```
+
+The decision fixes the target contract; it does not replace candidate-specific gate reruns or final maintainer acceptance.
+
+## V100-06 — Security Response Ownership
+
+### Decision
+
+- Primary owner: `Cynrath`.
+- Backup owner: `ShadowFlameC`.
+- Private disclosure channel: GitHub private vulnerability reporting.
+- Sensitive vulnerability data must not be placed in public issues.
+- The latest published pre-release receives planned security fixes.
+- Acknowledgement target: 3 business days.
+- Initial triage target: 7 business days.
+- These targets are maintainer objectives, not contractual SLAs.
+
+### Fresh Done-Criteria Verification
+
+| Criterion | Evidence | Result |
+| --- | --- | --- |
+| Primary owner | `docs/SECURITY_NOTIFICATION_OWNERSHIP.md`; repository owner/maintainer | VERIFIED |
+| Independent backup owner | TASK-0202 plus fresh GitHub `write` permission check for `ShadowFlameC` on 2026-07-10 | VERIFIED |
+| Private channel | Fresh `enabled: true` check on 2026-07-10 | VERIFIED |
+| Coverage path | Repository security notifications, private reporting, advisory escalation, and direct maintainer escalation | VERIFIED |
+| Non-public sensitive-data rule | `SECURITY.md` and response/handoff docs | VERIFIED |
+| Response targets | `docs/SECURITY_RESPONSE_READINESS.md` | VERIFIED |
+| Supported security-fix scope | Latest pre-release policy in response/support docs | VERIFIED |
+| Review date and non-sensitive reference | This packet, 2026-07-10 | VERIFIED |
+
+### Status
+
+```text
+MAINTAINER_DECISION_RECORDED
+DONE_CRITERIA_FRESHLY_VERIFIED
+CLOSED
+```
+
+V100-06 is closed for the current repository state. Reopen it after an owner, notification, disclosure-channel, or support-policy change.
+
+## V100-08 — Runtime And Support Lifecycle
+
+### Decision
+
+- Runtime baseline: .NET 10.
+- Tested platforms: Windows, Ubuntu/Linux, and macOS.
+- The latest published pre-release receives planned fixes.
+- The predecessor remains available for upgrade and rollback evidence.
+- Breaking pre-1.0 changes require changelog and migration notes.
+- .NET 9 and older are unsupported.
+- Hosted/cloud Web UI is unsupported.
+- Telemetry and repository upload are unsupported.
+- `ackit` does not perform release or publish operations.
+
+### Status
+
+```text
+MAINTAINER_DECISION_RECORDED
+OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION
+```
+
+The policy is approved; the selected final candidate still requires the supported three-OS hosted rerun.
+
+## V100-09 — Supply Chain And Recovery
+
+### Decision
+
+The minimum V100 supply-chain baseline is:
+
+- OIDC Trusted Publishing only;
+- immutable published versions;
+- no tag movement;
+- no package replacement;
+- commit/tag/release alignment;
+- package metadata and content inspection;
+- digest recording;
+- NuGet repository-signature verification;
+- GitHub Release asset verification;
+- upgrade and rollback evidence;
+- an immutable-successor recovery procedure with primary/backup ownership;
+- provenance/attestation evidence on the next authorized publish path.
+
+Author signing and SBOM remain documented accepted risks within their current dated scope. They must not be described as implemented. Hosted provenance is required from the next authorized publish path and cannot be fabricated locally or retroactively attached to an immutable release.
+
+### Status
+
+```text
+MAINTAINER_DECISION_RECORDED
+RECOVERY_OWNERSHIP_RECONCILED
+ACCEPTED_RISK_RECORDED_FOR_SIGNING_AND_SBOM
+OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE
+```
+
+## Resulting Boundary
+
+- V100-06 is closed.
+- V100-02 remains open pending final-candidate acceptance.
+- V100-08 remains open pending final-RC cross-platform confirmation.
+- V100-09 remains open pending hosted provenance evidence.
+- V100-07 local evidence expansion proceeds in TASK-0233.
+- No 1.0 or V100 RC readiness claim is made.
+
+The first future remote authorization boundary after the safe/local chain is manual `release-candidate-evidence.yml` dispatch. Publication, versioning, tagging, release creation, and provenance creation remain separate later boundaries.

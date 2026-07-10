@@ -83,6 +83,7 @@ $requiredPaths = @(
     @{ Path = "docs\HOSTED_VALIDATION_STATUS.md"; Description = "Hosted validation status" },
     @{ Path = "docs\PRIVATE_VULNERABILITY_REPORTING_STATUS.md"; Description = "Private vulnerability reporting status" },
     @{ Path = "docs\PUBLISHED_SUPPLY_CHAIN_STATUS.md"; Description = "Published supply-chain status" },
+    @{ Path = "docs\V100_MAINTAINER_DECISION_PACKET.md"; Description = "V100 maintainer decision packet" },
     @{ Path = "docs\tasks\TASK-0096-final-rc-local-readiness-consolidation.md"; Description = "TASK-0096" }
 )
 
@@ -91,7 +92,7 @@ foreach ($entry in $requiredPaths) {
 }
 
 Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "LOCAL READY / REMOTE NO-GO" -Description "Local-versus-remote decision"
-Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "186/186 tests" -Description "Validated test count"
+Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "428/428 tests" -Description "Validated test count"
 Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "PENDING MAINTAINER" -Description "Maintainer evidence boundary"
 Require-Text -RelativePath "docs\RC_LOCAL_READINESS.md" -Needle "docs/V100_GAP_ANALYSIS.md" -Description "Open gap source of truth"
 Require-Text -RelativePath "docs\MAINTAINER_RC_DECISION.md" -Needle "NO-GO for release-candidate publication" -Description "Maintainer NO-GO decision"
@@ -100,6 +101,7 @@ Require-Text -RelativePath "docs\HOSTED_VALIDATION_STATUS.md" -Needle "4c4fa64ff
 Require-Text -RelativePath "docs\HOSTED_VALIDATION_STATUS.md" -Needle "27478635057" -Description "Successful manual RC workflow run"
 Require-Text -RelativePath "docs\PRIVATE_VULNERABILITY_REPORTING_STATUS.md" -Needle "enabled: true" -Description "Verified enabled private-reporting state"
 Require-Text -RelativePath "docs\PUBLISHED_SUPPLY_CHAIN_STATUS.md" -Needle "No author signature was observed" -Description "Published author-signature boundary"
+Require-Text -RelativePath "docs\V100_MAINTAINER_DECISION_PACKET.md" -Needle "V100-06 is closed" -Description "Fresh V100-06 decision"
 
 Push-Location $repoRoot
 try {

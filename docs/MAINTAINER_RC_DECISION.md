@@ -3,22 +3,22 @@
 ## Current Decision
 **NO-GO for release-candidate publication.**
 
-The local contract freeze, machine-readable schema assets, localization parity gate, security/supply-chain handoff, consolidated local-readiness gate, reviewed alpha.2 hosted evidence, private reporting, and bounded supply-chain dispositions are complete. Independent backup security ownership, recovery authority/backup coverage, exact alpha.3 candidate evidence, and release approval remain incomplete.
+The local contract freeze, machine-readable schema assets, localization parity gate, security/supply-chain handoff, consolidated local-readiness gate, reviewed historical hosted evidence, private reporting, backup security ownership, recovery coverage, and bounded supply-chain dispositions are complete or explicitly recorded. Final-candidate acceptance, a new exact hosted RC run, hosted provenance, candidate/version selection, and release approval remain incomplete.
 
 ## Decision Inputs
 | Area | Current State | Required For GO | Owner / Action |
 | --- | --- | --- | --- |
 | Local contract freeze | Complete locally | Review `docs/RELEASE_CANDIDATE_CONTRACT_FREEZE.md` with no unresolved breaking change | Maintainer review |
-| Local tests and gates | Complete locally: 186/186 tests and clean gates | Rerun on final candidate commit | Local/CI validation |
+| Local tests and gates | Complete locally: 428/428 tests at the TASK-0230 baseline and clean gates | Rerun on final candidate commit | Local/CI validation |
 | Hosted RC workflow | Standard 8/8 and dedicated run `27478635057` are green at `4c4fa64` on Windows, Ubuntu, and macOS | Rerun for a different final candidate commit | Release automation |
 | Upgrade/config evidence | Local fixtures and hosted predecessor install/config hash/`config-check`/baseline/SARIF/final scan pass | Review and rerun for a different selected candidate | Hosted workflow |
 | JSON/SARIF contract | TASK-0093 machine-readable schemas, golden fixtures, live-output tests, and local gate exist | Review the final candidate assets and rerun the contract gate | Maintainer review |
-| Security reporting | Private reporting enabled; `Cynrath` primary triage owner; backup unassigned | Assign independent backup and verify coverage | Security ownership task |
+| Security reporting | Private reporting enabled; `Cynrath` primary; `ShadowFlameC` backup; V100-06 closed by fresh TASK-0232 evidence | Recheck after owner/channel/support-policy change | Security ownership review |
 | Dependency review | Clean on 2026-06-12 | Rerun on final candidate date | Maintainer/release validation |
-| NuGet ownership/signing | Owner identity difference and author signing have bounded accepted-risk dispositions through 2026-09-30; valid repository signature; destructive recovery authority remains unverified | Recheck dispositions and verify recovery authority | Maintainer NuGet/supply-chain decision |
+| NuGet ownership/signing | Owner identity difference and author signing have bounded accepted-risk dispositions through 2026-09-30; valid repository signature; backup recovery ownership is reconciled | Recheck dispositions by expiry or before the next pre-release review | Maintainer NuGet/supply-chain decision |
 | SBOM/provenance | SBOM is bounded-deferred through 2026-09-30; provenance is implemented for the next exact GitHub Release nupkg but has no hosted publication evidence yet | Require attestation creation/verification in the next publish run | Release workflow |
 | Localization parity | TASK-0094 human/error/exit/JSON parity matrix and local gate complete | Rerun on final candidate and review intended stable technical tokens | Maintainer review |
-| Version and release | `0.2.0-alpha.3` selected as planning scope; metadata unchanged | Close P0 ownership blocker, prepare exact commit/package diff, and approve release plan | TASK-0134 |
+| Version and release | `0.2.0-alpha.4` is the current immutable published release; no new version is selected | Select a future candidate/version only in a separately authorized task | Future release task |
 
 ## GO Conditions
 A maintainer may record GO only when:

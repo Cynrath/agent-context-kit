@@ -24,7 +24,7 @@ During development, run the CLI through:
 dotnet run --project src/AgentContextKit.Cli -- <command>
 ```
 
-Current package note: `ackit sarif` is part of the current source command surface and the published `0.2.0-alpha.3` NuGet global tool.
+Current package note: `ackit sarif` is part of the current source command surface and the published `0.2.0-alpha.4` NuGet global tool. Published alpha3 references elsewhere are historical predecessor evidence.
 
 ## Stable Command Surface
 The v1.0 target command surface is:
@@ -54,6 +54,7 @@ ackit help
 ```
 
 ## Stability Rules
+- TASK-0232 records the current shipped/documented surface as the V100 target contract. Final-candidate acceptance and candidate-specific reruns remain pending.
 - Keep command names stable before v1.0 release.
 - Keep JSON schema version 2 envelope fields stable: `schemaVersion`, `toolVersion`, `generatedAtUtc`, and `command`.
 - Treat new JSON properties as additive; breaking removals, renames, type changes, or semantic changes require a schema version increment.
@@ -62,6 +63,8 @@ ackit help
 - Keep skip-existing-file behavior as the default.
 - Keep offline-first behavior as the default.
 - Keep public release actions outside the CLI command contract.
+- Keep command identifiers, scanner rule IDs, config diagnostic IDs, exit semantics, and the documented SARIF profile stable within the same target contract.
+- Localized human-readable prose is not byte-for-byte stable; localization must not change technical tokens or machine-readable contracts.
 
 ## Global Options
 - `--lang en|tr`: selects English or Turkish output/templates where supported. Unknown language values fall back to English.

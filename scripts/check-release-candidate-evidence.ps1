@@ -82,7 +82,7 @@ foreach ($entry in $requiredPaths) {
 Require-Text -RelativePath "docs\UPGRADE_COMPATIBILITY.md" -Needle "0.2.0-alpha.1" -Description "Supported predecessor"
 Require-Text -RelativePath "docs\UPGRADE_COMPATIBILITY.md" -Needle "Rollback" -Description "Upgrade rollback guidance"
 Require-Text -RelativePath "docs\PERFORMANCE_POLICY.md" -Needle "not a production SLA" -Description "Performance non-SLA boundary"
-Require-Text -RelativePath "docs\SECURITY_RESPONSE_READINESS.md" -Needle "Primary and backup security notification ownership" -Description "Security notification ownership blocker"
+Require-Text -RelativePath "docs\SECURITY_RESPONSE_READINESS.md" -Needle "Primary and backup security notification ownership are recorded and freshly reviewed" -Description "Security notification ownership completion"
 Require-Text -RelativePath "docs\SUPPORT_LIFECYCLE.md" -Needle ".NET 10" -Description "Runtime lifecycle baseline"
 Require-Text -RelativePath "docs\SUPPLY_CHAIN_POLICY.md" -Needle "Signing, SBOM, And Provenance Decision" -Description "Supply-chain decision boundary"
 Require-Text -RelativePath "docs\RELEASE_CANDIDATE_EVIDENCE.md" -Needle "Do not call the project 1.0 RC-ready" -Description "RC decision rule"

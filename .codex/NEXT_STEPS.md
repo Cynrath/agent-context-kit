@@ -1,5 +1,17 @@
 # Next Steps
 
+## Current V100 Chain
+
+1. COMPLETED — TASK-0232: V100 decisions recorded, V100-06 closed, security/recovery truth reconciled, and current CLI alpha4 references corrected.
+2. CURRENT — TASK-0233: expand mixed-corpus, peak-memory, interruption, and unreadable-file performance evidence.
+3. TASK-0234: select the exact last source-impacting local commit as the final-candidate evidence base without a version bump.
+4. TASK-0235: prepare the alpha4/current-source conditional contract freeze; keep final acceptance open.
+5. TASK-0236: prepare post-push `0.2.0-alpha.4` / `0.2.0-alpha.3` hosted RC inputs; do not dispatch.
+6. TASK-0237: synchronize roadmap, queue, index, readiness, release, and handoff sources.
+7. TASK-0238: run the single complete local audit, close the chain, push all commits once, and wait for final push-triggered CI once.
+
+First remaining authorization boundary: manual `release-candidate-evidence.yml` dispatch. No NuGet publish, tag/release mutation, version bump, workflow dispatch/rerun, repository/security/collaborator settings change, destructive recovery, `.ackit/` artifact commit, force push, or 1.0/V100 RC readiness claim.
+
 PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 completed TASK-0177 through TASK-0180, then inserted user-prioritized TASK-0187 before TASK-0181 to audit and harden the visible `nuget-release` failed deployments without release/tag/NuGet/deployment mutation.
 
 1. Current published release: `v0.2.0-alpha.4` at exact publish commit `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
@@ -65,4 +77,4 @@ PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green
 59. TASK-0228 completed: V100 gap register refresh against alpha4. All gaps classified; no P0/P1 gaps closed.
 60. TASK-0229 completed: sanitized Web UI screenshot committed and wired into README.md/README.tr.md. V100-12 advanced.
 61. TASK-0230 completed: V100 local contract and readiness gate rerun against alpha4. All gates PASS at HEAD `77748e7`. Fresh evidence recorded.
-62. Current task: TASK-0231: post-alpha4 V100 cleanup and next roadmap selection. Classify remaining V100 gaps into actionable buckets and select the next roadmap path.
+62. Historical checkpoint: TASK-0231 completed and selected TASK-0232. See the current V100 chain at the top of this file.

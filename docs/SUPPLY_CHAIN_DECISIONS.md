@@ -44,3 +44,9 @@ The read-only `verify-existing` job retains `contents: read` only and cannot att
 
 ## Review
 Revisit all three decisions before the next release candidate, after a workflow permission/action change, or by 2026-09-30.
+
+## TASK-0232 V100-09 Decision
+
+Decision date: 2026-07-10. The V100 minimum baseline is OIDC Trusted Publishing, immutable versions, no tag movement or package replacement, commit/tag/release alignment, package metadata/content and digest inspection, NuGet repository-signature verification, release asset verification, upgrade/rollback evidence, reconciled recovery ownership, and provenance/attestation evidence on the next authorized publish path.
+
+Author signing and SBOM remain bounded accepted risks within the 2026-06-14 through 2026-09-30 review scope. Status: `MAINTAINER_DECISION_RECORDED`, `RECOVERY_OWNERSHIP_RECONCILED`, `ACCEPTED_RISK_RECORDED_FOR_SIGNING_AND_SBOM`, and `OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE`.

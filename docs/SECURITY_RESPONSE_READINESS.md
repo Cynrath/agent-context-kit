@@ -22,12 +22,12 @@ These are maintainer targets, not contractual SLAs:
 - SARIF baseline metadata omits raw matches.
 - Hygiene and public release gates scan tracked source/artifacts.
 
-## Remaining Operational Blocker
-The private channel is active. Do not request sensitive details through a public issue. Primary and backup security notification ownership must still be recorded and reviewed under TASK-0130 before a future release-candidate GO decision.
+## Current Operational Coverage
+The private channel is active. Do not request sensitive details through a public issue. Primary and backup security notification ownership are recorded and freshly reviewed by TASK-0232 for the current repository state.
 
 The exact metadata-only evidence is maintained in `docs/PRIVATE_VULNERABILITY_REPORTING_STATUS.md`, `docs/SECURITY_SUPPLY_CHAIN_EVIDENCE.md`, and `docs/MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md`.
 
-TASK-0130 records `Cynrath` as primary security triage owner in `docs/SECURITY_NOTIFICATION_OWNERSHIP.md`. No independent backup owner is verified, so notification ownership remains a P0 operational blocker.
+`Cynrath` is the primary security triage owner. `ShadowFlameC` is the independent backup security notification owner and backup maintainer contact. TASK-0202 records the assignment; TASK-0232 freshly verified repository `write` permission and private reporting `enabled: true` on 2026-07-10. V100-06 is closed for the current repository state and must be reopened after an owner, notification, disclosure-channel, or support-policy change.
 
 ## Dependency Review
 Before an RC, run:

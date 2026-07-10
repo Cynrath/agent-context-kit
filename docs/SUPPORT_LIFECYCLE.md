@@ -12,6 +12,8 @@
 - Pre-1.0 command/schema changes may occur, but breaking changes require changelog and migration notes.
 - Deprecation should be announced for at least one published pre-release when practical.
 
+TASK-0232 records this current shipped policy as the V100 support baseline. Status: `MAINTAINER_DECISION_RECORDED` and `OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION`.
+
 ## 1.0 Target Policy
 Before 1.0 GA, freeze:
 - minimum .NET SDK/runtime and supported OS versions;

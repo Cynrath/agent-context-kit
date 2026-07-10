@@ -58,6 +58,7 @@ $privateReportingVerificationScript = Read-RequiredFile "scripts\check-private-v
 $notificationOwnership = Read-RequiredFile "docs\SECURITY_NOTIFICATION_OWNERSHIP.md" "Security notification ownership"
 $packageRecovery = Read-RequiredFile "docs\PACKAGE_RECOVERY.md" "Package recovery procedure"
 $supplyChainDecisions = Read-RequiredFile "docs\SUPPLY_CHAIN_DECISIONS.md" "Signing/SBOM/provenance decisions"
+$v100DecisionPacket = Read-RequiredFile "docs\V100_MAINTAINER_DECISION_PACKET.md" "V100 maintainer decision packet"
 
 foreach ($marker in @(
     "Local evidence register prepared on 2026-06-12",
@@ -92,7 +93,7 @@ foreach ($marker in @(
 }
 
 Require-Text $securityPolicy "Private GitHub vulnerability reporting was enabled and verified on 2026-06-14" "Public security policy private-reporting state"
-Require-Text $responseReadiness "Primary and backup security notification ownership must still be recorded" "Security response ownership blocker"
+Require-Text $responseReadiness "Primary and backup security notification ownership are recorded and freshly reviewed" "Security response ownership completion"
 Require-Text $supplyChain "repository-signed by NuGet.org" "Repository-signing truth boundary"
 Require-Text $supplyChain "must not be described as author-signed" "Author-signing truth boundary"
 Require-Text $maintainerDecision "NO-GO for release-candidate publication" "Maintainer NO-GO decision"
@@ -103,7 +104,7 @@ Require-Text $privateReportingStatus "repos/Cynrath/agent-context-kit/private-vu
 Require-Text $privateReportingVerificationScript "RequireEnabled" "Private-reporting enabled-state assertion"
 Require-Text $notificationOwnership "Primary security triage owner" "Primary security notification owner"
 Require-Text $notificationOwnership "Backup security triage owner" "Backup security notification boundary"
-Require-Text $notificationOwnership "BLOCKER" "Unassigned backup blocker"
+Require-Text $notificationOwnership "DONE_CRITERIA_FRESHLY_VERIFIED" "Fresh V100-06 ownership verification"
 Require-Text $packageRecovery 'Decision owner: `Cynrath`' "Package recovery decision owner"
 Require-Text $packageRecovery "NuGet unlist/deprecate/account-recovery authority: unverified" "Package recovery authority blocker"
 Require-Text $packageRecovery "never overwrite or reuse the published version" "Immutable package recovery boundary"
@@ -112,6 +113,10 @@ Require-Text $supplyChainDecisions "Author Signing" "Author-signing decision"
 Require-Text $supplyChainDecisions "SBOM" "SBOM decision"
 Require-Text $supplyChainDecisions "GitHub Artifact Provenance" "Provenance decision"
 Require-Text $supplyChainDecisions "actions/attest@v4" "Official attestation action boundary"
+Require-Text $v100DecisionPacket "OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE" "V100-02 final-candidate boundary"
+Require-Text $v100DecisionPacket "DONE_CRITERIA_FRESHLY_VERIFIED" "V100-06 closure evidence"
+Require-Text $v100DecisionPacket "OPEN_PENDING_FINAL_RC_CROSS_PLATFORM_CONFIRMATION" "V100-08 hosted boundary"
+Require-Text $v100DecisionPacket "OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE" "V100-09 provenance boundary"
 Require-Text $privateReportingTask "No GitHub setting change" "Private-reporting task remote-write boundary"
 Require-Text $publishedSupplyChainStatus "No author signature was observed" "Published author-signature boundary"
 Require-Text $publishedSupplyChainStatus "no accessible GitHub artifact attestation" "Published provenance boundary"

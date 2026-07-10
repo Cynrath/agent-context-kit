@@ -1,5 +1,19 @@
 # Project Execution Queue
 
+## Active V100 Safe/Local Completion Track
+
+| Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |
+| ---: | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Completed | TASK-0232 maintainer decision packet and source-of-truth reconciliation | Record authorized V100 decisions and reconcile current security/recovery/CLI truth | TASK-0231 | Decision packet, V100/security/contract/queue/handoff docs | ACKit, CLI, security/supply-chain, V100, Markdown gates | No remote setting/owner/release mutation |
+| 2 | Current | TASK-0233 performance and resource evidence expansion | Mixed corpus, peak memory, interruption, unreadable-file evidence | TASK-0232 | Performance script/test/policy/evidence docs | Focused test, Release build, benchmark, RC gate | Hosted confirmation pending |
+| 3 | Planned | TASK-0234 final-candidate local source selection | Select exact last source-impacting local evidence base | TASK-0233 | Candidate selection/V100/roadmap docs | SHA/path/input review | No version or publish |
+| 4 | Planned | TASK-0235 final-candidate local contract freeze preparation | Refresh conditional freeze and target-contract review | TASK-0234 | Freeze/CLI/JSON/schema/V100 docs | Contract/config/JSON/localization/V100 gates | Final acceptance pending |
+| 5 | Planned | TASK-0236 hosted RC evidence input preparation | Prepare dispatch-time post-push alpha4/alpha3 inputs | TASK-0235 | Hosted/RC/release/V100 evidence docs | Workflow/input static gates | Manual dispatch not executed |
+| 6 | Planned | TASK-0237 documentation and handoff synchronization | Align all active sources and indexes | TASK-0232–0236 | Roadmap/queue/index/map/readiness/handoff docs | Markdown/tracked/V100/ACKit gates | Docs only |
+| 7 | Planned | TASK-0238 final local readiness audit and closeout | Complete local suite, one final push, one blocking CI wait | TASK-0237 | Final evidence/task/queue/handoff docs | Full local suite plus push-triggered CI | Next action is manual RC dispatch |
+
+Execution rule: one local commit per completed task, no intermediate push, no manual workflow dispatch/rerun, and no release/version/settings mutation.
+
 ## Active PROJECT-CONTROL-0109 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -89,12 +103,12 @@
 | Order | Status | Action | Priority | Blocking status | Expected evidence | Validation required | Remote write required? | Done criteria |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | M1 | Verified for alpha.2 state | Manual hosted RC evidence workflow | P0 | Rerun for a different final candidate | Run `27478635057`, exact `4c4fa64`, three-OS results | Hosted predecessor/config/baseline/SARIF/performance workflow | Yes | Green run recorded; future candidate must rerun |
-| M2 | Partially complete | Private vulnerability reporting and notification ownership | P0 | Independent backup still blocks RC | Setting `enabled: true`; primary `Cynrath`; backup unassigned | Read-only API/UI verification plus ownership record | Setting complete | Verified channel plus primary and backup coverage |
+| M2 | Complete for current repository state | Private vulnerability reporting and notification ownership | P0 | V100-06 closed by TASK-0232 | Setting `enabled: true`; primary `Cynrath`; backup `ShadowFlameC`; fresh 2026-07-10 verification | Recheck after owner/channel/support-policy change | No | Verified channel plus primary and backup coverage |
 | M3 | Accepted risk | NuGet owner identity alignment | P1 | Disposed through next prerelease decision or 2026-09-30 | `Cyranth`/`Cynrath` dated intentional exception | NuGet package/profile/OIDC review | No owner mutation | Recheck before expiry |
 | M4 | Accepted risk | Author signing | P1 | Deferred through next prerelease decision or 2026-09-30 | Repository signature plus dated controls/review | Exact package verification | No signing | Recheck before expiry |
 | M5 | Accepted risk | SBOM publication | P1 | Deferred through next prerelease decision or 2026-09-30 | Dependency/package controls plus dated review | Exact candidate/package review | No publication | Recheck before expiry |
 | M6 | Implemented locally | Provenance/attestation | P1 | Hosted evidence requires next publish | Exact release nupkg, signer workflow, CLI verification | Workflow static tests plus future hosted attestation | Publish job only | Verified attestation on next release |
-| M7 | Partially complete | Package recovery ownership | P1 | Authority and backup remain | Owner, threshold, communication, immutable successor procedure recorded | Tabletop/document review | Only during incident/action | Verify authority and backup coverage |
+| M7 | Complete for current ownership record | Package recovery ownership | P1 | Hosted provenance remains separate | `Cynrath` decision owner, `Cyranth` primary NuGet identity, `ShadowFlameC` backup, thresholds, communication, immutable successor | Tabletop/document review; no destructive test | Only during an actual incident/action | Keep recovery coverage current |
 | M8 | Published | Candidate version and release approval | P0/P1 | `0.2.0-alpha.3` published and verified | TASK-0206 publish evidence: NuGet package, tag, GitHub prerelease, global tool install, immutable verification | Full local and hosted release gates | Yes, completed | Published through OIDC release workflow; successor release for corrections |
 
 ## Local-Only Ecosystem/Product Intelligence Track
@@ -134,5 +148,5 @@ Last verified locally on 2026-06-14 at commit `a5686aa`:
 - NuGet README rendering infrastructure is completed by PR #1 (TASK-0215): `README.nuget.md`, `PackageReadmeFile` wiring, agent docs, and package metadata validation. Visible nuget.org README changes require a later authorized package publish.
 - Do not mutate the published package, tag, GitHub Release, NuGet owner state, or release workflow history. TASK-0208 already hardened the `release.yml` provenance probe; any future release work still requires a dedicated task, hosted evidence, and explicit workflow dispatch authorization.
 
-## Docs/Queue Simplification
-- Current task: TASK-0216 docs/queue simplification and stale-heading cleanup (this task).
+## Historical Docs/Queue Simplification Checkpoint
+- TASK-0216 docs/queue simplification and stale-heading cleanup is complete. The current queue is the V100 safe/local completion track at the top of this file.

@@ -5,7 +5,7 @@ The local/remote boundary is summarized in `docs/RELEASE_BLOCKER_BOARD.md`. Loca
 ## Decision
 **LOCAL READY / REMOTE NO-GO** as of 2026-06-27 (TASK-0230 refresh).
 
-The current source tree has complete local release-candidate evidence for its documented contract, localization, security regression, dependency, package, and repository-hygiene checks. This is not a release approval. Hosted evidence, remote security settings, supply-chain decisions, candidate version selection, and maintainer sign-off remain incomplete.
+The current source tree has local release-candidate evidence for its documented contract, localization, security regression, dependency, package, and repository-hygiene checks. This is not a release approval. TASK-0232 closes V100-06 and records V100-02/08/09 decisions, but final-candidate/hosted evidence, hosted provenance, candidate/version selection, and final maintainer sign-off remain incomplete.
 
 Standard hosted `ci`, published-package smoke, and source-package smoke are green for commit `4c4fa64ff34287dff01818d52f49b521efb3176d`. Dedicated RC evidence run `27478635057` also passed predecessor/config/baseline/SARIF/performance validation on Windows, Ubuntu, and macOS. The remote decision remains NO-GO for the independent security, ownership, supply-chain, and final candidate approval blockers. See `docs/HOSTED_VALIDATION_STATUS.md`.
 
@@ -27,18 +27,18 @@ Standard hosted `ci`, published-package smoke, and source-package smoke are gree
 | Area | Required Evidence | Status |
 | --- | --- | --- |
 | Hosted RC workflow | Standard 8/8 are green for `4c4fa64`; dedicated run `27478635057` passed all three operating systems | VERIFIED HOSTED; rerun for a different final candidate |
-| Private vulnerability reporting | Read-only API verified disabled on 2026-06-13; enable it, verify `enabled: true` and the entry point, then record date/owner/reference | VERIFIED REMOTE BLOCKER |
-| Security notification ownership | Primary and backup owner confirmation | PENDING MAINTAINER |
+| Private vulnerability reporting | Enabled since 2026-06-14 and freshly reverified `enabled: true` on 2026-07-10 | VERIFIED MAINTAINER |
+| Security notification ownership | `Cynrath` primary; `ShadowFlameC` backup; coverage and non-SLA targets recorded | V100-06 CLOSED |
 | Final contract acceptance | Candidate-specific CLI/config/JSON/baseline/SARIF/localization review | PENDING MAINTAINER |
-| NuGet ownership | Public owner profile `Cyranth` versus package author/project persona `Cynrath`; align or accept explicitly | VERIFIED REMOTE BLOCKER |
-| Signing | Published package is NuGet.org repository-signed with no observed author signature; sign or defer with accepted risk | VERIFIED PUBLISHED STATE / PENDING DECISION |
-| SBOM | No package/release SBOM observed; publish or defer tied to the exact candidate commit | VERIFIED PUBLISHED STATE / PENDING DECISION |
-| Provenance | No accessible GitHub attestation for the published package digest; attest or defer | VERIFIED PUBLISHED STATE / PENDING DECISION |
-| Package recovery | Accepted unlist/deprecate/successor ownership and communication procedure | PENDING MAINTAINER |
+| NuGet ownership | Public owner profile `Cyranth` versus package author/project persona `Cynrath` | ACCEPTED RISK through 2026-09-30 |
+| Signing | NuGet repository signing verified; author signing remains bounded-deferred | ACCEPTED RISK through 2026-09-30 |
+| SBOM | Publication remains bounded-deferred | ACCEPTED RISK through 2026-09-30 |
+| Provenance | Control implemented locally; exact hosted evidence requires the next authorized publish path | OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE |
+| Package recovery | Immutable-successor procedure plus `Cynrath` decision ownership and `ShadowFlameC` backup recovery ownership | RECOVERY_OWNERSHIP_RECONCILED |
 | Version and release plan | Candidate version, metadata, package diff, notes, rollback, and post-publish smoke approval | PENDING MAINTAINER |
 
 ## Open Gap Boundary
-`docs/V100_GAP_ANALYSIS.md` remains the source of truth. A local pass does not close a P0 gap that requires hosted or remote evidence, and it does not dispose a P1 risk without a dated maintainer decision.
+`docs/V100_GAP_ANALYSIS.md` remains the source of truth. TASK-0232 closes V100-06 from fresh evidence and records dated V100-02/08/09 decisions. A local pass still does not close any other P0 gap that requires final-candidate or hosted evidence.
 
 The current release-candidate decision in `docs/MAINTAINER_RC_DECISION.md` remains **NO-GO for release-candidate publication**.
 

@@ -10,9 +10,9 @@ Local evidence preparation includes TASK-0084 through TASK-0096 baseline/config 
 | Config compatibility | published `0.2.0-alpha.1` config fixture plus read-only `config-check` human/JSON/exit/privacy contract tests and hosted predecessor smoke | Verified for reviewed alpha.2 state | final candidate sign-off |
 | CLI/JSON/SARIF | contract tests, additive schema rules, exit-code parity, conditional local freeze, machine-readable schemas/golden fixtures | Ready locally | final candidate maintainer sign-off |
 | Performance | disposable 2,000-file benchmark with unchanged 30-second tripwire; hosted Windows 1.265s, Ubuntu 0.957s, macOS 0.684s | Hosted tripwire verified | memory, cancellation, mixed corpus |
-| Security response | policy, Critical regression tests, privacy boundaries, clean dated dependency review, metadata-only maintainer evidence register/handoff | Ready locally | enable and verify private GitHub reporting; record maintainer evidence |
-| Runtime support | .NET 10, three-OS standard workflows, and successful dedicated RC run `27478635057` | Verified for reviewed alpha.2 state | final support window and future-candidate rerun |
-| Supply chain | exact published package/release audit plus explicit owner alignment, sign/defer, SBOM, provenance, and recovery evidence fields | Published state verified | dated maintainer decisions and any approved remote publication |
+| Security response | private reporting enabled; `Cynrath` primary and `ShadowFlameC` backup; coverage, non-public data rule, latest-pre-release fix scope, and non-SLA targets freshly reviewed by TASK-0232 | V100-06 CLOSED | recheck after owner/channel/support-policy change |
+| Runtime support | .NET 10; Windows, Ubuntu/Linux, and macOS; latest-pre-release fix scope; predecessor rollback evidence; unsupported surfaces recorded | Maintainer decision recorded | final-RC three-OS rerun |
+| Supply chain | OIDC/immutability/alignment/inspection/digest/signature/asset/upgrade/recovery baseline; recovery ownership reconciled; signing/SBOM accepted risks recorded | Maintainer decision recorded | hosted provenance on next authorized publish path |
 | Migration/localization | upgrade/rollback guide, fixtures, read-only config diagnostics, explicit no-auto-migration policy, 13-command EN/TR human/error/JSON parity matrix | Ready locally | hosted evidence and final candidate sign-off |
 
 ## Local Commands
@@ -48,9 +48,9 @@ Local evidence recorded on 2026-06-12:
 The former xUnit test-tooling warning is resolved locally. Remaining supply-chain decisions are signing, SBOM, provenance, recovery policy, and release-date revalidation.
 
 ## Maintainer-Only Evidence
-- Enable and verify private vulnerability reporting.
+- Recheck private vulnerability reporting and primary/backup coverage after any relevant owner/channel change.
 - Rerun green Windows/Ubuntu/macOS CI, source-package smoke, baseline upgrade smoke, and benchmark evidence for any different final candidate commit.
-- Decide signing, SBOM, provenance, and package recovery/deprecation policy.
+- Recheck the bounded signing/SBOM dispositions by expiry; obtain hosted provenance on the next authorized publish path; keep recovery ownership current.
 - Select/version a release candidate, create tag/GitHub pre-release, publish NuGet only in a dedicated approved release task.
 - Record dependency vulnerability/deprecation review with the release date.
 - Complete and approve `docs/MAINTAINER_RC_DECISION.md`; the current decision remains NO-GO for RC publication.

@@ -317,3 +317,9 @@ Once maintainer decisions are obtained, the next phase is RC candidate selection
 Local implementation of V100-07 (performance evidence expansion) can proceed in parallel.
 
 See `docs/tasks/TASK-0231-post-alpha4-v100-cleanup-and-next-roadmap-selection.md` for the full decision matrix.
+
+## V100 Safe/Local Completion Chain
+
+TASK-0232 through TASK-0238 are the current user-authorized safe/local continuation. The chain records maintainer decisions, expands V100-07 local evidence, selects the last source-impacting local evidence base, prepares the conditional contract freeze and hosted RC inputs, synchronizes documentation, and performs one final local audit. It intentionally stops at manual `release-candidate-evidence.yml` dispatch.
+
+The chain does not select a new package version, mutate immutable alpha4 artifacts, publish NuGet, create/move a tag, edit a GitHub Release, dispatch/rerun workflows, change repository/security/collaborator settings, or claim V100 RC/1.0 readiness.
