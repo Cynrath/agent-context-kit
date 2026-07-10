@@ -2,7 +2,7 @@
 
 ## Status
 
-Final candidate accepted and final local validation passed; commit, joint push, and standard CI follow-through pending.
+Completed and hosted-verified. Final candidate accepted; publication remained a separate TASK-0242 boundary.
 
 ## Purpose
 
@@ -132,4 +132,4 @@ TASK-0241 acceptance was recorded on 2026-07-10 from exact candidate `548b6affd0
 - all V100/docs/CLI/config/JSON/localization/RC-readiness gates passed after retaining the required historical freeze markers; the final successful RC-gate benchmark was 5.342 seconds / 44.5 MiB
 - final Markdown audit covered 428 files and 231 local targets with zero broken targets; diff/bridge checks pass and no `.ackit/` file is tracked
 
-The acceptance commit must remain documentation/evidence/governance-only. The prescribed final local suite, separate TASK-0241 commit, joint TASK-0240/TASK-0241 push, final standard CI, and clean synchronization verification complete the task operationally. TASK-0242 is not created or executed.
+The acceptance commit `b1fae4d18ce738be6a8679abd7333f95e044e3a6` remained documentation/evidence/governance-only. TASK-0240/TASK-0241 were pushed together; final runs `29119747553` (`ci`), `29119747558` (`cross-platform-smoke`), and `29119747534` (`cross-platform-source-smoke`) passed for exact acceptance HEAD. TASK-0241 completed with a clean synchronized tree. TASK-0242 was not created or executed until separate explicit authorization arrived on 2026-07-11.

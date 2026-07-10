@@ -1,6 +1,6 @@
 # Release Blocker Board
 
-Current status date: 2026-07-10. `0.2.0-alpha.3` and `0.2.0-alpha.4` are published and immutable. TASK-0241 accepts exact source candidate `1.0.0-rc.1` for a separately authorized publish task; it remains unpublished. The alpha3 table below is retained as historical release evidence; current V100 decisions are summarized first.
+Current status date: 2026-07-11. `0.2.0-alpha.3` and `0.2.0-alpha.4` are published and immutable. TASK-0241 accepts exact source candidate `1.0.0-rc.1`; explicit TASK-0242 authorization permits one OIDC publish dispatch, but the candidate remains unpublished until that run succeeds. The alpha3 table below is retained as historical release evidence; current V100 decisions are summarized first.
 
 ## Current V100 Decision Boundary
 
@@ -18,9 +18,9 @@ Current status date: 2026-07-10. `0.2.0-alpha.3` and `0.2.0-alpha.4` are publish
 | V100-10 localization | FINAL_LOCALIZATION_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241 | Reopen after localization/contract change |
 | Candidate version | `1.0.0-rc.1` accepted at `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; predecessor `0.2.0-alpha.4` | CONDITIONAL GO for separately authorized publish task |
 | Open P0 gaps | `0` | V100-09 is a publish-path P1 boundary |
-| Publication | NOT AUTHORIZED | Separate explicit TASK-0242 only |
+| Publication | AUTHORIZED FOR TASK-0242 / NOT YET DISPATCHED | Exactly one OIDC publish run; no recovery or second dispatch |
 
-See `docs/V100_MAINTAINER_DECISION_PACKET.md`. Conditional GO does not authorize `release.yml`, NuGet, package/tag/release mutation, repository settings changes, publish provenance, or 1.0 GA readiness claims.
+See `docs/V100_MAINTAINER_DECISION_PACKET.md`. TASK-0242 authorization is limited to the exact RC1 OIDC publication and evidence path; it does not authorize repository settings changes, version reuse, tag movement, recovery, manual upload, force push, or a 1.0 GA claim.
 
 ## Historical Alpha3 Blocker Table
 

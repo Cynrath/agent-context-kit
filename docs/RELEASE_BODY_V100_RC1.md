@@ -1,6 +1,6 @@
-# AgentContextKit 1.0.0-rc.1 — Draft Release Body
+# AgentContextKit 1.0.0-rc.1
 
-> Draft only. `1.0.0-rc.1` is prepared for exact-candidate validation and is not published. Do not use this body until a separate publication task is explicitly authorized.
+AgentContextKit `1.0.0-rc.1` is the first contract-frozen V100 release candidate. It is a prerelease for validation and feedback, not a `1.0.0` GA declaration.
 
 ## Highlights
 
@@ -28,4 +28,6 @@ Default commands remain offline-first: no repository upload, remote AI call, tel
 
 ## Validation Boundary
 
-The final release record must include the exact TASK-0239 candidate SHA, successful TASK-0240 Windows/Ubuntu/macOS hosted run, TASK-0241 conditional acceptance, final standard CI, package digests, and future TASK-0242 provenance evidence. None of those publication claims are implied by this draft.
+The accepted source/workflow/test/package-metadata candidate is TASK-0239 commit `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`. TASK-0240 hosted run `29118452246` passed Windows, Ubuntu, and macOS with 431/431 tests per runner, predecessor upgrade/config immutability, frozen contract gates, SARIF parsing, and resource thresholds. TASK-0241 recorded conditional publication GO with zero open P0 gaps.
+
+The release is published only through the existing exact-SHA OIDC workflow. The tag, GitHub prerelease, NuGet repository metadata, release assets, digests, and GitHub artifact attestation remain authoritative for the exact publication commit. The workflow must verify the exact nupkg attestation before the release task is complete.

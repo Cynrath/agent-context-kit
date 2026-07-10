@@ -1,16 +1,17 @@
 # Next Tasks
 
-## V100 `1.0.0-rc.1` Candidate Chain — Active
+## V100 `1.0.0-rc.1` Publication — TASK-0242 Active
 
-TASK-0239 through TASK-0241 are the complete authorized candidate-preparation, hosted-evidence, and final-acceptance chain. All three task files were created with `ackit task` and fully planned before candidate implementation. The chain stops at publication authorization.
+TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 was created with `ackit task` after explicit publication authorization on 2026-07-11 and is the active one-dispatch OIDC publication/post-publish verification task.
 
 | Order | Task | Status | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
 | 1 | TASK-0239 `1.0.0-rc.1` candidate selection and release preparation | COMPLETED | Candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` prepared and pushed | TASK-0238 | 431/431 local plus standard runs `29118331264`, `29118331259`, `29118331258` | One normal candidate push completed; no publication |
-| 2 | TASK-0240 hosted RC evidence execution and recording | COMPLETED / COMMITTED LOCALLY | Exact-SHA three-OS evidence run `29118452246` passed after one authorized dispatch | TASK-0239 standard CI green | Exact input gate plus one blocking hosted run | Commit `fd2ce8d`; joint final push pending; no uploads/publication |
-| 3 | TASK-0241 final-candidate acceptance and publish boundary | LOCAL COMPLETE / COMMIT PENDING | Open P0 0; conditional GO; final local suite green; V100-09 publish provenance remains open | TASK-0240 PASS | Bridge review and full local suite passed; final standard CI pending | Joint final docs push; stop before TASK-0242 |
+| 2 | TASK-0240 hosted RC evidence execution and recording | COMPLETED | Exact-SHA three-OS evidence run `29118452246` passed after one authorized dispatch | TASK-0239 standard CI green | Exact input gate plus one blocking hosted run | Commit `fd2ce8d`; no uploads/publication |
+| 3 | TASK-0241 final-candidate acceptance and publish boundary | COMPLETED | Open P0 0; conditional GO; final local suite and final runs `29119747553`, `29119747558`, `29119747534` green | TASK-0240 PASS | Bridge review, full suite, final standard CI | Commit `b1fae4d`; publication remained separate |
+| 4 | TASK-0242 OIDC publication and post-publish verification | ACTIVE / NOT DISPATCHED | Publish RC1 exactly once, verify immutable release/provenance/install, sync public docs/pin, wait final CI | TASK-0241 complete plus explicit authorization | Full release gates, one release run, immutable verification, three-platform final smoke | One publish dispatch only; stop on any partial failure |
 
-Candidate `1.0.0-rc.1` is conditionally accepted but unpublished; published release remains `0.2.0-alpha.4`. TASK-0239 through TASK-0241 do not authorize NuGet publication, `release.yml`, tag/GitHub Release mutation, provenance publication, settings/security/collaborator changes, uploads, force push, or GA-readiness claims.
+Candidate `1.0.0-rc.1` is accepted but remains unpublished until TASK-0242 succeeds; published release remains `0.2.0-alpha.4`. TASK-0242 authorizes only the exact OIDC publication/provenance path and required post-publish sync. No second dispatch/recovery, manual package upload, settings/security/collaborator change, force push, version reuse, tag movement, or GA claim is authorized.
 
 ## Historical Execution Record
 

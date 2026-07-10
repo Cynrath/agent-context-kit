@@ -334,3 +334,10 @@ TASK-0232 through TASK-0238 are the current user-authorized safe/local continuat
 The chain does not select a new package version, mutate immutable alpha4 artifacts, publish NuGet, create/move a tag, edit a GitHub Release, dispatch/rerun workflows, change repository/security/collaborator settings, or claim V100 RC/1.0 readiness.
 
 TASK-0234 selects `b1604ae1e73017521d28e5a83f328bb1347406b6` as the last planned source-impacting local evidence base. No release version is selected. Later chain commits must remain docs/evidence/governance-only; hosted input preparation will target the final pushed docs-only successor after bridge review.
+
+## `1.0.0-rc.1` Candidate And Publication Track
+
+- TASK-0239 prepared exact source candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` with 431/431 tests and green standard CI.
+- TASK-0240 recorded successful three-platform hosted RC run `29118452246`.
+- TASK-0241 accepted the final candidate with zero open P0 gaps; acceptance commit `b1fae4d` and its three standard workflows are green.
+- TASK-0242 is explicitly authorized on 2026-07-11 for one OIDC `1.0.0-rc.1` publication dispatch, exact provenance verification, installed/post-publish smoke, and public documentation synchronization. It must stop without recovery or a second dispatch on any partial failure.

@@ -1,12 +1,13 @@
 # Next Steps
 
-## Current V100 `1.0.0-rc.1` Chain
+## Current V100 `1.0.0-rc.1` Publication
 
 1. COMPLETED — TASK-0239: exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` is pushed; 431/431 local and standard CI runs `29118331264`, `29118331259`, `29118331258` are green.
-2. COMPLETED / COMMITTED LOCALLY — TASK-0240: exactly one dispatch produced successful hosted run `29118452246` on Windows, Ubuntu, and macOS; evidence commit is `fd2ce8d` and remains unpushed until the joint final push.
-3. LOCAL COMPLETE / COMMIT PENDING — TASK-0241: docs-only bridge passed; open P0 gaps are 0; conditional GO is recorded; V100-09 remains open pending publish-path provenance; source/build/test/Unicode/all gates/Markdown validation passed. Create the separate commit, push TASK-0240/0241 together once, and wait for final standard CI.
+2. COMPLETED — TASK-0240: exactly one dispatch produced successful hosted run `29118452246` on Windows, Ubuntu, and macOS; evidence commit `fd2ce8d` is pushed.
+3. COMPLETED — TASK-0241: acceptance commit `b1fae4d` is pushed; open P0 gaps are 0; final runs `29119747553`, `29119747558`, and `29119747534` passed.
+4. ACTIVE / NOT DISPATCHED — TASK-0242: explicit authorization received. Finalize/push the docs-only plan/body bridge, validate its CI, dispatch `release.yml` once for RC1, verify immutable release/provenance/install, then push post-publish docs/pin and wait final CI.
 
-Stop boundary: `TASK-0242: Authorized 1.0.0-rc.1 OIDC publication and provenance verification` requires a separate explicit prompt. No NuGet publish, `release.yml`, tag/GitHub Release, provenance publication, upload, settings/security/collaborator mutation, `.ackit/` commit, force push, published-RC claim, or GA-readiness claim is authorized now.
+Hard boundary: no second release dispatch, rerun, automatic recovery, manual package upload, version reuse, tag movement, release replacement, settings/security/collaborator mutation, `.ackit/` commit, force push, or GA-readiness claim. If the single workflow partially succeeds, inspect once and stop.
 
 PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 completed TASK-0177 through TASK-0180, then inserted user-prioritized TASK-0187 before TASK-0181 to audit and harden the visible `nuget-release` failed deployments without release/tag/NuGet/deployment mutation.
 

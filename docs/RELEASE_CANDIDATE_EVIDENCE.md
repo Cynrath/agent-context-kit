@@ -5,6 +5,8 @@ Local evidence preparation includes TASK-0084 through TASK-0096 baseline/config 
 
 The hosted tuple is `commit_sha=548b6affd0da25cb379ec1b153b1064fd5ff6f0b`, `candidate_version=1.0.0-rc.1`, and `predecessor_version=0.2.0-alpha.4`. It passed Windows, Ubuntu, and macOS after exactly one manual dispatch. Publication authorized: No.
 
+TASK-0242 note: the `Publication authorized: No` marker above is the historical TASK-0239–0241 boundary. Explicit authorization received on 2026-07-11 permits one existing OIDC `release.yml` publish dispatch; V100-09 remains open until that exact run creates and verifies publish-path provenance.
+
 ## Local Evidence Matrix
 | Area | Local Evidence | Status | Remaining Blocker |
 | --- | --- | --- | --- |

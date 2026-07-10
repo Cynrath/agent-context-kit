@@ -2,7 +2,7 @@
 
 ## Status
 
-Prepared by TASK-0239 on 2026-07-10. Publication is prohibited through TASK-0241. This plan is not a tag, GitHub Release, NuGet publication, provenance record, or publication authorization.
+Prepared by TASK-0239 and accepted by TASK-0241. Explicit TASK-0242 authorization was received on 2026-07-11 for exactly one OIDC publish dispatch. No package, tag, GitHub Release, or provenance claim is recorded until that run succeeds.
 
 | Field | Value |
 | --- | --- |
@@ -10,9 +10,9 @@ Prepared by TASK-0239 on 2026-07-10. Publication is prohibited through TASK-0241
 | Candidate tag if later authorized | `v1.0.0-rc.1` |
 | Published predecessor | `0.2.0-alpha.4` |
 | Current published release | `0.2.0-alpha.4` |
-| Candidate commit | Exact TASK-0239 commit, captured after the candidate commit is created and used unchanged by TASK-0240 |
-| Publication authorized | No |
-| Release body | Draft `docs/RELEASE_BODY_V100_RC1.md` |
+| Candidate commit | Source candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; later bridge commits are docs/evidence/governance-only |
+| Publication authorized | Yes, TASK-0242 single-dispatch scope on 2026-07-11 |
+| Release body | Publication-ready `docs/RELEASE_BODY_V100_RC1.md` |
 
 ## Version Availability
 
@@ -60,7 +60,7 @@ Before publication, correct the source with a normal successor commit and rerun 
 3. TASK-0241 closes all P0 gaps and all target non-provenance P1 gaps, records the V100-09 boundary, and final standard CI passes.
 4. Local/remote HEAD are synchronized and the tree is clean.
 5. A separate explicit TASK-0242 authorization is received.
-6. Publication uses only the existing OIDC `release.yml` path and exact candidate/version inputs.
+6. Publication uses only the existing OIDC `release.yml` path and exact synchronized TASK-0242 publication HEAD for both automation/release inputs; its bridge from the hosted source candidate must remain docs/evidence/governance-only.
 
 ## Post-Publish Validation
 

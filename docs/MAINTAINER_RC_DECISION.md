@@ -1,11 +1,13 @@
 # Maintainer Release-Candidate Decision
 
 ## Current Decision
-**CONDITIONAL GO FOR A SEPARATELY AUTHORIZED PUBLISH TASK.**
+**AUTHORIZED GO FOR TASK-0242 SINGLE OIDC PUBLISH DISPATCH.**
 
 Candidate `1.0.0-rc.1` is accepted against published predecessor `0.2.0-alpha.4`. TASK-0239 local/package evidence and standard CI passed for exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; TASK-0240 hosted run `29118452246` passed on Windows, Ubuntu, and macOS; the post-candidate bridge is documentation/evidence/governance-only; and TASK-0241 closes every P0 gap plus target P1 gaps V100-07, V100-08, and V100-10.
 
-Publication authorized: No. V100-09 remains open for exact publish-path provenance. `PUBLISH AUTHORIZATION REQUIRED` is the separate TASK-0242 boundary.
+Publication authorized: Yes, by explicit maintainer instruction dated 2026-07-11, scoped to exactly one `release.yml` publish dispatch for `1.0.0-rc.1`, exact immutable package/tag/GitHub prerelease creation, prepared release body, and attestation verification. V100-09 remains open until exact publish-path provenance succeeds. No second dispatch, rerun, automatic recovery, manual package upload, version reuse, tag movement, release replacement, or force push is authorized.
+
+Historical TASK-0241 boundary markers retained for gate/audit compatibility: `Publication authorized: No` and `PUBLISH AUTHORIZATION REQUIRED`. Those statements describe the completed TASK-0241 scope; the explicit TASK-0242 authorization above supersedes them only for this single publish run.
 
 ## Decision Inputs
 | Area | Current State | Required For GO | Owner / Action |
@@ -20,7 +22,7 @@ Publication authorized: No. V100-09 remains open for exact publish-path provenan
 | NuGet ownership/signing | Owner identity difference and author signing have bounded accepted-risk dispositions through 2026-09-30; valid repository signature; backup recovery ownership is reconciled | Recheck dispositions by expiry or before the next pre-release review | Maintainer NuGet/supply-chain decision |
 | SBOM/provenance | SBOM is bounded-deferred through 2026-09-30; provenance is implemented for the next exact GitHub Release nupkg but has no hosted publication evidence yet | Require attestation creation/verification in the next publish run | Release workflow |
 | Localization parity | TASK-0240 localization gate passed for exact candidate on all three operating systems | Final localization contract accepted | TASK-0241 |
-| Version and release | `1.0.0-rc.1` accepted but unpublished; `0.2.0-alpha.4` remains published | Separate explicit publication authorization | TASK-0242 only |
+| Version and release | `1.0.0-rc.1` accepted but unpublished; `0.2.0-alpha.4` remains published | Explicit single-dispatch authorization received | TASK-0242 only |
 
 ## TASK-0240 Evidence Record
 

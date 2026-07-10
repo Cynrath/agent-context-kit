@@ -2,7 +2,11 @@
 
 ## V100 `1.0.0-rc.1` Candidate Preparation (TASK-0239)
 
-Candidate `1.0.0-rc.1` is prepared against published predecessor `0.2.0-alpha.4`. The normative plan is `docs/V100_RC1_RELEASE_PLAN.md`; the unpublished draft release body is `docs/RELEASE_BODY_V100_RC1.md`. Public install guidance remains pinned to published alpha4.
+Candidate `1.0.0-rc.1` is prepared against published predecessor `0.2.0-alpha.4`. The normative plan is `docs/V100_RC1_RELEASE_PLAN.md`; TASK-0242 finalizes `docs/RELEASE_BODY_V100_RC1.md` for the authorized release. Public install guidance remains pinned to published alpha4 until publication succeeds.
+
+## TASK-0242 Publication Authorization
+
+Explicit authorization was received on 2026-07-11 for exactly one existing `release.yml` OIDC publish dispatch covering NuGet `1.0.0-rc.1`, exact `v1.0.0-rc.1` tag, GitHub prerelease/assets/body, and exact nupkg attestation creation/verification. Any failure ends the dispatch budget: no second dispatch, rerun, automatic recovery, manual package upload, version reuse, tag movement, release replacement, or force push is authorized. If NuGet succeeds before a later failure, inspect immutable state once and stop.
 
 TASK-0239 adds exact alpha4 generated-config fixture/regeneration coverage, direct hosted CLI/config/JSON/localization gates, run-unique candidate packaging, source/package version alignment, and future release-body routing. Dependency, local package/install, full-suite, Unicode, resource, and hygiene checks completed locally; exact candidate standard CI is recorded after the candidate push.
 
