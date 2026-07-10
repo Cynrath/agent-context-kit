@@ -60,5 +60,9 @@ The former xUnit test-tooling warning is resolved locally. Remaining supply-chai
 
 Copy-ready pre-dispatch validation and dispatch commands are in `docs/RC_HOSTED_EVIDENCE.md`. Status: `HOSTED_INPUT_PREPARED / NOT_DISPATCHED / OPEN_PENDING_MANUAL_WORKFLOW_DISPATCH`.
 
+## TASK-0238 Final Safe/Local Audit
+
+On 2026-07-10 the single complete goal-defined local suite passed: ACKit `0.2.0-alpha.4`, doctor 13/13, scan exit 0, Release build with 0 warnings/0 errors, 430/430 tests, pre/post-test Windows Unicode temp guards, all required V100/CLI/config/JSON/localization/RC gates, Markdown completeness/links, clean diff, and no tracked `.ackit/` output. The RC-gate benchmark passed at 5.432 seconds and 44.8 MiB; the required standalone benchmark passed at 4.620 seconds and 44.5 MiB against 30-second/512-MiB thresholds. This closes the safe/local evidence chain only; it does not close final-candidate or hosted gaps.
+
 ## Decision Rule
 Do not call the project 1.0 RC-ready while any P0 gap in `docs/V100_GAP_ANALYSIS.md` remains open. P1 gaps require completion or an explicit dated maintainer risk acceptance before 1.0 GA.

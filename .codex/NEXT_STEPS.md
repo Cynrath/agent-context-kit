@@ -8,7 +8,7 @@
 4. COMPLETED — TASK-0235: alpha4/current-source conditional contract freeze prepared; final acceptance remains open.
 5. COMPLETED — TASK-0236: post-push final-HEAD `0.2.0-alpha.4` / `0.2.0-alpha.3` hosted RC inputs prepared; no dispatch.
 6. COMPLETED — TASK-0237: roadmap, queue, index, readiness, current-package/predecessor, and handoff sources synchronized; historical evidence relabeled without rewriting its facts.
-7. CURRENT — TASK-0238: run the single complete local audit, close the chain, push all commits once, and wait for final push-triggered CI once.
+7. LOCAL COMPLETE — TASK-0238: full suite PASS (430/430, all gates, Unicode guard, performance, Markdown and `.ackit` hygiene). Create the closeout commit, push all commits once, and wait for final push-triggered CI once.
 
 First remaining authorization boundary: manual `release-candidate-evidence.yml` dispatch. No NuGet publish, tag/release mutation, version bump, workflow dispatch/rerun, repository/security/collaborator settings change, destructive recovery, `.ackit/` artifact commit, force push, or 1.0/V100 RC readiness claim.
 

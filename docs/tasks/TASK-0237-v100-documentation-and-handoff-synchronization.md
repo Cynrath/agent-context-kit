@@ -120,4 +120,4 @@ Completed on 2026-07-10.
 - `check-v100-documentation-release-gates.ps1 -FailOnIssues` passed; the nested link audit checked 423 Markdown files and 231 local targets.
 - Standalone Markdown links passed; `ackit doctor` passed 13/13 checks; `ackit scan --ci` exited 0 with only the already-classified local findings; `git diff --check` passed.
 
-Commit: recorded after validation. The next task is TASK-0238.
+Commit: `feaa9b2`. The next task is TASK-0238.

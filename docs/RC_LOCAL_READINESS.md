@@ -3,7 +3,7 @@
 The local/remote boundary is summarized in `docs/RELEASE_BLOCKER_BOARD.md`. Local readiness evidence does not close hosted, security-setting, ownership, signing, SBOM, provenance, recovery, candidate, or approval rows.
 
 ## Decision
-**LOCAL READY / REMOTE NO-GO** as of 2026-07-10 (TASK-0233–0237 refresh).
+**LOCAL READY / REMOTE NO-GO** as of 2026-07-10 (TASK-0238 final safe/local audit).
 
 The current source tree has local release-candidate evidence for its documented contract, localization, security regression, dependency, package, repository-hygiene, and expanded resource checks. This is not a release approval. TASK-0232 closes V100-06 and records V100-02/08/09 decisions; TASK-0233 expands V100-07 local evidence; TASK-0234 selects source evidence base `b1604ae1e73017521d28e5a83f328bb1347406b6`; TASK-0235 prepares the conditional freeze; TASK-0236 prepares hosted inputs without dispatch. Final-candidate acceptance, hosted evidence/provenance, and final maintainer sign-off remain incomplete.
 
@@ -12,14 +12,14 @@ Standard hosted `ci`, published-package smoke, and source-package smoke are gree
 ## Locally Verified Evidence
 | Area | Evidence | Local Status |
 | --- | --- | --- |
-| Build and tests | .NET 10 restore and zero-warning Release build; 428/428 tests (TASK-0230 refresh) | VERIFIED LOCAL |
+| Build and tests | .NET 10 restore; zero-warning/zero-error Release build; 430/430 tests (TASK-0238) | VERIFIED LOCAL |
 | CLI and config contracts | help/exit/config convention gates and read-only config diagnostics | VERIFIED LOCAL |
 | Machine-readable contracts | command JSON schema `2`, baseline schema `1`, SARIF `2.1.0` profile, sanitized golden fixtures | VERIFIED LOCAL |
 | Baseline behavior | deterministic sanitized fingerprints, integrity checks, existing/new classification, output parity | VERIFIED LOCAL |
 | Localization | English/Turkish human output, known errors, exits, and language-independent JSON semantics | VERIFIED LOCAL |
 | Security regression | Critical token coverage, unsuppressible Critical policy, clean self-scan and hygiene checks | VERIFIED LOCAL |
 | Dependencies | direct/transitive vulnerability and deprecation reviews clean after xUnit v3 migration | VERIFIED LOCAL |
-| Performance/resource evidence | mixed 2,000-file scan completed in 5.185 seconds with 44.6 MiB peak working set; interruption and unreadable-file behavior passed against the 30-second/512-MiB local thresholds (TASK-0233) | VERIFIED LOCAL; HOSTED FINAL-RC CONFIRMATION PENDING |
+| Performance/resource evidence | TASK-0238 mixed 2,000-file scans passed at 5.432s/44.8 MiB through the RC gate and 4.620s/44.5 MiB standalone; TASK-0233 interruption and unreadable-file evidence remains green | VERIFIED LOCAL; HOSTED FINAL-RC CONFIRMATION PENDING |
 | Package | local pack, isolated tool install, help, scan JSON, and package metadata verification | VERIFIED LOCAL |
 | Samples and outputs | sample smoke, doctor, JSON/SARIF parse, and local release verification | VERIFIED LOCAL |
 
@@ -39,6 +39,8 @@ Standard hosted `ci`, published-package smoke, and source-package smoke are gree
 
 ## Open Gap Boundary
 `docs/V100_GAP_ANALYSIS.md` remains the source of truth. TASK-0232 closes V100-06 from fresh evidence and records dated V100-02/08/09 decisions. A local pass still does not close any other P0 gap that requires final-candidate or hosted evidence.
+
+TASK-0238 reran the complete goal-defined local suite: ACKit `0.2.0-alpha.4`, doctor 13/13, scan exit 0, restore/build/test 430/430, Unicode temp guard, all V100/contract/config/JSON/localization/RC gates, both performance invocations, 423-file Markdown link audit, completeness/diff checks, and no tracked `.ackit/` artifacts. All passed. The exact goal invocation did not request `-RunDependencyReview`; the RC gate therefore retained its explicit warning that dependency review was not freshly rerun.
 
 The current release-candidate decision in `docs/MAINTAINER_RC_DECISION.md` remains **NO-GO for release-candidate publication**.
 

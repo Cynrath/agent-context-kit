@@ -105,4 +105,16 @@ Before push, revert the relevant local task commit normally if evidence is incor
 
 ## Completion notes
 
-Planned. No test, push, or CI result is claimed yet.
+Local closeout completed on 2026-07-10.
+
+- ACKit `0.2.0-alpha.4`; doctor 13/13 PASS; scan exit 0 with only classified Medium/Low local findings.
+- Restore completed; Release build passed with 0 warnings/0 errors; tests passed 430/430.
+- Exact TASK-0217/TASK-0230 root-directory guard found 0 Unicode/temp directories before and after the full test run.
+- V100 readiness, V100 documentation/release, CLI, config/generated, JSON asset, localization, and RC local-readiness gates passed.
+- The RC-gate benchmark passed at 5.432 seconds and 44.8 MiB; the standalone benchmark passed at 4.620 seconds and 44.5 MiB against 30-second/512-MiB thresholds.
+- Markdown completeness passed with 0 staged/untracked entries; 423 Markdown files and 231 local targets had 0 broken links; `git diff --check` passed; no `.ackit/` artifact is tracked.
+- The exact goal suite did not request `-RunDependencyReview`; the RC gate's explicit not-freshly-rerun warning is retained rather than hidden.
+- No source/script/test/workflow/package metadata/version/release/settings/owner/secret/advisory/destructive state changed after the selected source base.
+- The closeout commit precedes the single authorized push. Final push SHA and push-triggered `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` run IDs are intentionally recorded in the final goal report, not fabricated in this pre-push commit.
+
+Local status: `LOCAL READY / REMOTE NO-GO`. Next authorization boundary after final standard CI: manual `release-candidate-evidence.yml` dispatch.

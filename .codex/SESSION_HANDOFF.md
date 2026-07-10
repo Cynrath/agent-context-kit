@@ -11,8 +11,8 @@
 - TASK-0235 completed locally: conditional freeze refreshed against source base `b1604ae1e73017521d28e5a83f328bb1347406b6`; focused CLI/config/JSON/localization/V100 documentation gates passed; V100-02 remains pending final acceptance.
 - TASK-0236 completed locally at commit `6aa5a6b`: post-push final HEAD / `0.2.0-alpha.4` / predecessor `0.2.0-alpha.3` input packet prepared; workflow/input static checks passed; no workflow was dispatched.
 - TASK-0237 completed locally: active roadmap/queue/index/map/readiness/release/handoff sources synchronized; current package is alpha4 and alpha3 is the immutable predecessor; historical evidence was preserved and relabeled. Documentation gates passed.
-- Current task: TASK-0238 final local readiness audit and safe-chain closeout.
-- Continue sequentially through TASK-0238 with one local commit per task, no intermediate push, then one final push and one blocking final-HEAD CI wait.
+- TASK-0238 local suite passed: ACKit alpha4; doctor 13/13; scan exit 0; Release build 0 warnings/0 errors; 430/430 tests; Unicode guard clean; all required gates; RC benchmark 5.432s/44.8 MiB; standalone benchmark 4.620s/44.5 MiB; Markdown/diff/`.ackit` hygiene clean.
+- Current action: create the TASK-0238 closeout commit, perform the one protected final push, then use the one prescribed blocking final-HEAD CI block.
 - First remaining authorization boundary after local closeout: manual `release-candidate-evidence.yml` dispatch. No version, publish, tag, release, settings, owner, secret, advisory, destructive recovery, workflow dispatch/rerun, or force push is authorized.
 
 ## Project Purpose

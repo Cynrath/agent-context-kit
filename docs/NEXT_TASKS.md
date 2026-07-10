@@ -1,8 +1,8 @@
 # Next Tasks
 
-## Active V100 Safe/Local Completion Chain
+## V100 Safe/Local Completion Chain — Local Closeout Complete
 
-The user-authorized TASK-0232 through TASK-0238 chain is the current execution source of truth. All task files were created with `ackit task` before implementation. Complete the tasks sequentially with one local commit per task, do not push between tasks, run one final full local validation, push the complete chain once, and wait for push-triggered CI once. Stop at the manual hosted RC workflow-dispatch boundary.
+The user-authorized TASK-0232 through TASK-0238 safe/local work and full local validation are complete. All task files were created with `ackit task` before implementation and each task has one local commit. The final push and its standard push-triggered CI are executed after the closeout commit; the first subsequent authorization boundary is manual hosted RC workflow dispatch.
 
 | Order | Task | Status | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
@@ -12,7 +12,7 @@ The user-authorized TASK-0232 through TASK-0238 chain is the current execution s
 | 4 | TASK-0235 final-candidate local contract freeze preparation | COMPLETED | Refresh the conditional freeze against the selected base and target contract | TASK-0234 | CLI/config/JSON/localization/V100 doc gates | Final acceptance remains pending |
 | 5 | TASK-0236 hosted RC evidence input preparation | COMPLETED | Prepare exact post-push alpha4/alpha3 dispatch inputs and evidence schema | TASK-0235 | Workflow/input static tests | Manual workflow dispatch is not executed |
 | 6 | TASK-0237 documentation and handoff synchronization | COMPLETED | Synchronize roadmap, queues, indexes, readiness, and `.codex` state | TASK-0232–0236 | Markdown, tracked/untracked, V100 docs, ACKit | Documentation only |
-| 7 | TASK-0238 final local readiness audit and safe-chain closeout | CURRENT | Run final complete local suite, close local chain, push once, wait for final CI | TASK-0237 | Complete goal-defined validation and final CI | Next boundary: manual hosted RC dispatch |
+| 7 | TASK-0238 final local readiness audit and safe-chain closeout | LOCAL COMPLETE; FINAL PUSH/CI PENDING | Complete local suite, close local chain, push once, wait for final CI | TASK-0237 | Complete goal-defined validation PASS; final CI follows the commit | Next boundary: manual hosted RC dispatch |
 
 No task in this chain authorizes a version bump, NuGet publish, tag/release mutation, workflow dispatch/rerun, GitHub settings/security/collaborator change, destructive recovery, force push, or a V100 RC/1.0 readiness claim.
 

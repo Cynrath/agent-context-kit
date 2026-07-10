@@ -1,5 +1,21 @@
 # Release Validation
 
+## V100 Safe/Local Final Audit (TASK-0238)
+
+The single complete local closeout suite passed on 2026-07-10:
+
+| Check | Result |
+| --- | --- |
+| ACKit | `0.2.0-alpha.4`; doctor 13/13 PASS; scan exit 0 with only classified Medium/Low local findings |
+| Restore/build/test | restore current; Release build 0 warnings/0 errors; 430/430 tests PASS |
+| Windows Unicode temp guard | 0 matching root directories before and after the full test run |
+| V100/contract gates | readiness, documentation/release, CLI, config/generated, JSON assets, localization, and RC local-readiness PASS |
+| RC-gate benchmark | 2,000 mixed files; 5.432s; 44.8 MiB; PASS |
+| Standalone benchmark | 2,000 mixed files; 4.620s; 44.5 MiB; PASS |
+| Documentation/hygiene | 423 Markdown files, 231 local targets, 0 broken; completeness clean; no tracked `.ackit/`; `git diff --check` clean |
+
+The exact goal suite invoked the RC gate without `-RunDependencyReview`, so its existing warning that dependency review was not freshly rerun is preserved. No release, version, package, tag, workflow, setting, or hosted evidence claim is made by this local audit.
+
 ## V100 Performance And Resource Evidence Expansion (TASK-0233)
 
 TASK-0233 replaced the uniform timing-only local fixture with a default 2,000-file mixed corpus while preserving the existing command. Local evidence on 2026-07-10:
