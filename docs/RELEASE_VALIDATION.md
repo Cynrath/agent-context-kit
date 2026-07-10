@@ -1,5 +1,21 @@
 # Release Validation
 
+## V100 Performance And Resource Evidence Expansion (TASK-0233)
+
+TASK-0233 replaced the uniform timing-only local fixture with a default 2,000-file mixed corpus while preserving the existing command. Local evidence on 2026-07-10:
+
+| Check | Result |
+| --- | --- |
+| Release build | PASS; 0 warnings, 0 errors |
+| Focused performance/resource tests | 2/2 PASS |
+| Mixed corpus | 746 small text, 1,000 medium text, 4 oversized text, 250 binary |
+| Elapsed time | 5.185 seconds / 30-second tripwire — PASS |
+| Peak working set | 44.6 MiB / 512-MiB tripwire — PASS |
+| Process interruption | PASS; no `.ackit/` output and source sentinel unchanged |
+| Unreadable text file | PASS through deterministic fake filesystem |
+
+This is local machine-specific regression evidence, not a production SLA. V100-07 remains open pending the selected final-candidate three-OS hosted rerun.
+
 ## v0.2.0-alpha.4 Local Gate Refresh (TASK-0230)
 
 TASK-0230 ran all local V100 contract/readiness gates against the current source at HEAD `583b62e` on 2026-06-27.

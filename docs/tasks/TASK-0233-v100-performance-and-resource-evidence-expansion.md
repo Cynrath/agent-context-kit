@@ -111,4 +111,16 @@ Revert the TASK-0233 commit; the previous uniform timing-only benchmark returns 
 
 ## Completion notes
 
-Planned. No performance result is claimed before execution.
+Completed on 2026-07-10.
+
+- The default benchmark now builds a mixed corpus while preserving the original required command.
+- Local result: 5.185 seconds, 44.6 MiB peak working set, both below the 30-second/512-MiB tripwires.
+- Corpus distribution: 746 small text, 1,000 medium text, 4 oversized text, and 250 binary files.
+- Opt-in interruption probe passed and confirmed no `.ackit/` output or sentinel mutation.
+- New deterministic tests passed 2/2, including unreadable-text `UnauthorizedAccessException` behavior.
+- Release build passed with 0 warnings and 0 errors.
+- The full local RC evidence gate passed; its independent benchmark rerun completed in 5.186 seconds with the same 44.6 MiB peak working set.
+- No CLI command/option/JSON contract, dependency, package metadata, version, workflow, or remote state changed.
+- V100-07 is `LOCAL_EVIDENCE_EXPANDED / OPEN_PENDING_FINAL_RC_HOSTED_CONFIRMATION`.
+
+Commit: recorded after creation. The next task is TASK-0234.

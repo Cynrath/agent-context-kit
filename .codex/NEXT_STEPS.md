@@ -3,8 +3,8 @@
 ## Current V100 Chain
 
 1. COMPLETED — TASK-0232: V100 decisions recorded, V100-06 closed, security/recovery truth reconciled, and current CLI alpha4 references corrected.
-2. CURRENT — TASK-0233: expand mixed-corpus, peak-memory, interruption, and unreadable-file performance evidence.
-3. TASK-0234: select the exact last source-impacting local commit as the final-candidate evidence base without a version bump.
+2. COMPLETED — TASK-0233: mixed-corpus/time/memory/interruption/unreadable-file evidence passed; V100-07 awaits final-RC hosted confirmation.
+3. CURRENT — TASK-0234: select the exact last source-impacting local commit as the final-candidate evidence base without a version bump.
 4. TASK-0235: prepare the alpha4/current-source conditional contract freeze; keep final acceptance open.
 5. TASK-0236: prepare post-push `0.2.0-alpha.4` / `0.2.0-alpha.3` hosted RC inputs; do not dispatch.
 6. TASK-0237: synchronize roadmap, queue, index, readiness, release, and handoff sources.

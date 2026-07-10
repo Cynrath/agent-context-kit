@@ -6,7 +6,8 @@
 - ACKit preflight: installed `0.2.0-alpha.4`; doctor 13/13 PASS; scan exit 0. `ackit task --help` is not supported by this parser and returned the expected missing-title exit 1; do not repeat it.
 - All task files TASK-0232 through TASK-0238 were created with `ackit task` before implementation and fully planned.
 - TASK-0232 completed locally: V100 decision packet added; V100-06 closed from fresh `enabled: true` plus backup `write` evidence; V100-02/08/09 decisions recorded with final-candidate/hosted boundaries; current security/recovery/CLI sources reconciled. Focused gates passed.
-- Current task: TASK-0233 performance and resource evidence expansion.
+- TASK-0233 completed locally: mixed 2,000-file scan passed at 5.185 seconds and 44.6 MiB peak working set; interruption and unreadable-file evidence passed; focused tests 2/2 and full RC evidence gate passed. V100-07 now awaits final-RC hosted confirmation.
+- Current task: TASK-0234 final-candidate local source selection and preparation.
 - Continue sequentially through TASK-0238 with one local commit per task, no intermediate push, then one final push and one blocking final-HEAD CI wait.
 - First remaining authorization boundary after local closeout: manual `release-candidate-evidence.yml` dispatch. No version, publish, tag, release, settings, owner, secret, advisory, destructive recovery, workflow dispatch/rerun, or force push is authorized.
 

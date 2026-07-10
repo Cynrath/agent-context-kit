@@ -9,7 +9,7 @@ Local evidence preparation includes TASK-0084 through TASK-0096 baseline/config 
 | Baseline policy | schema/fingerprint fixtures, explicit update, integrity checks, new/existing CI tests, JSON/SARIF/report/Web UI parity, three-OS run `27478635057` | Verified for reviewed alpha.2 state | rerun and sign off for a different final candidate |
 | Config compatibility | published `0.2.0-alpha.1` config fixture plus read-only `config-check` human/JSON/exit/privacy contract tests and hosted predecessor smoke | Verified for reviewed alpha.2 state | final candidate sign-off |
 | CLI/JSON/SARIF | contract tests, additive schema rules, exit-code parity, conditional local freeze, machine-readable schemas/golden fixtures | Ready locally | final candidate maintainer sign-off |
-| Performance | disposable 2,000-file benchmark with unchanged 30-second tripwire; hosted Windows 1.265s, Ubuntu 0.957s, macOS 0.684s | Hosted tripwire verified | memory, cancellation, mixed corpus |
+| Performance | TASK-0233 mixed 2,000-file benchmark: 5.185s, 44.6 MiB peak working set, interruption PASS, unreadable-file test PASS; historical hosted timing remains exact-commit evidence | Expanded local evidence complete | selected final-candidate hosted rerun and variance review |
 | Security response | private reporting enabled; `Cynrath` primary and `ShadowFlameC` backup; coverage, non-public data rule, latest-pre-release fix scope, and non-SLA targets freshly reviewed by TASK-0232 | V100-06 CLOSED | recheck after owner/channel/support-policy change |
 | Runtime support | .NET 10; Windows, Ubuntu/Linux, and macOS; latest-pre-release fix scope; predecessor rollback evidence; unsupported surfaces recorded | Maintainer decision recorded | final-RC three-OS rerun |
 | Supply chain | OIDC/immutability/alignment/inspection/digest/signature/asset/upgrade/recovery baseline; recovery ownership reconciled; signing/SBOM accepted risks recorded | Maintainer decision recorded | hosted provenance on next authorized publish path |
@@ -44,6 +44,7 @@ Local evidence recorded on 2026-06-12:
 - TASK-0096 adds `docs/RC_LOCAL_READINESS.md` and a read-only orchestration gate that reports `LOCAL READY / REMOTE NO-GO`; it does not close hosted, security-setting, supply-chain, version, or approval blockers.
 - TASK-0128 records successful standard 8/8 validation and dedicated RC run `27478635057` for exact commit `4c4fa64ff34287dff01818d52f49b521efb3176d`. Predecessor/config/baseline/SARIF/performance hosted evidence is complete for this reviewed alpha.2 state.
 - TASK-0099 records the exact published package/release state: valid NuGet.org repository signature, no observed author signature, no package/release SBOM, no accessible GitHub package attestation, and a NuGet owner profile differing from the project persona.
+- TASK-0233 expands the local performance/resource evidence: the 2,000-file mixed corpus completed in 5.185 seconds with 44.6 MiB observed peak working set; interruption left no generated output or source mutation; focused unreadable-file/script tests passed 2/2. This is a regression tripwire, not an SLA.
 
 The former xUnit test-tooling warning is resolved locally. Remaining supply-chain decisions are signing, SBOM, provenance, recovery policy, and release-date revalidation.
 
