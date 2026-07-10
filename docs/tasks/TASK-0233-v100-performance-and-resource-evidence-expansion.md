@@ -123,4 +123,4 @@ Completed on 2026-07-10.
 - No CLI command/option/JSON contract, dependency, package metadata, version, workflow, or remote state changed.
 - V100-07 is `LOCAL_EVIDENCE_EXPANDED / OPEN_PENDING_FINAL_RC_HOSTED_CONFIRMATION`.
 
-Commit: recorded after creation. The next task is TASK-0234.
+Commit: `b1604ae`. The next task is TASK-0234.

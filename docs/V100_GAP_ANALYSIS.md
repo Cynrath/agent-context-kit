@@ -72,5 +72,9 @@ A future 1.0 release candidate must provide:
 - reviewed package contents and security/privacy documentation;
 - a maintainer-approved release, support, and rollback plan.
 
+## TASK-0234 Local Source Selection
+
+The last planned source/script/test-impacting commit in the safe/local chain is `b1604ae1e73017521d28e5a83f328bb1347406b6` from TASK-0233. It is the local V100 evidence base, not a selected release version or accepted RC. Later TASK-0234–0238 commits must remain docs/evidence/governance-only or the selection must be reopened. A future manual hosted run uses the final pushed HEAD after exact bridge review.
+
 ## Status Maintenance
 Each implementation task must update this register with evidence rather than marking a gap complete from documentation alone. `scripts/check-v100-readiness.ps1` verifies that this analysis and the historical readiness assets exist; it is not a substitute for closing the gaps. TASK-0228 refreshed this register against the alpha4 published state. TASK-0230 ran all local V100 contract/readiness gates and recorded fresh evidence for V100-01/02/03/04/07/10. TASK-0232 closes V100-06 from freshly verified ownership/channel/policy evidence and records bounded decisions for V100-02/08/09; all final-candidate/hosted boundaries remain open.

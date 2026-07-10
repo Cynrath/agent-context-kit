@@ -102,4 +102,12 @@ Revert the TASK-0234 commit and return the candidate state to unselected.
 
 ## Completion notes
 
-Planned. The exact SHA will be derived during execution, not fabricated during planning.
+Completed on 2026-07-10.
+
+- Selected `b1604ae1e73017521d28e5a83f328bb1347406b6` as the last planned source/script/test-impacting local V100 evidence base.
+- Reviewed the exact commit paths: only the TASK-0233 performance script, focused test, and supporting evidence/docs changed.
+- Local candidate input validation passed for current source metadata `0.2.0-alpha.4` and published predecessor `0.2.0-alpha.3`.
+- Recorded the docs-only bridge rule for the future final pushed HEAD.
+- No release version, package, tag, GitHub Release, workflow dispatch, publication, or final-candidate acceptance occurred.
+
+Commit: recorded after creation. The next task is TASK-0235.

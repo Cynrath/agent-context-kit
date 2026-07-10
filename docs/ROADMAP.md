@@ -323,3 +323,5 @@ See `docs/tasks/TASK-0231-post-alpha4-v100-cleanup-and-next-roadmap-selection.md
 TASK-0232 through TASK-0238 are the current user-authorized safe/local continuation. The chain records maintainer decisions, expands V100-07 local evidence, selects the last source-impacting local evidence base, prepares the conditional contract freeze and hosted RC inputs, synchronizes documentation, and performs one final local audit. It intentionally stops at manual `release-candidate-evidence.yml` dispatch.
 
 The chain does not select a new package version, mutate immutable alpha4 artifacts, publish NuGet, create/move a tag, edit a GitHub Release, dispatch/rerun workflows, change repository/security/collaborator settings, or claim V100 RC/1.0 readiness.
+
+TASK-0234 selects `b1604ae1e73017521d28e5a83f328bb1347406b6` as the last planned source-impacting local evidence base. No release version is selected. Later chain commits must remain docs/evidence/governance-only; hosted input preparation will target the final pushed docs-only successor after bridge review.

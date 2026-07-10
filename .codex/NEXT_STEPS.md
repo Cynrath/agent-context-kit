@@ -4,8 +4,8 @@
 
 1. COMPLETED — TASK-0232: V100 decisions recorded, V100-06 closed, security/recovery truth reconciled, and current CLI alpha4 references corrected.
 2. COMPLETED — TASK-0233: mixed-corpus/time/memory/interruption/unreadable-file evidence passed; V100-07 awaits final-RC hosted confirmation.
-3. CURRENT — TASK-0234: select the exact last source-impacting local commit as the final-candidate evidence base without a version bump.
-4. TASK-0235: prepare the alpha4/current-source conditional contract freeze; keep final acceptance open.
+3. COMPLETED — TASK-0234: source-impacting evidence base `b1604ae1e73017521d28e5a83f328bb1347406b6` selected; no version/publication selected.
+4. CURRENT — TASK-0235: prepare the alpha4/current-source conditional contract freeze; keep final acceptance open.
 5. TASK-0236: prepare post-push `0.2.0-alpha.4` / `0.2.0-alpha.3` hosted RC inputs; do not dispatch.
 6. TASK-0237: synchronize roadmap, queue, index, readiness, release, and handoff sources.
 7. TASK-0238: run the single complete local audit, close the chain, push all commits once, and wait for final push-triggered CI once.
