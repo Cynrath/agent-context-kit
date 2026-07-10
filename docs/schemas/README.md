@@ -16,6 +16,8 @@ Compatibility rules:
 - the SARIF profile does not replace the official complete SARIF schema;
 - fixtures must not contain real secrets, absolute local paths, private user/machine data, or raw finding matches.
 
+TASK-0235 includes this catalog in the V100 conditional local contract freeze against source-impacting evidence base `b1604ae1e73017521d28e5a83f328bb1347406b6`. This is local preparation, not final-candidate acceptance or publication approval.
+
 Validate locally:
 
 ```powershell

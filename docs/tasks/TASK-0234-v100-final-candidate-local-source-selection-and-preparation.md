@@ -110,4 +110,4 @@ Completed on 2026-07-10.
 - Recorded the docs-only bridge rule for the future final pushed HEAD.
 - No release version, package, tag, GitHub Release, workflow dispatch, publication, or final-candidate acceptance occurred.
 
-Commit: recorded after creation. The next task is TASK-0235.
+Commit: `e19338b`. The next task is TASK-0235.

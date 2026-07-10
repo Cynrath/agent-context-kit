@@ -103,4 +103,14 @@ Revert the TASK-0235 commit; no runtime or remote rollback is needed.
 
 ## Completion notes
 
-Planned.
+Completed on 2026-07-10.
+
+- Refreshed the conditional local freeze from stale alpha3 preparation text to current alpha4/source-base truth.
+- Bound local preparation to `b1604ae1e73017521d28e5a83f328bb1347406b6` and the docs-only bridge policy.
+- Explicitly included commands/options, JSON fields/schemas, command/status identifiers, rule/diagnostic IDs, exit semantics, SARIF expectations, and localization technical-token invariance.
+- Updated CLI, JSON, schema-catalog, and V100 references without changing runtime behavior.
+- Focused validation passed: CLI contract, config/generated conventions, JSON contract assets, localization parity, V100 documentation/release gates, and `git diff --check`.
+- V100-02 remains `MAINTAINER_DECISION_RECORDED / LOCAL_FREEZE_PREPARED / OPEN_PENDING_FINAL_CANDIDATE_ACCEPTANCE`.
+- No version, package, tag, release, workflow, remote state, or final acceptance changed.
+
+Commit: recorded after creation. The next task is TASK-0236.

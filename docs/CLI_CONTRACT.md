@@ -66,6 +66,8 @@ ackit help
 - Keep command identifiers, scanner rule IDs, config diagnostic IDs, exit semantics, and the documented SARIF profile stable within the same target contract.
 - Localized human-readable prose is not byte-for-byte stable; localization must not change technical tokens or machine-readable contracts.
 
+The selected local source-impacting evidence base for this preparation is `b1604ae1e73017521d28e5a83f328bb1347406b6`. Later docs/evidence/governance-only commits use the bridge policy in `docs/V100_FINAL_CANDIDATE_LOCAL_SELECTION.md`; any later behavior change reopens the selection and freeze.
+
 ## Global Options
 - `--lang en|tr`: selects English or Turkish output/templates where supported. Unknown language values fall back to English.
 - Human-readable headings, labels, summaries, and known argument errors are localized; command names, option names, rule/diagnostic IDs, paths, and exit decisions remain stable.

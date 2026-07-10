@@ -40,6 +40,7 @@ JSON responses include:
 The machine-readable Draft 2020-12 contract is `docs/schemas/ackit-command-output-v2.schema.json`. It defines the common envelope and command-specific required top-level fields for all JSON-capable commands while allowing additive properties. Sanitized golden examples live in `tests/fixtures/contracts/command-output-v2-golden.json`.
 
 ## Stability Rules
+- TASK-0232/TASK-0235 include schema `2`, the common envelope, command identifiers, required command fields, status tokens, rule/diagnostic IDs, and exit semantics in the V100 target contract. Final-candidate acceptance remains pending.
 - Every successful JSON command includes `schemaVersion`, `toolVersion`, `generatedAtUtc`, and `command`.
 - Existing fields should not be removed or renamed within schema version `2`.
 - New optional fields may be added without changing the schema version.

@@ -8,7 +8,8 @@
 - TASK-0232 completed locally: V100 decision packet added; V100-06 closed from fresh `enabled: true` plus backup `write` evidence; V100-02/08/09 decisions recorded with final-candidate/hosted boundaries; current security/recovery/CLI sources reconciled. Focused gates passed.
 - TASK-0233 completed locally: mixed 2,000-file scan passed at 5.185 seconds and 44.6 MiB peak working set; interruption and unreadable-file evidence passed; focused tests 2/2 and full RC evidence gate passed. V100-07 now awaits final-RC hosted confirmation.
 - TASK-0234 completed locally: exact source-impacting evidence base `b1604ae1e73017521d28e5a83f328bb1347406b6`; alpha4/alpha3 input validation PASS; no version or publication selected; later commits constrained to docs/evidence/governance-only.
-- Current task: TASK-0235 final-candidate local contract freeze preparation.
+- TASK-0235 completed locally: conditional freeze refreshed against source base `b1604ae1e73017521d28e5a83f328bb1347406b6`; focused CLI/config/JSON/localization/V100 documentation gates passed; V100-02 remains pending final acceptance.
+- Current task: TASK-0236 hosted RC evidence input preparation.
 - Continue sequentially through TASK-0238 with one local commit per task, no intermediate push, then one final push and one blocking final-HEAD CI wait.
 - First remaining authorization boundary after local closeout: manual `release-candidate-evidence.yml` dispatch. No version, publish, tag, release, settings, owner, secret, advisory, destructive recovery, workflow dispatch/rerun, or force push is authorized.
 
