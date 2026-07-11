@@ -17,7 +17,9 @@ One-time read-only audit on 2026-07-11 after release run `29131335084`:
 
 The OIDC publish step succeeded, then bounded NuGet availability verification timed out. Tag/release/provenance steps were skipped. No second dispatch, rerun, recovery, manual upload, version reuse, tag movement, or force push occurred. The alpha.2 audit below remains historical evidence and must not be relabeled as RC1 provenance.
 
-TASK-0243 through TASK-0245 are now separately authorized to recover this exact immutable package without NuGet publication. The bounded path must use validated artifact `8242162439`, exact nupkg/snupkg hashes, exact release commit `258918b33c3d1359aac967604ee524e8b66ddf02`, one recovery dispatch, two asset attestations, and Windows/Ubuntu/macOS install verification. Until that run fully succeeds, this section remains the authoritative partial-state record.
+TASK-0243 through TASK-0245 received a separate bounded authorization to recover this exact immutable package without NuGet publication. The path required validated artifact `8242162439`, exact nupkg/snupkg hashes, exact release commit `258918b33c3d1359aac967604ee524e8b66ddf02`, one recovery dispatch, two asset attestations, and Windows/Ubuntu/macOS install verification. The subsequent run did not complete, so this section remains the authoritative partial-state record.
+
+TASK-0244 consumed that single recovery dispatch in run `29151228607`. The Ubuntu safety gate failed on a Windows-only `powershell` child invocation before any remote mutation step. A one-time audit reconfirmed artifact `8242162439` unexpired, candidate hashes unchanged, NuGet repository signature/content equivalence and commit `258918b33c3d1359aac967604ee524e8b66ddf02`, NuGet-served hash `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`, and absent tag/release/nupkg attestation/snupkg attestation. No automatic correction or second dispatch is authorized.
 
 Future-release decisions derived from this published-state evidence are tracked without closure in `docs/RELEASE_BLOCKER_BOARD.md` and `docs/MAINTAINER_DECISION_REGISTER.md`.
 

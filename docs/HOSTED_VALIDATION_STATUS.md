@@ -4,7 +4,15 @@
 
 Release run [`29131335084`](https://github.com/Cynrath/agent-context-kit/actions/runs/29131335084) targeted exact HEAD `258918b33c3d1359aac967604ee524e8b66ddf02`. Validate job `86487127197` passed. Publish job `86487525013` completed OIDC login and NuGet publish, then failed because the package did not become available to its verification runner inside the bounded retry window. Tag, GitHub prerelease, provenance, and attestation steps were skipped. One-time follow-up verified NuGet availability/signature/repository commit and global install, while tag/release/attestation remained absent. User-required hard stop applies; no recovery or second dispatch occurred.
 
-TASK-0243/0244/0245 recovery authorization was recorded separately on 2026-07-11. TASK-0243 must implement and validate a NuGet-publish-free path first. TASK-0244 may dispatch that recovery operation exactly once after green pre-recovery CI; its run ID and per-platform evidence will be appended without changing the TASK-0242 record above.
+TASK-0243/0244/0245 recovery authorization was recorded separately on 2026-07-11. TASK-0243 implemented and validated the NuGet-publish-free path before TASK-0244 consumed its single recovery dispatch. The resulting failure is recorded below without changing the TASK-0242 record above.
+
+## TASK-0244 Recovery Run — Pre-Mutation Failure / Hard Stop
+
+TASK-0243 automation commit `3b979972ba24b6acd4f0eecca49ff3dcc2c8cdff` passed pre-recovery standard runs `29151153458`, `29151153453`, and `29151153454`. The single authorized recovery dispatch then created run [`29151228607`](https://github.com/Cynrath/agent-context-kit/actions/runs/29151228607), job `86540942756`.
+
+The job failed in `Run exact recovery safety gates`. Exact-package fixtures and the release workflow static gate passed; `scripts/test-supply-chain-workflow.ps1` then called Windows-only `powershell` from Ubuntu and exited before source-artifact validation. Every tag/release/asset/attestation/completed-recovery step was skipped, and the three-platform recovered-package matrix was skipped. Normal `publish` and `verify-existing` jobs were also skipped.
+
+The failed log was inspected once. One immutable-state audit confirmed artifact/package hashes and repository signature/commit unchanged, and remote tag, GitHub prerelease/assets, nupkg attestation, and snupkg attestation absent. No second dispatch, rerun, automatic correction, or remote mutation occurred. State: `RECOVERY_DISPATCH_CONSUMED / PRE_MUTATION_FAILURE / REMOTE_STATE_UNCHANGED / NEW_DECISION_REQUIRED`.
 
 ## V100 `1.0.0-rc.1` Hosted Evidence — PASS
 

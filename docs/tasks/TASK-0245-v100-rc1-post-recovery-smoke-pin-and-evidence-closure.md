@@ -123,4 +123,6 @@ Before push, revert local pin/docs edits normally. After push, correct documenta
 
 ## Completion notes
 
-Status: `PLANNED / CONDITIONAL_ON_TASK-0244_SUCCESS`. No smoke pin or current-release claim changes are allowed until the single recovery workflow completes all required jobs successfully.
+Status: `NOT_EXECUTED / BLOCKED_BY_TASK-0244_FAILURE / SMOKE_PIN_UNCHANGED`.
+
+TASK-0244 run `29151228607` failed before any recovery mutation and its single dispatch budget is consumed. Therefore `.github/workflows/cross-platform-smoke.yml` remains pinned to immutable complete release `0.2.0-alpha.4`; no RC1 current-complete-release claim, README install change, tag/release/provenance change, or post-recovery three-platform smoke was made. TASK-0245 records only this conditional hard stop; the final user report records the push-triggered failure-documentation CI evidence. It does not attempt recovery or fix the hosted failure.

@@ -22,12 +22,12 @@ This file is hand-maintained. `ackit generate` does not regenerate it. Update it
 - Agent instructions: yes
 
 ## Release Status
-- Current complete release: `v0.2.0-alpha.4`. NuGet `1.0.0-rc.1` exists in a partial immutable state; tag, GitHub prerelease, and provenance are absent after TASK-0242 stopped.
+- Current complete release: `v0.2.0-alpha.4`. NuGet `1.0.0-rc.1` exists in a partial immutable state; TASK-0244 recovery stopped before mutation, so tag, GitHub prerelease, and provenance remain absent.
 - Current publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
 - Previous release: `v0.2.0-alpha.3` published and verified; pushed, released, and published.
 - Main stack: `.NET`, `.NET CLI / .NET Tool`, and `GitHub Actions`.
 - `0.2.0-alpha.4` is published and verified by TASK-0220. Do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
-- `1.0.0-rc.1` NuGet publication is immutable at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`; do not republish/reuse it or create/move its tag/release/provenance without a new explicit recovery decision.
+- `1.0.0-rc.1` NuGet publication is immutable at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`; TASK-0244's recovery dispatch is consumed, so do not republish/reuse it or fix/retry/create/move its tag/release/provenance without a new explicit recovery decision.
 
 ## Commit And Push Policy
 - Hard prohibitions: never force-push, never rewrite history, never move an existing tag, never create a remote, never publish a package, never create a release, never delete user changes, never expose secrets, never fabricate owner, identity, signature, or recovery evidence.

@@ -28,7 +28,7 @@ powershell -ExecutionPolicy Bypass -File scripts/check-release-workflow.ps1 -Fai
 powershell -ExecutionPolicy Bypass -File scripts/test-supply-chain-workflow.ps1
 ```
 
-TASK-0244 alone may dispatch `recover-existing`, exactly once and only after TASK-0243 push-triggered CI is green. Any partial failure receives one read-only audit and a hard stop; no second recovery dispatch, normal publish, NuGet push, manual upload, tag movement, or force update is allowed.
+TASK-0244 alone could dispatch `recover-existing`, exactly once and only after TASK-0243 push-triggered CI was green. That budget is now consumed by run `29151228607`. The run failed in the Ubuntu safety-gate step because `scripts/test-supply-chain-workflow.ps1` calls Windows-only `powershell`; all remote mutation and three-platform verification steps were skipped. The failed log was read once and one immutable audit confirmed package/artifact evidence unchanged plus tag/release/two attestations absent. No second recovery dispatch, normal publish, automatic correction, NuGet push, manual upload, tag movement, or force update is allowed without a new explicit decision.
 
 TASK-0239 adds exact alpha4 generated-config fixture/regeneration coverage, direct hosted CLI/config/JSON/localization gates, run-unique candidate packaging, source/package version alignment, and future release-body routing. Dependency, local package/install, full-suite, Unicode, resource, and hygiene checks completed locally; exact candidate standard CI is recorded after the candidate push.
 
@@ -337,7 +337,7 @@ English/Turkish human output, known argument errors, exit decisions, and JSON se
 
 Security reporting and supply-chain maintainer evidence fields are defined in [SECURITY_SUPPLY_CHAIN_EVIDENCE.md](SECURITY_SUPPLY_CHAIN_EVIDENCE.md) and [MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md](MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md), with local structure/dependency review through `scripts/check-security-supply-chain-evidence.ps1`. Remote private-reporting state can be rechecked separately through `scripts/check-private-vulnerability-reporting.ps1`; the local structure gate alone does not prove remote settings or artifact publication.
 
-Signing, SBOM, and provenance dispositions are recorded in [SUPPLY_CHAIN_DECISIONS.md](SUPPLY_CHAIN_DECISIONS.md). `scripts/test-supply-chain-workflow.ps1` verifies positive and negative permission/action boundaries. RC1 provenance remains hosted-pending until the separately authorized TASK-0244 exact-existing-package recovery attests and verifies both release assets without republishing NuGet.
+Signing, SBOM, and provenance dispositions are recorded in [SUPPLY_CHAIN_DECISIONS.md](SUPPLY_CHAIN_DECISIONS.md). `scripts/test-supply-chain-workflow.ps1` verifies positive and negative permission/action boundaries. RC1 provenance remains absent because TASK-0244 stopped before attestation; any fixture correction or future recovery attempt requires a new explicit decision and must not republish NuGet.
 
 The consolidated local RC decision is defined in [RC_LOCAL_READINESS.md](RC_LOCAL_READINESS.md). `scripts/check-rc-local-readiness.ps1` orchestrates the existing local evidence gates and intentionally reports `LOCAL READY / REMOTE NO-GO` while hosted and maintainer-only evidence remains open.
 

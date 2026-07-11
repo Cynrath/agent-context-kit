@@ -6,6 +6,8 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 
 ## [Unreleased]
 
+- TASK-0243 added a NuGet-publish-free exact-existing-package recovery operation with exact artifact/package verification, two release-asset attestations, negative workflow gates, and a three-platform install matrix. TASK-0244 run `29151228607` stopped in a pre-mutation Ubuntu safety gate because a fixture helper invoked Windows-only `powershell`; no tag, GitHub prerelease, asset, or attestation was created, no second dispatch occurred, and the published smoke pin remains `0.2.0-alpha.4`.
+
 ## [1.0.0-rc.1] - NuGet published; release incomplete
 
 ### Candidate scope
@@ -19,7 +21,7 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 ### Known limitations
 - NuGet `1.0.0-rc.1` is available and repository-signed, but TASK-0242 stopped after bounded propagation verification timed out; no `v1.0.0-rc.1` tag, GitHub prerelease, or attestation exists.
 - Author signing and SBOM publication remain documented bounded accepted risks; neither is claimed as implemented.
-- Hosted publish-path provenance remains pending. No recovery or second dispatch is authorized; immutable NuGet state must be preserved until a separate recovery decision.
+- Hosted publish-path provenance remains pending. TASK-0244's single recovery attempt stopped before mutation and its dispatch budget is consumed; immutable NuGet state must be preserved until a new explicit decision.
 - External adoption evidence remains limited, and hosted documentation/GitHub Pages remains deferred.
 
 ### Added

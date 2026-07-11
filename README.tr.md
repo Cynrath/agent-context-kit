@@ -16,7 +16,7 @@ Public repository URL: `https://github.com/Cynrath/agent-context-kit`
 
 Current complete release: `v0.2.0-alpha.4` GitHub ve NuGet uzerinde pre-release olarak yayinlandi; global tool kurulumu dogrulandi. Publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
 
-RC1 partial state: NuGet `1.0.0-rc.1` mevcuttur ve kurulabilir; TASK-0242 hard stop sonrasinda tag, GitHub prerelease ve provenance yoktur. Asagidaki tamamlanmis release kurulum komutlari `0.2.0-alpha.4` olarak kalir.
+RC1 partial state: NuGet `1.0.0-rc.1` mevcuttur ve kurulabilir; TASK-0244 recovery mutation oncesinde durdugu icin tag, GitHub prerelease ve provenance halen yoktur. Asagidaki tamamlanmis release kurulum komutlari `0.2.0-alpha.4` olarak kalir.
 
 Varsayılan komutlar repository içeriğini yerelde işler; repository upload, AI API çağrısı, telemetry veya harici araç çalıştırma yapmaz. Ayrıntı: [Varsayılan No-Network Politikası](docs/NO_NETWORK_DEFAULT_POLICY.md).
 

@@ -135,7 +135,7 @@ Before dispatch, revert the workflow/script/docs commit normally if validation f
 
 ## Completion notes
 
-Status: `COMPLETED LOCALLY / PENDING PUSH_AND_PRE_RECOVERY_CI`.
+Status: `COMPLETED / PUSHED / PRE_RECOVERY_CI_PASS`.
 
 Starting state was verified on 2026-07-11 at repository HEAD/origin `6362524a3ff1e0776ec1b07ae746fb33f0b88a55`. Release run `29131335084` validate job succeeded; artifact `8242162439` is unexpired with digest `sha256:cd5550b2172aa0e4ff9bf700f6eefb04dfd8dbd88c8d7fee22914c1769533b3f`; NuGet RC1 is accessible; tag, GitHub Release, and both candidate-asset attestations were absent.
 
@@ -162,4 +162,4 @@ Actual validation evidence:
 - ACKit `1.0.0-rc.1`: doctor 13/13 PASS; scan exit 0 with classified Medium/Low findings only; redact-check exit 1 reports the same known local artifact/path findings with no Critical/High finding;
 - `git diff --check`: PASS; no tracked `.ackit/` artifact.
 
-The pre-commit public-release orchestration correctly rejected the dirty working tree and will be rerun after the implementation commit. No workflow dispatch, NuGet mutation, tag, release, attestation, manual upload, or force push occurred in TASK-0243.
+The pre-commit public-release orchestration correctly rejected the dirty working tree; it passed after implementation commit `3b979972ba24b6acd4f0eecca49ff3dcc2c8cdff`. Planning commit `291f91f` and implementation commit `3b97997` were pushed together. Pre-recovery runs `29151153458` (`ci`), `29151153453` (`cross-platform-smoke`), and `29151153454` (`cross-platform-source-smoke`) all passed. No recovery dispatch, NuGet mutation, tag, release, attestation, manual upload, or force push occurred in TASK-0243.

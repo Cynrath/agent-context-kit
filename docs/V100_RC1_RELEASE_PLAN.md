@@ -2,7 +2,7 @@
 
 ## Status
 
-Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its single authorized publish dispatch on 2026-07-11. NuGet publication succeeded, but bounded package-availability verification timed out before tag, GitHub prerelease, or provenance. TASK-0243 through TASK-0245 now carry a separate exact-existing-package recovery authorization that forbids any second NuGet push.
+Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its single publish dispatch and left NuGet-only immutable state. TASK-0243 implemented an exact-existing-package recovery path. TASK-0244 consumed the separate single recovery dispatch in run `29151228607`, which failed in an Ubuntu safety gate before mutation; TASK-0245 was not executed.
 
 | Field | Value |
 | --- | --- |
@@ -11,7 +11,7 @@ Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its single a
 | Published predecessor | `0.2.0-alpha.4` |
 | Current published release | `0.2.0-alpha.4` |
 | Candidate commit | Source candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; later bridge commits are docs/evidence/governance-only |
-| Publication status | Partial immutable state: NuGet published; tag/release/provenance absent; exact-package recovery authorized but not dispatched |
+| Publication status | Partial immutable state: NuGet published; tag/release/provenance absent; recovery attempt stopped before mutation; both dispatch budgets consumed |
 | Release body | Publication-ready `docs/RELEASE_BODY_V100_RC1.md` |
 
 ## Version Availability
@@ -45,7 +45,7 @@ After hosted evidence starts, TASK-0240 and TASK-0241 may change documentation, 
 
 - Hosted three-OS exact-candidate evidence is pending TASK-0240.
 - Final candidate acceptance and gap reconciliation are pending TASK-0241.
-- V100-09 provenance remains open until TASK-0244 creates and verifies attestations for both exact recovered release assets without republishing NuGet.
+- V100-09 provenance remains open because TASK-0244 stopped before creating attestations for either exact release asset; a new explicit decision is required for any future recovery attempt.
 - Author signing and SBOM publication remain bounded accepted risks through their recorded review boundary.
 - `1.0.0` GA readiness is not claimed.
 
@@ -64,7 +64,7 @@ Before publication, correct the source with a normal successor commit and rerun 
 
 ## Post-Publish Validation
 
-TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. Tag/release/assets/attestation and three-platform RC1 post-publish smoke were not completed. TASK-0243/0244/0245 now implement, execute once, and document an exact-existing-package recovery. Do not republish or reuse the version; use only prior validated artifact `8242162439` and the recorded exact hashes.
+TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. TASK-0243 implemented and validated exact-package recovery. TASK-0244 run `29151228607` failed before mutation because `scripts/test-supply-chain-workflow.ps1` invoked unavailable Windows-only `powershell` on Ubuntu. The one-time audit confirmed unchanged package/artifact evidence and absent tag/release/two attestations. TASK-0245 did not change the smoke pin. Do not republish, reuse, fix-and-retry, or dispatch again without a new explicit decision.
 
 ## TASK-0239 Evidence
 

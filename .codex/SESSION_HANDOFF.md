@@ -1,6 +1,6 @@
 # AgentContextKit Session Handoff
 
-## TASK-0243–0245 `1.0.0-rc.1` Exact-Package Recovery — Authorized
+## TASK-0243–0245 `1.0.0-rc.1` Exact-Package Recovery — Stopped
 
 - Entry verified on 2026-07-10: clean `master`; local/origin HEAD `5c1a7782579f1bdc54a0d3706c886108382914cb`; published `0.2.0-alpha.4`; no open PRs/issues; historical standard runs `29107940364`, `29107940251`, and `29107940236` succeeded.
 - NuGet `1.0.0-rc.1` now exists and is immutable; remote tag, GitHub Release, and attestation do not exist.
@@ -15,8 +15,10 @@
 - One-time audit: NuGet signature/repository commit/global install PASS; NuGet SHA-256 `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`; tag/release/attestation absent. No RC1 smoke-pin change or three-platform post-publish smoke occurred.
 - Recovery authorization received on 2026-07-11. ACKit was upgraded to published `1.0.0-rc.1`; doctor 13/13 PASS and scan exit 0. TASK-0243/0244/0245 were created once with `ackit task` and fully planned before implementation.
 - Recovery precondition audit: source run artifact `8242162439` (`AgentContextKit-1.0.0-rc.1`) is unexpired until 2026-07-24 with artifact digest `sha256:cd5550b2172aa0e4ff9bf700f6eefb04dfd8dbd88c8d7fee22914c1769533b3f`; NuGet exists; tag/release and candidate nupkg/snupkg attestations are absent.
-- TASK-0243 implementation and local validation are complete: 431/431 tests, exact real artifact/NuGet equivalence, YAML/static/negative recovery gates, release/V100/security/package checks, and performance passed. No dispatch occurred.
-- Current action: commit/push TASK-0243 and wait for green pre-recovery standard CI. TASK-0244 may then dispatch `recover-existing` exactly once. No NuGet push, normal publish, second recovery dispatch, manual upload, tag movement, settings mutation, force push, or TASK-0242 history rewrite.
+- TASK-0243 implementation commit `3b979972ba24b6acd4f0eecca49ff3dcc2c8cdff` is pushed. Pre-recovery runs `29151153458`, `29151153453`, and `29151153454` passed.
+- TASK-0244 single recovery run `29151228607`, job `86540942756`, failed in `Run exact recovery safety gates`: fixture/static checks passed, then `scripts/test-supply-chain-workflow.ps1` invoked Windows-only `powershell` on Ubuntu. All remote mutation and three-platform recovery verification steps were skipped.
+- The failed log was read once. One immutable audit reconfirmed artifact/package hashes, repository signature/content/commit, and absent tag/release/nupkg attestation/snupkg attestation. No correction, retry, rerun, or second dispatch occurred.
+- TASK-0245 is not executed; `.github/workflows/cross-platform-smoke.yml` remains pinned to `0.2.0-alpha.4`. Current action: commit/push failure-state docs and wait final standard CI once. Any code fix or future recovery needs a new explicit decision.
 
 ## Project Purpose
 AgentContextKit is an offline-first, security-first, docs-first, task-first .NET CLI for developers who use AI coding agents. It analyzes repositories, detects stacks and hygiene gaps, generates safe context/workflow files for multiple agents, and reports secret/PII/brand leakage risks before public release or AI context export.

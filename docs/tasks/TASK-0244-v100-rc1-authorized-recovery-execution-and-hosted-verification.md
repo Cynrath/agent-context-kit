@@ -116,4 +116,23 @@ There is no destructive rollback for an exact immutable recovery. Before dispatc
 
 ## Completion notes
 
-Status: `PLANNED / AUTHORIZED / NOT_DISPATCHED`. Depends on completed TASK-0243 implementation, push, and pre-recovery CI. The user explicitly authorized exactly one recovery dispatch and explicitly prohibited a second dispatch or normal publish operation.
+Status: `STOPPED / SINGLE_RECOVERY_DISPATCH_CONSUMED / NO_REMOTE_MUTATION`.
+
+TASK-0243 implementation commit `3b979972ba24b6acd4f0eecca49ff3dcc2c8cdff` was pushed and its pre-recovery standard runs passed: `ci` `29151153458`, published alpha4 smoke `29151153453`, and source RC1 smoke `29151153454`.
+
+The exact pre-dispatch block passed: local/origin were clean and synchronized at `3b979972ba24b6acd4f0eecca49ff3dcc2c8cdff`; artifact `8242162439` was unexpired with the expected GitHub digest; NuGet RC1 existed; tag, GitHub prerelease, nupkg attestation, and snupkg attestation were absent.
+
+Exactly one recovery dispatch was sent. Run [`29151228607`](https://github.com/Cynrath/agent-context-kit/actions/runs/29151228607), job `86540942756`, failed in `Run exact recovery safety gates` before any source-artifact validation or mutation step. The fixture test and static workflow gate passed, then `scripts/test-supply-chain-workflow.ps1` failed on Ubuntu because its `Invoke-Gate` helper calls Windows-only `powershell`, which is unavailable on the runner. Tag/release/asset/attestation and three-platform verification steps were skipped. The normal publish and verify-existing jobs were also skipped.
+
+The failed log was read once. One subsequent immutable-state audit verified:
+
+- source artifact `8242162439` remains unexpired and unchanged;
+- candidate nupkg SHA-256 `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d`;
+- candidate snupkg SHA-256 `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d`;
+- NuGet package accessible, repository signature/content equivalence PASS, repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`, served nupkg SHA-256 `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`;
+- remote tag ABSENT;
+- GitHub prerelease/assets ABSENT;
+- nupkg attestation ABSENT;
+- snupkg attestation ABSENT.
+
+No second dispatch, rerun, automatic correction, NuGet login/push, manual upload, tag/release mutation, attestation creation, force push, or history rewrite occurred. The single recovery authorization is consumed. A future fix or recovery attempt requires a new explicit decision; this task does not authorize it.

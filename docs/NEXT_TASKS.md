@@ -1,6 +1,6 @@
 # Next Tasks
 
-## V100 `1.0.0-rc.1` Exact-Package Recovery — TASK-0243 Local Complete
+## V100 `1.0.0-rc.1` Exact-Package Recovery — TASK-0244 Stopped
 
 TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 consumed its single authorized OIDC publish dispatch: NuGet published, propagation verification timed out, and tag/release/provenance were skipped. Its history remains unchanged. A new bounded recovery decision now authorizes TASK-0243 through TASK-0245 without any second NuGet push.
 
@@ -10,11 +10,11 @@ TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, an
 | 2 | TASK-0240 hosted RC evidence execution and recording | COMPLETED | Exact-SHA three-OS evidence run `29118452246` passed after one authorized dispatch | TASK-0239 standard CI green | Exact input gate plus one blocking hosted run | Commit `fd2ce8d`; no uploads/publication |
 | 3 | TASK-0241 final-candidate acceptance and publish boundary | COMPLETED | Open P0 0; conditional GO; final local suite and final runs `29119747553`, `29119747558`, `29119747534` green | TASK-0240 PASS | Bridge review, full suite, final standard CI | Commit `b1fae4d`; publication remained separate |
 | 4 | TASK-0242 OIDC publication and post-publish verification | STOPPED / PARTIAL IMMUTABLE PUBLICATION | Run `29131335084`: NuGet/signature/install verified; tag/release/provenance absent | TASK-0241 plus one consumed authorization | Immutable-state audit and failure docs; RC1 three-platform post-publish smoke not run | New explicit recovery decision required; no second dispatch |
-| 5 | TASK-0243 exact-existing-package recovery operation | COMPLETED LOCALLY / PENDING PUSH+CI | Fail-closed recovery path uses prior validated artifacts and contains no NuGet publication | TASK-0242 evidence plus current recovery authorization | 431/431, real package equivalence, static/negative/full gates PASS | No dispatch occurred |
-| 6 | TASK-0244 authorized recovery execution and hosted verification | AUTHORIZED / NOT DISPATCHED | Dispatch recovery exactly once; exact tag/prerelease/assets/two attestations/three-OS install | TASK-0243 pushed and pre-recovery CI green | Single recovery run plus bounded remote verification | Exactly one recovery dispatch; no retry/rerun/publish |
-| 7 | TASK-0245 post-recovery smoke pin and evidence closure | CONDITIONAL | Pin published smoke to RC1 and synchronize docs only after complete recovery | TASK-0244 full success | Full local suite plus final three standard workflows | Normal commits/push only; no release mutation |
+| 5 | TASK-0243 exact-existing-package recovery operation | COMPLETED / PUSHED / CI PASS | Fail-closed recovery path uses prior validated artifacts and contains no NuGet publication | TASK-0242 evidence plus recovery authorization | 431/431; runs `29151153458`, `29151153453`, `29151153454` PASS | No dispatch occurred in TASK-0243 |
+| 6 | TASK-0244 authorized recovery execution and hosted verification | STOPPED / DISPATCH CONSUMED / NO MUTATION | Run `29151228607` failed in Ubuntu safety gate on Windows-only `powershell` child call | TASK-0243 green | Failed log once; immutable audit once | No retry/fix/second dispatch; new decision required |
+| 7 | TASK-0245 post-recovery smoke pin and evidence closure | NOT EXECUTED | RC1 pin/current-release sync prohibited after incomplete recovery | TASK-0244 full success not met | Failure docs plus final standard CI only | Smoke pin remains alpha4 |
 
-NuGet `1.0.0-rc.1` is immutable and installable, but the RC release remains incomplete until TASK-0244 succeeds. Complete release remains `v0.2.0-alpha.4`. The recovery authorization is exact and bounded: no NuGet push, no normal publish operation, no second recovery dispatch, no manual upload, no tag movement, no settings change, no force push, and no GA claim.
+NuGet `1.0.0-rc.1` is immutable and installable, but the RC release remains incomplete. Complete release remains `v0.2.0-alpha.4`. TASK-0244's exact recovery authorization is consumed: no NuGet push, normal publish operation, workflow fix/retry, second recovery dispatch, manual upload, tag movement, settings change, force push, or GA claim is authorized.
 
 ## Historical Execution Record
 

@@ -1,12 +1,12 @@
 # AgentContextKit Context Pack
 
-## TASK-0243–0245 `1.0.0-rc.1` Exact-Package Recovery — Authorized
+## TASK-0243–0245 `1.0.0-rc.1` Exact-Package Recovery — Stopped
 
 Release HEAD `258918b33c3d1359aac967604ee524e8b66ddf02` passed preflight and standard CI. NuGet `1.0.0-rc.1` exists after the single TASK-0242 run; tag, GitHub Release, and attestation remain absent. ACKit preflight used published predecessor `0.2.0-alpha.4`, doctor 13/13 PASS, and scan exit 0.
 
 TASK-0239/0240/0241 evidence remains valid. TASK-0242 run `29131335084` validated the exact package and published it through OIDC, then failed in bounded NuGet propagation verification. One-time audit verified repository signature/commit, digest, and global install; tag/release/provenance absent. TASK-0243/0244/0245 now authorize a separate NuGet-publish-free exact-package recovery chain: develop locally, dispatch recovery exactly once, then update the RC1 smoke pin only after complete success. TASK-0242 history must remain unchanged.
 
-TASK-0243 is locally complete. The recovery path binds artifact `8242162439`, its GitHub digest, exact nupkg/snupkg hashes, the NuGet repository signature/content, and release commit `258918b33c3d1359aac967604ee524e8b66ddf02`; it has no NuGet credential/push path. Full tests remain 431/431, real package equivalence and negative workflow fixtures pass, and no dispatch has occurred. Push plus pre-recovery CI are required before TASK-0244's single authorized dispatch.
+TASK-0243 is complete/pushed at `3b979972ba24b6acd4f0eecca49ff3dcc2c8cdff`; full tests remain 431/431 and pre-recovery runs `29151153458`, `29151153453`, and `29151153454` passed. TASK-0244 then consumed the single recovery dispatch in run `29151228607`. Its Ubuntu safety gate failed on a Windows-only `powershell` child call before artifact validation or any remote mutation. One log inspection and one immutable audit confirmed NuGet/artifact evidence unchanged and tag/release/two attestations absent. TASK-0245 did not change the alpha4 smoke pin. No fix/retry/second dispatch is authorized.
 
 TASK-0239 local evidence: dependency vulnerability/deprecation reviews are clean; build is 0 warnings/0 errors; 431/431 tests and Unicode guard pass; disposable RC1 nupkg/snupkg metadata/content/hygiene and isolated install pass; installed alpha4-to-RC config/hash/baseline/SARIF smoke passes. All ACKit/contract/readiness gates pass; the RC-gate benchmark is 5.691s/45.1 MiB, the standalone benchmark is 4.193s/44.6 MiB, and the 428-file Markdown audit is clean. TASK-0240 hosted evidence repeats 431/431 and all frozen/upgrade/machine/localization gates on three operating systems; observed resource maxima are 1.019s and 59.9 MiB.
 
