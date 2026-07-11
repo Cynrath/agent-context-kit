@@ -4,12 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Publish a new version or verify an existing immutable release
+        description: Publish, recover an exact existing package, or verify an immutable release
         required: true
         default: verify-existing
         type: choice
         options:
           - publish
+          - recover-existing
           - verify-existing
       version:
         description: SemVer package version without v prefix
@@ -28,6 +29,22 @@ on:
         required: true
         default: true
         type: boolean
+      source_run_id:
+        description: Prior release run containing the exact validated recovery artifact
+        required: false
+        type: string
+      source_artifact_digest:
+        description: Exact sha256 digest reported by GitHub for the prior workflow artifact
+        required: false
+        type: string
+      expected_nupkg_sha256:
+        description: Exact SHA-256 of the validated unsigned nupkg recovery asset
+        required: false
+        type: string
+      expected_snupkg_sha256:
+        description: Exact SHA-256 of the validated snupkg recovery asset
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -332,6 +349,275 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           $subject = Join-Path "${{ runner.temp }}/ackit-attestation-subject" "AgentContextKit.${{ inputs.version }}.nupkg"
           gh attestation verify $subject --repo "${{ github.repository }}" --signer-workflow "${{ github.repository }}/.github/workflows/release.yml"
+
+  recover-existing:
+    if: inputs.operation == 'recover-existing'
+    name: recover exact existing package
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Checkout exact recovery automation commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.automation_commit_sha }}
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run exact recovery safety gates
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          pwsh -NoProfile -File scripts/test-existing-package-recovery.ps1
+          pwsh -NoProfile -File scripts/check-release-workflow.ps1 -FailOnIssues
+          pwsh -NoProfile -File scripts/test-supply-chain-workflow.ps1
+
+      - name: Validate exact source artifact and existing NuGet package
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $version = "${{ inputs.version }}"
+          $automationSha = "${{ inputs.automation_commit_sha }}"
+          $releaseSha = "${{ inputs.release_commit_sha }}"
+          $sourceRunId = "${{ inputs.source_run_id }}"
+          $artifactDigest = "${{ inputs.source_artifact_digest }}".ToLowerInvariant()
+          $expectedNupkgHash = "${{ inputs.expected_nupkg_sha256 }}".ToLowerInvariant()
+          $expectedSnupkgHash = "${{ inputs.expected_snupkg_sha256 }}".ToLowerInvariant()
+          $artifactName = "AgentContextKit-$version"
+          $tagName = "v$version"
+
+          if (-not [System.Convert]::ToBoolean("${{ inputs.prerelease }}")) { throw "Existing-package recovery requires prerelease=true." }
+          if ($sourceRunId -notmatch '^\d+$') { throw "source_run_id must be a numeric GitHub Actions run ID." }
+          if ($artifactDigest -notmatch '^sha256:[a-f0-9]{64}$') { throw "source_artifact_digest must be an exact sha256 digest." }
+          if ($expectedNupkgHash -notmatch '^[a-f0-9]{64}$') { throw "expected_nupkg_sha256 must be an exact SHA-256 value." }
+          if ($expectedSnupkgHash -notmatch '^[a-f0-9]{64}$') { throw "expected_snupkg_sha256 must be an exact SHA-256 value." }
+
+          git fetch origin master --tags
+          $headSha = (git rev-parse HEAD).Trim()
+          $originMasterSha = (git rev-parse origin/master).Trim()
+          if ($headSha -ne $automationSha) { throw "Checked-out HEAD does not match automation_commit_sha." }
+          if ($originMasterSha -ne $automationSha) { throw "automation_commit_sha is not current origin/master." }
+          $PSNativeCommandUseErrorActionPreference = $false
+          git merge-base --is-ancestor $releaseSha $automationSha
+          $isAncestor = $LASTEXITCODE -eq 0
+          $PSNativeCommandUseErrorActionPreference = $true
+          if (-not $isAncestor) { throw "release_commit_sha is not an ancestor of the recovery automation commit." }
+
+          $sourceRun = gh run view $sourceRunId --repo "${{ github.repository }}" --json databaseId,workflowName,event,headSha,conclusion | ConvertFrom-Json
+          if ($sourceRun.databaseId -ne [long]$sourceRunId) { throw "Source run identity mismatch." }
+          if ($sourceRun.workflowName -ne 'release' -or $sourceRun.event -ne 'workflow_dispatch') { throw "Source run is not the expected manual release workflow." }
+          if ($sourceRun.headSha -ne $releaseSha) { throw "Source run head SHA does not match release_commit_sha." }
+          if ($sourceRun.conclusion -ne 'failure') { throw "Recovery source run must be the recorded partial-failure run." }
+
+          $artifactResponse = gh api "repos/${{ github.repository }}/actions/runs/$sourceRunId/artifacts" | ConvertFrom-Json
+          $artifacts = @($artifactResponse.artifacts | Where-Object { $_.name -eq $artifactName })
+          if ($artifacts.Count -ne 1) { throw "Expected exactly one validated source artifact named $artifactName." }
+          $artifact = $artifacts[0]
+          if ([bool]$artifact.expired) { throw "Validated source artifact has expired." }
+          if ($artifact.digest.ToLowerInvariant() -ne $artifactDigest) { throw "Validated source artifact digest mismatch." }
+          if ($artifact.workflow_run.id -ne [long]$sourceRunId -or $artifact.workflow_run.head_sha -ne $releaseSha) { throw "Validated source artifact run/SHA mismatch." }
+
+          $assetRoot = Join-Path $env:RUNNER_TEMP 'ackit-existing-package-recovery'
+          New-Item -ItemType Directory -Force -Path $assetRoot | Out-Null
+          gh run download $sourceRunId --repo "${{ github.repository }}" --name $artifactName --dir $assetRoot
+          $candidateNupkg = Join-Path $assetRoot "AgentContextKit.$version.nupkg"
+          $candidateSnupkg = Join-Path $assetRoot "AgentContextKit.$version.snupkg"
+          $sourceFiles = @(Get-ChildItem -LiteralPath $assetRoot -File)
+          if ($sourceFiles.Count -ne 2 -or -not (Test-Path $candidateNupkg) -or -not (Test-Path $candidateSnupkg)) {
+            throw "Validated source artifact must contain only the exact nupkg and snupkg files."
+          }
+
+          $nugetNupkg = Join-Path $env:RUNNER_TEMP "nuget-AgentContextKit.$version.nupkg"
+          $packageUrl = "https://api.nuget.org/v3-flatcontainer/agentcontextkit/$version/agentcontextkit.$version.nupkg"
+          Invoke-WebRequest -Uri $packageUrl -OutFile $nugetNupkg -UseBasicParsing
+          $evidencePath = Join-Path $env:RUNNER_TEMP 'existing-package-recovery-evidence.json'
+          pwsh -NoProfile -File scripts/verify-existing-package-recovery.ps1 `
+            -Version $version `
+            -ReleaseCommitSha $releaseSha `
+            -CandidateNupkgPath $candidateNupkg `
+            -CandidateSnupkgPath $candidateSnupkg `
+            -NuGetNupkgPath $nugetNupkg `
+            -ExpectedNupkgSha256 $expectedNupkgHash `
+            -ExpectedSnupkgSha256 $expectedSnupkgHash `
+            -OutputPath $evidencePath
+          Get-Content $evidencePath -Raw | ConvertFrom-Json | Out-Null
+          pwsh -NoProfile -File scripts/verify-published-package.ps1 -Version $version -PackageSource $assetRoot
+
+          $remoteTag = @(git ls-remote --tags origin "refs/tags/$tagName")
+          if ($remoteTag.Count -ne 0) { throw "Recovery requires the exact tag to be absent before mutation." }
+          $PSNativeCommandUseErrorActionPreference = $false
+          $releaseProbe = gh api --include "repos/${{ github.repository }}/releases/tags/$tagName" 2>&1
+          $releaseProbeExit = $LASTEXITCODE
+          $PSNativeCommandUseErrorActionPreference = $true
+          if ($releaseProbeExit -eq 0) { throw "Recovery requires the GitHub Release to be absent before mutation." }
+          $releaseProbeText = ($releaseProbe | Out-String)
+          if ($releaseProbeText -notmatch '(?m)^HTTP/\S+\s+404\b' -and $releaseProbeText -notmatch '\(HTTP 404\)') {
+            throw "Unable to prove that the GitHub Release is absent."
+          }
+
+      - name: Recheck exact remote recovery state
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $tagName = "v${{ inputs.version }}"
+          $remoteTag = @(git ls-remote --tags origin "refs/tags/$tagName")
+          if ($remoteTag.Count -ne 0) { throw "Recovery tag appeared after validation; refusing mutation." }
+          $PSNativeCommandUseErrorActionPreference = $false
+          $releaseProbe = gh api --include "repos/${{ github.repository }}/releases/tags/$tagName" 2>&1
+          $releaseProbeExit = $LASTEXITCODE
+          $PSNativeCommandUseErrorActionPreference = $true
+          if ($releaseProbeExit -eq 0) { throw "Recovery release appeared after validation; refusing mutation." }
+          $releaseProbeText = ($releaseProbe | Out-String)
+          if ($releaseProbeText -notmatch '(?m)^HTTP/\S+\s+404\b' -and $releaseProbeText -notmatch '\(HTTP 404\)') {
+            throw "Unable to re-prove that the GitHub Release is absent."
+          }
+
+      - name: Create exact immutable tag and GitHub prerelease
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $version = "${{ inputs.version }}"
+          $releaseSha = "${{ inputs.release_commit_sha }}"
+          $tagName = "v$version"
+          $notesFile = 'docs/RELEASE_BODY_V100_RC1.md'
+          if ($version -ne '1.0.0-rc.1') { throw "This prepared recovery body is restricted to 1.0.0-rc.1." }
+          if (-not (Test-Path $notesFile -PathType Leaf)) { throw "Prepared RC1 release body is missing." }
+          $assetRoot = Join-Path $env:RUNNER_TEMP 'ackit-existing-package-recovery'
+          $nupkg = Join-Path $assetRoot "AgentContextKit.$version.nupkg"
+          $snupkg = Join-Path $assetRoot "AgentContextKit.$version.snupkg"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$tagName" "$releaseSha"
+          git push origin "refs/tags/$tagName"
+          gh release create $tagName $nupkg $snupkg --repo "${{ github.repository }}" --verify-tag --target $releaseSha --title "AgentContextKit $version" --notes-file $notesFile --prerelease
+
+      - name: Verify exact tag prerelease body and assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $version = "${{ inputs.version }}"
+          $releaseSha = "${{ inputs.release_commit_sha }}"
+          $tagName = "v$version"
+          $expectedNupkgHash = "${{ inputs.expected_nupkg_sha256 }}".ToLowerInvariant()
+          $expectedSnupkgHash = "${{ inputs.expected_snupkg_sha256 }}".ToLowerInvariant()
+          git fetch origin "refs/tags/$tagName:refs/tags/$tagName"
+          if ((git rev-list -n 1 $tagName).Trim() -ne $releaseSha) { throw "Recovered tag does not target the exact release commit." }
+          $release = gh release view $tagName --repo "${{ github.repository }}" --json tagName,targetCommitish,isPrerelease,title,body,assets,url | ConvertFrom-Json
+          if ($release.tagName -ne $tagName -or $release.targetCommitish -ne $releaseSha) { throw "Recovered prerelease identity/target mismatch." }
+          if (-not [bool]$release.isPrerelease) { throw "Recovered release is not a prerelease." }
+          if ($release.title -ne "AgentContextKit $version") { throw "Recovered prerelease title mismatch." }
+          $expectedBody = (Get-Content 'docs/RELEASE_BODY_V100_RC1.md' -Raw).Replace("`r`n", "`n").TrimEnd()
+          $actualBody = ([string]$release.body).Replace("`r`n", "`n").TrimEnd()
+          if ($actualBody -ne $expectedBody) { throw "Recovered prerelease body mismatch." }
+          $expectedNames = @("AgentContextKit.$version.nupkg", "AgentContextKit.$version.snupkg")
+          $actualNames = @($release.assets | ForEach-Object name | Sort-Object)
+          if (($actualNames -join '|') -ne (($expectedNames | Sort-Object) -join '|')) { throw "Recovered prerelease asset set mismatch." }
+          $releaseRoot = Join-Path $env:RUNNER_TEMP 'ackit-recovered-release-assets'
+          New-Item -ItemType Directory -Force -Path $releaseRoot | Out-Null
+          gh release download $tagName --repo "${{ github.repository }}" --dir $releaseRoot --pattern "AgentContextKit.$version.nupkg" --pattern "AgentContextKit.$version.snupkg"
+          $nupkg = Join-Path $releaseRoot "AgentContextKit.$version.nupkg"
+          $snupkg = Join-Path $releaseRoot "AgentContextKit.$version.snupkg"
+          $actualNupkgHash = (Get-FileHash $nupkg -Algorithm SHA256).Hash.ToLowerInvariant()
+          $actualSnupkgHash = (Get-FileHash $snupkg -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actualNupkgHash -ne $expectedNupkgHash -or $actualSnupkgHash -ne $expectedSnupkgHash) { throw "Recovered release asset hash mismatch." }
+          foreach ($asset in @($release.assets)) {
+            $actualHash = if ($asset.name.EndsWith('.snupkg')) { $actualSnupkgHash } else { $actualNupkgHash }
+            if ($asset.digest -ne "sha256:$actualHash") { throw "Recovered release asset API digest mismatch: $($asset.name)" }
+          }
+
+      - name: Attest exact recovered nupkg
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ runner.temp }}/ackit-recovered-release-assets/AgentContextKit.${{ inputs.version }}.nupkg
+
+      - name: Attest exact recovered snupkg
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ runner.temp }}/ackit-recovered-release-assets/AgentContextKit.${{ inputs.version }}.snupkg
+
+      - name: Verify both exact recovered asset attestations
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $root = Join-Path $env:RUNNER_TEMP 'ackit-recovered-release-assets'
+          $nupkg = Join-Path $root "AgentContextKit.${{ inputs.version }}.nupkg"
+          $snupkg = Join-Path $root "AgentContextKit.${{ inputs.version }}.snupkg"
+          gh attestation verify $nupkg --repo "${{ github.repository }}" --signer-workflow "${{ github.repository }}/.github/workflows/release.yml"
+          gh attestation verify $snupkg --repo "${{ github.repository }}" --signer-workflow "${{ github.repository }}/.github/workflows/release.yml"
+
+      - name: Verify completed immutable recovery
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $evidencePath = Join-Path $env:RUNNER_TEMP 'completed-recovery-evidence.json'
+          pwsh -NoProfile -File scripts/verify-existing-release.ps1 `
+            -Version "${{ inputs.version }}" `
+            -AutomationCommitSha "${{ inputs.automation_commit_sha }}" `
+            -ReleaseCommitSha "${{ inputs.release_commit_sha }}" `
+            -Prerelease "${{ inputs.prerelease }}" `
+            -Repository "${{ github.repository }}" `
+            -OutputPath $evidencePath
+          Get-Content $evidencePath -Raw | ConvertFrom-Json | Out-Null
+
+  verify-recovered-package:
+    if: inputs.operation == 'recover-existing'
+    name: verify recovered package (${{ matrix.os }})
+    needs: recover-existing
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-2025
+          - ubuntu-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout exact recovery automation commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.automation_commit_sha }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Verify recovered NuGet global tool
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          pwsh -NoProfile -File scripts/verify-published-package.ps1 -Version "${{ inputs.version }}"
 
   verify-existing:
     if: inputs.operation == 'verify-existing'

@@ -29,7 +29,12 @@ try {
         @{ Name = "missing status-aware 404 handling"; Content = $content.Replace('HTTP/\S+\s+404\b', 'HTTP 000') },
         @{ Name = "missing release asset download failure"; Content = $content.Replace('if ($LASTEXITCODE -ne 0) { throw "Unable to download the exact GitHub Release package asset." }', '') },
         @{ Name = "missing v100 rc1 release body mapping"; Content = $content.Replace('$notesFile = "docs/RELEASE_BODY_V100_RC1.md"', '$notesFile = "docs/missing-v100-rc1-body.md"') },
-        @{ Name = "missing final attestation verify"; Content = $content.Replace('gh attestation verify', 'Write-Host "attestation verify skipped"') }
+        @{ Name = "missing final attestation verify"; Content = $content.Replace('gh attestation verify', 'Write-Host "attestation verify skipped"') },
+        @{ Name = "recovery gains NuGet push"; Content = $content.Replace("      - name: Recheck exact remote recovery state", "      - name: Forbidden recovery NuGet push`n        run: dotnet nuget push forbidden.nupkg`n`n      - name: Recheck exact remote recovery state") },
+        @{ Name = "recovery gains NuGet login"; Content = $content.Replace("      - name: Recheck exact remote recovery state", "      - name: Forbidden recovery login`n        uses: NuGet/login@v1`n`n      - name: Recheck exact remote recovery state") },
+        @{ Name = "missing exact recovery verifier"; Content = $content.Replace('scripts/verify-existing-package-recovery.ps1', 'scripts/missing-existing-package-recovery.ps1') },
+        @{ Name = "missing second recovery attestation"; Content = ([regex]::new('(?ms)^      - name: Attest exact recovered snupkg\r?\n        uses: actions/attest@v4\r?\n        with:\r?\n          subject-path:.*?\r?\n')).Replace($content, '', 1) },
+        @{ Name = "recovery manual release upload"; Content = $content.Replace("      - name: Verify exact tag prerelease body and assets", "      - name: Forbidden manual upload`n        run: gh release upload forbidden forbidden.nupkg`n`n      - name: Verify exact tag prerelease body and assets") }
     )
 
     foreach ($case in $cases) {

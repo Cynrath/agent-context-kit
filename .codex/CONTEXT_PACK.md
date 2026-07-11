@@ -6,6 +6,8 @@ Release HEAD `258918b33c3d1359aac967604ee524e8b66ddf02` passed preflight and sta
 
 TASK-0239/0240/0241 evidence remains valid. TASK-0242 run `29131335084` validated the exact package and published it through OIDC, then failed in bounded NuGet propagation verification. One-time audit verified repository signature/commit, digest, and global install; tag/release/provenance absent. TASK-0243/0244/0245 now authorize a separate NuGet-publish-free exact-package recovery chain: develop locally, dispatch recovery exactly once, then update the RC1 smoke pin only after complete success. TASK-0242 history must remain unchanged.
 
+TASK-0243 is locally complete. The recovery path binds artifact `8242162439`, its GitHub digest, exact nupkg/snupkg hashes, the NuGet repository signature/content, and release commit `258918b33c3d1359aac967604ee524e8b66ddf02`; it has no NuGet credential/push path. Full tests remain 431/431, real package equivalence and negative workflow fixtures pass, and no dispatch has occurred. Push plus pre-recovery CI are required before TASK-0244's single authorized dispatch.
+
 TASK-0239 local evidence: dependency vulnerability/deprecation reviews are clean; build is 0 warnings/0 errors; 431/431 tests and Unicode guard pass; disposable RC1 nupkg/snupkg metadata/content/hygiene and isolated install pass; installed alpha4-to-RC config/hash/baseline/SARIF smoke passes. All ACKit/contract/readiness gates pass; the RC-gate benchmark is 5.691s/45.1 MiB, the standalone benchmark is 4.193s/44.6 MiB, and the 428-file Markdown audit is clean. TASK-0240 hosted evidence repeats 431/431 and all frozen/upgrade/machine/localization gates on three operating systems; observed resource maxima are 1.019s and 59.9 MiB.
 
 ## Project

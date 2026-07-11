@@ -60,6 +60,9 @@ scripts/check-package-metadata.ps1
 scripts/audit-public-release.ps1
 scripts/check-release-blockers.ps1
 scripts/check-public-release-gates.ps1
+scripts/check-release-workflow.ps1
+scripts/test-existing-package-recovery.ps1
+scripts/verify-existing-package-recovery.ps1
 scripts/verify-release.ps1
 ```
 

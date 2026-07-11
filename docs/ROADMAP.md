@@ -3,7 +3,7 @@
 ## Active V100 Release-Candidate Chain
 
 - TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 then published NuGet RC1 through OIDC but stopped after propagation verification timed out; its partial-failure history remains immutable.
-- TASK-0243 is active: add and locally validate a NuGet-publish-free `recover-existing` operation that binds the TASK-0242 validated artifact, repository-signed NuGet package, and exact release commit.
+- TASK-0243 is complete locally: the NuGet-publish-free `recover-existing` operation, exact package verifier, negative security fixtures, two-asset attestation path, and three-OS install matrix pass local validation; push and pre-recovery CI are next.
 - TASK-0244 is authorized but not dispatched: run the recovery workflow exactly once, create `v1.0.0-rc.1` only at `258918b33c3d1359aac967604ee524e8b66ddf02`, create the prepared prerelease with verified assets, attest both assets, and verify install on Windows/Ubuntu/macOS.
 - TASK-0245 is conditional on complete TASK-0244 success: update the published smoke pin to RC1, synchronize evidence/current-release docs, push normally, and wait for final standard CI in one blocking command sequence.
 - NuGet RC1 must never be republished, changed, unlisted, or replaced. No second recovery dispatch, normal publish operation, tag movement, manual upload, settings mutation, force push, or GA-readiness claim is authorized.

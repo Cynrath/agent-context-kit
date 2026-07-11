@@ -1,6 +1,6 @@
 # Project Execution Queue
 
-## V100 `1.0.0-rc.1` Exact-Package Recovery Track — TASK-0243 Active
+## V100 `1.0.0-rc.1` Exact-Package Recovery Track — TASK-0243 Local Complete
 
 | Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- | --- |
@@ -8,7 +8,7 @@
 | 2 | Completed | TASK-0240 hosted RC evidence execution and recording | Single authorized run `29118452246` passed on all three operating systems | TASK-0239 green | Hosted/validation/V100/queue/handoff docs | Exact input plus one dispatch/watch/view/log sequence passed | Commit `fd2ce8d`; one RC dispatch; read-only/no upload |
 | 3 | Completed | TASK-0241 final acceptance, gap closure, and publish boundary | Open P0 0; conditional GO; final suite and standard CI green; V100-09 remains publish-provenance boundary | TASK-0240 PASS | V100/decision/release/queue/handoff docs | Commit `b1fae4d`; runs `29119747553`, `29119747558`, `29119747534` | Publication remained separate |
 | 4 | Stopped / partial immutable publication | TASK-0242 OIDC publication and post-publish verification | Single run published NuGet then failed propagation verification; tag/release/provenance absent | TASK-0241 plus consumed authorization | Task/release/decision/incident docs | Run `29131335084`; one-time immutable audit; final docs CI | New explicit recovery decision required; no second dispatch |
-| 5 | In progress | TASK-0243 exact-existing-package recovery operation | Implement a fail-closed recovery operation using exact prior artifacts without NuGet publication | TASK-0242 immutable evidence plus explicit recovery authorization | Workflow/script/static tests/recovery and automation docs | Focused/full local gates and pre-recovery standard CI | No dispatch in TASK-0243 |
+| 5 | Completed locally / pending push+CI | TASK-0243 exact-existing-package recovery operation | Fail-closed recovery operation uses exact prior artifacts without NuGet publication | TASK-0242 immutable evidence plus explicit recovery authorization | Workflow/script/static tests/recovery and automation docs | 431/431, real artifact equivalence, static/negative/full local gates PASS | No dispatch in TASK-0243 |
 | 6 | Authorized / not dispatched | TASK-0244 recovery execution and hosted verification | One recovery dispatch; exact tag/prerelease/assets/two attestations/three-OS install | TASK-0243 pushed and CI green | Hosted/supply-chain/V100/queue/handoff evidence | One blocking recovery run and bounded remote audit | Exactly one recovery dispatch; no retry/publish/manual upload |
 | 7 | Conditional | TASK-0245 post-recovery smoke pin and evidence closure | Pin published smoke to RC1 and synchronize current-release evidence after full recovery | TASK-0244 success | Published smoke workflow, README/agent/release/supply-chain/handoff docs | Full local suite and final standard CI | Normal push only; no release mutation |
 

@@ -12,6 +12,24 @@ Explicit authorization was received on 2026-07-11 for exactly one existing `rele
 
 Run `29131335084` published NuGet `1.0.0-rc.1` through OIDC, then failed in `verify-published-package.ps1` after the runner's bounded NuGet availability window. Subsequent tag, GitHub prerelease, release verification, provenance, and attestation steps were skipped. A one-time audit later verified the NuGet repository signature, repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`, nupkg SHA-256 `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`, and global install/version. Remote tag, GitHub Release, and attestation are absent. No recovery or second dispatch occurred.
 
+## TASK-0243 Exact Existing-Package Recovery Validation
+
+TASK-0243 adds a separate `recover-existing` operation to `.github/workflows/release.yml`. It contains no NuGet login/push path and does not use the `nuget-release` environment. Required inputs bind the prior source run, GitHub artifact digest, exact candidate nupkg/snupkg SHA-256 values, current automation commit, and historical release/package commit.
+
+`scripts/verify-existing-package-recovery.ps1` verifies package filenames, exact hashes, package ID/version/repository URL/commit across nupkg/snupkg/NuGet copies, the NuGet repository signature, and archive-entry content equality between the unsigned validated nupkg and repository-signed NuGet copy after excluding only `.signature.p7s`. `scripts/test-existing-package-recovery.ps1` covers positive, repeated, wrong-hash, wrong-commit, and changed-content fixtures.
+
+Before mutation the workflow requires NuGet availability plus absent tag/release state, then repeats the absence check. It creates a non-force exact tag, uses `RELEASE_BODY_V100_RC1.md`, attaches only the verified nupkg/snupkg, verifies release downloads/digests/body/target, creates and verifies two attestations, runs the existing immutable-release verifier, and then verifies the NuGet global tool on Windows, Ubuntu, and macOS.
+
+Local exact evidence uses TASK-0242 artifact `8242162439`: candidate nupkg `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d`, candidate snupkg `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d`, NuGet-served signed nupkg `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`, and exact repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`. Repository-signature and archive-content-equivalence verification pass locally.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/test-existing-package-recovery.ps1
+powershell -ExecutionPolicy Bypass -File scripts/check-release-workflow.ps1 -FailOnIssues
+powershell -ExecutionPolicy Bypass -File scripts/test-supply-chain-workflow.ps1
+```
+
+TASK-0244 alone may dispatch `recover-existing`, exactly once and only after TASK-0243 push-triggered CI is green. Any partial failure receives one read-only audit and a hard stop; no second recovery dispatch, normal publish, NuGet push, manual upload, tag movement, or force update is allowed.
+
 TASK-0239 adds exact alpha4 generated-config fixture/regeneration coverage, direct hosted CLI/config/JSON/localization gates, run-unique candidate packaging, source/package version alignment, and future release-body routing. Dependency, local package/install, full-suite, Unicode, resource, and hygiene checks completed locally; exact candidate standard CI is recorded after the candidate push.
 
 Local evidence completed so far on 2026-07-10:
@@ -319,7 +337,7 @@ English/Turkish human output, known argument errors, exit decisions, and JSON se
 
 Security reporting and supply-chain maintainer evidence fields are defined in [SECURITY_SUPPLY_CHAIN_EVIDENCE.md](SECURITY_SUPPLY_CHAIN_EVIDENCE.md) and [MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md](MAINTAINER_SECURITY_SUPPLY_CHAIN_HANDOFF.md), with local structure/dependency review through `scripts/check-security-supply-chain-evidence.ps1`. Remote private-reporting state can be rechecked separately through `scripts/check-private-vulnerability-reporting.ps1`; the local structure gate alone does not prove remote settings or artifact publication.
 
-Signing, SBOM, and provenance dispositions are recorded in [SUPPLY_CHAIN_DECISIONS.md](SUPPLY_CHAIN_DECISIONS.md). `scripts/test-supply-chain-workflow.ps1` verifies positive and negative permission/action boundaries. Provenance remains hosted-pending until a future publish run attests and verifies the exact release nupkg.
+Signing, SBOM, and provenance dispositions are recorded in [SUPPLY_CHAIN_DECISIONS.md](SUPPLY_CHAIN_DECISIONS.md). `scripts/test-supply-chain-workflow.ps1` verifies positive and negative permission/action boundaries. RC1 provenance remains hosted-pending until the separately authorized TASK-0244 exact-existing-package recovery attests and verifies both release assets without republishing NuGet.
 
 The consolidated local RC decision is defined in [RC_LOCAL_READINESS.md](RC_LOCAL_READINESS.md). `scripts/check-rc-local-readiness.ps1` orchestrates the existing local evidence gates and intentionally reports `LOCAL READY / REMOTE NO-GO` while hosted and maintainer-only evidence remains open.
 

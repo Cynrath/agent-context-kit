@@ -117,6 +117,8 @@ $gateScripts = @(
     "scripts\test-release-candidate-inputs.ps1",
     "scripts\test-release-recovery.ps1",
     "scripts\verify-existing-release.ps1",
+    "scripts\test-existing-package-recovery.ps1",
+    "scripts\verify-existing-package-recovery.ps1",
     "scripts\prepare-release.ps1",
     "scripts\verify-published-package.ps1",
     "scripts\check-cli-contract.ps1",
@@ -173,6 +175,14 @@ if ($LASTEXITCODE -ne 0) {
 }
 else {
     Add-Note "Release recovery behavior tests passed."
+}
+
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "test-existing-package-recovery.ps1")
+if ($LASTEXITCODE -ne 0) {
+    Add-Issue "Exact existing-package recovery tests failed."
+}
+else {
+    Add-Note "Exact existing-package recovery tests passed."
 }
 
 $documentationIndex = Get-FileText "docs\DOCUMENTATION_INDEX.md"

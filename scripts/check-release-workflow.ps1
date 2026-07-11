@@ -39,11 +39,17 @@ $required = @(
     "automation_commit_sha:",
     "release_commit_sha:",
     "prerelease:",
+    "source_run_id:",
+    "source_artifact_digest:",
+    "expected_nupkg_sha256:",
+    "expected_snupkg_sha256:",
     "concurrency:",
     "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true",
     "scripts/prepare-release.ps1",
     "scripts/verify-published-package.ps1",
     "scripts/verify-existing-release.ps1",
+    "scripts/verify-existing-package-recovery.ps1",
+    "scripts/test-existing-package-recovery.ps1",
     "scripts/test-release-recovery.ps1",
     "scripts/test-supply-chain-workflow.ps1",
     "scripts/check-local-markdown-links.ps1",
@@ -61,6 +67,8 @@ foreach ($marker in $required) {
 
 $validateBlock = Get-JobBlock -Name "validate-publish"
 $publishBlock = Get-JobBlock -Name "publish"
+$recoveryBlock = Get-JobBlock -Name "recover-existing"
+$recoveryMatrixBlock = Get-JobBlock -Name "verify-recovered-package"
 $verifyBlock = Get-JobBlock -Name "verify-existing"
 
 foreach ($marker in @("if: inputs.operation == 'publish'", "contents: read", "inputs.automation_commit_sha", "inputs.release_commit_sha")) {
@@ -152,6 +160,95 @@ foreach ($marker in @(
 
 if ($publishBlock.Contains('attestations/sha256:$digest" *> $null')) {
     $issues.Add("Publish provenance probe must not discard missing-attestation lookup failures before setting exists=false.") | Out-Null
+}
+
+foreach ($marker in @(
+        "if: inputs.operation == 'recover-existing'",
+        "actions: read",
+        "contents: write",
+        "id-token: write",
+        "attestations: write",
+        "inputs.source_run_id",
+        "inputs.source_artifact_digest",
+        "inputs.expected_nupkg_sha256",
+        "inputs.expected_snupkg_sha256",
+        "gh run download",
+        "scripts/verify-existing-package-recovery.ps1",
+        "scripts/verify-published-package.ps1",
+        "docs/RELEASE_BODY_V100_RC1.md",
+        'git tag "$tagName" "$releaseSha"',
+        'git push origin "refs/tags/$tagName"',
+        "gh release create",
+        "actions/attest@v4",
+        "gh attestation verify",
+        "scripts/verify-existing-release.ps1"
+    )) {
+    if (-not $recoveryBlock.Contains($marker)) { $issues.Add("Existing-package recovery marker missing: $marker") | Out-Null }
+}
+
+foreach ($forbidden in @(
+        "environment: nuget-release",
+        "NuGet/login@",
+        "NUGET_API_KEY",
+        "dotnet nuget push",
+        "--skip-duplicate",
+        "gh release upload",
+        "gh release edit",
+        "--force"
+    )) {
+    if ($recoveryBlock.Contains($forbidden)) {
+        $issues.Add("Existing-package recovery contains forbidden publication/mutation marker: $forbidden") | Out-Null
+    }
+}
+
+if ([regex]::Matches($recoveryBlock, "uses: actions/attest@v4").Count -ne 2) {
+    $issues.Add("Existing-package recovery must create exactly two asset attestations.") | Out-Null
+}
+if ([regex]::Matches($recoveryBlock, "gh attestation verify").Count -ne 2) {
+    $issues.Add("Existing-package recovery must verify exactly two asset attestations.") | Out-Null
+}
+
+foreach ($marker in @(
+        '$sourceRun.workflowName -ne ''release''',
+        '$sourceRun.event -ne ''workflow_dispatch''',
+        '$sourceRun.headSha -ne $releaseSha',
+        '$artifact.digest.ToLowerInvariant() -ne $artifactDigest',
+        '$artifact.workflow_run.head_sha -ne $releaseSha',
+        'Recovery requires the exact tag to be absent before mutation.',
+        'Recovery requires the GitHub Release to be absent before mutation.',
+        'Recovery tag appeared after validation; refusing mutation.',
+        'Recovery release appeared after validation; refusing mutation.',
+        'Recovered release asset hash mismatch.',
+        'Recovered prerelease body mismatch.'
+    )) {
+    if (-not $recoveryBlock.Contains($marker)) { $issues.Add("Existing-package recovery fail-closed marker missing: $marker") | Out-Null }
+}
+
+$recoveryVerifyIndex = $recoveryBlock.IndexOf("scripts/verify-existing-package-recovery.ps1", [StringComparison]::Ordinal)
+$recoveryTagIndex = $recoveryBlock.IndexOf('git tag "$tagName" "$releaseSha"', [StringComparison]::Ordinal)
+$recoveryReleaseIndex = $recoveryBlock.IndexOf("gh release create", [StringComparison]::Ordinal)
+$recoveryAttestIndex = $recoveryBlock.IndexOf("uses: actions/attest@v4", [StringComparison]::Ordinal)
+if ($recoveryVerifyIndex -lt 0 -or $recoveryTagIndex -lt 0 -or $recoveryReleaseIndex -lt 0 -or $recoveryAttestIndex -lt 0 -or
+    $recoveryVerifyIndex -gt $recoveryTagIndex -or $recoveryTagIndex -gt $recoveryReleaseIndex -or $recoveryReleaseIndex -gt $recoveryAttestIndex) {
+    $issues.Add("Existing-package recovery must verify exact artifacts before tag/release creation and attest only after release verification.") | Out-Null
+}
+
+foreach ($marker in @(
+        "if: inputs.operation == 'recover-existing'",
+        "needs: recover-existing",
+        "contents: read",
+        "windows-2025",
+        "ubuntu-latest",
+        "macos-latest",
+        "scripts/verify-published-package.ps1",
+        "inputs.version"
+    )) {
+    if (-not $recoveryMatrixBlock.Contains($marker)) { $issues.Add("Recovered-package matrix marker missing: $marker") | Out-Null }
+}
+foreach ($forbidden in @("contents: write", "id-token: write", "attestations: write", "NuGet/login@", "dotnet nuget push", "git push", "gh release")) {
+    if ($recoveryMatrixBlock.Contains($forbidden)) {
+        $issues.Add("Recovered-package matrix contains forbidden write marker: $forbidden") | Out-Null
+    }
 }
 
 $publishedVerifier = Get-Content -Raw (Join-Path $repoRoot "scripts\verify-published-package.ps1")

@@ -6,7 +6,7 @@
 2. COMPLETED — TASK-0240: exactly one dispatch produced successful hosted run `29118452246` on Windows, Ubuntu, and macOS; evidence commit `fd2ce8d` is pushed.
 3. COMPLETED — TASK-0241: acceptance commit `b1fae4d` is pushed; open P0 gaps are 0; final runs `29119747553`, `29119747558`, and `29119747534` passed.
 4. STOPPED / PARTIAL — TASK-0242: run `29131335084` published NuGet RC1, then timed out in availability verification; tag/release/provenance absent. Immutable audit and global install passed. Preserve this history.
-5. IN PROGRESS — TASK-0243: implement and test `recover-existing` using exact prior workflow artifacts and no NuGet publication.
+5. COMPLETED LOCALLY / PENDING PUSH+CI — TASK-0243: `recover-existing`, exact package verification, negative gates, two-asset attestation path, and three-OS verification matrix pass locally without NuGet publication.
 6. AUTHORIZED / NOT DISPATCHED — TASK-0244: after TASK-0243 push and green pre-recovery CI, dispatch recovery exactly once for exact tag/prerelease/assets/two attestations/three-OS install.
 7. CONDITIONAL — TASK-0245: only after complete TASK-0244 success, update the published smoke pin to RC1, synchronize evidence, push, and wait final standard CI once.
 

@@ -135,4 +135,31 @@ Before dispatch, revert the workflow/script/docs commit normally if validation f
 
 ## Completion notes
 
-Status: `IN_PROGRESS / TASK_FIRST_RECORD_COMPLETE`. Starting state verified on 2026-07-11: repository HEAD/origin `6362524a3ff1e0776ec1b07ae746fb33f0b88a55`; NuGet RC1 accessible; release run `29131335084` failed after its validate job succeeded; artifact `8242162439` is unexpired with digest `sha256:cd5550b2172aa0e4ff9bf700f6eefb04dfd8dbd88c8d7fee22914c1769533b3f`; tag, GitHub Release, and both candidate-asset attestations are absent. No recovery dispatch has occurred.
+Status: `COMPLETED LOCALLY / PENDING PUSH_AND_PRE_RECOVERY_CI`.
+
+Starting state was verified on 2026-07-11 at repository HEAD/origin `6362524a3ff1e0776ec1b07ae746fb33f0b88a55`. Release run `29131335084` validate job succeeded; artifact `8242162439` is unexpired with digest `sha256:cd5550b2172aa0e4ff9bf700f6eefb04dfd8dbd88c8d7fee22914c1769533b3f`; NuGet RC1 is accessible; tag, GitHub Release, and both candidate-asset attestations were absent.
+
+Implementation completed:
+
+- `.github/workflows/release.yml` now has a distinct `recover-existing` operation and read-only three-platform verification matrix.
+- The recovery job has no `nuget-release` environment, `NuGet/login`, `NUGET_API_KEY`, package permission, `dotnet nuget push`, manual upload/edit, force option, or tag movement path.
+- `scripts/verify-existing-package-recovery.ps1` binds exact hashes/metadata/repository commit/signature and archive content equivalence excluding only `.signature.p7s`.
+- `scripts/test-existing-package-recovery.ps1` covers positive, repeated, wrong-hash, wrong-commit, and changed-content cases.
+- Static/supply-chain gates require exact run/artifact evidence, repeated absent-state checks, exact body/assets, exactly two attestations/verifications, and read-only Windows/Ubuntu/macOS package verification.
+
+Actual validation evidence:
+
+- dependency vulnerability/deprecation reviews: no findings;
+- restore/build: PASS, 0 warnings and 0 errors;
+- full tests: 431/431 PASS;
+- sample smoke: PASS;
+- release workflow YAML parse: PASS;
+- recovery fixture/static/supply-chain/legacy recovery tests: PASS;
+- real TASK-0242 artifact versus NuGet verification: PASS; candidate nupkg `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d`, candidate snupkg `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d`, NuGet nupkg `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`;
+- V100, documentation, CLI, config, JSON, localization, RC, security/supply-chain, published-state, package metadata, and local release verification gates: PASS;
+- synthetic performance: 8.556 seconds/44.4 MiB inside RC gate and 8.413 seconds/45 MiB standalone, both PASS;
+- Markdown: 432 files, 231 local targets, 0 broken;
+- ACKit `1.0.0-rc.1`: doctor 13/13 PASS; scan exit 0 with classified Medium/Low findings only; redact-check exit 1 reports the same known local artifact/path findings with no Critical/High finding;
+- `git diff --check`: PASS; no tracked `.ackit/` artifact.
+
+The pre-commit public-release orchestration correctly rejected the dirty working tree and will be rerun after the implementation commit. No workflow dispatch, NuGet mutation, tag, release, attestation, manual upload, or force push occurred in TASK-0243.

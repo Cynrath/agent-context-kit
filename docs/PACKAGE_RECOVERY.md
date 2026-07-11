@@ -94,3 +94,11 @@ GitHub Actions / release environment boundary:
 - repository secrets: none required for NuGet publish because `.github/workflows/release.yml` uses `NuGet/login@v1` trusted publishing with `user: Cyranth` and `NUGET_API_KEY` from `steps.login.outputs.NUGET_API_KEY`.
 
 No NuGet unlist/deprecate action, package state change, account/recovery mutation, repository secret creation, workflow dispatch, tag, GitHub Release, NuGet publish, owner removal, or destructive package action occurred.
+
+## TASK-0243 Exact Existing-Package Recovery Path
+
+TASK-0242 created a distinct partial state: NuGet `1.0.0-rc.1` is immutable and repository-signed at commit `258918b33c3d1359aac967604ee524e8b66ddf02`, while its tag, GitHub prerelease/assets, and provenance are absent. This is not a bad-package replacement scenario and does not authorize unlist, deprecation, republish, or successor-version substitution.
+
+TASK-0243 adds a bounded `recover-existing` operation to the manual release workflow. It accepts only the prior validated workflow artifact, exact artifact/file hashes, the existing repository-signed NuGet package, the exact package commit, and an absent tag/release precondition. It contains no NuGet credential or push path. If authorized execution succeeds, it creates the non-force exact tag, prepared prerelease with only the verified nupkg/snupkg, separate attestations for both assets, and Windows/Ubuntu/macOS installed-tool evidence.
+
+Any partial recovery failure triggers the same immutability rule: no second automatic dispatch, no asset replacement, no tag movement, and no manual upload. Audit the remote state once, preserve TASK-0242 and the recovery task as separate evidence, then require a new explicit decision.
