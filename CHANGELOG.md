@@ -6,7 +6,7 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 
 ## [Unreleased]
 
-## [1.0.0-rc.1] - Prepared, not published
+## [1.0.0-rc.1] - NuGet published; release incomplete
 
 ### Candidate scope
 - Freezes the reviewed CLI command/option surface, exit semantics, config schema `1`, baseline schema `1`, JSON schema `2`, SARIF `2.1.0` profile, stable rule/diagnostic identifiers, and generated-file conventions for exact-candidate validation.
@@ -17,9 +17,9 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 - Validates the upgrade path from published immutable predecessor `0.2.0-alpha.4` to a run-unique `1.0.0-rc.1` source candidate without rewriting predecessor config.
 
 ### Known limitations
-- `1.0.0-rc.1` is prepared in source only and is not available from NuGet or as a GitHub Release until a separately authorized publish task completes.
+- NuGet `1.0.0-rc.1` is available and repository-signed, but TASK-0242 stopped after bounded propagation verification timed out; no `v1.0.0-rc.1` tag, GitHub prerelease, or attestation exists.
 - Author signing and SBOM publication remain documented bounded accepted risks; neither is claimed as implemented.
-- Hosted publish-path provenance is pending. It can be created and verified only for the exact release package during a future authorized OIDC publish workflow.
+- Hosted publish-path provenance remains pending. No recovery or second dispatch is authorized; immutable NuGet state must be preserved until a separate recovery decision.
 - External adoption evidence remains limited, and hosted documentation/GitHub Pages remains deferred.
 
 ### Added

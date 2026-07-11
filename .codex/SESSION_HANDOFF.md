@@ -1,17 +1,19 @@
 # AgentContextKit Session Handoff
 
-## Active TASK-0242 `1.0.0-rc.1` Publication
+## TASK-0242 `1.0.0-rc.1` Partial Publication — Hard Stop
 
 - Entry verified on 2026-07-10: clean `master`; local/origin HEAD `5c1a7782579f1bdc54a0d3706c886108382914cb`; published `0.2.0-alpha.4`; no open PRs/issues; historical standard runs `29107940364`, `29107940251`, and `29107940236` succeeded.
-- `1.0.0-rc.1` is available: no matching Git tag, GitHub Release, or NuGet version exists. Nothing was reserved, tagged, released, or published.
+- NuGet `1.0.0-rc.1` now exists and is immutable; remote tag, GitHub Release, and attestation do not exist.
 - ACKit preflight: installed `0.2.0-alpha.4`; doctor 13/13 PASS; scan exit 0 with no Critical/High blocker. `ackit task --help` is unsupported by this parser and returned missing-title exit 1; do not repeat it.
 - TASK-0239, TASK-0240, and TASK-0241 were created with `ackit task` and fully planned before implementation.
 - TASK-0239 is complete at exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`: one push completed and standard runs `29118331264`, `29118331259`, and `29118331258` are green.
 - TASK-0239 local evidence: source/package/runtime/source-smoke report RC1; exact alpha4 fixture and hosted direct gates are present; dependency reviews are clean; Release build is 0/0; tests pass 431/431; Unicode guard is 0/0; disposable package/install/upgrade evidence passes; all gates pass; RC-gate resource evidence is 5.691s/45.1 MiB, standalone evidence is 4.193s/44.6 MiB, and 428-file Markdown audit is clean.
 - TASK-0240 hosted evidence is complete and committed locally as `fd2ce8d185dfe351e402fb458a9acd9403c439ea` after exactly one dispatch: run `29118452246` passed on Windows job `86447580477`, Ubuntu job `86447580502`, and macOS job `86447580508`; exact candidate/predecessor/package/config/baseline/JSON/SARIF/localization/resource/final-scan evidence passed; uploads and publication were absent.
 - TASK-0241 acceptance commit `b1fae4d18ce738be6a8679abd7333f95e044e3a6` is pushed; final runs `29119747553`, `29119747558`, and `29119747534` passed. Open P0 gaps are 0; V100-09 alone awaits publish-path provenance.
-- TASK-0242 was created after explicit 2026-07-11 authorization for exactly one OIDC `release.yml` publish dispatch of `1.0.0-rc.1`, exact tag/prerelease/assets/body/provenance verification, installed-tool/post-publish smoke, and docs follow-through.
-- Current action: validate and push the docs-only task/body/authorization bridge, wait for its standard CI, recheck absence, then dispatch release once. If any partial failure occurs, do not recover/rerun/dispatch again; inspect immutable state once and stop.
+- TASK-0242 docs-only publication HEAD `258918b33c3d1359aac967604ee524e8b66ddf02` passed local preflight and standard runs `29131066882`, `29131066912`, and `29131066885`.
+- Single release run `29131335084` published NuGet through OIDC, then failed bounded package-availability verification. Tag/release/provenance steps were skipped.
+- One-time audit: NuGet signature/repository commit/global install PASS; NuGet SHA-256 `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`; tag/release/attestation absent. No RC1 smoke-pin change or three-platform post-publish smoke occurred.
+- Current action: commit/push failure-state documentation and wait final standard CI only. No release recovery, second dispatch, rerun, manual upload, tag/release action, or force push.
 
 ## Project Purpose
 AgentContextKit is an offline-first, security-first, docs-first, task-first .NET CLI for developers who use AI coding agents. It analyzes repositories, detects stacks and hygiene gaps, generates safe context/workflow files for multiple agents, and reports secret/PII/brand leakage risks before public release or AI context export.

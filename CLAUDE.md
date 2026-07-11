@@ -38,7 +38,7 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 - Agent instructions: yes
 
 ## Release Status
-- Current release: `v0.2.0-alpha.4` published and verified on GitHub and NuGet as a pre-release.
+- Current complete release: `v0.2.0-alpha.4`. NuGet `1.0.0-rc.1` exists in a partial immutable state; tag, GitHub prerelease, and provenance are absent after TASK-0242 stopped.
 - Current publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
 - Previous release: `v0.2.0-alpha.3` published and verified; pushed, released, and published.
 - NuGet global tool install verification: completed for `0.2.0-alpha.4`.
@@ -48,6 +48,7 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 ## Risk Summary
 - No risk findings in the latest local scan.
 - `0.2.0-alpha.4` is published and verified by TASK-0220; do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
+- `1.0.0-rc.1` NuGet publication is immutable at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`; do not republish/reuse it or create/move its tag/release/provenance without a new explicit recovery decision.
 
 ## Recommended Checks
 - `dotnet build AgentContextKit.sln -c Release --no-restore`

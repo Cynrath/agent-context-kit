@@ -2,7 +2,7 @@
 
 ## Status
 
-Authorized and in progress. Publication has not been dispatched yet.
+Stopped after partial immutable publication. The single authorized dispatch was consumed; recovery and a second dispatch are prohibited.
 
 ## Purpose
 
@@ -114,4 +114,43 @@ Before publication, correct with a normal successor commit and do not dispatch u
 
 ## Completion notes
 
-In progress. No release workflow has been dispatched and no `1.0.0-rc.1` package, tag, GitHub prerelease, or provenance claim is recorded yet.
+Stopped safely on 2026-07-11 after the single authorized release dispatch.
+
+### Pre-dispatch evidence
+
+- Docs-only publication bridge commit: `258918b33c3d1359aac967604ee524e8b66ddf02`.
+- Candidate bridge from `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` contained only docs/evidence/governance paths.
+- Pre-publish standard runs passed: `ci` `29131066882`, `cross-platform-smoke` `29131066912`, and `cross-platform-source-smoke` `29131066885`.
+- Full local preflight passed: no vulnerable/deprecated packages; build 0 warnings/0 errors; 431/431 tests; Unicode guard clean; exact release preparation, package metadata/install, V100/CLI/config/JSON/localization/security/supply-chain/public-release gates, Markdown, diff, and `.ackit` hygiene green.
+- NuGet `1.0.0-rc.1`, remote `v1.0.0-rc.1`, and GitHub Release were absent immediately before dispatch.
+
+### Single release run
+
+- Exactly one `release.yml` publish dispatch was sent for version `1.0.0-rc.1`, automation/release SHA `258918b33c3d1359aac967604ee524e8b66ddf02`, and `prerelease=true`.
+- Run [`29131335084`](https://github.com/Cynrath/agent-context-kit/actions/runs/29131335084): `failure`.
+- `validate exact package` job `86487127197`: success.
+- `publish and create release` job `86487525013`: OIDC login and NuGet publish succeeded; `Verify published package` failed after its bounded retry window because NuGet had not become available to that runner.
+- Tag, GitHub prerelease, release verification, release-asset provenance inspection, `actions/attest@v4`, and attestation verification were skipped.
+- No second dispatch, rerun, `verify-existing`, recovery, manual upload, tag/release mutation, or force push was performed.
+
+### One-time immutable-state audit
+
+| Field | Verified state |
+| --- | --- |
+| NuGet package | `AgentContextKit 1.0.0-rc.1` accessible |
+| NuGet repository signature | Verified; NuGet.org Repository certificate |
+| NuGet repository commit | `258918b33c3d1359aac967604ee524e8b66ddf02` |
+| NuGet nupkg SHA-256 | `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5` |
+| Global tool install | PASS; `AgentContextKit 1.0.0-rc.1` |
+| Validated workflow nupkg SHA-256 | `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d` |
+| Validated workflow snupkg SHA-256 | `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d` |
+| Remote tag | Absent |
+| GitHub prerelease | Absent |
+| Exact package attestation | Absent; attestation steps were skipped |
+| Three-platform RC1 post-publish smoke | Not run; published-package pin remains on immutable alpha4 because hard-stop applies |
+
+### Final disposition
+
+Status: `PARTIAL_IMMUTABLE_PUBLICATION / NUGET_PUBLISHED / TAG_RELEASE_PROVENANCE_ABSENT / STOPPED_BY_AUTHORIZATION_BOUNDARY`.
+
+TASK-0242 is not successfully complete. A future recovery decision requires new explicit authorization and must never republish or replace `1.0.0-rc.1`, move an existing tag, or fabricate provenance.

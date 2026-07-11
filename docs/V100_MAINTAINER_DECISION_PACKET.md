@@ -149,4 +149,4 @@ OPEN_PENDING_PUBLISH_PATH_PROVENANCE
 - Decision: `CONDITIONAL GO FOR A SEPARATELY AUTHORIZED PUBLISH TASK`.
 - No `1.0.0` GA or published-RC claim is made.
 
-The single authorized remote evidence action completed as TASK-0240 run `29118452246`. Publication, tagging, release creation, and provenance creation remain separate TASK-0242 boundaries. Publication authorized: No.
+The single authorized RC evidence action completed as TASK-0240 run `29118452246`. Historical TASK-0241 marker: Publication authorized: No. TASK-0242 later published NuGet RC1 through OIDC but stopped before tag/release/provenance; V100-09 remains open and recovery requires new authorization.

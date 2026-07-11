@@ -8,7 +8,7 @@ Current package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.
 Important fields:
 - `PackageId`: `AgentContextKit`
 - `ToolCommandName`: `ackit`
-- `Version`: `1.0.0-rc.1` (prepared source candidate, not published); current published package is `0.2.0-alpha.4`
+- `Version`: `1.0.0-rc.1` (NuGet published; tag/GitHub prerelease/provenance incomplete); latest complete release is `0.2.0-alpha.4`
 - `Authors`: `Cynrath`
 - `PackageLicenseExpression`: `MIT`
 - `PackageReadmeFile`: `README.nuget.md`

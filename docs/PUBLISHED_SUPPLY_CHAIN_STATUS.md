@@ -1,5 +1,22 @@
 # Published Supply-Chain Status
 
+## TASK-0242 RC1 Partial Immutable State
+
+One-time read-only audit on 2026-07-11 after release run `29131335084`:
+
+| Field | State |
+| --- | --- |
+| NuGet package | `AgentContextKit 1.0.0-rc.1` accessible |
+| Repository signature | Verified (`NuGet.org Repository by Microsoft`) |
+| Repository commit | `258918b33c3d1359aac967604ee524e8b66ddf02` |
+| NuGet nupkg SHA-256 | `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5` |
+| Global install | PASS; `AgentContextKit 1.0.0-rc.1` |
+| Remote `v1.0.0-rc.1` tag | Absent |
+| GitHub prerelease/assets | Absent |
+| GitHub artifact attestation | Absent |
+
+The OIDC publish step succeeded, then bounded NuGet availability verification timed out. Tag/release/provenance steps were skipped. No second dispatch, rerun, recovery, manual upload, version reuse, tag movement, or force push occurred. The alpha.2 audit below remains historical evidence and must not be relabeled as RC1 provenance.
+
 Future-release decisions derived from this published-state evidence are tracked without closure in `docs/RELEASE_BLOCKER_BOARD.md` and `docs/MAINTAINER_DECISION_REGISTER.md`.
 
 ## Audit Scope

@@ -1,15 +1,15 @@
 # Project Execution Queue
 
-## V100 `1.0.0-rc.1` Publication Track — TASK-0242 Active
+## V100 `1.0.0-rc.1` Publication Track — TASK-0242 Stopped
 
 | Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Completed | TASK-0239 candidate version selection and release preparation | Exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` prepared and pushed | TASK-0238 | Version/package/workflow/script/test/fixture/release-plan/evidence/handoff files | 431/431 local; standard CI `29118331264`, `29118331259`, `29118331258` green | One normal push completed; no publication |
 | 2 | Completed | TASK-0240 hosted RC evidence execution and recording | Single authorized run `29118452246` passed on all three operating systems | TASK-0239 green | Hosted/validation/V100/queue/handoff docs | Exact input plus one dispatch/watch/view/log sequence passed | Commit `fd2ce8d`; one RC dispatch; read-only/no upload |
 | 3 | Completed | TASK-0241 final acceptance, gap closure, and publish boundary | Open P0 0; conditional GO; final suite and standard CI green; V100-09 remains publish-provenance boundary | TASK-0240 PASS | V100/decision/release/queue/handoff docs | Commit `b1fae4d`; runs `29119747553`, `29119747558`, `29119747534` | Publication remained separate |
-| 4 | Active / not dispatched | TASK-0242 OIDC publication and post-publish verification | Publish RC1 once, verify release/provenance/install, sync public docs/pin and final CI | TASK-0241 plus explicit 2026-07-11 authorization | Task/body/decision docs, release run, public/pin/evidence sync | Exact preflight, one release watch, immutable verification, final CI | One release dispatch; stop on partial failure |
+| 4 | Stopped / partial immutable publication | TASK-0242 OIDC publication and post-publish verification | Single run published NuGet then failed propagation verification; tag/release/provenance absent | TASK-0241 plus consumed authorization | Task/release/decision/incident docs | Run `29131335084`; one-time immutable audit; final docs CI | New explicit recovery decision required; no second dispatch |
 
-Execution rule: TASK-0239 has one candidate commit/push; TASK-0240 and TASK-0241 are complete. TASK-0242 has exactly one authorized `release.yml` publish dispatch. No second dispatch/rerun/recovery, manual package upload, tag move, version reuse, settings mutation, or force push is authorized.
+Execution rule: TASK-0242's one dispatch budget is consumed. No second dispatch/rerun/recovery, manual package upload, tag creation/move, release mutation, version reuse, settings mutation, or force push is authorized.
 
 ## Historical PROJECT-CONTROL-0109 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |

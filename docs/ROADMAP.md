@@ -6,7 +6,7 @@
 - TASK-0240 is complete locally: single authorized run `29118452246` passed on Windows, Ubuntu, and macOS; evidence commit `fd2ce8d` awaits the joint final push.
 - TASK-0241 conditionally accepts the final candidate with open P0 gaps 0, closes the evidence-backed target gaps, preserves V100-09 pending publish-path provenance, and is completing final validation/push/CI.
 - Published release remains `0.2.0-alpha.4`. The chain explicitly prohibits NuGet publication, `release.yml`, tags, GitHub Releases, provenance publication, uploads, settings changes, and GA-readiness claims.
-- The next possible task is TASK-0242 OIDC publication/provenance verification, but it must not be created or executed without a separate explicit authorization: `PUBLISH AUTHORIZATION REQUIRED`.
+- TASK-0242 consumed its single authorized OIDC dispatch: NuGet RC1 published, verification timed out, and tag/release/provenance were skipped. Recovery requires a new explicit decision.
 
 ## v0.1.0-alpha
 - Solution foundation.
@@ -340,4 +340,4 @@ TASK-0234 selects `b1604ae1e73017521d28e5a83f328bb1347406b6` as the last planned
 - TASK-0239 prepared exact source candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` with 431/431 tests and green standard CI.
 - TASK-0240 recorded successful three-platform hosted RC run `29118452246`.
 - TASK-0241 accepted the final candidate with zero open P0 gaps; acceptance commit `b1fae4d` and its three standard workflows are green.
-- TASK-0242 is explicitly authorized on 2026-07-11 for one OIDC `1.0.0-rc.1` publication dispatch, exact provenance verification, installed/post-publish smoke, and public documentation synchronization. It must stop without recovery or a second dispatch on any partial failure.
+- TASK-0242 run `29131335084` published NuGet `1.0.0-rc.1`, then stopped after propagation verification timed out. Repository signature/commit and global install passed; tag, GitHub prerelease, provenance, and RC1 three-platform post-publish smoke remain absent. No recovery or second dispatch occurred.

@@ -38,8 +38,8 @@ Default commands process repository content locally: no repository upload, AI AP
 
 | Area | Status |
 | --- | --- |
-| Current release | `v0.2.0-alpha.4` published on GitHub and NuGet as a pre-release |
-| Prepared source candidate | `1.0.0-rc.1` selected for local/hosted validation; not published and not installable from NuGet yet |
+| Current complete release | `v0.2.0-alpha.4` published on GitHub and NuGet as a pre-release |
+| RC1 partial state | NuGet `1.0.0-rc.1` exists and installs; tag, GitHub prerelease, and provenance are absent after TASK-0242 hard stop |
 | Release evidence | Published from `98cdf9723a509a347bd0403f6373dafe81ba03fb`; NuGet install verified |
 | Package | `AgentContextKit` global tool install verified |
 | Previous release | `v0.2.0-alpha.3` |

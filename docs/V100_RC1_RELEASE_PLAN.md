@@ -2,7 +2,7 @@
 
 ## Status
 
-Prepared by TASK-0239 and accepted by TASK-0241. Explicit TASK-0242 authorization was received on 2026-07-11 for exactly one OIDC publish dispatch. No package, tag, GitHub Release, or provenance claim is recorded until that run succeeds.
+Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its single authorized dispatch on 2026-07-11. NuGet publication succeeded, but bounded package-availability verification timed out before tag, GitHub prerelease, or provenance; recovery is not authorized.
 
 | Field | Value |
 | --- | --- |
@@ -11,7 +11,7 @@ Prepared by TASK-0239 and accepted by TASK-0241. Explicit TASK-0242 authorizatio
 | Published predecessor | `0.2.0-alpha.4` |
 | Current published release | `0.2.0-alpha.4` |
 | Candidate commit | Source candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; later bridge commits are docs/evidence/governance-only |
-| Publication authorized | Yes, TASK-0242 single-dispatch scope on 2026-07-11 |
+| Publication status | Partial immutable state: NuGet published; tag/release/provenance absent; stopped |
 | Release body | Publication-ready `docs/RELEASE_BODY_V100_RC1.md` |
 
 ## Version Availability
@@ -64,7 +64,7 @@ Before publication, correct the source with a normal successor commit and rerun 
 
 ## Post-Publish Validation
 
-If TASK-0242 is separately authorized, verify NuGet availability, repository metadata/signature, exact tag/release target, release assets and digests, installed-tool smoke on all supported platforms, publish-path attestation creation/verification, public documentation/version pins, and immutable release state.
+TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. Tag/release/assets/attestation and three-platform RC1 post-publish smoke were not completed. They require a new explicit recovery decision; do not republish or reuse the version.
 
 ## TASK-0239 Evidence
 

@@ -1,10 +1,10 @@
 # AgentContextKit Context Pack
 
-## Active TASK-0242 `1.0.0-rc.1` Publication
+## TASK-0242 `1.0.0-rc.1` Partial Publication — Hard Stop
 
-Verified entry state: clean `master` at `5c1a7782579f1bdc54a0d3706c886108382914cb`, equal to `origin/master`; published release `0.2.0-alpha.4`; no open PRs/issues; prior standard CI green. Proposed `1.0.0-rc.1` is absent from Git tags, GitHub Releases, and NuGet. ACKit is `0.2.0-alpha.4`, doctor 13/13 PASS, scan exit 0 with no Critical/High blocker; `ackit task --help` is unsupported and returned missing-title exit 1.
+Release HEAD `258918b33c3d1359aac967604ee524e8b66ddf02` passed preflight and standard CI. NuGet `1.0.0-rc.1` exists after the single TASK-0242 run; tag, GitHub Release, and attestation remain absent. ACKit preflight used published predecessor `0.2.0-alpha.4`, doctor 13/13 PASS, and scan exit 0.
 
-TASK-0239 source candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`, TASK-0240 hosted run `29118452246`, and TASK-0241 acceptance commit `b1fae4d18ce738be6a8679abd7333f95e044e3a6` are complete and pushed. TASK-0241 final runs `29119747553`, `29119747558`, and `29119747534` passed. TASK-0242 was created after explicit 2026-07-11 authorization for exactly one OIDC publish dispatch, exact tag/prerelease/assets/body/provenance verification, global install/post-publish smoke, and final docs/CI. No second dispatch/rerun/recovery or manual upload is authorized; partial success requires one immutable-state inspection and stop.
+TASK-0239/0240/0241 evidence remains valid. TASK-0242 run `29131335084` validated the exact package and published it through OIDC, then failed in bounded NuGet propagation verification. One-time audit verified repository signature/commit, digest, and global install; tag/release/provenance absent. No second dispatch/rerun/recovery/manual upload or RC1 smoke-pin change is authorized.
 
 TASK-0239 local evidence: dependency vulnerability/deprecation reviews are clean; build is 0 warnings/0 errors; 431/431 tests and Unicode guard pass; disposable RC1 nupkg/snupkg metadata/content/hygiene and isolated install pass; installed alpha4-to-RC config/hash/baseline/SARIF smoke passes. All ACKit/contract/readiness gates pass; the RC-gate benchmark is 5.691s/45.1 MiB, the standalone benchmark is 4.193s/44.6 MiB, and the 428-file Markdown audit is clean. TASK-0240 hosted evidence repeats 431/431 and all frozen/upgrade/machine/localization gates on three operating systems; observed resource maxima are 1.019s and 59.9 MiB.
 

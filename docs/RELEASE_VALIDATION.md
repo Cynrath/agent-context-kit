@@ -2,11 +2,15 @@
 
 ## V100 `1.0.0-rc.1` Candidate Preparation (TASK-0239)
 
-Candidate `1.0.0-rc.1` is prepared against published predecessor `0.2.0-alpha.4`. The normative plan is `docs/V100_RC1_RELEASE_PLAN.md`; TASK-0242 finalizes `docs/RELEASE_BODY_V100_RC1.md` for the authorized release. Public install guidance remains pinned to published alpha4 until publication succeeds.
+Candidate `1.0.0-rc.1` was prepared against published predecessor `0.2.0-alpha.4`; its publication body is retained in `RELEASE_BODY_V100_RC1.md`. TASK-0242 published the NuGet package but stopped before tag/GitHub prerelease/provenance. Public complete-release guidance remains pinned to alpha4; RC1 is documented as a partial immutable state.
 
 ## TASK-0242 Publication Authorization
 
 Explicit authorization was received on 2026-07-11 for exactly one existing `release.yml` OIDC publish dispatch covering NuGet `1.0.0-rc.1`, exact `v1.0.0-rc.1` tag, GitHub prerelease/assets/body, and exact nupkg attestation creation/verification. Any failure ends the dispatch budget: no second dispatch, rerun, automatic recovery, manual package upload, version reuse, tag movement, release replacement, or force push is authorized. If NuGet succeeds before a later failure, inspect immutable state once and stop.
+
+### TASK-0242 Partial Publication Result
+
+Run `29131335084` published NuGet `1.0.0-rc.1` through OIDC, then failed in `verify-published-package.ps1` after the runner's bounded NuGet availability window. Subsequent tag, GitHub prerelease, release verification, provenance, and attestation steps were skipped. A one-time audit later verified the NuGet repository signature, repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`, nupkg SHA-256 `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`, and global install/version. Remote tag, GitHub Release, and attestation are absent. No recovery or second dispatch occurred.
 
 TASK-0239 adds exact alpha4 generated-config fixture/regeneration coverage, direct hosted CLI/config/JSON/localization gates, run-unique candidate packaging, source/package version alignment, and future release-body routing. Dependency, local package/install, full-suite, Unicode, resource, and hygiene checks completed locally; exact candidate standard CI is recorded after the candidate push.
 
