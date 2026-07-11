@@ -2,16 +2,16 @@
 
 ## Status
 
-Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its single authorized dispatch on 2026-07-11. NuGet publication succeeded, but bounded package-availability verification timed out before tag, GitHub prerelease, or provenance; recovery is not authorized.
+Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its single authorized publish dispatch on 2026-07-11. NuGet publication succeeded, but bounded package-availability verification timed out before tag, GitHub prerelease, or provenance. TASK-0243 through TASK-0245 now carry a separate exact-existing-package recovery authorization that forbids any second NuGet push.
 
 | Field | Value |
 | --- | --- |
 | Candidate version | `1.0.0-rc.1` |
-| Candidate tag if later authorized | `v1.0.0-rc.1` |
+| Authorized recovery tag | `v1.0.0-rc.1`, only at `258918b33c3d1359aac967604ee524e8b66ddf02` |
 | Published predecessor | `0.2.0-alpha.4` |
 | Current published release | `0.2.0-alpha.4` |
 | Candidate commit | Source candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; later bridge commits are docs/evidence/governance-only |
-| Publication status | Partial immutable state: NuGet published; tag/release/provenance absent; stopped |
+| Publication status | Partial immutable state: NuGet published; tag/release/provenance absent; exact-package recovery authorized but not dispatched |
 | Release body | Publication-ready `docs/RELEASE_BODY_V100_RC1.md` |
 
 ## Version Availability
@@ -45,7 +45,7 @@ After hosted evidence starts, TASK-0240 and TASK-0241 may change documentation, 
 
 - Hosted three-OS exact-candidate evidence is pending TASK-0240.
 - Final candidate acceptance and gap reconciliation are pending TASK-0241.
-- V100-09 publish-path provenance remains open until a future authorized OIDC publish creates and verifies an attestation for the exact release nupkg.
+- V100-09 provenance remains open until TASK-0244 creates and verifies attestations for both exact recovered release assets without republishing NuGet.
 - Author signing and SBOM publication remain bounded accepted risks through their recorded review boundary.
 - `1.0.0` GA readiness is not claimed.
 
@@ -64,7 +64,7 @@ Before publication, correct the source with a normal successor commit and rerun 
 
 ## Post-Publish Validation
 
-TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. Tag/release/assets/attestation and three-platform RC1 post-publish smoke were not completed. They require a new explicit recovery decision; do not republish or reuse the version.
+TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. Tag/release/assets/attestation and three-platform RC1 post-publish smoke were not completed. TASK-0243/0244/0245 now implement, execute once, and document an exact-existing-package recovery. Do not republish or reuse the version; use only prior validated artifact `8242162439` and the recorded exact hashes.
 
 ## TASK-0239 Evidence
 

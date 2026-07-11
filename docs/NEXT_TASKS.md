@@ -1,8 +1,8 @@
 # Next Tasks
 
-## V100 `1.0.0-rc.1` Publication — TASK-0242 Stopped
+## V100 `1.0.0-rc.1` Exact-Package Recovery — TASK-0243 Active
 
-TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 consumed its single authorized OIDC dispatch: NuGet published, propagation verification timed out, and tag/release/provenance were skipped. Hard stop applies.
+TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 consumed its single authorized OIDC publish dispatch: NuGet published, propagation verification timed out, and tag/release/provenance were skipped. Its history remains unchanged. A new bounded recovery decision now authorizes TASK-0243 through TASK-0245 without any second NuGet push.
 
 | Order | Task | Status | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
@@ -10,8 +10,11 @@ TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, an
 | 2 | TASK-0240 hosted RC evidence execution and recording | COMPLETED | Exact-SHA three-OS evidence run `29118452246` passed after one authorized dispatch | TASK-0239 standard CI green | Exact input gate plus one blocking hosted run | Commit `fd2ce8d`; no uploads/publication |
 | 3 | TASK-0241 final-candidate acceptance and publish boundary | COMPLETED | Open P0 0; conditional GO; final local suite and final runs `29119747553`, `29119747558`, `29119747534` green | TASK-0240 PASS | Bridge review, full suite, final standard CI | Commit `b1fae4d`; publication remained separate |
 | 4 | TASK-0242 OIDC publication and post-publish verification | STOPPED / PARTIAL IMMUTABLE PUBLICATION | Run `29131335084`: NuGet/signature/install verified; tag/release/provenance absent | TASK-0241 plus one consumed authorization | Immutable-state audit and failure docs; RC1 three-platform post-publish smoke not run | New explicit recovery decision required; no second dispatch |
+| 5 | TASK-0243 exact-existing-package recovery operation | IN PROGRESS | Build and test a fail-closed recovery path using prior validated artifacts and no NuGet publication | TASK-0242 evidence plus current recovery authorization | Static/fixture/full tests, package equivalence, release gates | Local implementation only; no dispatch |
+| 6 | TASK-0244 authorized recovery execution and hosted verification | AUTHORIZED / NOT DISPATCHED | Dispatch recovery exactly once; exact tag/prerelease/assets/two attestations/three-OS install | TASK-0243 pushed and pre-recovery CI green | Single recovery run plus bounded remote verification | Exactly one recovery dispatch; no retry/rerun/publish |
+| 7 | TASK-0245 post-recovery smoke pin and evidence closure | CONDITIONAL | Pin published smoke to RC1 and synchronize docs only after complete recovery | TASK-0244 full success | Full local suite plus final three standard workflows | Normal commits/push only; no release mutation |
 
-NuGet `1.0.0-rc.1` is immutable and installable, but the RC release is incomplete. Complete release remains `v0.2.0-alpha.4`. Do not dispatch/rerun/recover, upload manually, reuse the version, create/move the tag, mutate a release, change settings, force push, or claim GA without new explicit authorization.
+NuGet `1.0.0-rc.1` is immutable and installable, but the RC release remains incomplete until TASK-0244 succeeds. Complete release remains `v0.2.0-alpha.4`. The recovery authorization is exact and bounded: no NuGet push, no normal publish operation, no second recovery dispatch, no manual upload, no tag movement, no settings change, no force push, and no GA claim.
 
 ## Historical Execution Record
 

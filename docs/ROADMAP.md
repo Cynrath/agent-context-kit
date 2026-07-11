@@ -2,11 +2,11 @@
 
 ## Active V100 Release-Candidate Chain
 
-- TASK-0239 is complete at exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; local/package evidence and candidate standard CI passed.
-- TASK-0240 is complete locally: single authorized run `29118452246` passed on Windows, Ubuntu, and macOS; evidence commit `fd2ce8d` awaits the joint final push.
-- TASK-0241 conditionally accepts the final candidate with open P0 gaps 0, closes the evidence-backed target gaps, preserves V100-09 pending publish-path provenance, and is completing final validation/push/CI.
-- Published release remains `0.2.0-alpha.4`. The chain explicitly prohibits NuGet publication, `release.yml`, tags, GitHub Releases, provenance publication, uploads, settings changes, and GA-readiness claims.
-- TASK-0242 consumed its single authorized OIDC dispatch: NuGet RC1 published, verification timed out, and tag/release/provenance were skipped. Recovery requires a new explicit decision.
+- TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 then published NuGet RC1 through OIDC but stopped after propagation verification timed out; its partial-failure history remains immutable.
+- TASK-0243 is active: add and locally validate a NuGet-publish-free `recover-existing` operation that binds the TASK-0242 validated artifact, repository-signed NuGet package, and exact release commit.
+- TASK-0244 is authorized but not dispatched: run the recovery workflow exactly once, create `v1.0.0-rc.1` only at `258918b33c3d1359aac967604ee524e8b66ddf02`, create the prepared prerelease with verified assets, attest both assets, and verify install on Windows/Ubuntu/macOS.
+- TASK-0245 is conditional on complete TASK-0244 success: update the published smoke pin to RC1, synchronize evidence/current-release docs, push normally, and wait for final standard CI in one blocking command sequence.
+- NuGet RC1 must never be republished, changed, unlisted, or replaced. No second recovery dispatch, normal publish operation, tag movement, manual upload, settings mutation, force push, or GA-readiness claim is authorized.
 
 ## v0.1.0-alpha
 - Solution foundation.

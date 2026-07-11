@@ -4,6 +4,8 @@
 
 Release run [`29131335084`](https://github.com/Cynrath/agent-context-kit/actions/runs/29131335084) targeted exact HEAD `258918b33c3d1359aac967604ee524e8b66ddf02`. Validate job `86487127197` passed. Publish job `86487525013` completed OIDC login and NuGet publish, then failed because the package did not become available to its verification runner inside the bounded retry window. Tag, GitHub prerelease, provenance, and attestation steps were skipped. One-time follow-up verified NuGet availability/signature/repository commit and global install, while tag/release/attestation remained absent. User-required hard stop applies; no recovery or second dispatch occurred.
 
+TASK-0243/0244/0245 recovery authorization was recorded separately on 2026-07-11. TASK-0243 must implement and validate a NuGet-publish-free path first. TASK-0244 may dispatch that recovery operation exactly once after green pre-recovery CI; its run ID and per-platform evidence will be appended without changing the TASK-0242 record above.
+
 ## V100 `1.0.0-rc.1` Hosted Evidence — PASS
 
 TASK-0240 dispatched `release-candidate-evidence.yml` exactly once. Run [`29118452246`](https://github.com/Cynrath/agent-context-kit/actions/runs/29118452246) completed successfully for `master`, event `workflow_dispatch`, exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`, candidate `1.0.0-rc.1`, predecessor `0.2.0-alpha.4`, and run-unique package `1.0.0-rc.1.ci.29118452246`.

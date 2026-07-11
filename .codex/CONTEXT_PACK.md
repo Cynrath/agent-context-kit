@@ -1,10 +1,10 @@
 # AgentContextKit Context Pack
 
-## TASK-0242 `1.0.0-rc.1` Partial Publication — Hard Stop
+## TASK-0243–0245 `1.0.0-rc.1` Exact-Package Recovery — Authorized
 
 Release HEAD `258918b33c3d1359aac967604ee524e8b66ddf02` passed preflight and standard CI. NuGet `1.0.0-rc.1` exists after the single TASK-0242 run; tag, GitHub Release, and attestation remain absent. ACKit preflight used published predecessor `0.2.0-alpha.4`, doctor 13/13 PASS, and scan exit 0.
 
-TASK-0239/0240/0241 evidence remains valid. TASK-0242 run `29131335084` validated the exact package and published it through OIDC, then failed in bounded NuGet propagation verification. One-time audit verified repository signature/commit, digest, and global install; tag/release/provenance absent. No second dispatch/rerun/recovery/manual upload or RC1 smoke-pin change is authorized.
+TASK-0239/0240/0241 evidence remains valid. TASK-0242 run `29131335084` validated the exact package and published it through OIDC, then failed in bounded NuGet propagation verification. One-time audit verified repository signature/commit, digest, and global install; tag/release/provenance absent. TASK-0243/0244/0245 now authorize a separate NuGet-publish-free exact-package recovery chain: develop locally, dispatch recovery exactly once, then update the RC1 smoke pin only after complete success. TASK-0242 history must remain unchanged.
 
 TASK-0239 local evidence: dependency vulnerability/deprecation reviews are clean; build is 0 warnings/0 errors; 431/431 tests and Unicode guard pass; disposable RC1 nupkg/snupkg metadata/content/hygiene and isolated install pass; installed alpha4-to-RC config/hash/baseline/SARIF smoke passes. All ACKit/contract/readiness gates pass; the RC-gate benchmark is 5.691s/45.1 MiB, the standalone benchmark is 4.193s/44.6 MiB, and the 428-file Markdown audit is clean. TASK-0240 hosted evidence repeats 431/431 and all frozen/upgrade/machine/localization gates on three operating systems; observed resource maxima are 1.019s and 59.9 MiB.
 

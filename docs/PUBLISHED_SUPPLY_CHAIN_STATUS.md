@@ -17,6 +17,8 @@ One-time read-only audit on 2026-07-11 after release run `29131335084`:
 
 The OIDC publish step succeeded, then bounded NuGet availability verification timed out. Tag/release/provenance steps were skipped. No second dispatch, rerun, recovery, manual upload, version reuse, tag movement, or force push occurred. The alpha.2 audit below remains historical evidence and must not be relabeled as RC1 provenance.
 
+TASK-0243 through TASK-0245 are now separately authorized to recover this exact immutable package without NuGet publication. The bounded path must use validated artifact `8242162439`, exact nupkg/snupkg hashes, exact release commit `258918b33c3d1359aac967604ee524e8b66ddf02`, one recovery dispatch, two asset attestations, and Windows/Ubuntu/macOS install verification. Until that run fully succeeds, this section remains the authoritative partial-state record.
+
 Future-release decisions derived from this published-state evidence are tracked without closure in `docs/RELEASE_BLOCKER_BOARD.md` and `docs/MAINTAINER_DECISION_REGISTER.md`.
 
 ## Audit Scope

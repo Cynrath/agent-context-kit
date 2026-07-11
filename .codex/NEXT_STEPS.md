@@ -1,13 +1,16 @@
 # Next Steps
 
-## Current V100 `1.0.0-rc.1` Publication
+## Current V100 `1.0.0-rc.1` Exact-Package Recovery
 
 1. COMPLETED — TASK-0239: exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` is pushed; 431/431 local and standard CI runs `29118331264`, `29118331259`, `29118331258` are green.
 2. COMPLETED — TASK-0240: exactly one dispatch produced successful hosted run `29118452246` on Windows, Ubuntu, and macOS; evidence commit `fd2ce8d` is pushed.
 3. COMPLETED — TASK-0241: acceptance commit `b1fae4d` is pushed; open P0 gaps are 0; final runs `29119747553`, `29119747558`, and `29119747534` passed.
-4. STOPPED / PARTIAL — TASK-0242: run `29131335084` published NuGet RC1, then timed out in availability verification; tag/release/provenance absent. Immutable audit and global install passed. Push failure docs and wait final standard CI; do not change the RC1 smoke pin.
+4. STOPPED / PARTIAL — TASK-0242: run `29131335084` published NuGet RC1, then timed out in availability verification; tag/release/provenance absent. Immutable audit and global install passed. Preserve this history.
+5. IN PROGRESS — TASK-0243: implement and test `recover-existing` using exact prior workflow artifacts and no NuGet publication.
+6. AUTHORIZED / NOT DISPATCHED — TASK-0244: after TASK-0243 push and green pre-recovery CI, dispatch recovery exactly once for exact tag/prerelease/assets/two attestations/three-OS install.
+7. CONDITIONAL — TASK-0245: only after complete TASK-0244 success, update the published smoke pin to RC1, synchronize evidence, push, and wait final standard CI once.
 
-Hard boundary: the dispatch budget is consumed. No second release dispatch, rerun, automatic recovery, manual package upload, version reuse, tag creation/movement, release mutation, settings/security/collaborator mutation, `.ackit/` commit, force push, or GA-readiness claim.
+Hard boundary: TASK-0242's publish dispatch is consumed. TASK-0244 authorizes one separate recovery dispatch only. No NuGet push, normal publish operation, second recovery dispatch/rerun, manual package upload, version reuse, tag movement, settings/security/collaborator mutation, `.ackit/` commit, force push, history rewrite, or GA-readiness claim.
 
 PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 completed TASK-0177 through TASK-0180, then inserted user-prioritized TASK-0187 before TASK-0181 to audit and harden the visible `nuget-release` failed deployments without release/tag/NuGet/deployment mutation.
 
