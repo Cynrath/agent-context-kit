@@ -122,5 +122,23 @@ There is no destructive rollback. Before dispatch, correct through a normal succ
 
 ## Completion notes
 
-Status: `PLANNED / BLOCKED UNTIL TASK-0246 CI IS GREEN`.
+Status: `STOPPED / SINGLE DISPATCH CONSUMED / PRE-MUTATION FAILURE / REMOTE STATE UNCHANGED`.
 
+TASK-0246 implementation commit `b815c44f81dbaa7d2a9556db05403aee4368f7c0` was pushed and all required standard runs passed: `ci` `29182095416`, published alpha4 smoke `29182095415`, and Windows/Ubuntu/macOS source smoke `29182095423`.
+
+The single immutable preflight passed with a clean synchronized repository and the exact tuple: source run `29131335084`, artifact `8242162439`, artifact digest `sha256:cd5550b2172aa0e4ff9bf700f6eefb04dfd8dbd88c8d7fee22914c1769533b3f`, nupkg `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d`, snupkg `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d`, release commit `258918b33c3d1359aac967604ee524e8b66ddf02`, and absent tag/release/two attestations.
+
+Exactly one `recover-existing` dispatch was accepted for automation commit `b815c44f81dbaa7d2a9556db05403aee4368f7c0`. The dispatch response returned run [`29182188201`](https://github.com/Cynrath/agent-context-kit/actions/runs/29182188201). The subsequent single list/discovery response did not match its bounded client-time filter; no second discovery was sent. The run ID from the dispatch response was used for exactly one `gh run watch --exit-status --interval 30` invocation.
+
+The run failed in job `recover exact existing package`, step `Validate exact source artifact and existing NuGet package`. The cross-platform safety gates passed. The step then proved the exact source artifact, candidate hashes, NuGet repository signature/content equivalence/repository commit, and Linux global-tool install/smoke. It stopped with exit code 1 after the expected absent-release API probe and before `Recheck exact remote recovery state` or any mutation. The observed trace is consistent with the handled `gh api` 404 leaving native exit code 1 as the step's final process status; this is an evidence-based diagnosis, not authorization to change or retry the workflow.
+
+The failed log was inspected exactly once. One post-failure immutable-state audit recorded:
+
+- source artifact valid/unexpired with the expected digest;
+- NuGet `AgentContextKit 1.0.0-rc.1` accessible and unchanged;
+- remote `v1.0.0-rc.1` tag absent;
+- GitHub prerelease/assets absent;
+- nupkg attestation absent;
+- snupkg attestation absent.
+
+All tag/release/asset/attestation and Windows/Ubuntu/macOS recovery-matrix steps were skipped. No NuGet login/push/change/unlist/replace, normal publish operation, rerun, second dispatch, automatic fix, manual upload, tag mutation, settings change, force push, or history rewrite occurred. The TASK-0247 dispatch budget is consumed and TASK-0248 success-only work is prohibited.

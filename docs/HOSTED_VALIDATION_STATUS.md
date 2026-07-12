@@ -14,6 +14,26 @@ The job failed in `Run exact recovery safety gates`. Exact-package fixtures and 
 
 The failed log was inspected once. One immutable-state audit confirmed artifact/package hashes and repository signature/commit unchanged, and remote tag, GitHub prerelease/assets, nupkg attestation, and snupkg attestation absent. No second dispatch, rerun, automatic correction, or remote mutation occurred. State: `RECOVERY_DISPATCH_CONSUMED / PRE_MUTATION_FAILURE / REMOTE_STATE_UNCHANGED / NEW_DECISION_REQUIRED`.
 
+## TASK-0246 Cross-Platform Fix — Standard CI PASS
+
+TASK-0246 planning commit `926fc03` and implementation commit `b815c44f81dbaa7d2a9556db05403aee4368f7c0` were pushed normally. Standard runs were discovered once and watched once each:
+
+| Workflow | Run | Result | Relevant evidence |
+| --- | ---: | --- | --- |
+| `ci` | [`29182095416`](https://github.com/Cynrath/agent-context-kit/actions/runs/29182095416) | PASS | Ubuntu and Windows build/test/scan |
+| `cross-platform-smoke` | [`29182095415`](https://github.com/Cynrath/agent-context-kit/actions/runs/29182095415) | PASS | Published alpha4 package smoke unchanged |
+| `cross-platform-source-smoke` | [`29182095423`](https://github.com/Cynrath/agent-context-kit/actions/runs/29182095423) | PASS | New `pwsh` recovery safety/static/negative fixtures on Windows, Ubuntu, and macOS |
+
+No release workflow dispatch or release/package mutation occurred in TASK-0246.
+
+## TASK-0247 Recovery Run — Pre-Mutation Failure / Hard Stop
+
+The single preflight passed and exactly one new `recover-existing` dispatch was accepted for automation commit `b815c44f81dbaa7d2a9556db05403aee4368f7c0`. The dispatch response identified run [`29182188201`](https://github.com/Cynrath/agent-context-kit/actions/runs/29182188201). One list/discovery response failed its bounded client-time filter; the direct dispatch run ID was used without a second discovery query, and one blocking watch observed the final failure.
+
+Job `recover exact existing package` passed `Run exact recovery safety gates`. In `Validate exact source artifact and existing NuGet package`, the run verified source artifact `8242162439`, exact nupkg/snupkg hashes, NuGet repository signature/content equivalence/repository commit, and Linux global install/smoke. The step then returned exit 1 after the expected absent-release API probe and before `Recheck exact remote recovery state` or any mutation step. The trace is consistent with the handled 404 leaving native exit code 1 as final process status; this is diagnosis only and was not corrected.
+
+The failed log was read once. One immutable-state audit confirmed the source artifact and NuGet package remained valid, while tag `v1.0.0-rc.1`, GitHub prerelease/assets, nupkg attestation, and snupkg attestation remained absent. Tag/release/attestation creation and all three recovered-package matrix jobs were skipped. State: `TASK-0247_DISPATCH_CONSUMED / PRE_MUTATION_FAILURE / REMOTE_STATE_UNCHANGED / NO_RERUN`.
+
 ## V100 `1.0.0-rc.1` Hosted Evidence — PASS
 
 TASK-0240 dispatched `release-candidate-evidence.yml` exactly once. Run [`29118452246`](https://github.com/Cynrath/agent-context-kit/actions/runs/29118452246) completed successfully for `master`, event `workflow_dispatch`, exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`, candidate `1.0.0-rc.1`, predecessor `0.2.0-alpha.4`, and run-unique package `1.0.0-rc.1.ci.29118452246`.

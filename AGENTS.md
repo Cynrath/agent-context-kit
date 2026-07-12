@@ -76,7 +76,7 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 - GitHub Actions: .github/workflows
 
 ## Release Status
-- Current complete release: `v0.2.0-alpha.4`. NuGet `1.0.0-rc.1` exists in a partial immutable state; TASK-0244 recovery stopped before mutation, so tag, GitHub prerelease, and provenance remain absent.
+- Current complete release: `v0.2.0-alpha.4`. NuGet `1.0.0-rc.1` exists in a partial immutable state; TASK-0244 and TASK-0247 recovery runs stopped before mutation, so tag, GitHub prerelease, and provenance remain absent.
 - Current publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
 - Previous release: `v0.2.0-alpha.3` published and verified; pushed, released, and published.
 - NuGet global tool install verification: completed for `0.2.0-alpha.4`.
@@ -87,7 +87,7 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 ## Risk Summary
 - No risk findings in the latest local scan.
 - `0.2.0-alpha.4` is published and verified by TASK-0220; do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
-- `1.0.0-rc.1` NuGet publication is immutable at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`; TASK-0244's recovery dispatch is consumed, so do not republish/reuse it or fix/retry/create/move its tag/release/provenance without a new explicit recovery decision.
+- `1.0.0-rc.1` NuGet publication is immutable at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`; TASK-0247's latest recovery dispatch is consumed, so do not republish/reuse it or fix/retry/create/move its tag/release/provenance without a new explicit recovery decision.
 
 ## Recommended Checks
 - `dotnet build AgentContextKit.sln -c Release --no-restore`

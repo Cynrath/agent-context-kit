@@ -24,7 +24,7 @@
 - Never leave a newly created `.md` task file, plan, queue row, or test file uncommitted. New files must be added and committed in the same logical commit that creates them, or in an immediately following commit, before any push.
 
 ## Release Status
-- Current complete release: `v0.2.0-alpha.4`. NuGet `1.0.0-rc.1` exists in a partial immutable state; TASK-0244 recovery stopped before mutation, so tag, GitHub prerelease, and provenance remain absent.
+- Current complete release: `v0.2.0-alpha.4`. NuGet `1.0.0-rc.1` exists in a partial immutable state; TASK-0244 and TASK-0247 recovery runs stopped before mutation, so tag, GitHub prerelease, and provenance remain absent.
 - Current publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
 - Previous release: `v0.2.0-alpha.2` published and verified; pushed, released, and published.
 - Main stack: `.NET`, `.NET CLI / .NET Tool`, and `GitHub Actions`.

@@ -131,5 +131,10 @@ Before push, correct local pin/docs normally. After push, use a normal successor
 
 ## Completion notes
 
-Status: `PLANNED / CONDITIONAL ON FULL TASK-0247 SUCCESS`.
+Status: `NOT EXECUTED / BLOCKED BY TASK-0247 FAILURE / SMOKE PIN AND V100-09 UNCHANGED`.
 
+TASK-0247 run `29182188201` failed before every remote mutation and its single dispatch budget is consumed. Therefore `.github/workflows/cross-platform-smoke.yml` remains pinned to complete release `0.2.0-alpha.4`; RC1 is not labeled a complete prerelease, V100-09 remains open, and no post-recovery tag/release/provenance or three-platform published-package claim is made.
+
+The substantial English/Turkish/NuGet README quality work was already completed and validated in TASK-0246 under truthful partial-state language. This task makes no success-only version/status change. NuGet README source improvements do not mutate the immutable README embedded in the already-published RC1 package.
+
+Only factual failure/evidence documentation, a normal documentation commit/push, and final standard CI are permitted after this hard stop. No recovery fix, rerun, second dispatch, NuGet mutation, release mutation, smoke-pin change, V100-09 closure, force/history operation, or 1.0 GA readiness claim is authorized.

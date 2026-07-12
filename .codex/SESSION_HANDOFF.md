@@ -1,11 +1,12 @@
 # AgentContextKit Session Handoff
 
-## TASK-0246–0248 `1.0.0-rc.1` Exact-Package Recovery — Authorized / In Progress
+## TASK-0246–0248 `1.0.0-rc.1` Exact-Package Recovery — TASK-0247 Stopped
 
 - New explicit authorization received on 2026-07-12 for TASK-0246 through TASK-0248. ACKit `1.0.0-rc.1` preflight passed (`doctor` 13/13; `scan --ci` exit 0), and all three task files were created once with `ackit task` and fully planned before implementation.
-- TASK-0246 implementation and local validation are complete: resolved single `pwsh` application, strengthened ordering/negative fixture, three-OS source-smoke coverage, README rewrite/polish, pure-Markdown package gate, build 0/0, tests 431/431, V100/security/release gates PASS. Next action is the normal TASK-0246 commit/push and one-time standard CI wait.
-- TASK-0247 may perform exactly one new `recover-existing` dispatch only after TASK-0246 standard CI is green, using version `1.0.0-rc.1`, exact commit `258918b33c3d1359aac967604ee524e8b66ddf02`, tag `v1.0.0-rc.1`, and exact TASK-0242 artifacts. NuGet publication is forbidden.
-- TASK-0248 may change the published smoke pin and close V100-09 only after exact tag/release/assets/two-attestation/three-platform recovery success. TASK-0242/TASK-0244 history remains immutable and 1.0 GA readiness is not claimed.
+- TASK-0246 commits `926fc03` and `b815c44` are pushed; standard runs `29182095416`, `29182095415`, and three-OS `29182095423` passed.
+- TASK-0247 consumed exactly one `recover-existing` dispatch in run `29182188201`. Safety and exact artifact/package/signature/install verification passed; the step exited after the expected absent-release probe and before all mutations. The failed log and remote state were each inspected once.
+- Current immutable state: source artifact/NuGet valid; tag, GitHub prerelease/assets, nupkg attestation, and snupkg attestation absent. No rerun, second dispatch, correction, NuGet mutation, tag/release mutation, or manual upload is authorized.
+- TASK-0248 success-only work is not executed. Published smoke remains `0.2.0-alpha.4`; V100-09 remains open; 1.0 GA readiness is not claimed. Current action is factual docs commit/push and one final standard-CI wait only.
 
 ## TASK-0243–0245 Historical Recovery Attempt — Stopped
 

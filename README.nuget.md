@@ -9,7 +9,7 @@ This package README intentionally uses plain Markdown only so it renders consist
 ## Release status
 
 - Latest complete release: `0.2.0-alpha.4`.
-- NuGet `1.0.0-rc.1` exists in a partial immutable publication state while its GitHub tag, prerelease, and provenance recovery is completed and verified.
+- NuGet `1.0.0-rc.1` exists in a partial immutable publication state; two authorized recovery runs stopped before mutation, so its GitHub tag, prerelease, and provenance remain absent.
 - The commands below remain pinned to the latest complete release until that recovery is fully successful.
 - AgentContextKit does not claim 1.0 GA readiness.
 

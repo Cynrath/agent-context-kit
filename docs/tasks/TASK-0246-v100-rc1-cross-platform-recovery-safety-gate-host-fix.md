@@ -130,7 +130,7 @@ Before push, restore only TASK-0246 edits through a normal successor patch. Afte
 
 ## Completion notes
 
-Status: `IMPLEMENTED / LOCAL VALIDATION PASS / READY TO PUSH`.
+Status: `COMPLETED / PUSHED / STANDARD CI PASS`.
 
 Implementation uses the first resolved PowerShell 7 application returned by `Get-Command pwsh` and invokes that exact path for every child static-gate run. The first local attempt exposed multiple Windows Store `pwsh` aliases; selecting one application fixed the ambiguity without falling back to Windows PowerShell.
 
@@ -154,4 +154,6 @@ Actual local validation on Windows:
 - `scripts/verify-release.ps1`: PASS, including pack and temporary `1.0.0-rc.1` tool install/smoke;
 - ACKit scan/doctor within release verification: exit 0 and 13/13 PASS, with only the previously classified Medium/Low findings.
 
-No workflow dispatch, NuGet mutation, tag/release/asset/attestation mutation, manual upload, settings change, or force/history operation occurred. Hosted three-platform proof remains the required post-push gate before TASK-0247.
+Planning commit `926fc03` and implementation commit `b815c44f81dbaa7d2a9556db05403aee4368f7c0` were pushed normally. Standard runs were discovered once and each watched once: `ci` [`29182095416`](https://github.com/Cynrath/agent-context-kit/actions/runs/29182095416), published alpha4 smoke [`29182095415`](https://github.com/Cynrath/agent-context-kit/actions/runs/29182095415), and source smoke [`29182095423`](https://github.com/Cynrath/agent-context-kit/actions/runs/29182095423) all passed. The source-smoke matrix executed the new recovery safety tests on Windows, Ubuntu, and macOS.
+
+No release/recovery workflow dispatch, NuGet mutation, tag/release/asset/attestation mutation, manual upload, settings change, or force/history operation occurred in TASK-0246. Its green hosted evidence opened the TASK-0247 gate.

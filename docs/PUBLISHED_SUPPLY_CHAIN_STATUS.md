@@ -21,6 +21,10 @@ TASK-0243 through TASK-0245 received a separate bounded authorization to recover
 
 TASK-0244 consumed that single recovery dispatch in run `29151228607`. The Ubuntu safety gate failed on a Windows-only `powershell` child invocation before any remote mutation step. A one-time audit reconfirmed artifact `8242162439` unexpired, candidate hashes unchanged, NuGet repository signature/content equivalence and commit `258918b33c3d1359aac967604ee524e8b66ddf02`, NuGet-served hash `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`, and absent tag/release/nupkg attestation/snupkg attestation. No automatic correction or second dispatch is authorized.
 
+TASK-0246 later fixed the cross-platform `pwsh` fixture and passed standard runs `29182095416`, `29182095415`, and `29182095423`. TASK-0247 then consumed a separately authorized single recovery dispatch in run `29182188201`. Exact artifact/package/signature/content/install validation passed, but the validation step returned exit 1 after its expected absent-release probe and before remote-state recheck or mutation. The failure log and remote state were each inspected exactly once.
+
+TASK-0247 post-failure state is unchanged: artifact valid, NuGet package accessible, tag absent, GitHub prerelease/assets absent, nupkg attestation absent, and snupkg attestation absent. No tag/release/asset/attestation or three-platform recovered-package evidence was created. V100-09 remains open and the published smoke pin remains `0.2.0-alpha.4`.
+
 Future-release decisions derived from this published-state evidence are tracked without closure in `docs/RELEASE_BLOCKER_BOARD.md` and `docs/MAINTAINER_DECISION_REGISTER.md`.
 
 ## Audit Scope
