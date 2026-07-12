@@ -17,6 +17,7 @@
     <Company>Cynrath</Company>
     <Copyright>Copyright (c) 2026 Cynrath</Copyright>
     <Description>Offline-first repository context and safety tooling for AI-assisted development.</Description>
+    <!-- NuGet renders the dedicated pure-Markdown source; keep GitHub-only HTML/layout in README.md. -->
     <PackageReadmeFile>README.nuget.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>ai;coding-agent;context;security;cli;oss</PackageTags>

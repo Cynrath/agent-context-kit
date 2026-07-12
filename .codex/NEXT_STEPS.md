@@ -9,7 +9,7 @@
 5. COMPLETED / PUSHED / CI PASS — TASK-0243: implementation commit `3b97997`; standard runs `29151153458`, `29151153453`, and `29151153454` passed.
 6. STOPPED / DISPATCH CONSUMED / NO MUTATION — TASK-0244: run `29151228607` failed in Ubuntu safety gates on a Windows-only `powershell` child call before any mutation. Log and remote state were each inspected once.
 7. NOT EXECUTED — TASK-0245: smoke pin remains `0.2.0-alpha.4`; only failure docs, normal push, and final standard CI remain.
-8. IN PROGRESS — TASK-0246: use cross-platform `pwsh`, prove pre-mutation safety gates, polish all README sources, push normally, and require green standard CI.
+8. IMPLEMENTED / LOCAL PASS — TASK-0246: cross-platform `pwsh`, pre-mutation ordering regression, three-OS source-smoke coverage, and all README work are complete; 431/431 and release gates passed. Commit/push normally and require green standard CI.
 9. PLANNED / BLOCKED — TASK-0247: after TASK-0246 CI green, dispatch exact-existing recovery once and watch once; no NuGet publication or rerun.
 10. CONDITIONAL — TASK-0248: only after full recovery success, pin published smoke to RC1, synchronize evidence/readmes, close V100-09 if exact provenance is complete, push, and wait final standard CI once.
 

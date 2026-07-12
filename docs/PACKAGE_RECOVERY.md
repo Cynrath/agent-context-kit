@@ -102,3 +102,11 @@ TASK-0242 created a distinct partial state: NuGet `1.0.0-rc.1` is immutable and 
 TASK-0243 adds a bounded `recover-existing` operation to the manual release workflow. It accepts only the prior validated workflow artifact, exact artifact/file hashes, the existing repository-signed NuGet package, the exact package commit, and an absent tag/release precondition. It contains no NuGet credential or push path. If authorized execution succeeds, it creates the non-force exact tag, prepared prerelease with only the verified nupkg/snupkg, separate attestations for both assets, and Windows/Ubuntu/macOS installed-tool evidence.
 
 Any partial recovery failure triggers the same immutability rule: no second automatic dispatch, no asset replacement, no tag movement, and no manual upload. Audit the remote state once, preserve TASK-0242 and the recovery task as separate evidence, then require a new explicit decision.
+
+## TASK-0246–0248 Authorized Continuation
+
+TASK-0244 run `29151228607` failed before mutation because the supply-chain test started a Windows-only `powershell` child on Ubuntu. TASK-0246 changes only that test host to resolved PowerShell 7 (`pwsh`), adds three-platform execution, and strengthens the pre-mutation ordering regression. It does not dispatch recovery or modify any package, tag, release, asset, or attestation.
+
+After TASK-0246 is pushed and all standard CI is green, TASK-0247 may dispatch `recover-existing` exactly once for version `1.0.0-rc.1`, release commit `258918b33c3d1359aac967604ee524e8b66ddf02`, tag `v1.0.0-rc.1`, and the exact retained TASK-0242 nupkg/snupkg evidence. NuGet login/push/change/unlist/replace remains forbidden. A partial TASK-0247 failure receives one log inspection and one immutable-state audit, then stops without rerun.
+
+TASK-0248 is success-only follow-up. The published smoke pin, current-release documentation, and V100-09 may change only if the exact tag, prepared prerelease, two exact release assets, two verified attestations, and Windows/Ubuntu/macOS installed-tool smoke all succeed. Neither this chain nor successful RC recovery claims 1.0 GA readiness.

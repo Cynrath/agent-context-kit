@@ -40,7 +40,11 @@ The repository intentionally separates the GitHub README and NuGet package READM
 
 Keep `README.nuget.md` pure Markdown. Do not add raw HTML, GitHub-only alignment/layout markup, relative local image paths, generated reports, or package artifacts. If nuget.org rendering breaks, edit `README.nuget.md` and the package metadata/check/docs files together.
 
+`scripts/check-package-metadata.ps1 -FailOnIssues` enforces the renderer boundary by rejecting raw HTML/layout elements, CSS/layout attributes, and relative image references. GitHub-specific presentation remains confined to `README.md` and `README.tr.md`.
+
 A published NuGet version cannot be corrected in place for README rendering. The fix becomes visible on nuget.org only after a later authorized package publish.
+
+TASK-0246 improves the repository source for a future package without mutating or republishing the existing RC1 package. Therefore the already-published `1.0.0-rc.1` package page is not claimed to change retroactively.
 
 ## Metadata Review
 Run report-only mode:

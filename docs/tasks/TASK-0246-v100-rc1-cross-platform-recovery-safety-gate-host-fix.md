@@ -130,5 +130,28 @@ Before push, restore only TASK-0246 edits through a normal successor patch. Afte
 
 ## Completion notes
 
-Status: `PLANNED / IN PROGRESS`.
+Status: `IMPLEMENTED / LOCAL VALIDATION PASS / READY TO PUSH`.
 
+Implementation uses the first resolved PowerShell 7 application returned by `Get-Command pwsh` and invokes that exact path for every child static-gate run. The first local attempt exposed multiple Windows Store `pwsh` aliases; selecting one application fixed the ambiguity without falling back to Windows PowerShell.
+
+The release static gate now rejects a Windows-only child invocation, requires explicit `pwsh` resolution/invocation, and enforces safety-gate, exact-artifact, repeated remote-state, tag push, prerelease, and attestation ordering. The supply-chain fixture suite includes a negative case that moves the safety gate after mutation and correctly requires failure. `cross-platform-source-smoke.yml` runs the static and fixture checks in its Windows, Ubuntu, and macOS matrix.
+
+README work completed:
+
+- `README.md` gained clearer language navigation, partial-RC warning, and goal-oriented entry points while preserving its GitHub presentation.
+- `README.tr.md` was rewritten as a complete UTF-8 Turkish landing page with meaningful English parity.
+- `README.nuget.md` became a complete standalone pure-Markdown package page with no raw HTML/CSS or relative images.
+- Package metadata validation now enforces the NuGet renderer boundary; packaging docs explicitly record that source README improvements cannot mutate the already-published RC1 package page.
+
+Actual local validation on Windows:
+
+- focused release static/supply-chain/existing-package/release-recovery gates: PASS;
+- package metadata pure-Markdown gate: PASS;
+- local Markdown link audit: 435 files, 218 local targets, 0 broken;
+- restore/build: PASS, 0 warnings and 0 errors;
+- full tests: 431/431 PASS;
+- V100 documentation/release gate and security/supply-chain evidence gate: PASS;
+- `scripts/verify-release.ps1`: PASS, including pack and temporary `1.0.0-rc.1` tool install/smoke;
+- ACKit scan/doctor within release verification: exit 0 and 13/13 PASS, with only the previously classified Medium/Low findings.
+
+No workflow dispatch, NuGet mutation, tag/release/asset/attestation mutation, manual upload, settings change, or force/history operation occurred. Hosted three-platform proof remains the required post-push gate before TASK-0247.

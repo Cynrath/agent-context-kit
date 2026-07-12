@@ -1,96 +1,123 @@
+<div align="center">
+
 # AgentContextKit
 
-[![ci](https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml)
-[![cross-platform-smoke](https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-smoke.yml/badge.svg)](https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-smoke.yml)
-[![cross-platform-source-smoke](https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-source-smoke.yml/badge.svg)](https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-source-smoke.yml)
-[![NuGet](https://img.shields.io/nuget/v/AgentContextKit?label=NuGet)](https://www.nuget.org/packages/AgentContextKit)
-[![NuGet downloads](https://img.shields.io/nuget/dt/AgentContextKit?label=downloads)](https://www.nuget.org/packages/AgentContextKit)
-[![License](https://img.shields.io/github/license/Cynrath/agent-context-kit)](LICENSE)
-[![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+**AI destekli geliştirme için çevrimdışı-öncelikli repository bağlamı ve güvenlik aracı.**
 
-AI destekli geliştirme icin offline-first repository context ve guvenlik araci.
+Repository’nizi analiz edin, temiz agent bağlam dosyaları üretin, task-first çalışma kayıtları oluşturun ve proje AI araçlarıyla paylaşılmadan ya da herkese açılmadan önce secret/PII/marka sızıntısı risklerini yakalayın.
 
-AgentContextKit, Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI ve benzeri AI coding agent kullanan gelistiriciler icin .NET tabanli bir CLI aracidir (`ackit`). Repository yapisini analiz eder, stack sinyallerini tespit eder, guvenli agent yonerge/workflow dosyalari uretir ve public release ya da AI context export oncesi secret/PII/marka sizinti risklerini raporlar.
+<p>
+  <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-smoke.yml"><img alt="Platformlar arası smoke" src="https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-smoke.yml/badge.svg"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-source-smoke.yml"><img alt="Güncel kaynak smoke" src="https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-source-smoke.yml/badge.svg"></a>
+</p>
 
-Public repository URL: `https://github.com/Cynrath/agent-context-kit`
+<p>
+  <a href="https://www.nuget.org/packages/AgentContextKit"><img alt="NuGet" src="https://img.shields.io/nuget/v/AgentContextKit?label=NuGet&logo=nuget"></a>
+  <a href="https://www.nuget.org/packages/AgentContextKit"><img alt="NuGet indirme sayısı" src="https://img.shields.io/nuget/dt/AgentContextKit?label=indirme&logo=nuget"></a>
+  <a href="LICENSE"><img alt="Lisans" src="https://img.shields.io/github/license/Cynrath/agent-context-kit"></a>
+  <a href="https://dotnet.microsoft.com/"><img alt=".NET 10" src="https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white"></a>
+</p>
 
-Current complete release: `v0.2.0-alpha.4` GitHub ve NuGet uzerinde pre-release olarak yayinlandi; global tool kurulumu dogrulandi. Publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
+<p>
+  <a href="README.md"><strong>English</strong></a> ·
+  <a href="#hızlı-başlangıç"><strong>Hızlı Başlangıç</strong></a> ·
+  <a href="#neler-yapar"><strong>Özellikler</strong></a> ·
+  <a href="#cli-komut-haritası"><strong>CLI</strong></a> ·
+  <a href="#güvenlik-modeli"><strong>Güvenlik</strong></a> ·
+  <a href="#dokümantasyon-haritası"><strong>Dokümanlar</strong></a>
+</p>
 
-RC1 partial state: NuGet `1.0.0-rc.1` mevcuttur ve kurulabilir; TASK-0244 recovery mutation oncesinde durdugu icin tag, GitHub prerelease ve provenance halen yoktur. Asagidaki tamamlanmis release kurulum komutlari `0.2.0-alpha.4` olarak kalir.
+</div>
 
-Varsayılan komutlar repository içeriğini yerelde işler; repository upload, AI API çağrısı, telemetry veya harici araç çalıştırma yapmaz. Ayrıntı: [Varsayılan No-Network Politikası](docs/NO_NETWORK_DEFAULT_POLICY.md).
+Varsayılan komutlar repository içeriğini yerelde işler; repository yüklemez, AI API çağrısı veya telemetri yapmaz ve harici araç çalıştırmaz. Ayrıntılar için [Varsayılan No-Network Politikası](docs/NO_NETWORK_DEFAULT_POLICY.md) belgesine bakın.
 
-Kaynak notu: yayinlanmis `0.2.0-alpha.4` NuGet paketi `ackit sarif` komutunu icerir. `0.2.0-alpha.3` onceki release olarak kalir.
+> [!IMPORTANT]
+> NuGet `1.0.0-rc.1` şu anda kısmi ve değiştirilemez bir yayın durumundadır. Yetkili recovery tamamen doğrulanana kadar en son eksiksiz sürüm `v0.2.0-alpha.4` olarak kalır; aşağıdaki kurulum örnekleri bu nedenle bilinçli olarak alpha4’e sabitlenmiştir.
 
-## Preview
-Web UI dashboard; readiness score, stack signals, health checks, findings, generated context files ve task previews alanlarini gosterir.
+---
 
-![AgentContextKit Web UI gosterim](docs/assets/screenshots/ackit-webui-preview-alpha4.webp)
-*Sentetik demo reposundan sanitize edilmis onizleme. Yerel yol, gizli bilgi veya kisisel veri icermez.*
+## Proje Durumu
 
-![AgentContextKit flow](docs/assets/diagrams/ackit-flow.svg)
+| Alan | Durum |
+| --- | --- |
+| Güncel eksiksiz sürüm | `v0.2.0-alpha.4`; GitHub ve NuGet üzerinde pre-release olarak yayımlandı |
+| RC1 kısmi durum | NuGet `1.0.0-rc.1` vardır ve kurulabilir; tag, GitHub prerelease ve provenance henüz yoktur |
+| Yayın kanıtı | `98cdf9723a509a347bd0403f6373dafe81ba03fb` commit’inden yayımlandı; global tool kurulumu doğrulandı |
+| Çalışma zamanı | .NET 10 |
+| Platformlar | GitHub Actions ile Windows, Ubuntu ve macOS |
+| Gizlilik modeli | Offline-first; MVP repository yüklemez ve uzak AI API çağrısı yapmaz |
+| SARIF | `ackit sarif`, yayımlanmış `0.2.0-alpha.4` paketinde bulunur |
 
-Ayrinti icin [Web UI Preview](docs/WEB_UI_PREVIEW.md), [Visual Assets](docs/VISUAL_ASSETS.md), [Sample Gallery](docs/SAMPLE_GALLERY.md) ve [Demo Scenarios](docs/DEMO_SCENARIOS.md) dosyalarina bakin.
+---
 
-## İlgili ekosistem
+## Önizleme
 
-AgentContextKit, bir repository AI kodlama aracına veya release kararına ulaşmadan önce yerel hazırlık ve güvenlik kontrollerini düzenler. Uzmanlaşmış yerel araçlar bu akışı tamamlayabilir; ancak AgentContextKit varsayılan olarak harici araç kurmaz veya çalıştırmaz.
+Web UI; readiness puanı, stack sinyalleri, repository sağlık kontrolleri, bulgular, üretilen bağlam dosyaları ve task önizlemelerini tek bir çevrimdışı panelde gösterir.
 
-- Repo-to-context araçları, yerel hygiene incelemesinden sonra model için paket oluşturabilir.
-- Graph ve arama araçları isteğe bağlı mimari ve navigasyon bağlamı sağlayabilir.
-- Güvenlik scanner'ları ve SBOM araçları ayrı incelenen daha derin kanıtlar üretebilir.
-- Harici çıktılar, insan tarafından privacy incelemesi yapılana kadar yalnızca yerelde tutulur.
+![AgentContextKit Web UI önizlemesi](docs/assets/screenshots/ackit-webui-preview-alpha4.webp)
+*Sentetik bir demo repository’sinden sanitize edilmiş önizleme; yerel yol, secret veya özel veri içermez.*
 
-Detaylar: [İlgili Projeler](docs/RELATED_PROJECTS.md), [Karşılaştırma Matrisi](docs/RELATED_TOOLS_COMPARISON_MATRIX.md), [Harici Araç Workflow'ları](docs/EXTERNAL_TOOL_WORKFLOWS.md) ve [Agent Context Pipeline](docs/AGENT_CONTEXT_PIPELINE.md).
+![AgentContextKit akışı](docs/assets/diagrams/ackit-flow.svg)
 
-## Problem
-AI coding agent'lar cogu projede eksik, eski veya guvensiz context ile calisir. Bu durum yanlis dosya degisikligi, production ayari sizintisi, zayif task plani, eksik test, tutarsiz agent yonergeleri ve private projenin public hale gelirken hassas bilgi sizdirmasi gibi riskler dogurur.
+Bkz. [Web UI Preview](docs/WEB_UI_PREVIEW.md), [Visual Assets](docs/VISUAL_ASSETS.md), [Sample Gallery](docs/SAMPLE_GALLERY.md) ve [Demo Scenarios](docs/DEMO_SCENARIOS.md).
 
-## Cozum
-AgentContextKit lokal ve tekrarlanabilir bir workflow kurar:
-- Repository yapisini ve stack sinyallerini tarar.
-- Kisa bir project map uretir.
-- AI agent yonerge dosyalari uretir.
-- Task-first gelistirme dokumanlari olusturur.
-- Riskli dosyalari ve secret benzeri icerigi raporlar.
-- Var olan dosyalari varsayilan olarak ezmez.
+---
 
-## Kimler Kullanmalı
-- AI-assisted development yapan gelistiriciler.
-- Acik kaynak maintainer'lari.
-- Freelance, ajans ve kucuk ekipler.
-- Private repository'yi public yapmadan once temizlik yapmak isteyen ekipler.
-- Codex/Claude/Cursor/Copilot icin tutarli proje context'i isteyen gelistiriciler.
+## Neden AgentContextKit?
 
-## Neden Offline-first
-MVP uzak AI API cagrisi yapmaz ve repository icerigini yuklemez. Bu yaklasim private kodu lokalde tutar, veri sizintisi riskini azaltir ve kisitli ortamlarda kullanimi kolaylastirir.
+AI coding agent’ları güçlüdür; ancak eksik, eski veya güvensiz bağlam aldıklarında yanlış dosyaları değiştirebilir, test ve yetki beklentilerini kaçırabilir veya özel repository verilerinin istemeden paylaşılmasına yol açabilir. AgentContextKit, repository Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI veya benzeri bir araca teslim edilmeden önce tekrarlanabilir bir yerel hazırlık akışı sunar.
 
-## Ozellikler
-- `ackit init`: `.ackit/config.yml` olusturur, var olan config'i ezmez.
-- `ackit config-check`: config dosyasini degistirmeden sanitize edilmis tani ve gecis rehberi verir.
-- `ackit scan`: stack, docs, test, CI, Docker, agent dosyalari ve riskli yolları tespit eder.
-- `ackit scan --include <glob> --exclude <glob>`: mevcut source icin odakli ad-hoc tarama filtreleri uygular.
-- `ackit scan --ci`: high veya critical risk bulgularinda otomasyon kontrollerini basarisiz yapar.
-- `ackit baseline`: incelenmis bulgular icin sanitize edilmis lokal baseline olusturur; baseline modu sadece yeni High/Critical bulgulari CI blocker yapar.
-- Stabil scanner rule ID'leri ve safe technical domain, bilinen non-Critical path ve kabul edilen non-Critical rule ID'leri icin dar config allowlist destegi.
-- `ackit sarif`: CI/security incelemesi icin privacy-first SARIF 2.1.0 tarama raporu uretir. Yayinlanmis `0.2.0-alpha.4` paketi ve mevcut source icinde vardir.
-- `ackit report`: offline statik HTML tarama raporu uretir.
-- `ackit webui`: tarama incelemesi icin offline statik Web UI prototipi uretir.
-- `ackit prompt-pack`: remote cagri yapmadan gelecekteki LLM context incelemesi icin lokal dry-run prompt paketi uretir.
-- `ackit context-export`: incelenmis prompt paketi icin upload yapmadan lokal onay manifesti uretir.
-- `ackit generate`: desteklenen agent hedefleri icin context ve workflow dosyalari uretir.
-- `ackit task`: `docs/tasks` altinda yapilandirilmis task dosyasi olusturur.
-- `ackit redact-check`: secret/PII/marka/local path risklerini raporlar.
-- `ackit doctor`: OSS ve repository saglik kontrollerini raporlar.
-- `ackit mcp --stdio-server`: mevcut source icin local-only JSON-RPC stdio MCP tasimasi calistirir.
-- `ackit diff`: mevcut source icin sanitize edilmis baseline farki uretir.
-- `ackit trim`: mevcut source icin Markdown/JSON context ciktisini boyuta gore kisaltir.
-- `ackit watch`: mevcut source icin debounced lokal degisiklik izleme ve scan yenileme saglar.
-- `--json`: otomasyon uyumlu machine-readable JSON cikti uretir.
-- English ve Turkish output/template temeli.
+| Sorun | AgentContextKit’in yaklaşımı |
+| --- | --- |
+| Agent bağlamı dağınık | Tutarlı agent talimatları ve workflow dosyaları üretir |
+| Repository yapısı belirsiz | Kısa proje haritası ve stack sinyali özeti çıkarır |
+| İş task kaydı olmadan başlıyor | `docs/tasks/` altında yapılandırılmış task oluşturur |
+| Public release sızıntı riski taşıyor | Secret, PII, marka ve yerel yol bulgularını raporlar |
+| CI makine-okunur kontrole ihtiyaç duyuyor | JSON çıktı ve `scan --ci` severity kapıları sunar |
+| İnceleme çıktıları yerelde kalmalı | Offline HTML, Web UI, prompt pack ve context export üretir |
 
-## Hizli Baslangic
-NuGet global tool kurulumu:
+### Amacınıza göre başlayın
+
+| Amaç | İlk komutlar |
+| --- | --- |
+| Repository AI destekli çalışmaya hazır mı? | `ackit doctor`, ardından `ackit scan --ci` |
+| Proje için agent talimatları üretmek | `ackit generate --target all` |
+| İzlenebilir bir geliştirme işi başlatmak | `ackit task "Odaklı değişikliği açıklayın"` |
+| Bulguları sunucusuz görsel incelemek | `ackit report` veya `ackit webui` |
+| Veri yüklemeden bağlam hazırlamak | `ackit prompt-pack`, insan incelemesi, ardından `ackit context-export --approve` |
+
+---
+
+## Neler Yapar?
+
+| Yetenek | Komut | Çıktı |
+| --- | --- | --- |
+| Yapılandırmayı başlat | `ackit init` | `.ackit/config.yml` |
+| Yapılandırmayı doğrula | `ackit config-check` | Salt-okunur sanitize tanı ve geçiş rehberi |
+| Repository’yi tara | `ackit scan` | Stack, doküman, test, CI, Docker, agent ve riskli yol sinyalleri |
+| Tarama kapsamını filtrele | `ackit scan --include <glob> --exclude <glob>` | Ad-hoc include/exclude filtreleri |
+| Riskte CI’ı durdur | `ackit scan --ci` | High veya Critical bulguda sıfırdan farklı çıkış |
+| İncelenmiş bulguları kaydet | `ackit baseline` | Yeni bulgu politikasına uygun yerel sanitize baseline |
+| SARIF üret | `ackit sarif` | Gizlilik-öncelikli SARIF 2.1.0 raporu |
+| HTML rapor oluştur | `ackit report` | Çevrimdışı statik tarama raporu |
+| Web UI oluştur | `ackit webui` | Çevrimdışı statik inceleme arayüzü |
+| Prompt pack hazırla | `ackit prompt-pack` | Uzak çağrı yapmayan yerel dry-run Markdown |
+| Onaylı context manifesti çıkar | `ackit context-export` | Yerel onay manifesti |
+| Agent dosyaları üret | `ackit generate` | Codex, Claude, Cursor, Copilot ve diğer hedefler |
+| Task kaydı oluştur | `ackit task` | Yapılandırılmış Markdown task dosyası |
+| Hassas içerik kontrolü yap | `ackit redact-check` | Secret/PII/marka/yerel yol risk raporu |
+| Repository sağlığını denetle | `ackit doctor` | OSS ve repository hijyen tanıları |
+| Yerel MCP taşımasını çalıştır | `ackit mcp --stdio-server` | Yerel JSON-RPC stdio döngüsü |
+| Baseline karşılaştır | `ackit diff` | Sanitize baseline farkı |
+| Bağlam çıktısını sınırla | `ackit trim` | Boyut sınırına göre Markdown/JSON kırpma |
+| Yerel değişiklikleri izle | `ackit watch` | Debounced yerel tarama izleyicisi |
+
+---
+
+## Hızlı Başlangıç
+
+### NuGet’ten kurulum
 
 ```powershell
 dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
@@ -98,48 +125,37 @@ ackit version
 ackit --help
 ```
 
-Taramayi incelemek istediginiz repository root klasorunde calistirin:
+İncelemek istediğiniz repository’nin kök dizininde çalıştırın:
 
 ```powershell
+ackit doctor
 ackit scan
 ackit scan --ci
-ackit doctor
 ```
 
-`scan --ci`, High veya Critical bulguda non-zero exit code dondurur. Sadece rapor almak icin once `ackit scan` kullanin.
+`scan --ci`, High veya Critical bulguda sıfırdan farklı çıkış kodu döndürür. Yalnız rapor almak istiyorsanız önce `ackit scan` kullanın.
 
-Yayinlanmis `0.2.0-alpha.4` paketi read-only config tanilarini ve explicit baseline workflow'u destekler:
-
-```powershell
-ackit config-check --json
-ackit baseline
-ackit scan --baseline .ackit-baseline.json --ci
-ackit sarif --output .ackit/reports/baseline.sarif --baseline .ackit-baseline.json
-ackit report --output .ackit/reports/baseline.html --baseline .ackit-baseline.json
-ackit webui --output .ackit/webui/baseline.html --baseline .ackit-baseline.json
-```
-
-Baseline modu mevcut bulgulari gorunur tutar, yalniz yeni High veya Critical bulgularda CI'i basarisiz yapar. Baseline degistirmek icin `ackit baseline --update` gerekir.
-
-Lokal inceleme ciktisi uretmek icin:
+### Yaygın yerel akışlar
 
 ```powershell
-ackit sarif --output .ackit/reports/ackit.sarif
-ackit report --output .ackit/reports/scan-report.html
-ackit webui --output .ackit/webui/index.html
-```
-
-Agent context dosyalarini baslatmak ve uretmek icin:
-
-```powershell
+# Agent talimatları ve task-first kayıt
 ackit init --lang tr
 ackit generate --target all --lang tr
 ackit task "Yetki kontrollerini ekle" --lang tr
+
+# Yerel inceleme çıktıları
+ackit sarif --output .ackit/reports/ackit.sarif
+ackit report --output .ackit/reports/scan-report.html
+ackit webui --output .ackit/webui/index.html
+
+# İncelenmiş baseline
+ackit baseline
+ackit scan --baseline .ackit-baseline.json --ci
 ```
 
-Generated `.ackit/` rapor ve Web UI dosyalari local-only artifact'tir; paylasmadan once incelenmelidir.
+`.ackit/` altındaki rapor, Web UI, prompt pack ve context export dosyaları yerel generated artifact’lardır; paylaşmadan önce insan incelemesinden geçirilmelidir.
 
-Kaynak koddan calistirma:
+### Kaynak koddan çalıştırma
 
 ```powershell
 dotnet restore AgentContextKit.sln
@@ -147,56 +163,24 @@ dotnet build AgentContextKit.sln -c Release --no-restore
 dotnet test AgentContextKit.sln -c Release --no-build
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- --help
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci
-dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --json
-dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --include 'src/**' --exclude '**/*.bak' --ci
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
 ```
 
-Yayinlanmis `0.2.0-alpha.4` paketi human/JSON scan ciktisina sanitized suppression audit alanlari ekler ve scan glob filtreleri ile local-only `mcp`, `diff`, `trim`, `watch` komutlarini icerir.
+### Örnek üzerinde deneyin
 
-Kurulu tool icin hizli dogrulama:
-
-```powershell
-$smoke = Join-Path $env:TEMP "ackit-smoke-test"
-New-Item -ItemType Directory -Force -Path $smoke | Out-Null
-Push-Location $smoke
-dotnet new console -n DemoApp
-Push-Location DemoApp
-git init
-ackit init --lang tr
-ackit scan --ci
-ackit generate --target all --lang tr
-ackit task "Demo smoke test gorevi" --lang tr
-ackit report --output .ackit/reports/smoke.html
-ackit webui --output .ackit/webui/index.html
-ackit prompt-pack --output .ackit/prompt-packs/smoke.md --json
-ackit context-export --prompt-pack .ackit/prompt-packs/smoke.md --approve --output .ackit/context-exports/smoke.json --json
-Pop-Location
-Pop-Location
-```
-
-Minimal demo app icinde `ackit doctor`, README, LICENSE, SECURITY, test, CI, `.gitignore` veya package metadata eksiklerini raporlayabilir. Bu beklenen repository-health ciktisidir, tool hatasi degildir.
-
-Cross-platform yayinlanmis-paket smoke kapsami `.github/workflows/cross-platform-smoke.yml` ile takip edilir. Workflow pini TASK-0223 ile yayinlanmis `0.2.0-alpha.4` paketine guncellendi.
-Mevcut kaynak smoke kapsami `.github/workflows/cross-platform-source-smoke.yml` ile takip edilir. Bu workflow mevcut branch'i lokalde paketler ve paketi yayin yapmadan gecici package source uzerinden kurar.
-Tested on Windows, Ubuntu, and macOS via GitHub Actions.
-
-## Ornek Uzerinde Dene
 ```powershell
 Push-Location samples/dotnet-console
 dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci
 Pop-Location
 ```
 
-Araci ilk kez kullaniyorsaniz, yayinlanmis paketle disposable bir demo repository olusturan [First Five Minutes With Ackit](docs/FIRST_FIVE_MINUTES.md) rehberini izleyin. Turkce generated cikti icin desteklenen komutlarda `--lang tr` kullanabilirsiniz.
+İlk kullanım için [First Five Minutes With Ackit](docs/FIRST_FIVE_MINUTES.md), gerçek bir projeye uyarlamak için [Prepare A Repository For AI Coding Agents](docs/PREPARE_REPOSITORY_FOR_AI_AGENTS.md) rehberini izleyin.
 
-Gercek bir projede kullanima almak icin guvenlik, config, agent instruction uretimi, task-first calisma ve CI readiness adimlarini [Prepare A Repository For AI Coding Agents](docs/PREPARE_REPOSITORY_FOR_AI_AGENTS.md) rehberinden uygulayin.
+---
 
-Daha fazla rehberli ornek icin [Sample Gallery](docs/SAMPLE_GALLERY.md) ve [Demo Scenarios](docs/DEMO_SCENARIOS.md) dosyalarina bakin.
+## CLI Komut Haritası
 
-## CLI Komutlari
-`ackit sarif`, yayinlanmis `0.2.0-alpha.4` NuGet global tool ve mevcut source icinde vardir.
-Asagidaki harita yayinlanmis `0.2.0-alpha.4` `--help`, `docs/CLI_CONTRACT.md` ve `docs/CLI_REFERENCE.md` ile uyumludur.
+Bu harita yayımlanmış `0.2.0-alpha.4` yardım çıktısı ile [CLI Contract](docs/CLI_CONTRACT.md) ve [CLI Reference](docs/CLI_REFERENCE.md) belgelerini izler.
 
 ```text
 ackit init [--lang en|tr] [--json]
@@ -209,7 +193,7 @@ ackit webui [--output <repo-relative.html>] [--baseline <repo-relative.json>] [-
 ackit prompt-pack [--output <repo-relative.md>] [--lang en|tr] [--json]
 ackit context-export --prompt-pack <repo-relative.md> --approve [--output <repo-relative.json>] [--lang en|tr] [--json]
 ackit generate [--target codex|claude|anthropic|cursor|copilot|continue|all] [--lang en|tr] [--json]
-ackit task "<baslik>" [--lang en|tr] [--json]
+ackit task "<başlık>" [--lang en|tr] [--json]
 ackit redact-check [--profile public-release] [--lang en|tr] [--json]
 ackit doctor [--lang en|tr] [--json]
 ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--install|--dry-run] [--output <repo-relative-dir>] [--lang en|tr] [--json]
@@ -222,94 +206,82 @@ ackit version
 ackit --help
 ```
 
-## Uretilen Dosyalar
-Komuta ve hedefe gore AgentContextKit su dosyalari uretebilir:
-- `AGENTS.md`
-- `CLAUDE.md`
-- `.cursor/rules/project.mdc`
-- `.github/copilot-instructions.md`
-- `docs/PROJECT_MAP.md`
-- `docs/AI_WORKFLOW.md`
-- `docs/SECURITY_NOTES.md`
-- `docs/DEVELOPMENT_STANDARD.md`
-- `docs/tasks/TASK-0001.md`
-- `.codex/HANDOFF.md`
-- `.codex/CONTEXT_PACK.md`
-- `.ackit/reports/scan-report.html`
-- `.ackit/reports/ackit.sarif`
-- `.ackit/webui/index.html`
-- `.ackit/prompt-packs/prompt-pack.md`
-- `.ackit/context-exports/context-export-manifest.json`
+## Üretilen Dosyalar
 
-## Guvenli Davranis
-- Var olan dosyalar varsayilan olarak atlanir.
-- MVP otomatik secret redaction yapmaz.
-- Uzak servise upload yapmaz.
-- Statik rapor ve Web UI dosyalari lokal ve self-contained uretilir; lokal repository path gosterebilir ve public release artifact olarak paylasilmamalidir.
-- SARIF raporlari lokal generated artifact'tir; file location degerleri repository-relative yazilir ve ham secret match degerleri SARIF'e yazilmaz.
-- Prompt paketleri lokal dry-run ciktisidir ve remote LLM provider cagrisi yapmaz.
-- Context export manifestleri sadece lokal onayi kaydeder ve content upload yapmaz.
-- GitHub push veya NuGet publish yapmaz.
-- Risk raporlari severity bazlidir: Critical, High, Medium, Low, Info.
-- Scanner, yaygin platform/package domainleri ve acikca gercek olmayan fixture placeholder degerleri icin dar bir safe technical allowlist kullanir; Critical secret patternleri raporlanmaya devam eder.
-- Config scanner allowlist'leri non-Critical noise bulgularini bastirabilir, ancak Critical bulgular raporlanmaya devam eder.
+| Alan | Dosyalar |
+| --- | --- |
+| Agent talimatları | `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/project.mdc`, `.github/copilot-instructions.md` |
+| Proje akışı | `docs/PROJECT_MAP.md`, `docs/AI_WORKFLOW.md`, `docs/SECURITY_NOTES.md`, `docs/DEVELOPMENT_STANDARD.md` |
+| Task takibi | `docs/tasks/TASK-0001.md` |
+| Codex handoff | `.codex/HANDOFF.md`, `.codex/CONTEXT_PACK.md` |
+| Raporlar | `.ackit/reports/scan-report.html`, `.ackit/reports/ackit.sarif` |
+| İnceleme UI | `.ackit/webui/index.html` |
+| Prompt incelemesi | `.ackit/prompt-packs/prompt-pack.md` |
+| Context onayı | `.ackit/context-exports/context-export-manifest.json` |
+
+---
+
+## Güvenlik Modeli
+
+| Davranış | Varsayılan |
+| --- | --- |
+| Uzak AI/API çağrısı | MVP’de yok |
+| Repository yükleme | Yok |
+| Mevcut generated dosyalar | Varsayılan olarak atlanır |
+| Otomatik secret redaction | MVP’de yok |
+| Risk seviyeleri | Critical, High, Medium, Low, Info |
+| SARIF içeriği | Repository-relative konumlar; ham secret eşleşmesi yazılmaz |
+| Prompt pack | Yalnız yerel dry-run artifact |
+| Context export | Yalnız yerel onay manifesti |
+| Yayınlama | Araç GitHub push veya NuGet publish yapmaz |
+
+> [!CAUTION]
+> Statik raporlar, Web UI, prompt pack ve context export manifestleri repository metadatası veya yerel yol içerebilir. Paylaşmadan önce mutlaka inceleyin.
+
+Scanner, yaygın platform/package domainleri ve açıkça sentetik fixture değerleri için dar bir allowlist kullanır. Yapılandırılmış allowlist’ler non-Critical gürültüyü bastırabilir; Critical bulgular raporlanmaya devam eder.
+
+---
 
 ## Lokalizasyon
-Varsayilan dil English'tir. Turkish icin `--lang tr` kullanilir. Bilinmeyen dil degeri English'e duser.
-Turkish human-readable CLI output UTF-8 Turkce karakterler kullanabilir; JSON field adlari ve schema degerleri English/stable kalir.
 
-## Konfigurasyon Ve JSON
-`.ackit/config.yml` icin [docs/CONFIGURATION.md](docs/CONFIGURATION.md), machine-readable cikti icin [docs/JSON_OUTPUT.md](docs/JSON_OUTPUT.md) dosyasina bakin.
+Varsayılan dil İngilizcedir. Türkçe için desteklenen komutlarda `--lang tr` kullanın. Bilinmeyen dil değeri İngilizceye düşer. İnsan-okunur çıktı UTF‑8 Türkçe karakterler kullanabilir; JSON alan adları ve schema değerleri İngilizce ve kararlı kalır.
 
-## Dokumantasyon
-Baslangic icin [docs/DOCUMENTATION_INDEX.md](docs/DOCUMENTATION_INDEX.md) dosyasina bakin.
+```powershell
+ackit init --lang tr
+ackit scan --lang tr
+ackit generate --target all --lang tr
+ackit task "Yetki kontrollerini ekle" --lang tr
+```
 
-Onemli dokumanlar:
-- [CLI Reference](docs/CLI_REFERENCE.md)
-- [Examples](docs/EXAMPLES.md)
-- [Sample Gallery](docs/SAMPLE_GALLERY.md)
-- [Demo Scenarios](docs/DEMO_SCENARIOS.md)
-- [Web UI Preview](docs/WEB_UI_PREVIEW.md)
-- [Visual Assets](docs/VISUAL_ASSETS.md)
-- [GitHub Actions Usage](docs/GITHUB_ACTIONS_USAGE.md)
-- [Configuration](docs/CONFIGURATION.md)
-- [Scanner Rules](docs/SCANNER_RULES.md)
-- [Suppression Audit](docs/SUPPRESSION_AUDIT.md)
-- [JSON Output](docs/JSON_OUTPUT.md)
-- [Exit Codes](docs/EXIT_CODES.md)
-- [HTML Reports](docs/HTML_REPORTS.md)
-- [SARIF Output](docs/SARIF_OUTPUT.md)
-- [Web UI Prototype](docs/WEB_UI_PROTOTYPE.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Source Hygiene](docs/SOURCE_HYGIENE.md)
-- [Security Model](docs/SECURITY_MODEL.md)
-- [Packaging](docs/PACKAGING.md)
-- [Contributor Onboarding](docs/CONTRIBUTOR_ONBOARDING.md)
-- [Support Matrix](docs/SUPPORT_MATRIX.md)
-- [GitHub Labels](docs/GITHUB_LABELS.md)
-- [GitHub Settings Checklist](docs/GITHUB_SETTINGS_CHECKLIST.md)
-- [Maintainer Guide](docs/MAINTAINER_GUIDE.md)
-- [GitHub Repo Hygiene](docs/GITHUB_REPO_HYGIENE.md)
-- [Issue Triage](docs/ISSUE_TRIAGE.md)
-- [Maintainer Release Handoff](docs/MAINTAINER_RELEASE_HANDOFF.md)
-- [Public Release Audit](docs/PUBLIC_RELEASE_AUDIT.md)
-- [Release Validation](docs/RELEASE_VALIDATION.md)
-- [Release Blockers](docs/RELEASE_BLOCKERS.md)
+---
 
-## Roadmap
-Bkz. [docs/ROADMAP.md](docs/ROADMAP.md).
+## Dokümantasyon Haritası
 
-## Paketleme
-Lokal paket dogrulama adimlari [docs/PACKAGING.md](docs/PACKAGING.md) ve [docs/RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md) dosyalarinda yer alir. `0.2.0-alpha.4` paketi NuGet global tool olarak yayinlandi ve dogrulandi.
+Başlangıç noktası: [Dokümantasyon İndeksi](docs/DOCUMENTATION_INDEX.md).
 
-Public release blocker listesi [docs/RELEASE_BLOCKERS.md](docs/RELEASE_BLOCKERS.md) dosyasinda takip edilir.
+| Kategori | Bağlantılar |
+| --- | --- |
+| Kullanım | [CLI Reference](docs/CLI_REFERENCE.md), [Examples](docs/EXAMPLES.md), [Example Workflows](docs/EXAMPLE_WORKFLOWS.md) |
+| Demo | [Sample Gallery](docs/SAMPLE_GALLERY.md), [Demo Scenarios](docs/DEMO_SCENARIOS.md), [Web UI Preview](docs/WEB_UI_PREVIEW.md) |
+| Raporlar | [HTML Reports](docs/HTML_REPORTS.md), [SARIF Output](docs/SARIF_OUTPUT.md), [Web UI Prototype](docs/WEB_UI_PROTOTYPE.md) |
+| Operasyon | [Configuration](docs/CONFIGURATION.md), [JSON Output](docs/JSON_OUTPUT.md), [Troubleshooting](docs/TROUBLESHOOTING.md) |
+| Mühendislik | [Architecture](docs/ARCHITECTURE.md), [Source Hygiene](docs/SOURCE_HYGIENE.md), [Security Model](docs/SECURITY_MODEL.md) |
+| Paketleme | [Packaging](docs/PACKAGING.md), [Release Validation](docs/RELEASE_VALIDATION.md), [Maintainer Release Handoff](docs/MAINTAINER_RELEASE_HANDOFF.md) |
+| Katkı | [Contributor Onboarding](docs/CONTRIBUTOR_ONBOARDING.md), [Support Matrix](docs/SUPPORT_MATRIX.md), [Maintainer Guide](docs/MAINTAINER_GUIDE.md) |
 
-## Katki
-Bkz. [CONTRIBUTING.md](CONTRIBUTING.md) ve [docs/CONTRIBUTOR_ONBOARDING.md](docs/CONTRIBUTOR_ONBOARDING.md). GitHub issue ve pull request template'lerini kullanin; public raporlarda secret veya private repository verisi paylasmayin.
+## Ekosistem
 
-## Guvenlik
-Bkz. [SECURITY.md](SECURITY.md). Public issue'larda secret, private repository icerigi veya production config paylasmayin.
+AgentContextKit repository’yi AI coding agent’a veya release kararına ulaşmadan önce hazırlar. Repo-to-context paketleyicileri, graph/search araçları, güvenlik scanner’ları ve SBOM araçları bu akışı tamamlayabilir; ancak harici çıktıların paylaşımı her zaman ayrı insan ve gizlilik incelemesi gerektirir.
 
-## Lisans
-MIT. Bkz. [LICENSE](LICENSE).
+Bkz. [Related Projects](docs/RELATED_PROJECTS.md), [Comparison Matrix](docs/RELATED_TOOLS_COMPARISON_MATRIX.md), [External Workflows](docs/EXTERNAL_TOOL_WORKFLOWS.md) ve [Agent Context Pipeline](docs/AGENT_CONTEXT_PIPELINE.md).
+
+## Paketleme ve Platform Desteği
+
+Yerel paket doğrulama [Packaging](docs/PACKAGING.md) ve [Release Validation](docs/RELEASE_VALIDATION.md) belgelerinde açıklanır. Güncel eksiksiz paket `0.2.0-alpha.4` bir NuGet global tool’dur. Yayımlanmış paket ve güncel kaynak akışları Windows, Ubuntu ve macOS üzerinde ayrı GitHub Actions smoke workflow’larıyla izlenir.
+
+## Katkı, Güvenlik ve Lisans
+
+- Katkı: [CONTRIBUTING.md](CONTRIBUTING.md) ve [Contributor Onboarding](docs/CONTRIBUTOR_ONBOARDING.md)
+- Güvenlik bildirimi: [SECURITY.md](SECURITY.md). Public issue’larda secret, özel repository içeriği veya production configuration paylaşmayın.
+- Roadmap: [docs/ROADMAP.md](docs/ROADMAP.md)
+- Lisans: [MIT](LICENSE)

@@ -20,6 +20,7 @@ Analyze a repository, generate clean agent context files, create task-first work
 </p>
 
 <p>
+  <a href="README.tr.md"><strong>Türkçe</strong></a> ·
   <a href="#-quick-start"><strong>Quick Start</strong></a> ·
   <a href="#-preview"><strong>Preview</strong></a> ·
   <a href="#-what-it-does"><strong>Features</strong></a> ·
@@ -31,6 +32,9 @@ Analyze a repository, generate clean agent context files, create task-first work
 </div>
 
 Default commands process repository content locally: no repository upload, AI API call, telemetry, or external-tool invocation. See [No-Network Default Policy](docs/NO_NETWORK_DEFAULT_POLICY.md).
+
+> [!IMPORTANT]
+> NuGet `1.0.0-rc.1` currently exists in a partial immutable publication state. Until the authorized recovery is fully verified, `v0.2.0-alpha.4` remains the latest complete release and the installation examples below intentionally stay pinned to it.
 
 ---
 
@@ -90,6 +94,16 @@ AgentContextKit gives teams a repeatable local workflow before they hand a repos
 | Public release has leakage risk | Reporting secret-like, PII-like, brand, and local-path findings |
 | CI needs machine-readable checks | Supporting JSON output and `scan --ci` severity gates |
 | Review artifacts need to stay local | Creating offline HTML, Web UI, prompt pack, and context export artifacts |
+
+### Choose a workflow
+
+| Goal | Start here |
+| --- | --- |
+| Check whether a repository is ready for AI-assisted work | `ackit doctor` then `ackit scan --ci` |
+| Create agent instructions for the current project | `ackit generate --target all` |
+| Start a traceable implementation task | `ackit task "Describe the focused change"` |
+| Review findings visually without a server | `ackit report` or `ackit webui` |
+| Prepare context without uploading it | `ackit prompt-pack`, review it, then `ackit context-export --approve` |
 
 ---
 

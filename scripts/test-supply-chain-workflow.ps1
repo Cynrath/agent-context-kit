@@ -5,10 +5,12 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $workflowPath = Join-Path $repoRoot ".github\workflows\release.yml"
 $gatePath = Join-Path $PSScriptRoot "check-release-workflow.ps1"
 $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ackit-supply-chain-workflow-" + [guid]::NewGuid().ToString("N"))
+$pwshPath = Get-Command pwsh -CommandType Application -ErrorAction Stop |
+    Select-Object -First 1 -ExpandProperty Source
 
 function Invoke-Gate {
     param([string]$Path)
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $gatePath -WorkflowPath $Path -FailOnIssues *> $null
+    & $pwshPath -NoLogo -NoProfile -NonInteractive -File $gatePath -WorkflowPath $Path -FailOnIssues *> $null
     return $LASTEXITCODE
 }
 
@@ -19,6 +21,12 @@ try {
     }
 
     $content = Get-Content -Raw $workflowPath
+    $lateSafetyGate = $content.Replace(
+        "      - name: Run exact recovery safety gates",
+        "      - name: Deferred recovery safety gates").Replace(
+        "      - name: Verify completed immutable recovery",
+        "      - name: Run exact recovery safety gates`n        shell: pwsh`n        run: Write-Host `"too late`"`n`n      - name: Verify completed immutable recovery")
+
     $cases = @(
         @{ Name = "missing attestation permission"; Content = ([regex]::new('(?m)^      attestations: write\r?\n')).Replace($content, '', 1) },
         @{ Name = "missing official attest action"; Content = $content.Replace("actions/attest@v4", "actions/attest@missing") },
@@ -34,7 +42,8 @@ try {
         @{ Name = "recovery gains NuGet login"; Content = $content.Replace("      - name: Recheck exact remote recovery state", "      - name: Forbidden recovery login`n        uses: NuGet/login@v1`n`n      - name: Recheck exact remote recovery state") },
         @{ Name = "missing exact recovery verifier"; Content = $content.Replace('scripts/verify-existing-package-recovery.ps1', 'scripts/missing-existing-package-recovery.ps1') },
         @{ Name = "missing second recovery attestation"; Content = ([regex]::new('(?ms)^      - name: Attest exact recovered snupkg\r?\n        uses: actions/attest@v4\r?\n        with:\r?\n          subject-path:.*?\r?\n')).Replace($content, '', 1) },
-        @{ Name = "recovery manual release upload"; Content = $content.Replace("      - name: Verify exact tag prerelease body and assets", "      - name: Forbidden manual upload`n        run: gh release upload forbidden forbidden.nupkg`n`n      - name: Verify exact tag prerelease body and assets") }
+        @{ Name = "recovery manual release upload"; Content = $content.Replace("      - name: Verify exact tag prerelease body and assets", "      - name: Forbidden manual upload`n        run: gh release upload forbidden forbidden.nupkg`n`n      - name: Verify exact tag prerelease body and assets") },
+        @{ Name = "recovery safety gate moved after remote mutation"; Content = $lateSafetyGate }
     )
 
     foreach ($case in $cases) {

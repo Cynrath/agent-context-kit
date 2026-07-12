@@ -25,7 +25,11 @@ The repository intentionally has two README surfaces:
 
 The NuGet README is wired from `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj` through `PackageReadmeFile` and an explicit package-root packing entry. If the nuget.org README page needs a correction, update `README.nuget.md`, the CLI `.csproj`, `scripts/check-package-metadata.ps1`, and `docs/NUGET_METADATA.md` together.
 
+The metadata gate now rejects raw HTML/layout elements, CSS attributes, and relative image paths in `README.nuget.md`. Repository `README.md` and `README.tr.md` may use GitHub-supported presentation markup; that markup must not leak into the packed NuGet README.
+
 Published NuGet versions are immutable for README corrections. A visible nuget.org README fix requires a later authorized package publish; do not move tags, replace release assets, or republish an existing version.
+
+The TASK-0246 source README polish does not change the README embedded in already-published `1.0.0-rc.1`. It prepares a better renderer-safe source for a future separately authorized package version.
 
 Run the dedicated metadata review before pack or publish checks:
 

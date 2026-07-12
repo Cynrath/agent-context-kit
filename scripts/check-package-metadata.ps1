@@ -83,9 +83,29 @@ else {
     }
 
     $readmePath = Join-Path $repoRoot $readmeFile
-    if (-not (Test-Path $readmePath)) { Add-Issue "$readmeFile was not found for package readme." }
-    elseif (-not (Test-PackedReadme -Project $project)) { Add-Issue "$readmeFile exists but is not explicitly packed into the package root." }
-    else { Add-Note "$readmeFile is present and explicitly packed into the package root." }
+    if (-not (Test-Path $readmePath)) {
+        Add-Issue "$readmeFile was not found for package readme."
+    }
+    else {
+        if (-not (Test-PackedReadme -Project $project)) {
+            Add-Issue "$readmeFile exists but is not explicitly packed into the package root."
+        }
+
+        $readmeContent = Get-Content -Raw $readmePath
+        if ([regex]::IsMatch($readmeContent, '(?im)^\s*</?(?:div|p|picture|source|style|details|summary|table|tr|td|img)\b')) {
+            Add-Issue "$readmeFile contains raw HTML or GitHub-only layout markup."
+        }
+        if ([regex]::IsMatch($readmeContent, '(?im)<style\b|\sstyle\s*=|\salign\s*=')) {
+            Add-Issue "$readmeFile contains CSS or HTML layout attributes."
+        }
+        if ([regex]::IsMatch($readmeContent, '(?im)!\[[^\]]*\]\((?!https?://)[^)]+\)')) {
+            Add-Issue "$readmeFile contains a relative image path that nuget.org cannot render reliably."
+        }
+
+        if ($issues.Count -eq 0) {
+            Add-Note "$readmeFile is pure Markdown and explicitly packed into the package root."
+        }
+    }
 
     Add-Note "GitHub README.md and NuGet README.nuget.md are intentionally separate files."
     Add-Note "Package project inspected: $projectPath"

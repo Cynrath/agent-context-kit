@@ -2,86 +2,182 @@
 
 Offline-first repository context and safety tooling for AI-assisted development.
 
-AgentContextKit analyzes a repository, generates clean agent context files, creates task-first workflow docs, and catches secret, PII, and brand leakage risks before a project is shared with AI agents or released publicly.
+AgentContextKit is a .NET global tool (`ackit`) that inspects repository readiness, generates clean agent context files, creates task-first workflow records, and reports secret, PII, brand, artifact, and local-path risks before a project is shared with AI coding agents or released publicly.
 
-This NuGet README is intentionally plain Markdown so it renders consistently on nuget.org. The richer GitHub README remains in `README.md`.
+This package README intentionally uses plain Markdown only so it renders consistently on nuget.org. The GitHub repository has a richer visual README and a complete Turkish edition.
+
+## Release status
+
+- Latest complete release: `0.2.0-alpha.4`.
+- NuGet `1.0.0-rc.1` exists in a partial immutable publication state while its GitHub tag, prerelease, and provenance recovery is completed and verified.
+- The commands below remain pinned to the latest complete release until that recovery is fully successful.
+- AgentContextKit does not claim 1.0 GA readiness.
+
+## Requirements
+
+- .NET 10 SDK/runtime support for the current package.
+- Windows, Ubuntu, or macOS.
+- A repository you are authorized to inspect.
 
 ## Install
 
-Install the current package version shown on nuget.org:
+Install the latest complete release:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version <package-version>
+dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
 ```
 
 Update an existing global install:
 
 ```powershell
-dotnet tool update --global AgentContextKit --version <package-version>
+dotnet tool update --global AgentContextKit --version 0.2.0-alpha.4
 ```
 
-Verify the tool:
+Verify the executable and discover the current command surface:
 
 ```powershell
 ackit version
 ackit --help
 ```
 
-## Quick start
+## First five minutes
 
-Run the local repository health check:
+Run these commands from the root of the repository you want to inspect:
 
 ```powershell
 ackit doctor
-```
-
-Scan the current repository for release-blocking context risks:
-
-```powershell
+ackit scan
 ackit scan --ci
 ```
 
-Create a task-first workflow note:
+`ackit scan` reports findings. `ackit scan --ci` returns a non-zero exit code when High or Critical findings should block automation.
+
+Create the local configuration, agent instructions, and a structured task record:
 
 ```powershell
-ackit task "Describe the next focused change"
+ackit init --lang en
+ackit generate --target all --lang en
+ackit task "Describe the next focused change" --lang en
 ```
 
-Generate local agent instructions and context files:
+AgentContextKit skips existing generated files by default. Review proposed and generated content before committing it.
+
+## Common workflows
+
+### Repository readiness
 
 ```powershell
-ackit generate --target all
-ackit prompt-pack --output .ackit/prompt-pack.md
+ackit doctor
+ackit scan --ci
+ackit redact-check --profile public-release
 ```
 
-## Core commands
+### Local reports
+
+```powershell
+ackit sarif --output .ackit/reports/ackit.sarif
+ackit report --output .ackit/reports/scan-report.html
+ackit webui --output .ackit/webui/index.html
+```
+
+### Reviewed baseline
+
+```powershell
+ackit baseline
+ackit scan --baseline .ackit-baseline.json --ci
+```
+
+Baseline mode keeps existing findings visible while the CI policy focuses on new High or Critical findings. Replacing an existing baseline requires the explicit `ackit baseline --update` operation.
+
+### Local context preparation
+
+```powershell
+ackit prompt-pack --output .ackit/prompt-packs/review.md
+ackit context-export --prompt-pack .ackit/prompt-packs/review.md --approve --output .ackit/context-exports/review.json
+```
+
+Prompt packs and context export manifests remain local. The approval flag records an explicit local decision; it does not upload repository content.
+
+## Command map
 
 | Command | Purpose |
 | --- | --- |
-| `ackit doctor` | Checks repository readiness signals. |
-| `ackit scan --ci` | Scans for secret, PII, brand, artifact, and release-safety findings. |
-| `ackit task "title"` | Creates a task-first workflow document. |
-| `ackit generate --target all` | Generates supported local agent instruction surfaces. |
-| `ackit prompt-pack` | Builds a local Markdown prompt pack for review. |
-| `ackit context-export --approve` | Exports reviewed context after explicit approval. |
-| `ackit sarif --output <file.sarif>` | Writes SARIF for security tooling. |
-| `ackit report --output <file.html>` | Writes a local HTML report. |
-| `ackit watch --once` | Runs the watch-mode scan path once. |
+| `ackit init` | Creates `.ackit/config.yml` without overwriting an existing config. |
+| `ackit config-check` | Provides read-only sanitized configuration diagnostics. |
+| `ackit doctor` | Checks repository health and OSS readiness signals. |
+| `ackit scan` | Detects stacks, project structure, hygiene gaps, and risk findings. |
+| `ackit scan --ci` | Applies the High/Critical automation gate. |
+| `ackit baseline` | Records a reviewed, sanitized local finding baseline. |
+| `ackit redact-check` | Reviews secret, PII, brand, and local-path leakage risk. |
+| `ackit generate --target all` | Generates supported agent instruction and workflow files. |
+| `ackit task "title"` | Creates a structured task-first Markdown record. |
+| `ackit sarif` | Writes privacy-first SARIF 2.1.0 output. |
+| `ackit report` | Writes a self-contained local HTML report. |
+| `ackit webui` | Writes a self-contained local review dashboard. |
+| `ackit prompt-pack` | Builds a local Markdown prompt pack for human review. |
+| `ackit context-export --approve` | Creates a local approved-context manifest. |
+| `ackit diff` | Compares sanitized baseline snapshots. |
+| `ackit trim` | Applies a size limit to Markdown or JSON context artifacts. |
+| `ackit watch` | Runs a debounced local scan watcher. |
+| `ackit mcp --stdio-server` | Runs the local JSON-RPC stdio transport. |
 
-## Safety model
+Use `ackit --help` as the authoritative command and option reference for the installed version.
 
-Default commands process repository content locally. They do not upload a repository, call an AI API, send telemetry, or invoke external tools by default.
+## Generated files
 
-The tool is designed for a human-reviewed workflow before a repository is handed to Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI, or a similar coding agent.
+Depending on the selected command and target, AgentContextKit can create:
 
-## Documentation
+- `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/project.mdc`, `.github/copilot-instructions.md`
+- `docs/PROJECT_MAP.md`, `docs/AI_WORKFLOW.md`, `docs/SECURITY_NOTES.md`
+- `docs/tasks/TASK-0001.md`
+- `.ackit/reports/*.html` and `.ackit/reports/*.sarif`
+- `.ackit/webui/*.html`
+- `.ackit/prompt-packs/*.md`
+- `.ackit/context-exports/*.json`
 
-- Project website: https://github.com/Cynrath/agent-context-kit
+Generated `.ackit/` artifacts are intended for local review and should not be committed or shared without inspection.
+
+## Safety and privacy
+
+Default commands:
+
+- do not upload repository contents;
+- do not call a remote AI API;
+- do not send telemetry;
+- do not install or invoke external tools;
+- do not publish to GitHub or NuGet;
+- do not overwrite existing generated files by default;
+- do not write raw secret matches into SARIF.
+
+AgentContextKit reports risk; it does not automatically redact secrets in the MVP. Static reports, Web UI files, prompt packs, and context manifests can contain repository metadata or local paths, so review them before sharing.
+
+## Language support
+
+English is the default. Use `--lang tr` for supported Turkish human-readable output and templates:
+
+```powershell
+ackit scan --lang tr
+ackit generate --target all --lang tr
+ackit task "Yetki kontrollerini ekle" --lang tr
+```
+
+Machine-readable JSON field names and schemas remain stable in English.
+
+## Documentation and support
+
+- GitHub repository: https://github.com/Cynrath/agent-context-kit
+- Turkish README: https://github.com/Cynrath/agent-context-kit/blob/master/README.tr.md
+- First five minutes: https://github.com/Cynrath/agent-context-kit/blob/master/docs/FIRST_FIVE_MINUTES.md
 - CLI reference: https://github.com/Cynrath/agent-context-kit/blob/master/docs/CLI_REFERENCE.md
-- No-network default policy: https://github.com/Cynrath/agent-context-kit/blob/master/docs/NO_NETWORK_DEFAULT_POLICY.md
+- Configuration: https://github.com/Cynrath/agent-context-kit/blob/master/docs/CONFIGURATION.md
+- No-network policy: https://github.com/Cynrath/agent-context-kit/blob/master/docs/NO_NETWORK_DEFAULT_POLICY.md
+- Troubleshooting: https://github.com/Cynrath/agent-context-kit/blob/master/docs/TROUBLESHOOTING.md
 - Security policy: https://github.com/Cynrath/agent-context-kit/security
+- Issues: https://github.com/Cynrath/agent-context-kit/issues
 - License: MIT
 
-## Package note
+## NuGet rendering boundary
 
-The NuGet package uses `README.nuget.md` as `PackageReadmeFile`. Keep this file pure Markdown and avoid raw HTML, local image paths, generated report artifacts, or GitHub-only layout markup.
+The package uses `README.nuget.md` as `PackageReadmeFile`. This file deliberately avoids raw HTML, CSS, relative local images, GitHub-only alignment/layout markup, and generated artifacts.
+
+NuGet packages are immutable. Updating this source file does not retroactively change the README embedded in an already-published package; improvements appear only in a future separately authorized package version.

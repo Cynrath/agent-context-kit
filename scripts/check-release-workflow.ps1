@@ -128,6 +128,16 @@ if (-not $prepareRelease.Contains('git tag --list $tagName')) {
     $issues.Add("Release preparation must treat an absent target tag as an idempotent state.") | Out-Null
 }
 
+$supplyChainTest = Get-Content -Raw (Join-Path $repoRoot "scripts\test-supply-chain-workflow.ps1")
+if (-not $supplyChainTest.Contains('Get-Command pwsh -CommandType Application -ErrorAction Stop') -or
+    -not $supplyChainTest.Contains('Select-Object -First 1 -ExpandProperty Source') -or
+    -not $supplyChainTest.Contains('& $pwshPath -NoLogo -NoProfile -NonInteractive -File')) {
+    $issues.Add("Supply-chain workflow tests must resolve and invoke cross-platform pwsh explicitly.") | Out-Null
+}
+if ([regex]::IsMatch($supplyChainTest, '(?mi)&\s+powershell(?:\.exe)?(?:\s|$)')) {
+    $issues.Add("Supply-chain workflow tests must not invoke Windows-only powershell.") | Out-Null
+}
+
 $publishIndex = $publishBlock.IndexOf("dotnet nuget push", [StringComparison]::Ordinal)
 $tagIndex = $publishBlock.IndexOf('git tag "$tagName"', [StringComparison]::Ordinal)
 $releaseIndex = $publishBlock.IndexOf("gh release create", [StringComparison]::Ordinal)
@@ -224,13 +234,19 @@ foreach ($marker in @(
     if (-not $recoveryBlock.Contains($marker)) { $issues.Add("Existing-package recovery fail-closed marker missing: $marker") | Out-Null }
 }
 
+$recoverySafetyIndex = $recoveryBlock.IndexOf("Run exact recovery safety gates", [StringComparison]::Ordinal)
 $recoveryVerifyIndex = $recoveryBlock.IndexOf("scripts/verify-existing-package-recovery.ps1", [StringComparison]::Ordinal)
+$recoveryRemoteStateIndex = $recoveryBlock.IndexOf("Recheck exact remote recovery state", [StringComparison]::Ordinal)
 $recoveryTagIndex = $recoveryBlock.IndexOf('git tag "$tagName" "$releaseSha"', [StringComparison]::Ordinal)
+$recoveryTagPushIndex = $recoveryBlock.IndexOf('git push origin "refs/tags/$tagName"', [StringComparison]::Ordinal)
 $recoveryReleaseIndex = $recoveryBlock.IndexOf("gh release create", [StringComparison]::Ordinal)
 $recoveryAttestIndex = $recoveryBlock.IndexOf("uses: actions/attest@v4", [StringComparison]::Ordinal)
-if ($recoveryVerifyIndex -lt 0 -or $recoveryTagIndex -lt 0 -or $recoveryReleaseIndex -lt 0 -or $recoveryAttestIndex -lt 0 -or
-    $recoveryVerifyIndex -gt $recoveryTagIndex -or $recoveryTagIndex -gt $recoveryReleaseIndex -or $recoveryReleaseIndex -gt $recoveryAttestIndex) {
-    $issues.Add("Existing-package recovery must verify exact artifacts before tag/release creation and attest only after release verification.") | Out-Null
+if ($recoverySafetyIndex -lt 0 -or $recoveryVerifyIndex -lt 0 -or $recoveryRemoteStateIndex -lt 0 -or
+    $recoveryTagIndex -lt 0 -or $recoveryTagPushIndex -lt 0 -or $recoveryReleaseIndex -lt 0 -or $recoveryAttestIndex -lt 0 -or
+    $recoverySafetyIndex -gt $recoveryVerifyIndex -or $recoveryVerifyIndex -gt $recoveryRemoteStateIndex -or
+    $recoveryRemoteStateIndex -gt $recoveryTagIndex -or $recoveryTagIndex -gt $recoveryTagPushIndex -or
+    $recoveryTagPushIndex -gt $recoveryReleaseIndex -or $recoveryReleaseIndex -gt $recoveryAttestIndex) {
+    $issues.Add("Existing-package recovery safety, exact-artifact, and remote-state gates must precede tag/release mutations; attestations must follow release verification.") | Out-Null
 }
 
 foreach ($marker in @(

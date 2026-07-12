@@ -47,6 +47,10 @@ Recovery is fail-closed: NuGet must exist while tag and GitHub Release are absen
 
 `scripts/test-existing-package-recovery.ps1` provides network-free positive, repeated, wrong-hash, wrong-commit, and changed-content fixtures. The workflow static/supply-chain gates reject NuGet login/push, manual release upload/edit, force options, missing evidence bindings, missing second attestation, and write permissions in the three-platform verification matrix.
 
+TASK-0246 resolves the supply-chain fixture runner through `Get-Command pwsh` and invokes that exact PowerShell 7 executable for child gates. `cross-platform-source-smoke.yml` runs the static and positive/negative supply-chain checks on Windows, Ubuntu, and macOS. The static gate also requires this cross-platform host and enforces the order `recovery safety gates -> exact artifact verification -> repeated remote-state check -> non-force tag push -> prerelease creation -> attestations`; a negative fixture moves the safety step late and must fail.
+
+TASK-0247 is the only newly authorized execution of this recovery path. It remains bound to the exact RC1 package/artifact/commit tuple and may run only after the TASK-0246 standard workflows are green. It does not reopen the normal publish operation or authorize any NuGet mutation.
+
 ## Existing Release Recovery Verification
 `scripts/verify-existing-release.ps1` performs a read-only verification of NuGet availability, repository-signed package validity, full disposable installed-tool smoke, exact tag target, GitHub pre-release state, required `.nupkg`/`.snupkg` assets, package metadata, and SHA-256 evidence. NuGet and GitHub Release package hashes are recorded independently because NuGet repository signing can change the served package bytes.
 
