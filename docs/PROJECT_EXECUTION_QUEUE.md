@@ -1,6 +1,6 @@
 # Project Execution Queue
 
-## V100 `1.0.0-rc.1` Exact-Package Recovery Track — TASK-0244 Stopped
+## V100 `1.0.0-rc.1` Exact-Package Recovery Track — TASK-0246–0248 Authorized
 
 | Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- | --- |
@@ -11,8 +11,11 @@
 | 5 | Completed / pushed / CI pass | TASK-0243 exact-existing-package recovery operation | Fail-closed recovery operation uses exact prior artifacts without NuGet publication | TASK-0242 immutable evidence plus explicit recovery authorization | Workflow/script/static tests/recovery and automation docs | 431/431; pre-recovery runs `29151153458`, `29151153453`, `29151153454` PASS | No dispatch in TASK-0243 |
 | 6 | Stopped / dispatch consumed / no mutation | TASK-0244 recovery execution and hosted verification | Single run failed in Ubuntu safety gate before mutation | TASK-0243 green | Hosted/supply-chain/V100/queue/handoff evidence | Run `29151228607`; log once; immutable audit once | No fix/rerun/second dispatch; new decision required |
 | 7 | Not executed | TASK-0245 post-recovery smoke pin and evidence closure | Pin/current-release sync withheld because recovery did not complete | TASK-0244 success not met | Failure-state docs only | Smoke pin remains alpha4; no release mutation |
+| 8 | In progress | TASK-0246 cross-platform recovery safety gate host fix | Use `pwsh`, preserve pre-mutation gates, and polish all README sources | New explicit authorization | Script/workflow tests, README/docs/task/handoff files | Full local suite and green standard CI | One normal push; no dispatch/release mutation |
+| 9 | Planned / blocked | TASK-0247 authorized exact-package recovery execution | One exact-existing-package recovery dispatch | TASK-0246 CI green | Hosted/supply-chain/V100/task/handoff evidence | One dispatch/discovery/watch; exact assets/attestations/three OS | No NuGet publish/rerun/second dispatch/manual upload |
+| 10 | Conditional | TASK-0248 smoke pin, README, and evidence closure | Pin RC1 and close V100-09 only after complete recovery | TASK-0247 full success | Smoke workflow, README/package/provenance/queue/handoff docs | Full local suite, normal push, final standard CI | No release mutation or GA claim |
 
-Execution rule: TASK-0242's publish-dispatch and TASK-0244's recovery-dispatch budgets are both consumed. No NuGet push, normal publish operation, recovery code correction/retry, second recovery dispatch/rerun, manual package upload, tag movement, version reuse, settings mutation, history rewrite, or force push is authorized.
+Execution rule: TASK-0242's publish and TASK-0244's recovery budgets remain consumed. The new decision permits the TASK-0246 fix and exactly one TASK-0247 `recover-existing` dispatch after green standard CI. No NuGet push, normal publish operation, rerun/second TASK-0247 dispatch, manual package upload, tag movement, version reuse, settings mutation, history rewrite, force push, or GA claim is authorized.
 
 ## Historical PROJECT-CONTROL-0109 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |

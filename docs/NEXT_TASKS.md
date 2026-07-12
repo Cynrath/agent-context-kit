@@ -1,8 +1,8 @@
 # Next Tasks
 
-## V100 `1.0.0-rc.1` Exact-Package Recovery — TASK-0244 Stopped
+## V100 `1.0.0-rc.1` Exact-Package Recovery — TASK-0246–0248 Authorized
 
-TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 consumed its single authorized OIDC publish dispatch: NuGet published, propagation verification timed out, and tag/release/provenance were skipped. Its history remains unchanged. A new bounded recovery decision now authorizes TASK-0243 through TASK-0245 without any second NuGet push.
+TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 published NuGet but stopped before tag/release/provenance. TASK-0244 later failed before mutation on a Windows-only child PowerShell call. Both histories remain unchanged. A new bounded decision authorizes TASK-0246 through TASK-0248 without any second NuGet push.
 
 | Order | Task | Status | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
@@ -13,8 +13,11 @@ TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, an
 | 5 | TASK-0243 exact-existing-package recovery operation | COMPLETED / PUSHED / CI PASS | Fail-closed recovery path uses prior validated artifacts and contains no NuGet publication | TASK-0242 evidence plus recovery authorization | 431/431; runs `29151153458`, `29151153453`, `29151153454` PASS | No dispatch occurred in TASK-0243 |
 | 6 | TASK-0244 authorized recovery execution and hosted verification | STOPPED / DISPATCH CONSUMED / NO MUTATION | Run `29151228607` failed in Ubuntu safety gate on Windows-only `powershell` child call | TASK-0243 green | Failed log once; immutable audit once | No retry/fix/second dispatch; new decision required |
 | 7 | TASK-0245 post-recovery smoke pin and evidence closure | NOT EXECUTED | RC1 pin/current-release sync prohibited after incomplete recovery | TASK-0244 full success not met | Failure docs plus final standard CI only | Smoke pin remains alpha4 |
+| 8 | TASK-0246 cross-platform recovery safety gate host fix | IN PROGRESS | Replace Windows-only child host with `pwsh`, prove mutation ordering, and polish all README sources | New explicit authorization | Local full suite plus green standard CI | Normal push only; no release dispatch/mutation |
+| 9 | TASK-0247 authorized exact-package recovery execution | PLANNED / BLOCKED ON TASK-0246 CI | Dispatch exact-existing recovery once for exact RC1 evidence | TASK-0246 standard CI green | One dispatch/discovery/watch; exact tag/release/assets/two attestations/three OS | No NuGet publish, rerun, second dispatch, or manual upload |
+| 10 | TASK-0248 post-recovery smoke pin, README, and evidence closure | CONDITIONAL | Pin published smoke and close V100-09 only after full recovery success | TASK-0247 complete success | Full local validation, normal push, final standard CI | No release mutation or GA claim |
 
-NuGet `1.0.0-rc.1` is immutable and installable, but the RC release remains incomplete. Complete release remains `v0.2.0-alpha.4`. TASK-0244's exact recovery authorization is consumed: no NuGet push, normal publish operation, workflow fix/retry, second recovery dispatch, manual upload, tag movement, settings change, force push, or GA claim is authorized.
+NuGet `1.0.0-rc.1` is immutable and installable, but the RC release remains incomplete. Complete release remains `v0.2.0-alpha.4` until TASK-0247 fully succeeds. Exactly one new `recover-existing` dispatch is authorized after TASK-0246 CI is green; no NuGet push, normal publish operation, rerun, second TASK-0247 dispatch, manual upload, tag movement, settings change, force push, history rewrite, or GA claim is authorized.
 
 ## Historical Execution Record
 

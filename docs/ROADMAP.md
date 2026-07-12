@@ -6,7 +6,10 @@
 - TASK-0243 is complete and pushed at `3b979972ba24b6acd4f0eecca49ff3dcc2c8cdff`; pre-recovery `ci`, published alpha4 smoke, and RC1 source smoke passed.
 - TASK-0244 consumed its single recovery dispatch in run `29151228607`. The Ubuntu recovery safety gate exposed a Windows-only `powershell` child call before any mutation; tag/release/attestations remain absent and no second dispatch or automatic correction is allowed.
 - TASK-0245 is not executed because TASK-0244 did not complete. The published smoke pin remains `0.2.0-alpha.4`; only failure-state documentation and final standard CI are in scope.
-- NuGet RC1 must never be republished, changed, unlisted, or replaced. The TASK-0244 recovery budget is consumed. No second recovery dispatch, normal publish operation, automatic workflow correction/retry, tag movement, manual upload, settings mutation, force push, or GA-readiness claim is authorized.
+- TASK-0246 through TASK-0248 are newly authorized as a distinct recovery chain. TASK-0246 fixes the cross-platform `pwsh` test host, preserves mutation ordering gates, improves all README sources, and requires green standard CI before any dispatch.
+- TASK-0247 may dispatch `recover-existing` exactly once only after TASK-0246 CI is green. It is bound to version `1.0.0-rc.1`, commit `258918b33c3d1359aac967604ee524e8b66ddf02`, tag `v1.0.0-rc.1`, and exact TASK-0242 package artifacts; NuGet publication remains forbidden.
+- TASK-0248 is conditional on complete recovery success. Only then may it update the published smoke pin, mark RC1 as the complete prerelease, and close V100-09 from exact verified provenance. It must not claim 1.0 GA readiness.
+- NuGet RC1 must never be republished, changed, unlisted, or replaced. No normal publish operation, recovery rerun/second TASK-0247 dispatch, tag movement, manual upload, settings mutation, force push, history rewrite, or GA-readiness claim is authorized.
 
 ## v0.1.0-alpha
 - Solution foundation.
