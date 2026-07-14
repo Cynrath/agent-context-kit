@@ -1,12 +1,20 @@
 # AgentContextKit Session Handoff
 
-## TASK-0246–0248 `1.0.0-rc.1` Exact-Package Recovery — TASK-0247 Stopped
+## TASK-0249–0251 `1.0.0-rc.1` Recovery Closure — TASK-0249 Current
+
+- New explicit authorization received on 2026-07-14 for TASK-0249 through TASK-0251. Entry is clean synchronized `master` at `5d2cece457240e7fe3a99275c5afa757acbb4bab`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
+- TASK-0249 is current: correct the accepted HTTP 404 `$LASTEXITCODE` leak with one shared fail-closed helper, cross-platform fixtures, full local validation, normal push, and green `ci`/published-smoke/source-smoke.
+- TASK-0250 is planned only after green TASK-0249 CI: one immutable preflight and exactly one new `recover-existing` dispatch using source run `29131335084`, artifact `8242162439`, and release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. NuGet publication is forbidden.
+- TASK-0251 is success-only: RC1 published-smoke pin, exact provenance/V100-09 closure, README/status synchronization, final normal push, and final standard CI.
+- TASK-0242, TASK-0244, and TASK-0247 failure histories remain intact. On any TASK-0250 remote failure: one log read, one remote audit, documentation, and safe stop without rerun or manual completion.
+
+## TASK-0246–0248 Historical Recovery Attempt — TASK-0247 Stopped
 
 - New explicit authorization received on 2026-07-12 for TASK-0246 through TASK-0248. ACKit `1.0.0-rc.1` preflight passed (`doctor` 13/13; `scan --ci` exit 0), and all three task files were created once with `ackit task` and fully planned before implementation.
 - TASK-0246 commits `926fc03` and `b815c44` are pushed; standard runs `29182095416`, `29182095415`, and three-OS `29182095423` passed.
 - TASK-0247 consumed exactly one `recover-existing` dispatch in run `29182188201`. Safety and exact artifact/package/signature/install verification passed; the step exited after the expected absent-release probe and before all mutations. The failed log and remote state were each inspected once.
 - Current immutable state: source artifact/NuGet valid; tag, GitHub prerelease/assets, nupkg attestation, and snupkg attestation absent. No rerun, second dispatch, correction, NuGet mutation, tag/release mutation, or manual upload is authorized.
-- TASK-0248 success-only work is not executed. Published smoke remains `0.2.0-alpha.4`; V100-09 remains open; 1.0 GA readiness is not claimed. Current action is factual docs commit/push and one final standard-CI wait only.
+- TASK-0248 success-only work was not executed. Published smoke remained `0.2.0-alpha.4`; V100-09 remained open; 1.0 GA readiness was not claimed. The new TASK-0249–0251 authorization supersedes only the former prohibition on a future correction/new dispatch; it does not rewrite this history.
 
 ## TASK-0243–0245 Historical Recovery Attempt — Stopped
 

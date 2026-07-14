@@ -1,6 +1,14 @@
 # AgentContextKit Context Pack
 
-## TASK-0243–0245 `1.0.0-rc.1` Exact-Package Recovery — Stopped
+## TASK-0249–0251 `1.0.0-rc.1` Recovery Closure — TASK-0249 Current
+
+Clean synchronized entry HEAD is `5d2cece457240e7fe3a99275c5afa757acbb4bab`. ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified. TASK-0249/0250/0251 were created once with `ackit task` and fully planned before implementation.
+
+TASK-0249 corrects the expected-release-absence HTTP 404 native exit leak with a shared fail-closed PowerShell helper used at both recovery checkpoints and exercised on Windows, Ubuntu, and macOS. TASK-0250 permits exactly one new `recover-existing` dispatch only after green standard CI; it binds source run `29131335084`, artifact `8242162439`, release commit `258918b33c3d1359aac967604ee524e8b66ddf02`, and the full recorded digests/hashes. TASK-0251 is success-only for the RC1 published-smoke pin, public/provenance sync, and evidence-backed V100-09 closure.
+
+NuGet RC1 cannot be republished or changed. Normal publish, second recovery dispatch/rerun, manual upload, tag movement, settings change, force/history rewrite, `.ackit/` commit, and 1.0 GA claims remain forbidden. TASK-0242, TASK-0244, and TASK-0247 failure evidence remains historical and unchanged. Any new remote recovery failure triggers one log read, one remote audit, documentation, and immediate safe stop.
+
+## TASK-0243–0248 Historical Exact-Package Recovery — Stopped
 
 Release HEAD `258918b33c3d1359aac967604ee524e8b66ddf02` passed preflight and standard CI. NuGet `1.0.0-rc.1` exists after the single TASK-0242 run; tag, GitHub Release, and attestation remain absent. ACKit preflight used published predecessor `0.2.0-alpha.4`, doctor 13/13 PASS, and scan exit 0.
 

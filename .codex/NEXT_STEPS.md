@@ -1,6 +1,6 @@
 # Next Steps
 
-## Current V100 `1.0.0-rc.1` Exact-Package Recovery — TASK-0247 Stopped
+## Current V100 `1.0.0-rc.1` Recovery Closure — TASK-0249 Current
 
 1. COMPLETED — TASK-0239: exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` is pushed; 431/431 local and standard CI runs `29118331264`, `29118331259`, `29118331258` are green.
 2. COMPLETED — TASK-0240: exactly one dispatch produced successful hosted run `29118452246` on Windows, Ubuntu, and macOS; evidence commit `fd2ce8d` is pushed.
@@ -12,8 +12,11 @@
 8. COMPLETED / PUSHED / CI PASS — TASK-0246: commits `926fc03`, `b815c44`; standard runs `29182095416`, `29182095415`, `29182095423` passed.
 9. STOPPED / DISPATCH CONSUMED / NO MUTATION — TASK-0247: run `29182188201` passed exact artifact/package/install verification then exited after the expected absent-release probe. Log and remote state were each inspected once; tag/release/two attestations remain absent.
 10. NOT EXECUTED — TASK-0248: smoke pin remains `0.2.0-alpha.4`; V100-09 remains open; only failure docs, normal push, and final standard CI remain.
+11. CURRENT — TASK-0249: implement the shared expected-404 exit-state correction, pass focused/full local validation, commit/push, then require all three standard workflows green.
+12. PLANNED — TASK-0250: after green CI, run one immutable preflight and exactly one new `recover-existing` dispatch; watch/view once and either prove complete recovery or safe-stop after one log/audit.
+13. PLANNED / SUCCESS-ONLY — TASK-0251: pin published smoke to `1.0.0-rc.1`, synchronize exact public/provenance/V100 evidence, commit/push, and require final standard CI green.
 
-Hard boundary: TASK-0242 publish, TASK-0244 recovery, and TASK-0247 recovery budgets are consumed. No recovery correction/retry/rerun/second dispatch, NuGet push, normal publish operation, manual package upload, version reuse, tag movement, smoke-pin/V100-09 success closure, settings/security/collaborator mutation, `.ackit/` commit, force push, history rewrite, or GA-readiness claim.
+Hard boundary: historical TASK-0242/TASK-0244/TASK-0247 budgets and evidence remain consumed. The new authorization permits TASK-0249 local correction and exactly one TASK-0250 dispatch after green CI. No NuGet push, normal publish, recovery rerun/second dispatch, manual upload, version reuse, tag movement, settings/security/collaborator mutation, `.ackit/` commit, force push, history rewrite, or GA claim. Smoke-pin/V100-09 closure is allowed only after complete TASK-0250 success.
 
 PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 completed TASK-0177 through TASK-0180, then inserted user-prioritized TASK-0187 before TASK-0181 to audit and harden the visible `nuget-release` failed deployments without release/tag/NuGet/deployment mutation.
 

@@ -1,8 +1,8 @@
 # Next Tasks
 
-## V100 `1.0.0-rc.1` Exact-Package Recovery — TASK-0247 Stopped
+## V100 `1.0.0-rc.1` Exact-Package Recovery Closure — TASK-0249 Current
 
-TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 published NuGet but stopped before tag/release/provenance. TASK-0244 later failed before mutation on a Windows-only child PowerShell call. Both histories remain unchanged. A new bounded decision authorizes TASK-0246 through TASK-0248 without any second NuGet push.
+TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 published NuGet but stopped before tag/release/provenance. TASK-0244 and TASK-0247 later failed before mutation for separate cross-platform/exit-state defects; all three histories remain unchanged. A new bounded decision authorizes TASK-0249 through TASK-0251 without any second NuGet push.
 
 | Order | Task | Status | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
@@ -16,8 +16,11 @@ TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, an
 | 8 | TASK-0246 cross-platform recovery safety gate host fix | COMPLETED / PUSHED / CI PASS | Replace Windows-only child host with `pwsh`, prove mutation ordering, and polish all README sources | New explicit authorization | 431/431; runs `29182095416`, `29182095415`, `29182095423` PASS | No release dispatch/mutation in TASK-0246 |
 | 9 | TASK-0247 authorized exact-package recovery execution | STOPPED / DISPATCH CONSUMED / NO MUTATION | Single run passed exact artifact/package smoke then exited after expected absent-release probe | TASK-0246 standard CI green | Run `29182188201`; failed log once; immutable audit once | No retry/fix/second dispatch; new decision required |
 | 10 | TASK-0248 post-recovery smoke pin, README, and evidence closure | NOT EXECUTED | Success-only smoke pin/V100-09 closure prohibited after TASK-0247 failure | TASK-0247 success not met | Failure docs and final standard CI only | Smoke pin remains alpha4; V100-09 remains open |
+| 11 | TASK-0249 expected-404 recovery exit-state correction | CURRENT | Shared fail-closed release-absence helper clears only a verified 404 native exit state and adds three-OS regression coverage | New explicit authorization | Focused fixtures, full local suite, then standard CI | Local code/docs plus normal push only; no release mutation |
+| 12 | TASK-0250 authorized exact-existing-package recovery execution | PLANNED | Run one immutable preflight and exactly one NuGet-publish-free recovery dispatch | TASK-0249 standard CI fully green | Exact artifact/package/tag/release/assets/attestations plus recovery matrix | Exactly one dispatch; safe-stop on any remote failure |
+| 13 | TASK-0251 post-recovery smoke, provenance, and public-status closure | PLANNED / SUCCESS-ONLY | Pin published smoke to RC1, synchronize README/release/V100 evidence, and wait for final CI | TASK-0250 complete success | Full local gates plus final standard CI | No release mutation; normal docs/workflow-pin push only |
 
-NuGet `1.0.0-rc.1` is immutable and installable, but the RC release remains incomplete. Complete release remains `v0.2.0-alpha.4`. TASK-0247's exact recovery dispatch is consumed: no NuGet push, normal publish operation, workflow fix/retry, rerun, second recovery dispatch, manual upload, tag movement, settings change, force push, history rewrite, smoke-pin update, V100-09 closure, or GA claim is authorized.
+NuGet `1.0.0-rc.1` is immutable and installable, but the RC release remains incomplete at TASK-0249 entry. Complete release remains `v0.2.0-alpha.4`. The new authorization permits the local TASK-0249 correction, one new TASK-0250 recovery dispatch after green CI, and success-only TASK-0251 closure. It never permits a NuGet push, normal publish operation, recovery rerun/second dispatch, manual upload, tag movement, settings change, force push, history rewrite, or GA claim.
 
 ## Historical Execution Record
 
