@@ -12,7 +12,7 @@
 8. COMPLETED / PUSHED / CI PASS — TASK-0246: commits `926fc03`, `b815c44`; standard runs `29182095416`, `29182095415`, `29182095423` passed.
 9. STOPPED / DISPATCH CONSUMED / NO MUTATION — TASK-0247: run `29182188201` passed exact artifact/package/install verification then exited after the expected absent-release probe. Log and remote state were each inspected once; tag/release/two attestations remain absent.
 10. NOT EXECUTED — TASK-0248: smoke pin remains `0.2.0-alpha.4`; V100-09 remains open; only failure docs, normal push, and final standard CI remain.
-11. CURRENT — TASK-0249: implement the shared expected-404 exit-state correction, pass focused/full local validation, commit/push, then require all three standard workflows green.
+11. COMPLETED LOCALLY / PUSH AND CI PENDING — TASK-0249: plan commit `35600b6`; shared helper and fixtures implemented; build 0/0, tests 431/431, ACKit and all requested local gates pass. Commit/push, then require all three standard workflows green.
 12. PLANNED — TASK-0250: after green CI, run one immutable preflight and exactly one new `recover-existing` dispatch; watch/view once and either prove complete recovery or safe-stop after one log/audit.
 13. PLANNED / SUCCESS-ONLY — TASK-0251: pin published smoke to `1.0.0-rc.1`, synchronize exact public/provenance/V100 evidence, commit/push, and require final standard CI green.
 

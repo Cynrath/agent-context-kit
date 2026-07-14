@@ -3,7 +3,7 @@
 ## TASK-0249–0251 `1.0.0-rc.1` Recovery Closure — TASK-0249 Current
 
 - New explicit authorization received on 2026-07-14 for TASK-0249 through TASK-0251. Entry is clean synchronized `master` at `5d2cece457240e7fe3a99275c5afa757acbb4bab`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
-- TASK-0249 is current: correct the accepted HTTP 404 `$LASTEXITCODE` leak with one shared fail-closed helper, cross-platform fixtures, full local validation, normal push, and green `ci`/published-smoke/source-smoke.
+- TASK-0249 plan commit `35600b6` precedes implementation. The shared helper, both workflow call sites, positive/negative fixtures, static ordering/publication guards, and release/recovery docs are implemented. Local validation passed: build 0/0, tests 431/431, ACKit 13/13 plus scan exit 0, all requested V100/release/security/status/Markdown gates, Unicode guard, and no tracked `.ackit/`. Push and standard CI remain.
 - TASK-0250 is planned only after green TASK-0249 CI: one immutable preflight and exactly one new `recover-existing` dispatch using source run `29131335084`, artifact `8242162439`, and release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. NuGet publication is forbidden.
 - TASK-0251 is success-only: RC1 published-smoke pin, exact provenance/V100-09 closure, README/status synchronization, final normal push, and final standard CI.
 - TASK-0242, TASK-0244, and TASK-0247 failure histories remain intact. On any TASK-0250 remote failure: one log read, one remote audit, documentation, and safe stop without rerun or manual completion.

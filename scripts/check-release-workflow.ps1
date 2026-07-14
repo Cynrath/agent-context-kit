@@ -49,6 +49,7 @@ $required = @(
     "scripts/verify-published-package.ps1",
     "scripts/verify-existing-release.ps1",
     "scripts/verify-existing-package-recovery.ps1",
+    "scripts/github-release-state.ps1",
     "scripts/test-existing-package-recovery.ps1",
     "scripts/test-release-recovery.ps1",
     "scripts/test-supply-chain-workflow.ps1",
@@ -137,6 +138,27 @@ if (-not $supplyChainTest.Contains('Get-Command pwsh -CommandType Application -E
 if ([regex]::IsMatch($supplyChainTest, '(?mi)&\s+powershell(?:\.exe)?(?:\s|$)')) {
     $issues.Add("Supply-chain workflow tests must not invoke Windows-only powershell.") | Out-Null
 }
+if (-not $supplyChainTest.Contains('test-github-release-state.ps1')) {
+    $issues.Add("Supply-chain workflow tests must execute the expected-404 regression fixtures under pwsh.") | Out-Null
+}
+
+$releaseStateHelper = Get-Content -Raw (Join-Path $repoRoot "scripts\github-release-state.ps1")
+foreach ($marker in @(
+        'function Assert-GitHubReleaseAbsent',
+        'gh api --include',
+        '$probeExitCode = $LASTEXITCODE',
+        '$probeExitCode -eq 0',
+        '(?im)^HTTP/\S+\s+404(?:\s|$)',
+        '(?im)^gh:\s+.+\(HTTP 404\)\s*$',
+        '$global:LASTEXITCODE = 0'
+    )) {
+    if (-not $releaseStateHelper.Contains($marker)) {
+        $issues.Add("Shared release-absence helper marker missing: $marker") | Out-Null
+    }
+}
+if ($releaseStateHelper.Contains('exit 0')) {
+    $issues.Add("Shared release-absence helper must not use a blanket exit 0.") | Out-Null
+}
 
 $publishIndex = $publishBlock.IndexOf("dotnet nuget push", [StringComparison]::Ordinal)
 $tagIndex = $publishBlock.IndexOf('git tag "$tagName"', [StringComparison]::Ordinal)
@@ -202,6 +224,8 @@ foreach ($forbidden in @(
         "NUGET_API_KEY",
         "dotnet nuget push",
         "--skip-duplicate",
+        "operation=publish",
+        "operation: publish",
         "gh release upload",
         "gh release edit",
         "--force"
@@ -216,6 +240,15 @@ if ([regex]::Matches($recoveryBlock, "uses: actions/attest@v4").Count -ne 2) {
 }
 if ([regex]::Matches($recoveryBlock, "gh attestation verify").Count -ne 2) {
     $issues.Add("Existing-package recovery must verify exactly two asset attestations.") | Out-Null
+}
+
+$releaseAbsenceCallCount = [regex]::Matches($recoveryBlock, '(?m)^\s+Assert-GitHubReleaseAbsent\s+`?\s*$').Count
+$releaseStateSourceCount = [regex]::Matches($recoveryBlock, '(?m)^\s+\.\s+\./scripts/github-release-state\.ps1\s*$').Count
+if ($releaseAbsenceCallCount -ne 2 -or $releaseStateSourceCount -ne 2) {
+    $issues.Add("Both recovery release-absence checkpoints must use the same shared helper exactly once.") | Out-Null
+}
+if ($recoveryBlock.Contains('gh api --include "repos/${{ github.repository }}/releases/tags/$tagName"')) {
+    $issues.Add("Recovery release-absence checks must not bypass the shared helper with inline gh probes.") | Out-Null
 }
 
 foreach ($marker in @(
@@ -237,14 +270,18 @@ foreach ($marker in @(
 $recoverySafetyIndex = $recoveryBlock.IndexOf("Run exact recovery safety gates", [StringComparison]::Ordinal)
 $recoveryVerifyIndex = $recoveryBlock.IndexOf("scripts/verify-existing-package-recovery.ps1", [StringComparison]::Ordinal)
 $recoveryRemoteStateIndex = $recoveryBlock.IndexOf("Recheck exact remote recovery state", [StringComparison]::Ordinal)
+$recoveryFirstAbsenceIndex = $recoveryBlock.IndexOf("Assert-GitHubReleaseAbsent", [StringComparison]::Ordinal)
+$recoveryLastAbsenceIndex = $recoveryBlock.LastIndexOf("Assert-GitHubReleaseAbsent", [StringComparison]::Ordinal)
 $recoveryTagIndex = $recoveryBlock.IndexOf('git tag "$tagName" "$releaseSha"', [StringComparison]::Ordinal)
 $recoveryTagPushIndex = $recoveryBlock.IndexOf('git push origin "refs/tags/$tagName"', [StringComparison]::Ordinal)
 $recoveryReleaseIndex = $recoveryBlock.IndexOf("gh release create", [StringComparison]::Ordinal)
 $recoveryAttestIndex = $recoveryBlock.IndexOf("uses: actions/attest@v4", [StringComparison]::Ordinal)
 if ($recoverySafetyIndex -lt 0 -or $recoveryVerifyIndex -lt 0 -or $recoveryRemoteStateIndex -lt 0 -or
+    $recoveryFirstAbsenceIndex -lt 0 -or $recoveryLastAbsenceIndex -lt 0 -or
     $recoveryTagIndex -lt 0 -or $recoveryTagPushIndex -lt 0 -or $recoveryReleaseIndex -lt 0 -or $recoveryAttestIndex -lt 0 -or
-    $recoverySafetyIndex -gt $recoveryVerifyIndex -or $recoveryVerifyIndex -gt $recoveryRemoteStateIndex -or
-    $recoveryRemoteStateIndex -gt $recoveryTagIndex -or $recoveryTagIndex -gt $recoveryTagPushIndex -or
+    $recoverySafetyIndex -gt $recoveryVerifyIndex -or $recoveryVerifyIndex -gt $recoveryFirstAbsenceIndex -or
+    $recoveryFirstAbsenceIndex -gt $recoveryRemoteStateIndex -or $recoveryRemoteStateIndex -gt $recoveryLastAbsenceIndex -or
+    $recoveryLastAbsenceIndex -gt $recoveryTagIndex -or $recoveryTagIndex -gt $recoveryTagPushIndex -or
     $recoveryTagPushIndex -gt $recoveryReleaseIndex -or $recoveryReleaseIndex -gt $recoveryAttestIndex) {
     $issues.Add("Existing-package recovery safety, exact-artifact, and remote-state gates must precede tag/release mutations; attestations must follow release verification.") | Out-Null
 }

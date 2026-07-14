@@ -457,15 +457,12 @@ jobs:
 
           $remoteTag = @(git ls-remote --tags origin "refs/tags/$tagName")
           if ($remoteTag.Count -ne 0) { throw "Recovery requires the exact tag to be absent before mutation." }
-          $PSNativeCommandUseErrorActionPreference = $false
-          $releaseProbe = gh api --include "repos/${{ github.repository }}/releases/tags/$tagName" 2>&1
-          $releaseProbeExit = $LASTEXITCODE
-          $PSNativeCommandUseErrorActionPreference = $true
-          if ($releaseProbeExit -eq 0) { throw "Recovery requires the GitHub Release to be absent before mutation." }
-          $releaseProbeText = ($releaseProbe | Out-String)
-          if ($releaseProbeText -notmatch '(?m)^HTTP/\S+\s+404\b' -and $releaseProbeText -notmatch '\(HTTP 404\)') {
-            throw "Unable to prove that the GitHub Release is absent."
-          }
+          . ./scripts/github-release-state.ps1
+          Assert-GitHubReleaseAbsent `
+            -Repository "${{ github.repository }}" `
+            -Tag $tagName `
+            -ExistingReleaseMessage "Recovery requires the GitHub Release to be absent before mutation." `
+            -UnprovenAbsenceMessage "Unable to prove that the GitHub Release is absent."
 
       - name: Recheck exact remote recovery state
         shell: pwsh
@@ -477,15 +474,12 @@ jobs:
           $tagName = "v${{ inputs.version }}"
           $remoteTag = @(git ls-remote --tags origin "refs/tags/$tagName")
           if ($remoteTag.Count -ne 0) { throw "Recovery tag appeared after validation; refusing mutation." }
-          $PSNativeCommandUseErrorActionPreference = $false
-          $releaseProbe = gh api --include "repos/${{ github.repository }}/releases/tags/$tagName" 2>&1
-          $releaseProbeExit = $LASTEXITCODE
-          $PSNativeCommandUseErrorActionPreference = $true
-          if ($releaseProbeExit -eq 0) { throw "Recovery release appeared after validation; refusing mutation." }
-          $releaseProbeText = ($releaseProbe | Out-String)
-          if ($releaseProbeText -notmatch '(?m)^HTTP/\S+\s+404\b' -and $releaseProbeText -notmatch '\(HTTP 404\)') {
-            throw "Unable to re-prove that the GitHub Release is absent."
-          }
+          . ./scripts/github-release-state.ps1
+          Assert-GitHubReleaseAbsent `
+            -Repository "${{ github.repository }}" `
+            -Tag $tagName `
+            -ExistingReleaseMessage "Recovery release appeared after validation; refusing mutation." `
+            -UnprovenAbsenceMessage "Unable to re-prove that the GitHub Release is absent."
 
       - name: Create exact immutable tag and GitHub prerelease
         shell: pwsh

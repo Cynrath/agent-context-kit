@@ -125,6 +125,26 @@ Before dispatch, correct failures with normal successor commits and rerun local 
 
 ## Completion evidence
 
-Status: `CURRENT / PLANNED`.
+Status: `COMPLETED LOCALLY / AWAITING PUSHED STANDARD CI`.
 
-Planning started from clean synchronized HEAD `5d2cece457240e7fe3a99275c5afa757acbb4bab`. Implementation, validation, commit, push, and CI evidence will be appended without changing prior task histories.
+Planning started from clean synchronized HEAD `5d2cece457240e7fe3a99275c5afa757acbb4bab`; task-first plan commit `35600b6` was created before implementation.
+
+Implementation evidence:
+
+- `scripts/github-release-state.ps1` now owns the shared release-absence classification. It captures output/exit code, accepts only a recognized HTTP 404, rejects an existing release and all ambiguous/non-404 failures, and clears `$global:LASTEXITCODE` only on the accepted branch.
+- Both initial exact-package validation and `Recheck exact remote recovery state` dot-source and call that helper before tag/release mutation.
+- `scripts/test-github-release-state.ps1` proves 404 success, subsequent execution, process/native success, and fail-closed 200/401/403/429/500/network behavior.
+- `scripts/test-supply-chain-workflow.ps1` resolves `pwsh` and executes the new fixtures; the existing three-OS source-smoke matrix runs that script on Windows, Ubuntu, and macOS.
+- Static gates require exactly two shared-helper call sites, reject inline bypass, keep both calls before tag creation/push/release/attestation, and continue rejecting NuGet login/push, normal publish markers, manual upload/edit, and force behavior.
+
+Validation evidence on 2026-07-14:
+
+- focused expected-404, supply-chain, exact-package recovery, and release-workflow checks passed;
+- full restore/build passed with 0 warnings and 0 errors;
+- full tests passed 431/431;
+- ACKit doctor passed 13/13 and scan exited 0 with only pre-existing classified Medium/Low findings;
+- V100 readiness, documentation/release, security/supply-chain, published-status, release-workflow, and local Markdown gates passed;
+- Unicode temporary-path guard passed and `git ls-files .ackit` returned no tracked path;
+- no workflow dispatch, NuGet operation, tag/release/asset/attestation mutation, settings change, force push, history rewrite, or GA claim occurred.
+
+Hosted evidence remains pending. TASK-0250 must not dispatch until the exact TASK-0249 implementation HEAD passes `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke`.

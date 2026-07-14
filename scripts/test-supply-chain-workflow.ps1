@@ -4,6 +4,7 @@ Set-StrictMode -Version Latest
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $workflowPath = Join-Path $repoRoot ".github\workflows\release.yml"
 $gatePath = Join-Path $PSScriptRoot "check-release-workflow.ps1"
+$releaseStateTestPath = Join-Path $PSScriptRoot "test-github-release-state.ps1"
 $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ackit-supply-chain-workflow-" + [guid]::NewGuid().ToString("N"))
 $pwshPath = Get-Command pwsh -CommandType Application -ErrorAction Stop |
     Select-Object -First 1 -ExpandProperty Source
@@ -16,6 +17,11 @@ function Invoke-Gate {
 
 New-Item -ItemType Directory -Force -Path $tempRoot | Out-Null
 try {
+    & $pwshPath -NoLogo -NoProfile -NonInteractive -File $releaseStateTestPath
+    if ($LASTEXITCODE -ne 0) {
+        throw "Expected-404 release-state regression fixtures failed."
+    }
+
     if ((Invoke-Gate -Path $workflowPath) -ne 0) {
         throw "Positive release workflow fixture failed."
     }
@@ -34,7 +40,7 @@ try {
         @{ Name = "missing attestation lookup false path"; Content = $content.Replace('$exists = $false', 'throw "Missing attestation lookup failed before attest step."') },
         @{ Name = "missing existing attestation true path"; Content = $content.Replace('$exists = $true', '$exists = $false') },
         @{ Name = "missing provenance query hard failure"; Content = $content.Replace('throw "Unable to query release package attestation state. gh exit code: $attestationExit"', '$exists = $false') },
-        @{ Name = "missing status-aware 404 handling"; Content = $content.Replace('HTTP/\S+\s+404\b', 'HTTP 000') },
+        @{ Name = "missing shared release absence helper"; Content = $content.Replace('Assert-GitHubReleaseAbsent `', 'Write-Host "release absence skipped" #') },
         @{ Name = "missing release asset download failure"; Content = $content.Replace('if ($LASTEXITCODE -ne 0) { throw "Unable to download the exact GitHub Release package asset." }', '') },
         @{ Name = "missing v100 rc1 release body mapping"; Content = $content.Replace('$notesFile = "docs/RELEASE_BODY_V100_RC1.md"', '$notesFile = "docs/missing-v100-rc1-body.md"') },
         @{ Name = "missing final attestation verify"; Content = $content.Replace('gh attestation verify', 'Write-Host "attestation verify skipped"') },

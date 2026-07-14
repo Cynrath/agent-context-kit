@@ -112,3 +112,11 @@ After TASK-0246 was pushed and all standard CI was green, TASK-0247 dispatched `
 TASK-0248 is success-only follow-up. The published smoke pin, current-release documentation, and V100-09 may change only if the exact tag, prepared prerelease, two exact release assets, two verified attestations, and Windows/Ubuntu/macOS installed-tool smoke all succeed. Neither this chain nor successful RC recovery claims 1.0 GA readiness.
 
 TASK-0247 run `29182188201` stopped before mutation after exact artifact/package/signature/install validation and the expected absent-release probe. Its failed log and immutable remote state were each inspected once: package/artifact evidence remained valid and tag/release/two attestations remained absent. The dispatch is consumed; TASK-0248 success-only work did not run.
+
+## TASK-0249–0251 Authorized Recovery Closure
+
+TASK-0249 separately corrects the TASK-0247 expected-404 exit-state defect. The shared `scripts/github-release-state.ps1` helper is used by both recovery release-absence checkpoints, accepts only a verified HTTP 404, clears only that accepted native failure state, and throws for an existing release, authentication/permission/rate-limit/server responses, malformed output, or network/unknown failures. Network-free fixtures run through the Windows/Ubuntu/macOS source-smoke matrix before any new dispatch.
+
+Only after TASK-0249 standard CI is fully green may TASK-0250 perform one new exact-existing-package recovery dispatch. The immutable source run/artifact/digest/package hashes/release commit must pass one preflight; NuGet publication remains impossible and forbidden. A remote failure consumes that dispatch and requires one log read, one immutable-state audit, documentation, and a safe stop without rerun or manual completion.
+
+TASK-0251 is success-only. It may pin published smoke to `1.0.0-rc.1`, synchronize public/recovery/provenance evidence, and close V100-09 only after the exact tag, prepared prerelease, exact nupkg/snupkg assets and hashes, both verified attestations, and Windows/Ubuntu/macOS installed-tool smoke all pass. TASK-0242, TASK-0244, and TASK-0247 remain separate immutable failure records, and no recovery outcome is a 1.0 GA claim.
