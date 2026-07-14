@@ -6,6 +6,12 @@ TASK-0255 reverified source run `29131335084`, artifact `8242162439`, artifact/c
 
 Release `https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1` targets `258918b33c3d1359aac967604ee524e8b66ddf02`, uses the prepared body and title, is a non-draft prerelease, and contains only nupkg asset `476881883` and snupkg asset `476881892`. Exact sizes, GitHub API digests, and downloaded hashes match the retained TASK-0242 inputs. NuGet publish and tag mutation counts are zero. Attestations and three-platform post-release smoke remain TASK-0256 work; V100-09 remains open.
 
+## TASK-0256 Exact Existing-Release Attestation Path
+
+The manual `attest-existing` operation accepts the already complete exact release and has only `contents: read`, `id-token: write`, and `attestations: write`. Before either `actions/attest@v4` step, it verifies current automation ancestry, exact remote tag target, prepared body/title/prerelease state, exact two asset names/sizes/API digests/downloaded hashes, NuGet repository signature/content equivalence, and package repository commit. It contains no NuGet login/push, tag mutation/push, or release create/edit/upload/delete command.
+
+`scripts/verify-existing-release-assets.ps1` implements the exact release/body/asset contract. `scripts/test-existing-release-assets.ps1` covers positive and wrong tag/target/title/body/draft/hash/size/API-digest/missing/extra-asset fixtures. Static workflow fixtures require both attestation actions, both CLI verifications, final immutable revalidation, and the Windows/Ubuntu/macOS installed-package matrix. Local implementation validation passed with 431/431 tests, ACKit, release/V100/supply-chain/Markdown gates, YAML parsing, Unicode guard 0/0, and no tracked `.ackit` artifact. Hosted evidence remains pending.
+
 ## TASK-0252–0254 Existing-Tag Recovery Closure Result
 
 TASK-0252 commit `5f6c4ce2d0ab9745207196e6b01371653adfe009` removed every recovery tag mutation, added exact-existing-tag and absent release/asset/attestation verification, passed 431/431 local tests, and passed standard runs `29344903472`, `29344903420`, and `29344903850`.

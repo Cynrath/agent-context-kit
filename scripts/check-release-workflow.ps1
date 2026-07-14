@@ -48,14 +48,17 @@ $required = @(
     "scripts/prepare-release.ps1",
     "scripts/verify-published-package.ps1",
     "scripts/verify-existing-release.ps1",
+    "scripts/verify-existing-release-assets.ps1",
     "scripts/verify-existing-package-recovery.ps1",
     "scripts/github-release-state.ps1",
     "scripts/test-existing-package-recovery.ps1",
+    "scripts/test-existing-release-assets.ps1",
     "scripts/test-release-recovery.ps1",
     "scripts/test-supply-chain-workflow.ps1",
     "scripts/check-local-markdown-links.ps1",
     "scripts/verify-release.ps1",
     "docs/RELEASE_BODY_V100_RC1.md",
+    "- attest-existing",
     'git tag --list $tagName',
     "gh release list"
 )
@@ -70,6 +73,8 @@ $validateBlock = Get-JobBlock -Name "validate-publish"
 $publishBlock = Get-JobBlock -Name "publish"
 $recoveryBlock = Get-JobBlock -Name "recover-existing"
 $recoveryMatrixBlock = Get-JobBlock -Name "verify-recovered-package"
+$attestationBlock = Get-JobBlock -Name "attest-existing"
+$attestationMatrixBlock = Get-JobBlock -Name "verify-attested-package"
 $verifyBlock = Get-JobBlock -Name "verify-existing"
 
 foreach ($marker in @("if: inputs.operation == 'publish'", "contents: read", "inputs.automation_commit_sha", "inputs.release_commit_sha")) {
@@ -116,6 +121,94 @@ foreach ($forbidden in @("contents: write", "id-token: write", "attestations: wr
     if ($verifyBlock.Contains($forbidden)) {
         $issues.Add("Read-only verification job contains forbidden marker: $forbidden") | Out-Null
     }
+}
+
+foreach ($marker in @(
+        "if: inputs.operation == 'attest-existing'",
+        "contents: read",
+        "id-token: write",
+        "attestations: write",
+        "inputs.automation_commit_sha",
+        "inputs.release_commit_sha",
+        "inputs.expected_nupkg_sha256",
+        "inputs.expected_snupkg_sha256",
+        "docs/RELEASE_BODY_V100_RC1.md",
+        "Assert-ExactExistingGitTag",
+        "gh release view",
+        "tagName,targetCommitish,isPrerelease,isDraft,name,body,assets,url,publishedAt",
+        "gh release download",
+        "scripts/verify-existing-release-assets.ps1",
+        "scripts/verify-existing-package-recovery.ps1",
+        "Verify exact existing release assets before attestation",
+        "Query exact attestation state",
+        "actions/attest@v4",
+        "gh attestation verify",
+        "Reverify exact existing release after attestation"
+    )) {
+    if (-not $attestationBlock.Contains($marker)) { $issues.Add("Existing-release attestation marker missing: $marker") | Out-Null }
+}
+
+foreach ($forbidden in @(
+        "actions: write",
+        "contents: write",
+        "environment: nuget-release",
+        "NuGet/login@",
+        "NUGET_API_KEY",
+        "dotnet nuget push",
+        "--skip-duplicate",
+        "gh release create",
+        "gh release upload",
+        "gh release edit",
+        "gh release delete",
+        "git push",
+        "--force"
+    )) {
+    if ($attestationBlock.Contains($forbidden)) {
+        $issues.Add("Existing-release attestation contains forbidden publication/release mutation marker: $forbidden") | Out-Null
+    }
+}
+
+foreach ($forbiddenPattern in @(
+        '(?mi)^\s*(?:run:\s*)?git\s+tag(?:\s|$)',
+        '(?mi)^\s*(?:run:\s*)?git\s+push\s+.*refs/tags/',
+        '(?mi)^\s*(?:run:\s*)?gh\s+api\s+(?:(?:--method|-X)\s+(?:POST|PATCH|DELETE)|(?:POST|PATCH|DELETE)\s+).*/git/refs'
+    )) {
+    if ([regex]::IsMatch($attestationBlock, $forbiddenPattern)) {
+        $issues.Add("Existing-release attestation contains forbidden tag mutation pattern: $forbiddenPattern") | Out-Null
+    }
+}
+
+if ([regex]::Matches($attestationBlock, "uses: actions/attest@v4").Count -ne 2) {
+    $issues.Add("Existing-release attestation must define exactly two asset attestation steps.") | Out-Null
+}
+if ([regex]::Matches($attestationBlock, "gh attestation verify").Count -ne 2) {
+    $issues.Add("Existing-release attestation must verify exactly two asset attestations.") | Out-Null
+}
+if ([regex]::Matches($attestationBlock, '(?m)^\s+Assert-ExactExistingGitTag\s+`?\s*$').Count -ne 2) {
+    $issues.Add("Existing-release attestation must verify the immutable exact tag before and after attestation.") | Out-Null
+}
+
+foreach ($marker in @(
+        '$attestationOutput = gh api --include "repos/${{ github.repository }}/attestations/$Digest"',
+        '$attestationExit = $LASTEXITCODE',
+        '$attestationExit -eq 0',
+        'HTTP/\S+\s+404\b',
+        'return $false',
+        'Unable to query exact release asset attestation state',
+        "steps.attestation-state.outputs.nupkg_exists != 'true'",
+        "steps.attestation-state.outputs.snupkg_exists != 'true'"
+    )) {
+    if (-not $attestationBlock.Contains($marker)) { $issues.Add("Existing-release attestation idempotency marker missing: $marker") | Out-Null }
+}
+
+$attestationVerifyIndex = $attestationBlock.IndexOf("Verify exact existing release assets before attestation", [StringComparison]::Ordinal)
+$attestationCreateIndex = $attestationBlock.IndexOf("uses: actions/attest@v4", [StringComparison]::Ordinal)
+$attestationCliVerifyIndex = $attestationBlock.IndexOf("Verify both exact existing asset attestations", [StringComparison]::Ordinal)
+$attestationFinalVerifyIndex = $attestationBlock.IndexOf("Reverify exact existing release after attestation", [StringComparison]::Ordinal)
+if ($attestationVerifyIndex -lt 0 -or $attestationCreateIndex -lt 0 -or $attestationCliVerifyIndex -lt 0 -or $attestationFinalVerifyIndex -lt 0 -or
+    $attestationVerifyIndex -gt $attestationCreateIndex -or $attestationCreateIndex -gt $attestationCliVerifyIndex -or
+    $attestationCliVerifyIndex -gt $attestationFinalVerifyIndex) {
+    $issues.Add("Exact release/package gates must precede attestation, and both CLI attestation checks must precede final immutable revalidation.") | Out-Null
 }
 
 foreach ($forbidden in @("pull_request:", "push:", "NUGET_API_KEY: `${{ secrets.", "force-with-lease", "--force")) {
@@ -326,7 +419,8 @@ foreach ($marker in @(
         'scripts/test-github-release-state.ps1',
         'scripts/check-release-workflow.ps1 -FailOnIssues',
         'scripts/test-supply-chain-workflow.ps1',
-        'scripts/test-existing-package-recovery.ps1'
+        'scripts/test-existing-package-recovery.ps1',
+        'scripts/test-existing-release-assets.ps1'
     )) {
     if (-not $sourceSmokeWorkflow.Contains($marker)) {
         $issues.Add("Cross-platform source smoke recovery test marker missing: $marker") | Out-Null
@@ -348,6 +442,24 @@ foreach ($marker in @(
 foreach ($forbidden in @("contents: write", "id-token: write", "attestations: write", "NuGet/login@", "dotnet nuget push", "git push", "gh release")) {
     if ($recoveryMatrixBlock.Contains($forbidden)) {
         $issues.Add("Recovered-package matrix contains forbidden write marker: $forbidden") | Out-Null
+    }
+}
+
+foreach ($marker in @(
+        "if: inputs.operation == 'attest-existing'",
+        "needs: attest-existing",
+        "contents: read",
+        "windows-2025",
+        "ubuntu-latest",
+        "macos-latest",
+        "scripts/verify-published-package.ps1",
+        "inputs.version"
+    )) {
+    if (-not $attestationMatrixBlock.Contains($marker)) { $issues.Add("Attested-package matrix marker missing: $marker") | Out-Null }
+}
+foreach ($forbidden in @("contents: write", "id-token: write", "attestations: write", "NuGet/login@", "dotnet nuget push", "git push", "gh release")) {
+    if ($attestationMatrixBlock.Contains($forbidden)) {
+        $issues.Add("Attested-package matrix contains forbidden write marker: $forbidden") | Out-Null
     }
 }
 

@@ -5,6 +5,7 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $workflowPath = Join-Path $repoRoot ".github\workflows\release.yml"
 $gatePath = Join-Path $PSScriptRoot "check-release-workflow.ps1"
 $releaseStateTestPath = Join-Path $PSScriptRoot "test-github-release-state.ps1"
+$existingReleaseAssetsTestPath = Join-Path $PSScriptRoot "test-existing-release-assets.ps1"
 $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ackit-supply-chain-workflow-" + [guid]::NewGuid().ToString("N"))
 $pwshPath = Get-Command pwsh -CommandType Application -ErrorAction Stop |
     Select-Object -First 1 -ExpandProperty Source
@@ -20,6 +21,11 @@ try {
     & $pwshPath -NoLogo -NoProfile -NonInteractive -File $releaseStateTestPath
     if ($LASTEXITCODE -ne 0) {
         throw "Expected-404 release-state regression fixtures failed."
+    }
+
+    & $pwshPath -NoLogo -NoProfile -NonInteractive -File $existingReleaseAssetsTestPath
+    if ($LASTEXITCODE -ne 0) {
+        throw "Exact existing-release asset regression fixtures failed."
     }
 
     if ((Invoke-Gate -Path $workflowPath) -ne 0) {
@@ -56,7 +62,15 @@ try {
         @{ Name = "release creation loses verify tag"; Content = $content.Replace('            --verify-tag `', '            --fail-no-tag-check `') },
         @{ Name = "release creation loses exact target"; Content = $content.Replace('            --target $releaseSha `', '            --target forbidden `') },
         @{ Name = "recovery manual release upload"; Content = $content.Replace("      - name: Verify exact tag prerelease body and assets", "      - name: Forbidden manual upload`n        run: gh release upload forbidden forbidden.nupkg`n`n      - name: Verify exact tag prerelease body and assets") },
-        @{ Name = "recovery safety gate moved after remote mutation"; Content = $lateSafetyGate }
+        @{ Name = "recovery safety gate moved after remote mutation"; Content = $lateSafetyGate },
+        @{ Name = "attestation-only gains NuGet push"; Content = $content.Replace("      - name: Query exact attestation state", "      - name: Forbidden attestation NuGet push`n        run: dotnet nuget push forbidden.nupkg`n`n      - name: Query exact attestation state") },
+        @{ Name = "attestation-only gains release creation"; Content = $content.Replace("      - name: Query exact attestation state", "      - name: Forbidden attestation release creation`n        run: gh release create forbidden`n`n      - name: Query exact attestation state") },
+        @{ Name = "attestation-only gains tag mutation"; Content = $content.Replace("      - name: Query exact attestation state", "      - name: Forbidden attestation tag mutation`n        run: git tag forbidden`n`n      - name: Query exact attestation state") },
+        @{ Name = "attestation-only loses exact asset verifier"; Content = $content.Replace("scripts/verify-existing-release-assets.ps1", "scripts/missing-existing-release-assets.ps1") },
+        @{ Name = "attestation-only loses second attestation"; Content = ([regex]::new('(?ms)^      - name: Attest exact existing snupkg\r?\n.*?(?=^      - name: Verify both exact existing asset attestations)')).Replace($content, '', 1) },
+        @{ Name = "attestation-only loses attestation verification"; Content = $content.Replace("      - name: Verify both exact existing asset attestations", "      - name: Attestation verification removed").Replace('          gh attestation verify (Join-Path $root "AgentContextKit.${{ inputs.version }}.nupkg")', '          Write-Host "nupkg attestation verification removed"').Replace('          gh attestation verify (Join-Path $root "AgentContextKit.${{ inputs.version }}.snupkg")', '          Write-Host "snupkg attestation verification removed"') },
+        @{ Name = "attestation-only loses macOS smoke"; Content = $content.Replace("  verify-attested-package:`n    if: inputs.operation == 'attest-existing'`n", "  verify-attested-package:`n    if: inputs.operation == 'attest-existing'`n").Replace("          - macos-latest`n`n    steps:`n      - name: Checkout exact attestation automation commit", "`n    steps:`n      - name: Checkout exact attestation automation commit") },
+        @{ Name = "source smoke loses exact release asset fixtures"; Content = $content.Replace("          pwsh -NoProfile -File scripts/test-existing-release-assets.ps1", "          Write-Host exact-release-asset-fixtures-removed") }
     )
 
     foreach ($case in $cases) {

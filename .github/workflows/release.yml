@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Publish, recover an exact existing package, or verify an immutable release
+        description: Publish, recover, attest, or verify an exact immutable release
         required: true
         default: verify-existing
         type: choice
         options:
           - publish
           - recover-existing
+          - attest-existing
           - verify-existing
       version:
         description: SemVer package version without v prefix
@@ -544,10 +545,10 @@ jobs:
           $expectedSnupkgHash = "${{ inputs.expected_snupkg_sha256 }}".ToLowerInvariant()
           git fetch origin "refs/tags/$tagName:refs/tags/$tagName"
           if ((git rev-list -n 1 $tagName).Trim() -ne $releaseSha) { throw "Recovered tag does not target the exact release commit." }
-          $release = gh release view $tagName --repo "${{ github.repository }}" --json tagName,targetCommitish,isPrerelease,title,body,assets,url | ConvertFrom-Json
+          $release = gh release view $tagName --repo "${{ github.repository }}" --json tagName,targetCommitish,isPrerelease,name,body,assets,url | ConvertFrom-Json
           if ($release.tagName -ne $tagName -or $release.targetCommitish -ne $releaseSha) { throw "Recovered prerelease identity/target mismatch." }
           if (-not [bool]$release.isPrerelease) { throw "Recovered release is not a prerelease." }
-          if ($release.title -ne "AgentContextKit $version") { throw "Recovered prerelease title mismatch." }
+          if ($release.name -ne "AgentContextKit $version") { throw "Recovered prerelease title mismatch." }
           $expectedBody = (Get-Content 'docs/RELEASE_BODY_V100_RC1.md' -Raw).Replace("`r`n", "`n").TrimEnd()
           $actualBody = ([string]$release.body).Replace("`r`n", "`n").TrimEnd()
           if ($actualBody -ne $expectedBody) { throw "Recovered prerelease body mismatch." }
@@ -634,6 +635,219 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Verify recovered NuGet global tool
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          pwsh -NoProfile -File scripts/verify-published-package.ps1 -Version "${{ inputs.version }}"
+
+  attest-existing:
+    if: inputs.operation == 'attest-existing'
+    name: attest exact existing release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Checkout exact attestation automation commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.automation_commit_sha }}
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run exact existing-release safety gates
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          pwsh -NoProfile -File scripts/test-existing-release-assets.ps1
+          pwsh -NoProfile -File scripts/check-release-workflow.ps1 -FailOnIssues
+          pwsh -NoProfile -File scripts/test-supply-chain-workflow.ps1
+
+      - name: Verify exact existing release assets before attestation
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $version = "${{ inputs.version }}"
+          $automationSha = "${{ inputs.automation_commit_sha }}".ToLowerInvariant()
+          $releaseSha = "${{ inputs.release_commit_sha }}".ToLowerInvariant()
+          $expectedNupkgHash = "${{ inputs.expected_nupkg_sha256 }}".ToLowerInvariant()
+          $expectedSnupkgHash = "${{ inputs.expected_snupkg_sha256 }}".ToLowerInvariant()
+          $tagName = "v$version"
+          $notesFile = "docs/RELEASE_BODY_V100_RC1.md"
+
+          if ($version -ne "1.0.0-rc.1") { throw "Existing-release attestation is restricted to 1.0.0-rc.1." }
+          if (-not [System.Convert]::ToBoolean("${{ inputs.prerelease }}")) { throw "Existing-release attestation requires prerelease=true." }
+          if ($automationSha -notmatch '^[a-f0-9]{40}$' -or $releaseSha -notmatch '^[a-f0-9]{40}$') { throw "Automation and release commits must be exact Git SHAs." }
+          if ($expectedNupkgHash -notmatch '^[a-f0-9]{64}$' -or $expectedSnupkgHash -notmatch '^[a-f0-9]{64}$') { throw "Both exact release asset hashes are mandatory." }
+          if (-not (Test-Path -LiteralPath $notesFile -PathType Leaf)) { throw "Prepared RC1 release body is missing." }
+
+          git fetch origin master --quiet
+          if ((git rev-parse HEAD).Trim() -ne $automationSha) { throw "Checked-out HEAD does not match automation_commit_sha." }
+          if ((git rev-parse origin/master).Trim() -ne $automationSha) { throw "automation_commit_sha is not current origin/master." }
+          $PSNativeCommandUseErrorActionPreference = $false
+          git merge-base --is-ancestor $releaseSha $automationSha
+          $isAncestor = $LASTEXITCODE -eq 0
+          $PSNativeCommandUseErrorActionPreference = $true
+          if (-not $isAncestor) { throw "release_commit_sha is not an ancestor of the attestation automation commit." }
+
+          . ./scripts/github-release-state.ps1
+          Assert-ExactExistingGitTag `
+            -Tag $tagName `
+            -ExpectedCommitSha $releaseSha `
+            -UnprovenTagMessage "Unable to prove the exact existing release tag before attestation." `
+            -WrongTagMessage "Existing release tag does not target the exact release commit."
+
+          $assetRoot = Join-Path $env:RUNNER_TEMP "ackit-existing-release-attestation"
+          New-Item -ItemType Directory -Force -Path $assetRoot | Out-Null
+          $releaseJsonPath = Join-Path $env:RUNNER_TEMP "exact-existing-release.json"
+          $release = gh release view $tagName --repo "${{ github.repository }}" --json tagName,targetCommitish,isPrerelease,isDraft,name,body,assets,url,publishedAt | ConvertFrom-Json
+          $release | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $releaseJsonPath -Encoding utf8
+          gh release download $tagName --repo "${{ github.repository }}" --dir $assetRoot --pattern "AgentContextKit.$version.nupkg" --pattern "AgentContextKit.$version.snupkg" --clobber
+
+          $releaseEvidencePath = Join-Path $env:RUNNER_TEMP "exact-existing-release-evidence.json"
+          pwsh -NoProfile -File scripts/verify-existing-release-assets.ps1 `
+            -Version $version `
+            -ReleaseCommitSha $releaseSha `
+            -ReleaseJsonPath $releaseJsonPath `
+            -ReleaseBodyPath $notesFile `
+            -AssetDirectory $assetRoot `
+            -ExpectedNupkgSha256 $expectedNupkgHash `
+            -ExpectedSnupkgSha256 $expectedSnupkgHash `
+            -Prerelease "${{ inputs.prerelease }}" `
+            -OutputPath $releaseEvidencePath
+
+          $nugetNupkg = Join-Path $env:RUNNER_TEMP "nuget-AgentContextKit.$version.nupkg"
+          Invoke-WebRequest -Uri "https://api.nuget.org/v3-flatcontainer/agentcontextkit/$version/agentcontextkit.$version.nupkg" -OutFile $nugetNupkg -UseBasicParsing
+          $packageEvidencePath = Join-Path $env:RUNNER_TEMP "exact-existing-package-evidence.json"
+          pwsh -NoProfile -File scripts/verify-existing-package-recovery.ps1 `
+            -Version $version `
+            -ReleaseCommitSha $releaseSha `
+            -CandidateNupkgPath (Join-Path $assetRoot "AgentContextKit.$version.nupkg") `
+            -CandidateSnupkgPath (Join-Path $assetRoot "AgentContextKit.$version.snupkg") `
+            -NuGetNupkgPath $nugetNupkg `
+            -ExpectedNupkgSha256 $expectedNupkgHash `
+            -ExpectedSnupkgSha256 $expectedSnupkgHash `
+            -OutputPath $packageEvidencePath
+
+      - name: Query exact attestation state
+        id: attestation-state
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          function Test-AttestationExists {
+            param([Parameter(Mandatory = $true)][string]$Digest)
+
+            $PSNativeCommandUseErrorActionPreference = $false
+            $attestationOutput = gh api --include "repos/${{ github.repository }}/attestations/$Digest" 2>&1
+            $attestationExit = $LASTEXITCODE
+            $PSNativeCommandUseErrorActionPreference = $true
+            if ($attestationExit -eq 0) { return $true }
+
+            $attestationText = ($attestationOutput | Out-String)
+            if ($attestationText -match "(?m)^HTTP/\S+\s+404\b" -or $attestationText -match "\(HTTP 404\)") {
+              return $false
+            }
+            throw "Unable to query exact release asset attestation state. gh exit code: $attestationExit"
+          }
+
+          $nupkgExists = Test-AttestationExists -Digest "sha256:${{ inputs.expected_nupkg_sha256 }}"
+          $snupkgExists = Test-AttestationExists -Digest "sha256:${{ inputs.expected_snupkg_sha256 }}"
+          "nupkg_exists=$($nupkgExists.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "snupkg_exists=$($snupkgExists.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Attest exact existing nupkg
+        if: steps.attestation-state.outputs.nupkg_exists != 'true'
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ runner.temp }}/ackit-existing-release-attestation/AgentContextKit.${{ inputs.version }}.nupkg
+
+      - name: Attest exact existing snupkg
+        if: steps.attestation-state.outputs.snupkg_exists != 'true'
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ runner.temp }}/ackit-existing-release-attestation/AgentContextKit.${{ inputs.version }}.snupkg
+
+      - name: Verify both exact existing asset attestations
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $root = Join-Path $env:RUNNER_TEMP "ackit-existing-release-attestation"
+          gh attestation verify (Join-Path $root "AgentContextKit.${{ inputs.version }}.nupkg") --repo "${{ github.repository }}" --signer-workflow "${{ github.repository }}/.github/workflows/release.yml"
+          gh attestation verify (Join-Path $root "AgentContextKit.${{ inputs.version }}.snupkg") --repo "${{ github.repository }}" --signer-workflow "${{ github.repository }}/.github/workflows/release.yml"
+
+      - name: Reverify exact existing release after attestation
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $version = "${{ inputs.version }}"
+          $tagName = "v$version"
+          $releaseSha = "${{ inputs.release_commit_sha }}".ToLowerInvariant()
+          $releaseJsonPath = Join-Path $env:RUNNER_TEMP "exact-existing-release-final.json"
+          . ./scripts/github-release-state.ps1
+          Assert-ExactExistingGitTag `
+            -Tag $tagName `
+            -ExpectedCommitSha $releaseSha `
+            -UnprovenTagMessage "Unable to re-prove the exact existing release tag after attestation." `
+            -WrongTagMessage "Existing release tag changed target during attestation."
+          $release = gh release view $tagName --repo "${{ github.repository }}" --json tagName,targetCommitish,isPrerelease,isDraft,name,body,assets,url,publishedAt | ConvertFrom-Json
+          $release | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $releaseJsonPath -Encoding utf8
+          pwsh -NoProfile -File scripts/verify-existing-release-assets.ps1 `
+            -Version $version `
+            -ReleaseCommitSha $releaseSha `
+            -ReleaseJsonPath $releaseJsonPath `
+            -ReleaseBodyPath "docs/RELEASE_BODY_V100_RC1.md" `
+            -AssetDirectory (Join-Path $env:RUNNER_TEMP "ackit-existing-release-attestation") `
+            -ExpectedNupkgSha256 "${{ inputs.expected_nupkg_sha256 }}" `
+            -ExpectedSnupkgSha256 "${{ inputs.expected_snupkg_sha256 }}" `
+            -Prerelease "${{ inputs.prerelease }}"
+
+  verify-attested-package:
+    if: inputs.operation == 'attest-existing'
+    name: verify attested package (${{ matrix.os }})
+    needs: attest-existing
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-2025
+          - ubuntu-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout exact attestation automation commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.automation_commit_sha }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Verify attested NuGet global tool
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"

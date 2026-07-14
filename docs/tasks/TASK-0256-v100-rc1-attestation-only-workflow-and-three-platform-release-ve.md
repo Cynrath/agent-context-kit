@@ -118,4 +118,13 @@ Record implementation commit, local validation, standard CI runs/jobs, attestati
 
 ## Completion notes
 
-Status: `PLANNED / BLOCKED ON TASK-0255 COMPLETE RELEASE`.
+Status: `IMPLEMENTED / LOCAL VALIDATION PASS / HOSTED DISPATCH PENDING`.
+
+- Added `attest-existing` to `.github/workflows/release.yml` with only `contents: read`, `id-token: write`, and `attestations: write`. It cannot publish NuGet, create/edit/upload/delete a release, or mutate/push a tag.
+- Before attestation it verifies current automation HEAD/origin, release ancestry, exact remote tag target, prepared body, non-draft prerelease identity/title, exact two asset names/sizes/API digests/downloaded hashes, NuGet repository signature/content equivalence, and repository commit.
+- Missing exact attestations use two conditional `actions/attest@v4` steps; existing attestations may be reused, but both subjects must pass `gh attestation verify` against `Cynrath/agent-context-kit/.github/workflows/release.yml`. The exact tag/release/body/assets are reverified afterward.
+- A dependent `verify-attested-package` matrix requires `windows-2025`, `ubuntu-latest`, and `macos-latest` installed-package smoke through `scripts/verify-published-package.ps1`.
+- Added `scripts/verify-existing-release-assets.ps1` and network-free fixtures for wrong tag/target/title/body/draft state, missing/extra asset, size, API digest, and downloaded hash. Static negative fixtures reject NuGet publication, tag mutation, release creation, missing attestation verification, and missing macOS coverage.
+- Live read-only validation against release `353913024` exposed and corrected current `gh release view --json` title field usage from obsolete `title` to `name`; the exact live body/asset verification then passed.
+- Local validation passed: ACKit doctor 13/13; scan exit 0; restore; Release build 0 warnings/0 errors; 431/431 tests; focused exact-release/recovery/supply-chain fixtures; release/V100/security/supply-chain/Markdown gates; YAML parse; Unicode guard 0 before/0 after; tracked `.ackit` count 0; `git diff --check` clean.
+- Hosted standard CI, attestation dispatch, attestation IDs, and three-platform job evidence remain pending the implementation push.
