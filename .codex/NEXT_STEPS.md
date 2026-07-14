@@ -2,8 +2,8 @@
 
 ## Current V100 `1.0.0-rc.1` Full Release Closure — TASK-0255–0257 Planned
 
-1. PLANNED — TASK-0255: diagnose the TASK-0253 Actions integration HTTP 403, reverify immutable source/NuGet/tag/release inputs, and use authenticated local `gh` to create/verify the exact prerelease with only the retained nupkg/snupkg.
-2. PLANNED / BLOCKED ON TASK-0255 — TASK-0256: implement and validate an attestation-only exact-existing-release operation, verify both attestations, and pass Windows/Ubuntu/macOS installed-package smoke.
+1. COMPLETED — TASK-0255: exact source/NuGet/tag tuple passed; authenticated ADMIN local `gh` created release `353913024` with exact prepared body and only asset IDs `476881883`/`476881892`; sizes, API digests, and downloaded hashes passed; NuGet/tag/settings mutation zero.
+2. IN PROGRESS — TASK-0256: implement and validate an attestation-only exact-existing-release operation, verify both attestations, and pass Windows/Ubuntu/macOS installed-package smoke.
 3. PLANNED / SUCCESS-ONLY — TASK-0257: pin published smoke to RC1, synchronize EN/TR/NuGet/release/supply-chain/V100 evidence, close V100-09, and finish with full validation, final CI, clean local/origin equality.
 
 New full authorization supersedes obsolete retry/manual-completion boundaries while preserving every historical failure record. NuGet publication/mutation, normal publish, tag mutation, unverified assets, PAT/secret/settings changes, force push, history rewrite, generated `.ackit/` commit, and GA claims remain prohibited.

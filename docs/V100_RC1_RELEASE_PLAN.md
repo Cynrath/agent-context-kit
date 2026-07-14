@@ -45,7 +45,7 @@ After hosted evidence starts, TASK-0240 and TASK-0241 may change documentation, 
 
 - Hosted three-OS exact-candidate evidence completed in TASK-0240 run `29118452246`.
 - Final candidate acceptance and gap reconciliation completed in TASK-0241.
-- V100-09 provenance remains open because TASK-0253 received HTTP 403 before creating the GitHub prerelease/assets or attestations; the recovered-package matrix was skipped.
+- TASK-0255 created and fully verified the exact GitHub prerelease/body/nupkg/snupkg without NuGet or tag mutation. V100-09 remains open only for both attestations and TASK-0256 Windows/Ubuntu/macOS installed-package proof.
 - Author signing and SBOM publication remain bounded accepted risks through their recorded review boundary.
 - `1.0.0` GA readiness is not claimed.
 
@@ -64,7 +64,7 @@ Before publication, correct the source with a normal successor commit and rerun 
 
 ## Post-Publish Validation
 
-TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. TASK-0243 implemented exact-package recovery. TASK-0244 failed before mutation on a Windows-only fixture call. TASK-0246 fixed that call and passed standard CI. TASK-0247 stopped after the expected absent-release probe. TASK-0249 fixed that exit state and passed standard CI. TASK-0250 stopped at tag push. The owner later created the exact tag. TASK-0252 removed all tag mutation from recovery and passed standard CI. TASK-0253 run `29345313517` passed safety plus exact artifact/package/signature/install/tag/recheck validation, then `gh release create` returned HTTP 403. One audit confirmed unchanged package/artifact/tag evidence and absent prerelease/assets/two attestations. TASK-0254 did not change the smoke pin or V100-09. Do not republish, reuse, fix-and-retry, rerun, redispatch, complete manually, change settings, or mutate the exact tag.
+TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. TASK-0243 implemented exact-package recovery. TASK-0244/TASK-0247/TASK-0250/TASK-0253 preserve their distinct failures. New full authorization enabled TASK-0255 to diagnose the Actions integration 403 and use authenticated ADMIN local `gh` to create exact release `353913024`. The exact body, target, prerelease state, only two asset IDs, sizes, API digests, and downloaded hashes passed; NuGet/tag/settings remained unchanged. TASK-0256 now owns attestation-only provenance and three-platform proof. Do not republish NuGet, reuse/rebuild assets, mutate the tag/release assets, change settings/PAT/secrets, force push, or rewrite history.
 
 ## TASK-0239 Evidence
 

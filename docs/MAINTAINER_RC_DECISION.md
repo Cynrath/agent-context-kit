@@ -1,9 +1,9 @@
 # Maintainer Release-Candidate Decision
 
 ## Current Decision
-**TASK-0253 STOPPED AFTER GITHUB RELEASE CREATION RETURNED HTTP 403; REMOTE RELEASE STATE UNCHANGED.**
+**TASK-0255 COMPLETED THE EXACT GITHUB PRERELEASE AND TWO ASSETS; ATTESTATIONS AND THREE-PLATFORM PROOF REMAIN.**
 
-The repository owner created exact tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. TASK-0252 changed recovery to verify that tag without mutation and passed exact-HEAD standard CI. TASK-0253 then consumed one authorized `recover-existing` dispatch in run `29345313517`. All safety/artifact/package/tag/release-state gates passed, but `gh release create` returned `HTTP 403: Resource not accessible by integration`. One log read and one immutable audit proved NuGet/artifact/tag unchanged and prerelease/assets/two attestations absent. TASK-0254 is not executed; V100-09 remains open and `v0.2.0-alpha.4` remains the latest complete prerelease.
+The repository owner created exact tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. TASK-0253's Actions integration later received HTTP 403 at release creation despite declared Contents write. New full authorization enabled TASK-0255 to reverify the exact source/NuGet/tag tuple and use authenticated ADMIN local `gh` to create release `353913024` with the prepared body and only exact asset IDs `476881883`/`476881892`. Target/title/body/prerelease state, sizes, API digests, and downloaded hashes passed. NuGet/tag/settings remained unchanged. V100-09 remains open only for both attestations and three-platform installed-package proof; `v0.2.0-alpha.4` remains public guidance until TASK-0257.
 
 Candidate `1.0.0-rc.1` is accepted against published predecessor `0.2.0-alpha.4`. TASK-0239 local/package evidence and standard CI passed for exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; TASK-0240 hosted run `29118452246` passed on Windows, Ubuntu, and macOS; the post-candidate bridge is documentation/evidence/governance-only; and TASK-0241 closes every P0 gap plus target P1 gaps V100-07, V100-08, and V100-10.
 

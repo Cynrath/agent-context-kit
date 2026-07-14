@@ -117,4 +117,27 @@ Record release URL/ID, exact tag target, title/body/prerelease verification, ass
 
 ## Completion notes
 
-Status: `PLANNED / WAITING FOR TASK-FIRST PLAN COMMIT`.
+Status: `COMPLETED / EXACT PRERELEASE AND TWO ASSETS VERIFIED`.
+
+Diagnosis and authenticated boundary:
+
+- TASK-0253 job `87127346868` received `Actions: read`, `Attestations: write`, and `Contents: write`; repository Actions settings also report default workflow permissions `write`. The release endpoint nevertheless returned `HTTP 403: Resource not accessible by integration` to `github.token`.
+- Local `gh` is authenticated as `Cynrath` with `repo`/`workflow` scopes; repository viewer permission is `ADMIN` and repository permission flags include `push` and `admin`.
+- Current official GitHub CLI/API documentation confirms `gh release create --verify-tag --target`, release creation requiring Contents write, and binary attestation permissions `contents: read`, `id-token: write`, `attestations: write`.
+
+Immutable input verification:
+
+- Source run `29131335084`, artifact `8242162439`, name `AgentContextKit-1.0.0-rc.1`, digest `sha256:cd5550b2172aa0e4ff9bf700f6eefb04dfd8dbd88c8d7fee22914c1769533b3f`, and expiry `2026-07-24T23:55:32Z` verified.
+- Artifact contained only nupkg `218322` bytes / SHA-256 `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d` and snupkg `50053` bytes / SHA-256 `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d`.
+- NuGet-served SHA-256 `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`, NuGet.org repository signature, archive content equivalence excluding `.signature.p7s`, and repository commit `258918b33c3d1359aac967604ee524e8b66ddf02` verified.
+- Exact remote tag resolved to the same release commit; release and both attestations were absent before mutation.
+
+Release result:
+
+- Authenticated local `gh release create` completed once using the exact two retained files, `--verify-tag`, exact `--target`, title `AgentContextKit 1.0.0-rc.1`, prepared body, and prerelease flag.
+- Release ID `353913024`; URL `https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1`; body SHA-256 `c5a6c110fea849f8544ffb23818ad5be1b9c83c3faa595dbd2e03eb9506d72f6`.
+- nupkg asset ID `476881883`, size `218322`, API digest and downloaded SHA-256 `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d`.
+- snupkg asset ID `476881892`, size `50053`, API digest and downloaded SHA-256 `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d`.
+- Exact tag target, release target/title/body/prerelease/draft state, exact two-asset set, sizes, API digests, and downloaded hashes all passed.
+
+NuGet publish count: zero. Tag mutation count: zero. Settings/PAT/secret mutation: zero. TASK-0256 is unblocked; both attestations and three-platform installed-package evidence remain pending.

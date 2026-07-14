@@ -3,7 +3,7 @@
 ## Active V100 Release-Candidate Chain
 
 - TASK-0255 through TASK-0257 are the active fully authorized RC1 completion chain. Entry `master`/`origin/master` is clean at `177810dc2e7dc14304541430cb074c13efc19612`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
-- TASK-0255 will diagnose the TASK-0253 Actions integration HTTP 403, reverify the frozen source/NuGet/tag tuple, and create/verify the exact prerelease plus nupkg/snupkg through the authenticated local `gh` identity.
+- TASK-0255 completed: TASK-0253's token had declared Contents write but the release endpoint rejected the integration; authenticated ADMIN local `gh` created release `353913024` and exact body/two assets, and all tag/target/size/API-digest/download-hash checks passed without NuGet or tag mutation.
 - TASK-0256 will add a minimal attestation-only exact-existing-release workflow, enforce release/body/asset/hash verification before provenance, verify both attestations, and run Windows/Ubuntu/macOS installed-package smoke.
 - TASK-0257 is success-only: pin published smoke to RC1, synchronize EN/TR/NuGet/release/supply-chain/V100 evidence, close V100-09, and require final green standard CI plus clean local/origin equality.
 - TASK-0252 through TASK-0254 are the latest authorized closure chain. Entry HEAD was `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 were verified.

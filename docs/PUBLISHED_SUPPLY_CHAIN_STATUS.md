@@ -1,5 +1,22 @@
 # Published Supply-Chain Status
 
+## TASK-0255 Exact GitHub Prerelease And Assets — PASS
+
+Authenticated completion on 2026-07-14 used only the exact retained TASK-0242 package files after a full immutable revalidation:
+
+| Field | Verified state |
+| --- | --- |
+| Source run/artifact | Run `29131335084`; artifact `8242162439`; digest `sha256:cd5550b2172aa0e4ff9bf700f6eefb04dfd8dbd88c8d7fee22914c1769533b3f`; unexpired |
+| NuGet package | `AgentContextKit 1.0.0-rc.1` unchanged; repository-signed; repository commit `258918b33c3d1359aac967604ee524e8b66ddf02` |
+| Exact tag | `v1.0.0-rc.1` unchanged at the release commit |
+| GitHub prerelease | Release ID `353913024`; `https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1`; exact title/body/target/prerelease state |
+| nupkg asset | ID `476881883`; `218322` bytes; API digest/download SHA-256 `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d` |
+| snupkg asset | ID `476881892`; `50053` bytes; API digest/download SHA-256 `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d` |
+| Release body SHA-256 | `c5a6c110fea849f8544ffb23818ad5be1b9c83c3faa595dbd2e03eb9506d72f6` |
+| Attestations/platform smoke | Pending TASK-0256 |
+
+The TASK-0253 GitHub Actions integration 403 was not retried unchanged. Its job had Contents write, but the release endpoint rejected the integration. Existing authenticated local account `Cynrath` had ADMIN/write access and created the exact release once. NuGet publish count, tag mutation count, and settings/PAT/secret mutation count are zero. V100-09 remains open until both attestations and three-platform installed-package evidence pass.
+
 ## TASK-0253 Post-Failure Immutable State
 
 One post-failure audit on 2026-07-14 after recovery run `29345313517`, job `87127346868`:

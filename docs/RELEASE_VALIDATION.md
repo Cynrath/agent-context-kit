@@ -1,5 +1,11 @@
 # Release Validation
 
+## TASK-0255 Exact Prerelease And Asset Completion
+
+TASK-0255 reverified source run `29131335084`, artifact `8242162439`, artifact/candidate/NuGet hashes, NuGet.org repository signature, archive content equivalence, repository commit, and exact tag. Local authenticated account `Cynrath` has repository ADMIN access and created exact prerelease `353913024` once after the TASK-0253 GitHub Actions integration path was diagnosed as release-endpoint HTTP 403 despite declared Contents write.
+
+Release `https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1` targets `258918b33c3d1359aac967604ee524e8b66ddf02`, uses the prepared body and title, is a non-draft prerelease, and contains only nupkg asset `476881883` and snupkg asset `476881892`. Exact sizes, GitHub API digests, and downloaded hashes match the retained TASK-0242 inputs. NuGet publish and tag mutation counts are zero. Attestations and three-platform post-release smoke remain TASK-0256 work; V100-09 remains open.
+
 ## TASK-0252–0254 Existing-Tag Recovery Closure Result
 
 TASK-0252 commit `5f6c4ce2d0ab9745207196e6b01371653adfe009` removed every recovery tag mutation, added exact-existing-tag and absent release/asset/attestation verification, passed 431/431 local tests, and passed standard runs `29344903472`, `29344903420`, and `29344903850`.

@@ -1,5 +1,9 @@
 # Hosted Validation Status
 
+## TASK-0255 Authenticated Release Completion — PASS
+
+Local authenticated account `Cynrath` with repository `ADMIN` permission completed exact GitHub prerelease `353913024` after TASK-0253's GitHub Actions integration token received HTTP 403 despite declared Contents write. URL: `https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1`. Exact tag/target/title/body/prerelease state and only nupkg/snupkg asset IDs `476881883`/`476881892` passed size, API digest, and downloaded SHA-256 verification. TASK-0256 hosted attestation and three-platform evidence remain pending.
+
 ## TASK-0252 Standard CI — PASS
 
 TASK-0252 implementation commit `5f6c4ce2d0ab9745207196e6b01371653adfe009` passed `ci` run `29344903472`, published alpha4 `cross-platform-smoke` run `29344903420`, and `cross-platform-source-smoke` run `29344903850`. Source-smoke jobs `87125920260` (Windows), `87125920328` (Ubuntu), and `87125920330` (macOS) exercised the exact-existing-tag state fixtures and recovery static gates.
