@@ -1,5 +1,9 @@
 # Hosted Validation Status
 
+## TASK-0257 Public RC1 Closure — PASS
+
+Closure commit `b6211831b019220737e7b7d8eaf7400ead64af8e` passed `ci` run `29351903037`, published `cross-platform-smoke` run `29351903024`, and `cross-platform-source-smoke` run `29351902643`. Published smoke installed and reported `AgentContextKit 1.0.0-rc.1` in Windows job `87149935862`, Ubuntu job `87149935888`, and macOS job `87149935926`. Source-smoke jobs `87149934376`/`87149934388`/`87149934424` and CI jobs `87149935667`/`87149935755` also passed. V100-09 is closed; this remains a prerelease rather than a `1.0.0` GA claim.
+
 ## TASK-0255 Authenticated Release Completion — PASS
 
 Local authenticated account `Cynrath` with repository `ADMIN` permission completed exact GitHub prerelease `353913024` after TASK-0253's GitHub Actions integration token received HTTP 403 despite declared Contents write. URL: `https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1`. Exact tag/target/title/body/prerelease state and only nupkg/snupkg asset IDs `476881883`/`476881892` passed size, API digest, and downloaded SHA-256 verification.

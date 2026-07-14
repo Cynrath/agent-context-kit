@@ -1,6 +1,6 @@
 # Next Tasks
 
-## V100 `1.0.0-rc.1` Full Release Closure — Local PASS / Final CI Pending
+## V100 `1.0.0-rc.1` Full Release Closure — Completed
 
 New explicit full operational authorization received on 2026-07-14 supersedes only obsolete retry/manual-completion boundaries while preserving all historical evidence. Clean synchronized entry is `177810dc2e7dc14304541430cb074c13efc19612`. TASK-0255 owns authenticated local GitHub prerelease/exact-asset completion, TASK-0256 owns attestation-only workflow plus three-platform verification, and TASK-0257 owns RC1 published-smoke/public/V100/final-CI closure. NuGet republication and every tag mutation remain prohibited.
 
@@ -24,7 +24,7 @@ New explicit full operational authorization received on 2026-07-14 supersedes on
 | 16 | TASK-0254 three-platform smoke, public status, and provenance closure | NOT EXECUTED | Success-only smoke pin/V100-09 closure withheld after TASK-0253 failure | TASK-0253 success not met | Failure-state documentation only | Smoke pin alpha4; V100-09 open |
 | 17 | TASK-0255 authenticated GitHub prerelease and exact asset completion | COMPLETED | Actions integration 403 diagnosed; authenticated local `gh` created and verified exact prerelease/body/two retained assets | New full authorization; immutable artifact/tag facts | Release `353913024`; exact body, asset IDs/sizes/API digests/download hashes PASS | One exact GitHub Release creation; zero NuGet/tag/settings mutation |
 | 18 | TASK-0256 attestation-only workflow and three-platform release verification | COMPLETED | Exact release/package gates, two verified attestations, and Windows/Ubuntu/macOS installed smoke passed | TASK-0255 exact release complete | Run `29350091782`; attestation job `87143810767`; platform jobs `87144074850`/`87144074884`/`87144074933` | OIDC attestations only; zero NuGet/tag/release mutation |
-| 19 | TASK-0257 public status provenance and final CI closure | LOCAL PASS / FINAL CI PENDING | Published smoke pinned to RC1; EN/TR/NuGet/public/V100 evidence synchronized; V100-09 closed; complete local suite passed | TASK-0255 and TASK-0256 complete | Final three workflows and final remote/local equality | Normal repository commits/pushes only |
+| 19 | TASK-0257 public status provenance and final CI closure | COMPLETED / CI PASS | Published smoke pinned to RC1; EN/TR/NuGet/public/V100 evidence synchronized; V100-09 closed; complete local suite and closure-head standard CI passed | TASK-0255 and TASK-0256 complete | Runs `29351903037`, `29351903024`, `29351902643` PASS | Normal repository commits/pushes only; evidence sync follows |
 
 NuGet `1.0.0-rc.1` and exact tag `v1.0.0-rc.1` remain immutable. Current authorization permits exact GitHub prerelease/assets, attestation workflow dispatch/retry after validated correction, three-platform verification, smoke-pin/docs/V100 closure, and normal commits/pushes. NuGet publication/mutation, normal publish, tag mutation, unverified asset upload, force push, history rewrite, generated `.ackit/` commit, or GA claim remains prohibited.
 

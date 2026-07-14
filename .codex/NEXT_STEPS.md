@@ -1,10 +1,10 @@
 # Next Steps
 
-## Current V100 `1.0.0-rc.1` Full Release Closure — Local PASS / Final CI Pending
+## Current V100 `1.0.0-rc.1` Full Release Closure — Completed
 
 1. COMPLETED — TASK-0255: exact source/NuGet/tag tuple passed; authenticated ADMIN local `gh` created release `353913024` with exact prepared body and only asset IDs `476881883`/`476881892`; sizes, API digests, and downloaded hashes passed; NuGet/tag/settings mutation zero.
 2. COMPLETED — TASK-0256: correction `83ab0a5`, standard runs `29349905919`/`29349906036`/`29349905891`, and corrected release run `29350091782` pass; attestations `35295200`/`35295205` and three platform jobs pass; zero NuGet/tag/release mutation.
-3. LOCAL PASS / FINAL CI PENDING — TASK-0257: published smoke pinned to RC1; EN/TR/NuGet/release/supply-chain/V100 evidence synchronized; V100-09 closed; 431/431 full local suite and all gates passed. Finish closure push, final CI, and clean local/origin equality.
+3. COMPLETED / CI PASS — TASK-0257: published smoke pinned to RC1; EN/TR/NuGet/release/supply-chain/V100 evidence synchronized; V100-09 closed; 431/431 full local suite passed; closure-head runs `29351903037`, `29351903024`, and `29351902643` passed. Final evidence sync requires its own standard CI and clean local/origin equality check.
 
 New full authorization supersedes obsolete retry/manual-completion boundaries while preserving every historical failure record. NuGet publication/mutation, normal publish, tag mutation, unverified assets, PAT/secret/settings changes, force push, history rewrite, generated `.ackit/` commit, and GA claims remain prohibited.
 

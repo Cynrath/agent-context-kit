@@ -2,7 +2,7 @@
 
 ## TASK-0257 Public Closure Local Validation
 
-Published smoke and current public guidance now use `1.0.0-rc.1`; alpha4 remains the immutable predecessor. V100-09 is closed from TASK-0255/TASK-0256 exact hosted evidence. Local closure validation passed: restore; Release build 0 warnings/0 errors; 431/431 tests; Unicode 0/0; ACKit doctor 13/13 and scan exit 0; focused exact-release/recovery/supply-chain fixtures; release/package/V100/security/public/Markdown/hygiene gates; and zero tracked `.ackit` artifacts. Exact-HEAD hosted standard CI remains the final TASK-0257 gate.
+Published smoke and current public guidance now use `1.0.0-rc.1`; alpha4 remains the immutable predecessor. V100-09 is closed from TASK-0255/TASK-0256 exact hosted evidence. Local closure validation passed: restore; Release build 0 warnings/0 errors; 431/431 tests; Unicode 0/0; ACKit doctor 13/13 and scan exit 0; focused exact-release/recovery/supply-chain fixtures; release/package/V100/security/public/Markdown/hygiene gates; and zero tracked `.ackit` artifacts. Closure commit `b6211831b019220737e7b7d8eaf7400ead64af8e` passed `ci` `29351903037`, published smoke `29351903024`, and source smoke `29351902643`.
 
 ## TASK-0255 Exact Prerelease And Asset Completion
 
