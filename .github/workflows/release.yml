@@ -455,14 +455,24 @@ jobs:
           Get-Content $evidencePath -Raw | ConvertFrom-Json | Out-Null
           pwsh -NoProfile -File scripts/verify-published-package.ps1 -Version $version -PackageSource $assetRoot
 
-          $remoteTag = @(git ls-remote --tags origin "refs/tags/$tagName")
-          if ($remoteTag.Count -ne 0) { throw "Recovery requires the exact tag to be absent before mutation." }
           . ./scripts/github-release-state.ps1
+          Assert-ExactExistingGitTag `
+            -Tag $tagName `
+            -ExpectedCommitSha $releaseSha `
+            -UnprovenTagMessage "Recovery requires the exact existing tag before release creation." `
+            -WrongTagMessage "Existing recovery tag does not target the exact release commit."
           Assert-GitHubReleaseAbsent `
             -Repository "${{ github.repository }}" `
             -Tag $tagName `
-            -ExistingReleaseMessage "Recovery requires the GitHub Release to be absent before mutation." `
-            -UnprovenAbsenceMessage "Unable to prove that the GitHub Release is absent."
+            -ExistingReleaseMessage "Recovery requires the GitHub Release and its assets to be absent before creation." `
+            -UnprovenAbsenceMessage "Unable to prove that the GitHub Release and its assets are absent."
+          foreach ($digest in @("sha256:$expectedNupkgHash", "sha256:$expectedSnupkgHash")) {
+            Assert-GitHubAttestationAbsent `
+              -Repository "${{ github.repository }}" `
+              -Digest $digest `
+              -ExistingAttestationMessage "Recovery requires both exact release asset attestations to be absent before creation." `
+              -UnprovenAbsenceMessage "Unable to prove that an exact release asset attestation is absent."
+          }
 
       - name: Recheck exact remote recovery state
         shell: pwsh
@@ -472,16 +482,29 @@ jobs:
           $ErrorActionPreference = "Stop"
           $PSNativeCommandUseErrorActionPreference = $true
           $tagName = "v${{ inputs.version }}"
-          $remoteTag = @(git ls-remote --tags origin "refs/tags/$tagName")
-          if ($remoteTag.Count -ne 0) { throw "Recovery tag appeared after validation; refusing mutation." }
+          $releaseSha = "${{ inputs.release_commit_sha }}"
+          $expectedNupkgHash = "${{ inputs.expected_nupkg_sha256 }}".ToLowerInvariant()
+          $expectedSnupkgHash = "${{ inputs.expected_snupkg_sha256 }}".ToLowerInvariant()
           . ./scripts/github-release-state.ps1
+          Assert-ExactExistingGitTag `
+            -Tag $tagName `
+            -ExpectedCommitSha $releaseSha `
+            -UnprovenTagMessage "Unable to re-prove the exact existing recovery tag." `
+            -WrongTagMessage "Existing recovery tag changed target after validation; refusing release creation."
           Assert-GitHubReleaseAbsent `
             -Repository "${{ github.repository }}" `
             -Tag $tagName `
-            -ExistingReleaseMessage "Recovery release appeared after validation; refusing mutation." `
-            -UnprovenAbsenceMessage "Unable to re-prove that the GitHub Release is absent."
+            -ExistingReleaseMessage "Recovery release or assets appeared after validation; refusing release creation." `
+            -UnprovenAbsenceMessage "Unable to re-prove that the GitHub Release and its assets are absent."
+          foreach ($digest in @("sha256:$expectedNupkgHash", "sha256:$expectedSnupkgHash")) {
+            Assert-GitHubAttestationAbsent `
+              -Repository "${{ github.repository }}" `
+              -Digest $digest `
+              -ExistingAttestationMessage "Recovery attestation appeared after validation; refusing release creation." `
+              -UnprovenAbsenceMessage "Unable to re-prove that an exact release asset attestation is absent."
+          }
 
-      - name: Create exact immutable tag and GitHub prerelease
+      - name: Create GitHub prerelease from verified exact existing tag
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
@@ -497,11 +520,15 @@ jobs:
           $assetRoot = Join-Path $env:RUNNER_TEMP 'ackit-existing-package-recovery'
           $nupkg = Join-Path $assetRoot "AgentContextKit.$version.nupkg"
           $snupkg = Join-Path $assetRoot "AgentContextKit.$version.snupkg"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag "$tagName" "$releaseSha"
-          git push origin "refs/tags/$tagName"
-          gh release create $tagName $nupkg $snupkg --repo "${{ github.repository }}" --verify-tag --target $releaseSha --title "AgentContextKit $version" --notes-file $notesFile --prerelease
+          gh release create $tagName `
+            $nupkg `
+            $snupkg `
+            --repo "${{ github.repository }}" `
+            --verify-tag `
+            --target $releaseSha `
+            --title "AgentContextKit $version" `
+            --notes-file $notesFile `
+            --prerelease
 
       - name: Verify exact tag prerelease body and assets
         shell: pwsh

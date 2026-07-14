@@ -6,6 +6,8 @@ Clean synchronized entry HEAD is `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`. ACK
 
 The authenticated repository owner created exact immutable tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`; local and remote resolution match. GitHub prerelease/assets and both candidate-digest attestations are absent at entry. TASK-0252 must replace recovery tag absence/creation with fail-closed exact-tag verification and pass standard CI. TASK-0253 then owns exactly one authorized NuGet-publish-free dispatch. TASK-0254 executes only after complete success and owns the RC1 smoke pin, public evidence synchronization, and conditional V100-09 closure.
 
+TASK-0252 planning commit is `56ba2f3dcde4db0529ef3249027ecd30ae8e9ea5`. The implementation is complete locally: focused exact-tag/release/asset/attestation fixtures and static gates pass; Release build is 0 warnings/errors; 431/431 tests pass; ACKit doctor is 13/13 and scan exits 0; V100/supply-chain/package/Markdown/Unicode/diff/`.ackit` gates pass. The implementation commit, first push, and exact-HEAD hosted CI remain pending; recovery dispatch count is still zero.
+
 NuGet RC1 and the existing exact tag are immutable. NuGet publication, normal publish, tag mutation, second dispatch/rerun, manual release completion/upload/attestation, settings change, force/history rewrite, `.ackit/` commit, and GA claims remain prohibited. TASK-0242, TASK-0244, TASK-0247, and TASK-0250 failure evidence remains unchanged.
 
 ## TASK-0249–0251 `1.0.0-rc.1` Recovery Closure — TASK-0250 Stopped

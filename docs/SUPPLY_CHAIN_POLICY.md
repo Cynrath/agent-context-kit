@@ -41,3 +41,5 @@ TASK-0095 consolidates the decision fields. TASK-0127 refreshes the exact publis
 
 ## Recovery
 If a bad package is published, stop recommending the version, document impact, publish a fixed successor rather than replacing immutable package content, and update release/install guidance. NuGet unlisting/deprecation is a maintainer remote action. Operational ownership, activation thresholds, communication, and the tabletop boundary are defined in `docs/PACKAGE_RECOVERY.md`.
+
+For the bounded `1.0.0-rc.1` partial-publication recovery, the package and owner-created exact tag are immutable inputs. `recover-existing` must verify the tag target and prove the GitHub Release/assets plus both candidate-digest attestations absent before creating the prerelease. The recovery path contains no NuGet publication or tag mutation; any failed authorized dispatch is preserved and never automatically rerun.

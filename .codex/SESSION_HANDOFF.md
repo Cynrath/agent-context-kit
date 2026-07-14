@@ -5,6 +5,7 @@
 - New explicit authorization received on 2026-07-14. Clean synchronized entry is `master` at `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
 - Local and remote `v1.0.0-rc.1` resolve to exact release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. GitHub prerelease, release assets, nupkg attestation, and snupkg attestation are absent at entry.
 - TASK-0252, TASK-0253, and TASK-0254 were created exactly once with `ackit task` and fully planned before implementation. TASK-0252 removes all recovery tag mutation and verifies the existing exact tag; TASK-0253 owns exactly one authorized recovery dispatch after green CI; TASK-0254 is success-only public/smoke/V100 closure.
+- TASK-0252 is complete locally. Focused recovery fixtures/static gates and the full suite pass: Release build 0 warnings/errors, 431/431 tests, ACKit doctor 13/13, scan exit 0, all requested V100/supply-chain/package/Markdown gates, Unicode guard 0/0, diff clean, and tracked `.ackit/` count 0. Planning commit is `56ba2f3dcde4db0529ef3249027ecd30ae8e9ea5`; implementation commit/push and exact-HEAD hosted CI are pending.
 - NuGet republish, normal publish, tag creation/push/move/delete, second dispatch/rerun, manual asset upload/attestation, settings changes, force push, history rewrite, `.ackit/` commit, and GA claims are prohibited.
 - TASK-0242, TASK-0244, TASK-0247, and TASK-0250 evidence remains historical and unchanged.
 

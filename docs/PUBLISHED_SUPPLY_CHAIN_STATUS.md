@@ -1,5 +1,22 @@
 # Published Supply-Chain Status
 
+## TASK-0252 Entry State — Owner-Created Exact Tag
+
+Read-only entry verification on 2026-07-14 establishes the new recovery precondition without rewriting TASK-0250 history:
+
+| Field | State |
+| --- | --- |
+| NuGet package | `AgentContextKit 1.0.0-rc.1` present and immutable |
+| NuGet nupkg SHA-256 | `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5` |
+| Repository commit | `258918b33c3d1359aac967604ee524e8b66ddf02` |
+| Existing exact tag | `v1.0.0-rc.1` present; owner-created |
+| Exact tag target | `258918b33c3d1359aac967604ee524e8b66ddf02` locally and remotely |
+| GitHub prerelease/assets | Absent |
+| nupkg attestation | Absent for candidate digest `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d` |
+| snupkg attestation | Absent for candidate digest `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d` |
+
+TASK-0252 may adapt and validate the exact-existing-tag workflow but performs no remote release mutation. TASK-0253 owns exactly one future recovery dispatch after green standard CI. NuGet publication, normal publish, tag mutation, second dispatch/rerun, manual completion, settings change, force push, and GA claims remain prohibited.
+
 ## TASK-0250 Post-Failure Immutable State
 
 One post-failure audit on 2026-07-14 after recovery run `29341087462`:
@@ -16,7 +33,7 @@ One post-failure audit on 2026-07-14 after recovery run `29341087462`:
 | nupkg attestation | Absent |
 | snupkg attestation | Absent |
 
-The one TASK-0250 dispatch passed all pre-mutation validation/recheck gates, then the GitHub App token's tag push was rejected for missing `workflows` permission. `gh release create` and all later steps did not run. No NuGet operation, rerun, second dispatch, manual completion, settings change, tag movement, or force push occurred. V100-09 remains open and published smoke remains `0.2.0-alpha.4`.
+The one TASK-0250 dispatch passed all pre-mutation validation/recheck gates, then the GitHub App token's tag push was rejected for missing `workflows` permission. `gh release create` and all later steps did not run. At the time of that audit, no NuGet operation, rerun, second dispatch, manual completion, settings change, tag movement, or force push occurred. V100-09 remained open and published smoke remained `0.2.0-alpha.4`. The later owner-created tag is recorded separately above and does not change this historical result.
 
 ## TASK-0242 RC1 Partial Immutable State
 

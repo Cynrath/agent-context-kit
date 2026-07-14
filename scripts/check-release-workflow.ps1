@@ -144,8 +144,13 @@ if (-not $supplyChainTest.Contains('test-github-release-state.ps1')) {
 
 $releaseStateHelper = Get-Content -Raw (Join-Path $repoRoot "scripts\github-release-state.ps1")
 foreach ($marker in @(
+        'function Assert-ExactExistingGitTag',
+        'git fetch --no-tags origin "refs/tags/$Tag"',
+        'git rev-list -n 1 FETCH_HEAD',
         'function Assert-GitHubReleaseAbsent',
+        'function Assert-GitHubAttestationAbsent',
         'gh api --include',
+        'attestations/$Digest',
         '$probeExitCode = $LASTEXITCODE',
         '$probeExitCode -eq 0',
         '(?im)^HTTP/\S+\s+404(?:\s|$)',
@@ -208,9 +213,13 @@ foreach ($marker in @(
         "scripts/verify-existing-package-recovery.ps1",
         "scripts/verify-published-package.ps1",
         "docs/RELEASE_BODY_V100_RC1.md",
-        'git tag "$tagName" "$releaseSha"',
-        'git push origin "refs/tags/$tagName"',
+        "Assert-ExactExistingGitTag",
+        "Assert-GitHubReleaseAbsent",
+        "Assert-GitHubAttestationAbsent",
+        "Create GitHub prerelease from verified exact existing tag",
         "gh release create",
+        "--verify-tag",
+        '--target $releaseSha',
         "actions/attest@v4",
         "gh attestation verify",
         "scripts/verify-existing-release.ps1"
@@ -235,6 +244,16 @@ foreach ($forbidden in @(
     }
 }
 
+foreach ($forbiddenPattern in @(
+        '(?mi)^\s*(?:run:\s*)?git\s+tag(?:\s|$)',
+        '(?mi)^\s*(?:run:\s*)?git\s+push\s+.*refs/tags/',
+        '(?mi)^\s*(?:run:\s*)?gh\s+api\s+(?:(?:--method|-X)\s+(?:POST|PATCH)|(?:POST|PATCH)\s+).*/git/refs'
+    )) {
+    if ([regex]::IsMatch($recoveryBlock, $forbiddenPattern)) {
+        $issues.Add("Existing-package recovery contains forbidden tag mutation pattern: $forbiddenPattern") | Out-Null
+    }
+}
+
 if ([regex]::Matches($recoveryBlock, "uses: actions/attest@v4").Count -ne 2) {
     $issues.Add("Existing-package recovery must create exactly two asset attestations.") | Out-Null
 }
@@ -243,9 +262,12 @@ if ([regex]::Matches($recoveryBlock, "gh attestation verify").Count -ne 2) {
 }
 
 $releaseAbsenceCallCount = [regex]::Matches($recoveryBlock, '(?m)^\s+Assert-GitHubReleaseAbsent\s+`?\s*$').Count
+$tagVerificationCallCount = [regex]::Matches($recoveryBlock, '(?m)^\s+Assert-ExactExistingGitTag\s+`?\s*$').Count
+$attestationAbsenceCallCount = [regex]::Matches($recoveryBlock, '(?m)^\s+Assert-GitHubAttestationAbsent\s+`?\s*$').Count
 $releaseStateSourceCount = [regex]::Matches($recoveryBlock, '(?m)^\s+\.\s+\./scripts/github-release-state\.ps1\s*$').Count
-if ($releaseAbsenceCallCount -ne 2 -or $releaseStateSourceCount -ne 2) {
-    $issues.Add("Both recovery release-absence checkpoints must use the same shared helper exactly once.") | Out-Null
+if ($releaseAbsenceCallCount -ne 2 -or $tagVerificationCallCount -ne 2 -or
+    $attestationAbsenceCallCount -ne 2 -or $releaseStateSourceCount -ne 2) {
+    $issues.Add("Both recovery checkpoints must verify the exact tag plus release/asset and both attestation absence states through shared helpers.") | Out-Null
 }
 if ($recoveryBlock.Contains('gh api --include "repos/${{ github.repository }}/releases/tags/$tagName"')) {
     $issues.Add("Recovery release-absence checks must not bypass the shared helper with inline gh probes.") | Out-Null
@@ -257,10 +279,13 @@ foreach ($marker in @(
         '$sourceRun.headSha -ne $releaseSha',
         '$artifact.digest.ToLowerInvariant() -ne $artifactDigest',
         '$artifact.workflow_run.head_sha -ne $releaseSha',
-        'Recovery requires the exact tag to be absent before mutation.',
-        'Recovery requires the GitHub Release to be absent before mutation.',
-        'Recovery tag appeared after validation; refusing mutation.',
-        'Recovery release appeared after validation; refusing mutation.',
+        'Recovery requires the exact existing tag before release creation.',
+        'Existing recovery tag does not target the exact release commit.',
+        'Recovery requires the GitHub Release and its assets to be absent before creation.',
+        'Recovery requires both exact release asset attestations to be absent before creation.',
+        'Unable to re-prove the exact existing recovery tag.',
+        'Recovery release or assets appeared after validation; refusing release creation.',
+        'Recovery attestation appeared after validation; refusing release creation.',
         'Recovered release asset hash mismatch.',
         'Recovered prerelease body mismatch.'
     )) {
@@ -270,20 +295,42 @@ foreach ($marker in @(
 $recoverySafetyIndex = $recoveryBlock.IndexOf("Run exact recovery safety gates", [StringComparison]::Ordinal)
 $recoveryVerifyIndex = $recoveryBlock.IndexOf("scripts/verify-existing-package-recovery.ps1", [StringComparison]::Ordinal)
 $recoveryRemoteStateIndex = $recoveryBlock.IndexOf("Recheck exact remote recovery state", [StringComparison]::Ordinal)
+$recoveryFirstTagVerificationIndex = $recoveryBlock.IndexOf("Assert-ExactExistingGitTag", [StringComparison]::Ordinal)
+$recoveryLastTagVerificationIndex = $recoveryBlock.LastIndexOf("Assert-ExactExistingGitTag", [StringComparison]::Ordinal)
 $recoveryFirstAbsenceIndex = $recoveryBlock.IndexOf("Assert-GitHubReleaseAbsent", [StringComparison]::Ordinal)
 $recoveryLastAbsenceIndex = $recoveryBlock.LastIndexOf("Assert-GitHubReleaseAbsent", [StringComparison]::Ordinal)
-$recoveryTagIndex = $recoveryBlock.IndexOf('git tag "$tagName" "$releaseSha"', [StringComparison]::Ordinal)
-$recoveryTagPushIndex = $recoveryBlock.IndexOf('git push origin "refs/tags/$tagName"', [StringComparison]::Ordinal)
+$recoveryFirstAttestationAbsenceIndex = $recoveryBlock.IndexOf("Assert-GitHubAttestationAbsent", [StringComparison]::Ordinal)
+$recoveryLastAttestationAbsenceIndex = $recoveryBlock.LastIndexOf("Assert-GitHubAttestationAbsent", [StringComparison]::Ordinal)
 $recoveryReleaseIndex = $recoveryBlock.IndexOf("gh release create", [StringComparison]::Ordinal)
+$recoveryReleaseVerifyIndex = $recoveryBlock.IndexOf("Verify exact tag prerelease body and assets", [StringComparison]::Ordinal)
 $recoveryAttestIndex = $recoveryBlock.IndexOf("uses: actions/attest@v4", [StringComparison]::Ordinal)
 if ($recoverySafetyIndex -lt 0 -or $recoveryVerifyIndex -lt 0 -or $recoveryRemoteStateIndex -lt 0 -or
+    $recoveryFirstTagVerificationIndex -lt 0 -or $recoveryLastTagVerificationIndex -lt 0 -or
     $recoveryFirstAbsenceIndex -lt 0 -or $recoveryLastAbsenceIndex -lt 0 -or
-    $recoveryTagIndex -lt 0 -or $recoveryTagPushIndex -lt 0 -or $recoveryReleaseIndex -lt 0 -or $recoveryAttestIndex -lt 0 -or
-    $recoverySafetyIndex -gt $recoveryVerifyIndex -or $recoveryVerifyIndex -gt $recoveryFirstAbsenceIndex -or
-    $recoveryFirstAbsenceIndex -gt $recoveryRemoteStateIndex -or $recoveryRemoteStateIndex -gt $recoveryLastAbsenceIndex -or
-    $recoveryLastAbsenceIndex -gt $recoveryTagIndex -or $recoveryTagIndex -gt $recoveryTagPushIndex -or
-    $recoveryTagPushIndex -gt $recoveryReleaseIndex -or $recoveryReleaseIndex -gt $recoveryAttestIndex) {
-    $issues.Add("Existing-package recovery safety, exact-artifact, and remote-state gates must precede tag/release mutations; attestations must follow release verification.") | Out-Null
+    $recoveryFirstAttestationAbsenceIndex -lt 0 -or $recoveryLastAttestationAbsenceIndex -lt 0 -or
+    $recoveryReleaseIndex -lt 0 -or $recoveryReleaseVerifyIndex -lt 0 -or $recoveryAttestIndex -lt 0 -or
+    $recoverySafetyIndex -gt $recoveryVerifyIndex -or $recoveryVerifyIndex -gt $recoveryFirstTagVerificationIndex -or
+    $recoveryFirstTagVerificationIndex -gt $recoveryFirstAbsenceIndex -or
+    $recoveryFirstAbsenceIndex -gt $recoveryFirstAttestationAbsenceIndex -or
+    $recoveryFirstAttestationAbsenceIndex -gt $recoveryRemoteStateIndex -or
+    $recoveryRemoteStateIndex -gt $recoveryLastTagVerificationIndex -or
+    $recoveryLastTagVerificationIndex -gt $recoveryLastAbsenceIndex -or
+    $recoveryLastAbsenceIndex -gt $recoveryLastAttestationAbsenceIndex -or
+    $recoveryLastAttestationAbsenceIndex -gt $recoveryReleaseIndex -or
+    $recoveryReleaseIndex -gt $recoveryReleaseVerifyIndex -or $recoveryReleaseVerifyIndex -gt $recoveryAttestIndex) {
+    $issues.Add("Existing-package recovery safety, exact-artifact, exact-tag, and remote absence gates must precede release creation; attestations must follow exact release asset verification.") | Out-Null
+}
+
+$sourceSmokeWorkflow = Get-Content -Raw (Join-Path $repoRoot ".github\workflows\cross-platform-source-smoke.yml")
+foreach ($marker in @(
+        'scripts/test-github-release-state.ps1',
+        'scripts/check-release-workflow.ps1 -FailOnIssues',
+        'scripts/test-supply-chain-workflow.ps1',
+        'scripts/test-existing-package-recovery.ps1'
+    )) {
+    if (-not $sourceSmokeWorkflow.Contains($marker)) {
+        $issues.Add("Cross-platform source smoke recovery test marker missing: $marker") | Out-Null
+    }
 }
 
 foreach ($marker in @(

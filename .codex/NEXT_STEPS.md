@@ -2,7 +2,7 @@
 
 ## Current V100 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0252–0254 Planned
 
-1. IN PROGRESS — TASK-0252: adapt `recover-existing` to verify owner-created exact tag `v1.0.0-rc.1` at `258918b33c3d1359aac967604ee524e8b66ddf02`, remove every tag mutation path, validate locally, commit, push, and require three green standard workflows.
+1. COMPLETED LOCALLY / PENDING PUSH AND CI — TASK-0252: `recover-existing` verifies owner-created exact tag `v1.0.0-rc.1` at `258918b33c3d1359aac967604ee524e8b66ddf02`, contains no tag mutation, and fail-closes release/asset/two-attestation preconditions. Focused tests and full local suite pass (431/431); implementation commit, first push, and three green standard workflows remain.
 2. PLANNED / BLOCKED ON TASK-0252 CI — TASK-0253: run one immutable preflight, dispatch `recover-existing` exactly once, watch once, and either record complete prerelease/assets/attestations/three-platform success or obey the strict remote-failure boundary.
 3. PLANNED / SUCCESS-ONLY — TASK-0254: pin published smoke to `1.0.0-rc.1`, synchronize public/release/supply-chain/V100/README/handoff evidence, close V100-09 only if complete, run final validation, push once, and wait for final CI.
 

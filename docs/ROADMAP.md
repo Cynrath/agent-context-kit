@@ -4,7 +4,7 @@
 
 - TASK-0252 through TASK-0254 are the active authorized closure chain. Entry HEAD is `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
 - The authenticated repository owner created exact immutable tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. The recovery workflow must verify this tag and contain no tag creation, push, move, delete, or ref API mutation.
-- TASK-0252 adapts and proves the exact-existing-tag recovery path, then requires green `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` before any dispatch.
+- TASK-0252 is complete locally: exact-tag/release/asset/attestation fixtures and the full suite pass with 431/431 tests, 0 build warnings/errors, ACKit 13/13, clean Unicode/diff/Markdown/package/V100 gates, and no tracked `.ackit/`. Its implementation push and exact-HEAD `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` remain required before any dispatch.
 - TASK-0253 may dispatch `recover-existing` exactly once. On complete success TASK-0254 pins published smoke to RC1, synchronizes public evidence, and closes V100-09 only with the full immutable proof set.
 - TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 then published NuGet RC1 through OIDC but stopped after propagation verification timed out; its partial-failure history remains immutable.
 - TASK-0243 is complete and pushed at `3b979972ba24b6acd4f0eecca49ff3dcc2c8cdff`; pre-recovery `ci`, published alpha4 smoke, and RC1 source smoke passed.

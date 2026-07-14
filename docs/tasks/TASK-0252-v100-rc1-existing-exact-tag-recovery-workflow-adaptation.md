@@ -117,4 +117,29 @@ Record the implementation commit, local test counts/results, exact CI run IDs, t
 
 ## Completion notes
 
-Status: `PLANNED / NOT IMPLEMENTED`.
+Status: `COMPLETED LOCALLY / PENDING PUSH AND EXACT-HEAD STANDARD CI`.
+
+Implementation result:
+
+- `recover-existing` now accepts only the exact existing `v1.0.0-rc.1` tag at `258918b33c3d1359aac967604ee524e8b66ddf02` and re-verifies it immediately before release creation.
+- The recovery job contains no tag creation, tag push, tag ref API mutation, NuGet login, or NuGet push.
+- Both checkpoints prove the GitHub Release/assets absent and prove both candidate-digest attestations absent; any existing or unproven state fails closed.
+- The release step is named `Create GitHub prerelease from verified exact existing tag` and uses `gh release create` with `--verify-tag`, exact `--target`, the prepared body, prerelease state, and only the validated nupkg/snupkg.
+- Network-free fixtures cover accepted/missing/wrong tag, existing release/unexpected asset state, expected/non-404 release absence, existing/unproven attestation state, prohibited tag mutations, missing tag/attestation helpers, and missing release verification flags.
+- Windows/Ubuntu/macOS source-smoke now executes the state fixtures, static/supply-chain tests, and existing-package recovery fixtures.
+
+Validation evidence:
+
+- Focused scripts: all PASS (`test-github-release-state`, `test-supply-chain-workflow`, `test-existing-package-recovery`, `check-release-workflow`).
+- `dotnet restore`: PASS.
+- Release build: PASS, 0 warnings / 0 errors.
+- Full tests: PASS, 431/431.
+- ACKit: `1.0.0-rc.1`; doctor 13/13 PASS; scan exit 0 with no Critical/High blocker.
+- V100 readiness/documentation, security/supply-chain, published-status, workflow, package metadata, and Markdown gates: PASS.
+- Unicode root-directory guard: 0 before / 0 after.
+- `git diff --check`: PASS.
+- Tracked `.ackit/`: 0.
+- Implementation commit: the commit containing this completion record with message `fix: recover RC1 from verified existing exact tag`.
+- Remote mutation in TASK-0252: none; recovery dispatch 0; NuGet publish 0; tag mutation 0.
+
+TASK-0253 remains blocked until this commit is pushed and exact-HEAD `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` all pass.

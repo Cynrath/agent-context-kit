@@ -37,8 +37,10 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $PSNativeCommandUseErrorActionPreference = $true
+          pwsh -NoProfile -File scripts/test-github-release-state.ps1
           pwsh -NoProfile -File scripts/check-release-workflow.ps1 -FailOnIssues
           pwsh -NoProfile -File scripts/test-supply-chain-workflow.ps1
+          pwsh -NoProfile -File scripts/test-existing-package-recovery.ps1
 
       - name: Restore, build, and test
         shell: pwsh
