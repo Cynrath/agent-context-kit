@@ -118,7 +118,7 @@ Record implementation commit, local validation, standard CI runs/jobs, attestati
 
 ## Completion notes
 
-Status: `FIRST HOSTED DISPATCH FAILED PRE-ATTESTATION / ROOT CAUSE CORRECTED / RETRY VALIDATION PENDING`.
+Status: `COMPLETED / BOTH ATTESTATIONS VERIFIED / THREE-PLATFORM INSTALLED SMOKE PASS`.
 
 - Added `attest-existing` to `.github/workflows/release.yml` with only `contents: read`, `id-token: write`, and `attestations: write`. It cannot publish NuGet, create/edit/upload/delete a release, or mutate/push a tag.
 - Before attestation it verifies current automation HEAD/origin, release ancestry, exact remote tag target, prepared body, non-draft prerelease identity/title, exact two asset names/sizes/API digests/downloaded hashes, NuGet repository signature/content equivalence, and repository commit.
@@ -132,3 +132,8 @@ Status: `FIRST HOSTED DISPATCH FAILED PRE-ATTESTATION / ROOT CAUSE CORRECTED / R
 - First `attest-existing` dispatch run `29349599514`, job `87142124518`, passed safety and exact release/package verification, then stopped in `Query exact attestation state`. Both attestation actions, both CLI verifications, final recheck, and matrix job `87142353303` were skipped.
 - Root cause: the expected attestation HTTP 404 was correctly classified as absent, but its native `$LASTEXITCODE=1` remained at script end and made the step fail without throwing. One post-failure audit confirmed both attestations absent and tag `v1.0.0-rc.1` unchanged at the release commit.
 - Correction explicitly sets `$global:LASTEXITCODE = 0` only on the verified 404 path. Static regression coverage now fails if this accepted-404 exit-state reset is removed. No NuGet, tag, release, asset, or attestation mutation occurred in the failed run.
+- Correction commit `83ab0a5c125fe25ec61dbd09026825e3cba18738` passed exact-HEAD standard runs: `ci` `29349905919`, `cross-platform-smoke` `29349906036`, and `cross-platform-source-smoke` `29349905891`.
+- Corrected run `29350091782` completed successfully. Attestation job `87143810767` passed safety, exact release/package verification, two `actions/attest@v4` steps, both signer-workflow CLI verifications, and final immutable tag/release/body/asset revalidation.
+- nupkg attestation `35295200` verifies digest `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d`; snupkg attestation `35295205` verifies digest `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d`. Each digest has exactly one repository attestation.
+- Installed-package smoke passed on Ubuntu job `87144074850`, Windows job `87144074884`, and macOS job `87144074933`, all within run `29350091782`.
+- Workflow dispatch count for TASK-0256: two. The first failed pre-attestation; the second followed a validated root-cause correction. NuGet publish count: zero. Tag mutation count: zero. Release/body/asset mutation count: zero. TASK-0257 is unblocked.

@@ -14,6 +14,8 @@ The manual `attest-existing` operation accepts the already complete exact releas
 
 Implementation commit `0a9abd04cc515c049d60a7cbbcc2d446a355fb15` passed all three standard workflows. First attestation run `29349599514` passed exact release/package gates, then failed pre-attestation because the verified-404 branch left native `$LASTEXITCODE=1`; no attestation or other immutable release mutation occurred. The accepted-404 path now resets only that known native failure state, and static coverage requires the reset before a corrected retry.
 
+Correction commit `83ab0a5c125fe25ec61dbd09026825e3cba18738` passed standard runs `29349905919`, `29349906036`, and `29349905891`. Corrected run `29350091782` passed exact tag/release/body/asset/NuGet verification, created and signer-workflow-verified nupkg attestation `35295200` plus snupkg attestation `35295205`, reverified immutable release state, and passed installed-package smoke in Ubuntu job `87144074850`, Windows job `87144074884`, and macOS job `87144074933`. TASK-0257 public synchronization and final CI are now unblocked.
+
 ## TASK-0252–0254 Existing-Tag Recovery Closure Result
 
 TASK-0252 commit `5f6c4ce2d0ab9745207196e6b01371653adfe009` removed every recovery tag mutation, added exact-existing-tag and absent release/asset/attestation verification, passed 431/431 local tests, and passed standard runs `29344903472`, `29344903420`, and `29344903850`.

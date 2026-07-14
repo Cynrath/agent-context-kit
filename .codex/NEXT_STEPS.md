@@ -3,8 +3,8 @@
 ## Current V100 `1.0.0-rc.1` Full Release Closure — TASK-0255–0257 Planned
 
 1. COMPLETED — TASK-0255: exact source/NuGet/tag tuple passed; authenticated ADMIN local `gh` created release `353913024` with exact prepared body and only asset IDs `476881883`/`476881892`; sizes, API digests, and downloaded hashes passed; NuGet/tag/settings mutation zero.
-2. IN PROGRESS / ROOT CAUSE CORRECTED — TASK-0256: commit `0a9abd0` and standard runs `29349381415`/`29349381490`/`29349381465` passed. First attestation run `29349599514` stopped pre-attestation because verified 404 left native exit 1; both attestations remain absent and tag unchanged. Validate/push the accepted-404 reset and static regression, wait standard CI, then run one corrected retry.
-3. PLANNED / SUCCESS-ONLY — TASK-0257: pin published smoke to RC1, synchronize EN/TR/NuGet/release/supply-chain/V100 evidence, close V100-09, and finish with full validation, final CI, clean local/origin equality.
+2. COMPLETED — TASK-0256: correction `83ab0a5`, standard runs `29349905919`/`29349906036`/`29349905891`, and corrected release run `29350091782` pass; attestations `35295200`/`35295205` and three platform jobs pass; zero NuGet/tag/release mutation.
+3. IN PROGRESS — TASK-0257: pin published smoke to RC1, synchronize EN/TR/NuGet/release/supply-chain/V100 evidence, close V100-09, and finish with full validation, final CI, clean local/origin equality.
 
 New full authorization supersedes obsolete retry/manual-completion boundaries while preserving every historical failure record. NuGet publication/mutation, normal publish, tag mutation, unverified assets, PAT/secret/settings changes, force push, history rewrite, generated `.ackit/` commit, and GA claims remain prohibited.
 

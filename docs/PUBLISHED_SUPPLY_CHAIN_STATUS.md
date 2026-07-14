@@ -1,5 +1,21 @@
 # Published Supply-Chain Status
 
+## TASK-0256 Exact Asset Provenance And Three-Platform Smoke — PASS
+
+Corrected run [`29350091782`](https://github.com/Cynrath/agent-context-kit/actions/runs/29350091782), exact automation commit `83ab0a5c125fe25ec61dbd09026825e3cba18738`:
+
+| Evidence | Result |
+| --- | --- |
+| Exact release/package gates | PASS in job `87143810767` before attestation |
+| nupkg attestation | [`35295200`](https://github.com/Cynrath/agent-context-kit/attestations/35295200); exact digest `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d`; signer workflow verified |
+| snupkg attestation | [`35295205`](https://github.com/Cynrath/agent-context-kit/attestations/35295205); exact digest `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d`; signer workflow verified |
+| Ubuntu installed-package smoke | PASS; job `87144074850` |
+| Windows installed-package smoke | PASS; job `87144074884` |
+| macOS installed-package smoke | PASS; job `87144074933` |
+| Immutable final recheck | PASS; exact tag/release/body/assets unchanged |
+
+First run `29349599514` is preserved as pre-attestation failure evidence: exact gates passed, but expected-404 native exit state was not reset; both attestations and the platform matrix were skipped. The corrected retry followed commit/standard-CI validation. NuGet publish, tag mutation, and release/body/asset mutation counts remain zero.
+
 ## TASK-0255 Exact GitHub Prerelease And Assets — PASS
 
 Authenticated completion on 2026-07-14 used only the exact retained TASK-0242 package files after a full immutable revalidation:
