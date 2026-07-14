@@ -114,4 +114,8 @@ Record closure commit, full local test/gate results, final CI runs/jobs, final r
 
 ## Completion notes
 
-Status: `PLANNED / SUCCESS-ONLY AFTER TASK-0255 AND TASK-0256`.
+Status: `CLOSURE IMPLEMENTED / LOCAL VALIDATION PASS / FINAL CI PENDING`.
+
+TASK-0255 and TASK-0256 evidence is complete. Published smoke now installs `1.0.0-rc.1`; README EN/TR/NuGet and current release, supply-chain, hosted, V100, roadmap, queue, and handoff sources identify RC1 as the complete prerelease while retaining alpha4 as immutable predecessor evidence. V100-09 is closed from release `353913024`, exact asset IDs `476881883`/`476881892`, attestations `35295200`/`35295205`, and run `29350091782` platform jobs `87144074850`/`87144074884`/`87144074933`. No GA claim is made.
+
+Local validation passed: restore; Release build with 0 warnings/0 errors; 431/431 tests; Unicode directory guard 0 before/0 after; ACKit doctor 13/13 and scan exit 0; exact release/recovery/supply-chain fixtures; release, package, V100, security, published-state, public-release, localization, Markdown-link, tracked/untracked, diff, RC1 smoke-pin, pure-Markdown NuGet README, and no-tracked-`.ackit` gates. The first full test attempt exposed a stale `alpha.3` canonical instruction assertion after agent surfaces were synchronized; the expectation and `DEVELOPMENT_STANDARD.md` were corrected to RC1, then the complete build/test suite passed. Closure commit/push, exact-HEAD standard CI, equality, and clean-tree evidence remain to record.

@@ -8,9 +8,8 @@ This package README intentionally uses plain Markdown only so it renders consist
 
 ## Release status
 
-- Latest complete release: `0.2.0-alpha.4`.
-- NuGet `1.0.0-rc.1` exists in a partial immutable publication state. Its owner-created exact tag exists, but the single TASK-0253 recovery received HTTP 403 while creating the GitHub prerelease, so prerelease, assets, attestations, and recovered-package matrix evidence remain absent.
-- The commands below remain pinned to the latest complete release until that recovery is fully successful.
+- Latest complete prerelease: `1.0.0-rc.1`.
+- The exact GitHub prerelease, nupkg/snupkg assets, both attestations, and installed-package smoke on Windows, Ubuntu, and macOS are verified.
 - AgentContextKit does not claim 1.0 GA readiness.
 
 ## Requirements
@@ -21,16 +20,16 @@ This package README intentionally uses plain Markdown only so it renders consist
 
 ## Install
 
-Install the latest complete release:
+Install the latest complete prerelease:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool install --global AgentContextKit --version 1.0.0-rc.1
 ```
 
 Update an existing global install:
 
 ```powershell
-dotnet tool update --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool update --global AgentContextKit --version 1.0.0-rc.1
 ```
 
 Verify the executable and discover the current command surface:

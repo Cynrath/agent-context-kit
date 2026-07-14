@@ -14,7 +14,7 @@
 
 TASK-0232 records this policy as the V100 support baseline. TASK-0240 exact-candidate evidence passed on Windows, Ubuntu, and macOS; TASK-0241 accepts the unchanged support scope. Status: `FINAL_RC_CROSS_PLATFORM_CONFIRMATION_PASS / CLOSED_BY_TASK_0241`.
 
-Exact candidate `1.0.0-rc.1` at `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` passed the required Windows/Ubuntu/macOS confirmation in run `29118452246`. Published `0.2.0-alpha.4` remains the upgrade/rollback predecessor until publication is separately authorized.
+Exact candidate `1.0.0-rc.1` at `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` passed the required Windows/Ubuntu/macOS confirmation in run `29118452246`. Published RC1 installed-package smoke later passed on all three operating systems in run `29350091782`; `0.2.0-alpha.4` remains the immutable upgrade/rollback predecessor.
 
 ## 1.0 Target Policy
 Before 1.0 GA, freeze:

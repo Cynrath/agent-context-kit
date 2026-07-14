@@ -1,16 +1,20 @@
 # Release Validation
 
+## TASK-0257 Public Closure Local Validation
+
+Published smoke and current public guidance now use `1.0.0-rc.1`; alpha4 remains the immutable predecessor. V100-09 is closed from TASK-0255/TASK-0256 exact hosted evidence. Local closure validation passed: restore; Release build 0 warnings/0 errors; 431/431 tests; Unicode 0/0; ACKit doctor 13/13 and scan exit 0; focused exact-release/recovery/supply-chain fixtures; release/package/V100/security/public/Markdown/hygiene gates; and zero tracked `.ackit` artifacts. Exact-HEAD hosted standard CI remains the final TASK-0257 gate.
+
 ## TASK-0255 Exact Prerelease And Asset Completion
 
 TASK-0255 reverified source run `29131335084`, artifact `8242162439`, artifact/candidate/NuGet hashes, NuGet.org repository signature, archive content equivalence, repository commit, and exact tag. Local authenticated account `Cynrath` has repository ADMIN access and created exact prerelease `353913024` once after the TASK-0253 GitHub Actions integration path was diagnosed as release-endpoint HTTP 403 despite declared Contents write.
 
-Release `https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1` targets `258918b33c3d1359aac967604ee524e8b66ddf02`, uses the prepared body and title, is a non-draft prerelease, and contains only nupkg asset `476881883` and snupkg asset `476881892`. Exact sizes, GitHub API digests, and downloaded hashes match the retained TASK-0242 inputs. NuGet publish and tag mutation counts are zero. Attestations and three-platform post-release smoke remain TASK-0256 work; V100-09 remains open.
+Release `https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1` targets `258918b33c3d1359aac967604ee524e8b66ddf02`, uses the prepared body and title, is a non-draft prerelease, and contains only nupkg asset `476881883` and snupkg asset `476881892`. Exact sizes, GitHub API digests, and downloaded hashes match the retained TASK-0242 inputs. NuGet publish and tag mutation counts are zero. TASK-0256 completed both attestations and three-platform post-release smoke; TASK-0257 closes V100-09.
 
 ## TASK-0256 Exact Existing-Release Attestation Path
 
 The manual `attest-existing` operation accepts the already complete exact release and has only `contents: read`, `id-token: write`, and `attestations: write`. Before either `actions/attest@v4` step, it verifies current automation ancestry, exact remote tag target, prepared body/title/prerelease state, exact two asset names/sizes/API digests/downloaded hashes, NuGet repository signature/content equivalence, and package repository commit. It contains no NuGet login/push, tag mutation/push, or release create/edit/upload/delete command.
 
-`scripts/verify-existing-release-assets.ps1` implements the exact release/body/asset contract. `scripts/test-existing-release-assets.ps1` covers positive and wrong tag/target/title/body/draft/hash/size/API-digest/missing/extra-asset fixtures. Static workflow fixtures require both attestation actions, both CLI verifications, final immutable revalidation, and the Windows/Ubuntu/macOS installed-package matrix. Local implementation validation passed with 431/431 tests, ACKit, release/V100/supply-chain/Markdown gates, YAML parsing, Unicode guard 0/0, and no tracked `.ackit` artifact. Hosted evidence remains pending.
+`scripts/verify-existing-release-assets.ps1` implements the exact release/body/asset contract. `scripts/test-existing-release-assets.ps1` covers positive and wrong tag/target/title/body/draft/hash/size/API-digest/missing/extra-asset fixtures. Static workflow fixtures require both attestation actions, both CLI verifications, final immutable revalidation, and the Windows/Ubuntu/macOS installed-package matrix. Local implementation validation passed with 431/431 tests, ACKit, release/V100/supply-chain/Markdown gates, YAML parsing, Unicode guard 0/0, and no tracked `.ackit` artifact. Corrected hosted run `29350091782` completed all required evidence.
 
 Implementation commit `0a9abd04cc515c049d60a7cbbcc2d446a355fb15` passed all three standard workflows. First attestation run `29349599514` passed exact release/package gates, then failed pre-attestation because the verified-404 branch left native `$LASTEXITCODE=1`; no attestation or other immutable release mutation occurred. The accepted-404 path now resets only that known native failure state, and static coverage requires the reset before a corrected retry.
 
@@ -32,7 +36,7 @@ The run passed safety, exact artifact/package/signature/content/install validati
 
 ## V100 `1.0.0-rc.1` Candidate Preparation (TASK-0239)
 
-Candidate `1.0.0-rc.1` was prepared against published predecessor `0.2.0-alpha.4`; its publication body is retained in `RELEASE_BODY_V100_RC1.md`. TASK-0242 published the NuGet package but stopped before tag/GitHub prerelease/provenance. Public complete-release guidance remains pinned to alpha4; RC1 is documented as a partial immutable state.
+Candidate `1.0.0-rc.1` was prepared against published predecessor `0.2.0-alpha.4`; its publication body is retained in `RELEASE_BODY_V100_RC1.md`. TASK-0242's partial publish and later recovery failures remain historical. TASK-0255/TASK-0256 completed exact prerelease/assets/attestations/three-platform proof, and TASK-0257 makes RC1 the current complete prerelease without claiming GA readiness.
 
 ## TASK-0242 Publication Authorization
 
@@ -392,7 +396,7 @@ dotnet list AgentContextKit.sln package --deprecated
 
 The 2026-06-12 post-migration review found no vulnerable or deprecated direct/transitive packages. TASK-0091 replaced Legacy `xunit` `2.9.3` with `xunit.v3` `3.2.2`, updated the Visual Studio runner to `3.1.5`, and preserved 169/169 passing tests.
 
-The `sarif` command is available in current source and in the published NuGet `0.2.0-alpha.4` global tool.
+The `sarif` command is available in current source and in the published NuGet `1.0.0-rc.1` global tool.
 
 ## Historical Local v0.2.0-alpha.3 Candidate Package Validation
 Use temporary directories outside the repository:
@@ -689,7 +693,7 @@ Historical alpha.2 hosted result:
 - Windows, Ubuntu, and macOS jobs succeeded.
 - NuGet global tool install, `ackit version`, `ackit --help`, DemoApp smoke flow, expected fake-secret `redact-check` failure, and final `scan --ci` all completed successfully.
 
-The current public package guidance installs `0.2.0-alpha.4` and exercises `ackit sarif`.
+The current public package guidance installs `1.0.0-rc.1` and exercises `ackit sarif`.
 
 ## Cross-Platform Source Smoke Workflow
 `.github/workflows/cross-platform-source-smoke.yml` verifies the current branch and local package before future publication.
@@ -698,7 +702,7 @@ The workflow:
 - Uses `actions/checkout@v6` and `actions/setup-dotnet@v5`.
 - Runs restore, Release build, and Release tests.
 - Packs `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj` into a temporary package directory.
-- Installs `AgentContextKit` version `0.2.0-alpha.4` from that temporary package source into a temporary tool path.
+- Installs `AgentContextKit` version `1.0.0-rc.1` from that temporary package source into a temporary tool path.
 - Runs `ackit version`, `ackit --help`, a clean demo app smoke flow, expected fake-secret `redact-check` failure, fake secret cleanup, and final `ackit scan --ci`.
 - Does not push, tag, create GitHub Releases, or publish NuGet packages.
 
@@ -752,7 +756,7 @@ Hosted workflow validation is complete for the latest TASK-0056 push. Future wor
 See [MAINTAINER_RELEASE_HANDOFF.md](MAINTAINER_RELEASE_HANDOFF.md) for published release status and follow-up guidance.
 
 ## Baseline Validation
-The published NuGet `0.2.0-alpha.4` package includes the explicit baseline workflow added by TASK-0086.
+The published NuGet `1.0.0-rc.1` package includes the explicit baseline workflow added by TASK-0086.
 
 ```powershell
 dotnet run --project src/AgentContextKit.Cli -- baseline --output .ackit-baseline.json

@@ -1,6 +1,6 @@
 # Project Execution Queue
 
-## V100 `1.0.0-rc.1` Full Release Closure — TASK-0255–0257 Planned
+## V100 `1.0.0-rc.1` Full Release Closure — Local PASS / Final CI Pending
 
 | Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- | --- |
@@ -22,7 +22,7 @@
 | 16 | Not executed | TASK-0254 three-platform smoke/public/provenance closure | Success-only pin/public/V100 closure withheld | TASK-0253 success not met | Failure-state docs only | Published smoke alpha4; V100-09 open | Final factual documentation push only; no immutable release mutation |
 | 17 | Completed | TASK-0255 authenticated GitHub prerelease and exact asset completion | Actions integration 403 diagnosed; exact release completed through authenticated local `gh` | New full authorization; exact source/package/tag facts | Task plus release/hosted/supply-chain/queue/handoff evidence | Release `353913024`; body and exact two assets/digests/hashes PASS | One exact prerelease creation; zero NuGet/tag/settings mutation |
 | 18 | Completed | TASK-0256 attestation-only workflow and three-platform release verification | Existing release verified; nupkg/snupkg attested and verified; three OS install/smoke passed | TASK-0255 complete release | Workflow/helpers/static fixtures/task/release/hosted/supply-chain/handoff docs | Corrected run `29350091782`; attestation job `87143810767`; three platform jobs PASS | Two dispatches after root-cause fix; zero NuGet/tag/release mutation |
-| 19 | In progress | TASK-0257 public status provenance and final CI closure | RC1 smoke pin, README/public/V100 closure, and final synchronized green state | TASK-0255/TASK-0256 complete | Published-smoke workflow, README/changelog/release/V100/task/queue/handoff docs | Full local suite plus final standard CI and equality checks | Normal repository commits/pushes only |
+| 19 | Local pass / final CI pending | TASK-0257 public status provenance and final CI closure | RC1 smoke pin, README/public/V100 closure, and final synchronized green state | TASK-0255/TASK-0256 complete | Published-smoke workflow, README/changelog/release/V100/task/queue/handoff docs | Full local suite passed; final standard CI and equality checks pending | Normal repository commits/pushes only |
 
 Execution rule: TASK-0242/TASK-0244/TASK-0247/TASK-0250/TASK-0253 remain immutable historical records. New full authorization allows TASK-0255 exact authenticated prerelease/assets, TASK-0256 attestation-only workflow dispatch and validated retries, and TASK-0257 repository closure. NuGet publication/mutation, normal publish, tag mutation, unverified assets, settings/PAT/secret change, force push, history rewrite, generated `.ackit/` commit, and GA claim remain prohibited.
 

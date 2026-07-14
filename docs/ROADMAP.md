@@ -1,11 +1,11 @@
 # Roadmap
 
-## Active V100 Release-Candidate Chain
+## V100 Release-Candidate Closure
 
 - TASK-0255 through TASK-0257 are the active fully authorized RC1 completion chain. Entry `master`/`origin/master` is clean at `177810dc2e7dc14304541430cb074c13efc19612`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
 - TASK-0255 completed: TASK-0253's token had declared Contents write but the release endpoint rejected the integration; authenticated ADMIN local `gh` created release `353913024` and exact body/two assets, and all tag/target/size/API-digest/download-hash checks passed without NuGet or tag mutation.
 - TASK-0256 completed: corrected run `29350091782` verified the exact immutable release/package tuple, created and verified nupkg/snupkg attestations `35295200`/`35295205`, and passed installed-package smoke on Ubuntu, Windows, and macOS with zero NuGet/tag/release mutation.
-- TASK-0257 is active: pin published smoke to RC1, synchronize EN/TR/NuGet/release/supply-chain/V100 evidence, close V100-09, and require final green standard CI plus clean local/origin equality.
+- TASK-0257 closure is implemented: published smoke is pinned to RC1, EN/TR/NuGet/release/supply-chain/V100 evidence is synchronized, and V100-09 is closed. Final green standard CI and clean local/origin equality remain the completion gate.
 - TASK-0252 through TASK-0254 are the latest authorized closure chain. Entry HEAD was `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 were verified.
 - The authenticated repository owner created exact immutable tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. The recovery workflow must verify this tag and contain no tag creation, push, move, delete, or ref API mutation.
 - TASK-0252 is complete and pushed at `5f6c4ce`; exact-tag/release/asset/attestation fixtures and the full suite passed with 431/431 tests, and standard runs `29344903472`, `29344903420`, and `29344903850` passed.
@@ -300,7 +300,7 @@ This track is also safe local-only work that does not change the published `0.2.
 
 ### Current State
 
-v0.2.0-alpha.4 is the current published release. Local v0.3/v0.4/v0.5 readiness assets exist as historical implementation evidence but do not automatically define the next implementation task.
+v1.0.0-rc.1 is the current complete prerelease; v0.2.0-alpha.4 remains its immutable predecessor. Local v0.3/v0.4/v0.5 readiness assets exist as historical implementation evidence but do not automatically define the next implementation task.
 
 ### Completed Post-Alpha4 Tasks
 

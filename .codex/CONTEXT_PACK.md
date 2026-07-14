@@ -1,12 +1,12 @@
 # AgentContextKit Context Pack
 
-## TASK-0255–0257 `1.0.0-rc.1` Full Release Closure — Planned
+## TASK-0255–0257 `1.0.0-rc.1` Full Release Closure — Local PASS / Final CI Pending
 
 Clean synchronized entry HEAD/origin is `177810dc2e7dc14304541430cb074c13efc19612`. ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 passed. TASK-0255/0256/0257 were created once with `ackit task` and fully planned before implementation.
 
 The new full authorization permits authenticated local `gh` creation of the exact existing-tag prerelease and validated TASK-0242 assets, a minimal attestation-only workflow with validated retries, three-platform RC1 installation smoke, and repository/public/V100 closure. NuGet/package mutation, normal publish, tag mutation, unverified assets, PAT/secret/settings changes, force/history rewrite, `.ackit/` commit, and GA claims remain forbidden.
 
-Historical failure evidence remains intact. TASK-0255 exact release/assets passed. TASK-0256 is complete: after preserving first run `29349599514`, correction `83ab0a5` passed standard CI and run `29350091782` verified exact release/package state, created/verified attestations `35295200`/`35295205`, and passed Ubuntu/Windows/macOS installed smoke jobs `87144074850`/`87144074884`/`87144074933`. Two dispatches; zero NuGet/tag/release mutation. TASK-0257 is active for public/V100/final-CI closure.
+Historical failure evidence remains intact. TASK-0255 exact release/assets passed. TASK-0256 is complete: after preserving first run `29349599514`, correction `83ab0a5` passed standard CI and run `29350091782` verified exact release/package state, created/verified attestations `35295200`/`35295205`, and passed Ubuntu/Windows/macOS installed smoke jobs `87144074850`/`87144074884`/`87144074933`. Two dispatches; zero NuGet/tag/release mutation. TASK-0257 has pinned public smoke to RC1, synchronized public/evidence sources, closed V100-09, and passed the full 431/431 local validation suite; closure push, final hosted CI, and equality evidence remain.
 
 ## TASK-0252–0254 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0253 Stopped
 

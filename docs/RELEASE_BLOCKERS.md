@@ -3,20 +3,20 @@
 This document lists release blockers and follow-ups after the current GitHub and NuGet publication.
 
 ## Current Status
-`v0.2.0-alpha.4` is published and verified.
+`v1.0.0-rc.1` is published and verified as the latest complete prerelease.
 
 - GitHub repository public: yes, `https://github.com/Cynrath/agent-context-kit`.
 - `master` pushed: yes.
-- `v0.2.0-alpha.4` tag pushed: yes.
-- GitHub Release page for `v0.2.0-alpha.4`: completed as a pre-release.
+- Exact `v1.0.0-rc.1` tag exists at the NuGet repository commit: yes.
+- GitHub Release page for `v1.0.0-rc.1`: completed as a prerelease with exact assets and two verified attestations.
 - NuGet publish: completed.
 - NuGet global tool install verification: completed.
 - Package metadata final URL: yes.
 - Codex for OSS application submission: completed per maintainer-provided status.
-- Predecessor release `v0.2.0-alpha.3` is verified and published.
+- Predecessor release `v0.2.0-alpha.4` is verified, published, and immutable.
 
 ## Blocking Items
-No active release blockers remain for `v0.2.0-alpha.4`.
+No active release blockers remain for `v1.0.0-rc.1`. This is not a `1.0.0` GA readiness claim.
 
 ## Remaining Follow-Ups
 - Keep `docs/CODEX_FOR_OSS_APPLICATION.md` as the submitted application pack/reference.
@@ -60,12 +60,12 @@ powershell -ExecutionPolicy Bypass -File scripts/check-public-release-gates.ps1 
 
 ## Install Verification
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool install --global AgentContextKit --version 1.0.0-rc.1
 ackit version
 ackit --help
 ```
 
-If the tool is already installed, use `dotnet tool update --global AgentContextKit --version 0.2.0-alpha.4` or a temporary `--tool-path` install.
+If the tool is already installed, use `dotnet tool update --global AgentContextKit --version 1.0.0-rc.1` or a temporary `--tool-path` install.
 
 ## References
 - [Create a NuGet package using MSBuild](https://learn.microsoft.com/en-us/nuget/create-packages/creating-a-package-msbuild)

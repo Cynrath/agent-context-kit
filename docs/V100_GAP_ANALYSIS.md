@@ -1,7 +1,7 @@
 # 1.0 Readiness Gap Analysis
 
 ## Verdict
-AgentContextKit is **not ready for 1.0 general availability**. `v0.2.0-alpha.4` remains the latest complete GitHub/NuGet prerelease. NuGet `1.0.0-rc.1` and its owner-created exact tag exist in a partial immutable state, but GitHub prerelease/assets and provenance are absent after TASK-0253 release creation returned HTTP 403. Existing v1.0-labelled evidence does not imply GA readiness.
+AgentContextKit is **not ready for 1.0 general availability**. `v1.0.0-rc.1` is the latest complete GitHub/NuGet prerelease: exact package/tag/release/body/assets, both attestations, and Windows/Ubuntu/macOS installed-package evidence are verified. This release-candidate evidence closes V100-09 but does not imply `1.0.0` GA readiness.
 
 ## Priority Definitions
 - **P0**: must be complete before a 1.0 release candidate.
@@ -19,30 +19,29 @@ AgentContextKit is **not ready for 1.0 general availability**. `v0.2.0-alpha.4` 
 | V100-06 | P0 | Security response ownership and coverage. | TASK-0232 freshly verified private reporting `enabled: true`, `Cynrath` primary ownership, `ShadowFlameC` backup ownership with repository `write` permission, non-public disclosure rules, latest-pre-release fix scope, coverage path, and 3/7-business-day non-SLA targets on 2026-07-10. | Security + Maintainer | Reopen only after owner, notification, disclosure-channel, or support-policy change. | No | No | CLOSED_BY_TASK_0232 |
 | V100-07 | P1 | Large-repository performance and resource limits require final-candidate hosted confirmation. | Hosted mixed corpus passed at 1.019s/45.1 MiB Windows, 0.910s/59.9 MiB Ubuntu, and 0.696s/53.8 MiB macOS against 30-second/512-MiB thresholds; local interruption/unreadable-file evidence remains green; TASK-0241 reviewed runner variance. | Core + Tests | Complete for exact candidate; retain as regression tripwire, not SLA. | No | Completed authorized dispatch | FINAL_RC_HOSTED_RESOURCE_EVIDENCE_PASS / CLOSED_BY_TASK_0241 |
 | V100-08 | P1 | Runtime/platform support lifecycle needs final RC confirmation. | .NET 10 support policy is unchanged; exact candidate build/test/package/upgrade/scan passed on Windows, Ubuntu, and macOS; TASK-0241 accepts the final support scope. | Maintainer + Docs | Complete; recheck after runtime/platform policy change. | No | Completed authorized dispatch | FINAL_RC_CROSS_PLATFORM_CONFIRMATION_PASS / CLOSED_BY_TASK_0241 |
-| V100-09 | P1 | Release supply-chain policy required hosted provenance evidence. | TASK-0255 exact prerelease/assets pass. TASK-0256 corrected run `29350091782` verified exact release/package alignment, created and verified nupkg/snupkg attestations `35295200`/`35295205`, and passed Ubuntu/Windows/macOS installed-package jobs `87144074850`/`87144074884`/`87144074933`. NuGet/tag/release assets remained unchanged. | Release + Maintainer | Synchronize public status and close the gap through TASK-0257 final gates. | No | Hosted evidence complete | EXACT_RELEASE_ASSETS_ATTESTATIONS_THREE_PLATFORM_PASS / CLOSURE_PENDING_TASK_0257 |
+| V100-09 | P1 | Release supply-chain policy required hosted provenance evidence. | TASK-0255 exact prerelease/assets pass. TASK-0256 corrected run `29350091782` verified exact release/package alignment, created and verified nupkg/snupkg attestations `35295200`/`35295205`, and passed Ubuntu/Windows/macOS installed-package jobs `87144074850`/`87144074884`/`87144074933`. NuGet/tag/release assets remained unchanged; TASK-0257 synchronized public status. | Release + Maintainer | Reopen after package, tag, release asset, signer workflow, or platform-support change. | No | Hosted evidence complete | EXACT_RELEASE_ASSETS_ATTESTATIONS_THREE_PLATFORM_PASS / CLOSED_BY_TASK_0257 |
 | V100-10 | P1 | Localization parity requires final candidate acceptance. | Direct localization gate passed locally and on all hosted runners; EN/TR help/error/exit behavior, JSON invariance, and stable technical tokens are accepted by TASK-0241. | Docs + CLI | Complete; reopen after localization/contract change. | No | No | FINAL_LOCALIZATION_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241 |
 | V100-11 | P2 | External adoption evidence and issue feedback are limited. | Public package, samples, tutorials, issue backlog, and cross-platform smoke remain available; not required for this V100 RC boundary. | Maintainer + Community | Continue as post-V100 adoption work. | No | Yes, for future issues/discussions | DEFERRED_POST_V100 |
 | V100-12 | P2 | Public presentation assets and hosted docs remain deferred. | TASK-0229 sanitized screenshot remains committed; docs-site/GitHub Pages activation remains deferred and was not changed. | Docs | Retain screenshot; any docs-site activation requires separate settings/privacy authorization. | No | Yes, for future Pages/settings | SCREENSHOT_RETAINED / DOCS_SITE_DEFERRED / GITHUB_PAGES_NOT_ACTIVATED |
 
 ## Required Sequence
-1. Treat alpha2/alpha3 as historical, preserve complete immutable `v0.2.0-alpha.4`, and preserve partial immutable NuGet `1.0.0-rc.1` without republishing or fabricating tag/release/provenance evidence.
+1. Treat alpha2/alpha3/alpha4 as historical or predecessor evidence, preserve immutable NuGet/tag/release/assets for complete prerelease `v1.0.0-rc.1`, and never republish or fabricate provenance evidence.
 2. The v0.3 baseline/config direction from `docs/V030_ROADMAP_DECISION.md` was partially delivered in alpha3/alpha4; remaining work is tracked in the gap register above.
 3. Convert the TASK-0092 conditional local freeze into a final candidate acceptance after hosted evidence and remaining schema assets are complete.
 4. Complete security response, performance, support-lifecycle, and supply-chain P0/P1 evidence.
 5. Publish a 1.0 release candidate and run upgrade plus cross-platform validation.
 6. Resolve or explicitly accept every remaining P1 risk before 1.0 GA.
 
-## TASK-0241 Final-Candidate Gap Summary
+## TASK-0257 Final Release-Candidate Gap Summary
 
 | Classification | Count | Gaps |
 | --- | ---: | --- |
 | Closed P0 | 6 | V100-01, V100-02, V100-03, V100-04, V100-05, V100-06 |
-| Closed target P1 | 3 | V100-07, V100-08, V100-10 |
-| Open P1 publish boundary | 1 | V100-09 |
+| Closed target P1 | 4 | V100-07, V100-08, V100-09, V100-10 |
 | Deferred post-V100 | 1 | V100-11 |
 | Retained presentation boundary | 1 | V100-12 |
 
-Open P0 gaps: 0. V100-06 remains closed by TASK-0232; TASK-0241 closes V100-01 through V100-05 from exact local/hosted evidence and final acceptance. V100-09 remains open after TASK-0253 consumed its single recovery dispatch and GitHub Release creation returned HTTP 403; prerelease/assets/two attestations and RC1 three-platform recovered-package evidence are missing.
+Open P0 gaps: 0. Open target P1 gaps: 0. V100-06 remains closed by TASK-0232; TASK-0241 closes V100-01 through V100-05 plus V100-07/V100-08/V100-10 from exact local/hosted evidence and final acceptance. TASK-0257 closes V100-09 from TASK-0255 exact release/assets and TASK-0256 attestations plus three-platform installed-package evidence. V100-11 remains deferred post-V100 and V100-12 retains the documentation-site boundary.
 
 ## Post-Alpha4 V100 Cleanup (TASK-0231)
 
@@ -87,4 +86,4 @@ TASK-0240 records evidence but does not itself close acceptance-dependent gaps. 
 The complete local suite passed with 430/430 tests, all required V100/contract/config/JSON/localization/RC gates, Unicode temp regression guard, mixed-corpus time/memory evidence, Markdown/diff hygiene, and no tracked `.ackit/` artifacts. This is `LOCAL READY / REMOTE NO-GO` evidence. It closes no additional P0/P1 gap: final-candidate acceptance, final-RC hosted confirmation, and hosted provenance remain required exactly as recorded above.
 
 ## Status Maintenance
-Each implementation task must update this register with evidence rather than marking a gap complete from documentation alone. `scripts/check-v100-readiness.ps1` verifies that this analysis and the historical readiness assets exist; it is not a substitute for closing gaps. TASK-0241 applied every done criterion to the exact candidate evidence. Publication remains separately unauthorized and V100-09 stays open until publish-path provenance exists.
+Each implementation task must update this register with evidence rather than marking a gap complete from documentation alone. `scripts/check-v100-readiness.ps1` verifies that this analysis and the historical readiness assets exist; it is not a substitute for closing gaps. TASK-0241 applied candidate criteria to exact evidence; TASK-0257 closes V100-09 only after TASK-0255/TASK-0256 hosted release, attestation, and platform proof.

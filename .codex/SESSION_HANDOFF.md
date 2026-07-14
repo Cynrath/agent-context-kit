@@ -1,12 +1,12 @@
 # AgentContextKit Session Handoff
 
-## TASK-0255–0257 `1.0.0-rc.1` Full Release Closure — Planned
+## TASK-0255–0257 `1.0.0-rc.1` Full Release Closure — Local PASS / Final CI Pending
 
 - Full operational authorization received on 2026-07-14. Clean synchronized entry is `master`/`origin/master` at `177810dc2e7dc14304541430cb074c13efc19612`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 passed.
 - TASK-0255, TASK-0256, and TASK-0257 were created exactly once with `ackit task` and fully specified before implementation.
 - TASK-0255 is complete. Source artifact/NuGet/signature/content/tag checks passed; authenticated ADMIN local `gh` created release `353913024` at `https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1` with exact prepared body and only asset IDs `476881883`/`476881892`; sizes, API digests, and downloaded hashes passed. NuGet/tag/settings mutation count is zero.
-- TASK-0256 is complete. First run `29349599514` preserved its pre-attestation accepted-404 exit-state failure. Correction commit `83ab0a5` passed standard runs `29349905919`/`29349906036`/`29349905891`; corrected run `29350091782`, job `87143810767`, verified exact release/package state, created and verified attestations `35295200`/`35295205`, rechecked immutability, and passed Ubuntu/Windows/macOS jobs `87144074850`/`87144074884`/`87144074933`. Two dispatches; zero NuGet/tag/release mutation. TASK-0257 is active.
-- TASK-0257 is success-only and owns the RC1 published-smoke pin, EN/TR/NuGet/public/release/supply-chain/V100 synchronization, V100-09 closure, and final CI/equality checks.
+- TASK-0256 is complete. First run `29349599514` preserved its pre-attestation accepted-404 exit-state failure. Correction commit `83ab0a5` passed standard runs `29349905919`/`29349906036`/`29349905891`; corrected run `29350091782`, job `87143810767`, verified exact release/package state, created and verified attestations `35295200`/`35295205`, rechecked immutability, and passed Ubuntu/Windows/macOS jobs `87144074850`/`87144074884`/`87144074933`. Two dispatches; zero NuGet/tag/release mutation.
+- TASK-0257 closure is implemented and locally green: RC1 published smoke, EN/TR/NuGet/public/release/supply-chain/V100 synchronization, and V100-09 closure are complete. Restore/build/test passed at 431/431 with 0 warnings/errors and Unicode 0/0; ACKit doctor/scan and all focused release/package/V100/supply-chain/public/Markdown/hygiene gates passed. Closure push, final standard CI, and equality/clean-tree evidence remain.
 - New authorization supersedes obsolete retry/manual-completion boundaries only. TASK-0242/TASK-0244/TASK-0247/TASK-0250/TASK-0253 remain factual historical evidence.
 - NuGet publication/mutation, normal publish, tag mutation, unverified assets, PAT/secret/settings changes, force push, history rewrite, generated `.ackit/` commit, and `1.0.0` GA claims remain prohibited.
 

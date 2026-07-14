@@ -5,7 +5,7 @@ Final-candidate contract accepted for `1.0.0-rc.1` on 2026-07-10 by TASK-0241, b
 
 The earlier `Conditional local freeze` status is retained as historical workflow vocabulary; TASK-0241 advances it to exact final-candidate acceptance without changing the frozen contract.
 
-The exact source/workflow/test/package-metadata candidate is `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`. Current source/package metadata is `1.0.0-rc.1`; the immutable published predecessor and current public release are `0.2.0-alpha.4`. The earlier base `b1604ae1e73017521d28e5a83f328bb1347406b6` remains historical local evidence.
+The exact source/workflow/test/package-metadata candidate is `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`. Current source/package metadata and current complete prerelease are `1.0.0-rc.1`; immutable published predecessor `0.2.0-alpha.4` remains upgrade/rollback evidence. The earlier base `b1604ae1e73017521d28e5a83f328bb1347406b6` remains historical local evidence.
 
 TASK-0232 records the target contract; TASK-0240 passed its exact hosted gates; TASK-0241 status is `FINAL_CANDIDATE_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241`.
 

@@ -42,7 +42,7 @@ public sealed class AgentInstructionSurfaceConsistencyTests
         Assert.Contains("task-first", content, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("force-push", content, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("history", content, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("alpha.3", content, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("1.0.0-rc.1", content, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("model name", content, StringComparison.OrdinalIgnoreCase);
         Assert.Contains(".ackit", content, StringComparison.OrdinalIgnoreCase);
     }

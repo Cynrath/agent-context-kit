@@ -71,7 +71,7 @@ foreach ($marker in @(
     "NuGet owner identity | ACCEPTED RISK on 2026-06-14",
     "NuGet package signature | ACCEPTED RISK: author signing deferred on 2026-06-14",
     "SBOM | ACCEPTED RISK: publication deferred on 2026-06-14",
-    "Build/package provenance | IMPLEMENTED LOCALLY / HOSTED PENDING",
+    "Build/package provenance | VERIFIED PUBLISHED STATE / HOSTED PASS",
     "Candidate commit:",
     "Decision date:",
     "Maintainer: Cynrath",

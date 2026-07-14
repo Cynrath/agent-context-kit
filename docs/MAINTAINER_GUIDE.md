@@ -70,9 +70,9 @@ powershell -ExecutionPolicy Bypass -File scripts/test-samples.ps1 -NoBuild
 ```
 
 ## SARIF And Code Scanning
-The published `0.2.0-alpha.4` package and current source include `ackit sarif --output .ackit/reports/ackit.sarif`, which creates a local SARIF 2.1.0 scanner report with repository-relative paths and no raw scanner match values.
+The published `1.0.0-rc.1` package and current source include `ackit sarif --output .ackit/reports/ackit.sarif`, which creates a local SARIF 2.1.0 scanner report with repository-relative paths and no raw scanner match values.
 
-The published NuGet `0.2.0-alpha.4` package includes `ackit sarif`. Keep source package smoke for validating future source changes before publication.
+The published NuGet `1.0.0-rc.1` package includes `ackit sarif`. Keep source package smoke for validating future source changes before publication.
 
 The repository does not enable GitHub Code Scanning upload by default. `docs/examples/github-actions-sarif-upload.yml` is a non-active example only. Before enabling it as a real workflow, maintainers should review the generated SARIF artifact, confirm `security-events: write` permission is acceptable, and decide whether Code Scanning alerts should become part of release validation.
 
@@ -110,8 +110,8 @@ Use `docs/ISSUE_BACKLOG.md` for the first copy-ready issue set. Issue creation i
 - If a release tag points to the wrong commit, stop and document the incident before any maintainer-only tag action.
 
 ## Current Release
-`v0.2.0-alpha.4` is published on GitHub and NuGet as a pre-release at final publish SHA `98cdf9723a509a347bd0403f6373dafe81ba03fb`. Global tool install, immutable release verification, and published/source smoke evidence are complete. `v0.2.0-alpha.3` remains the immutable published predecessor.
+`v1.0.0-rc.1` is the current complete prerelease on GitHub and NuGet at exact package/tag commit `258918b33c3d1359aac967604ee524e8b66ddf02`. Exact assets, both attestations, and Windows/Ubuntu/macOS installed-package smoke are verified. This is not a `1.0.0` GA claim.
 
-Current source metadata is prepared candidate `1.0.0-rc.1`; the current published package and exact hosted predecessor remain `0.2.0-alpha.4`. TASK-0239 prepares the candidate without dispatching or publishing it.
+Current source metadata and the current published prerelease are `1.0.0-rc.1`; exact hosted predecessor `0.2.0-alpha.4` remains immutable upgrade/rollback evidence.
 
 For historical release-note evidence, use the version-specific release task and immutable GitHub prerelease. Do not reuse an older release body as a current alpha4 source of truth.

@@ -8,7 +8,7 @@ This packet records the maintainer-authorized policy decisions and TASK-0241 fin
 
 ## Verified Decision Inputs
 
-- Current published release and exact RC predecessor: immutable `AgentContextKit 0.2.0-alpha.4`; older `0.2.0-alpha.3` evidence remains historical.
+- Current complete prerelease: immutable `AgentContextKit 1.0.0-rc.1`; exact RC predecessor `0.2.0-alpha.4` and older alpha3 evidence remain historical.
 - TASK-0239 entry HEAD: `5c1a7782579f1bdc54a0d3706c886108382914cb`.
 - Selected candidate: `1.0.0-rc.1`; exact candidate SHA `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; hosted run `29118452246`.
 - Installed tool: `AgentContextKit 0.2.0-alpha.4`.
@@ -137,16 +137,16 @@ MAINTAINER_DECISION_RECORDED
 RECOVERY_OWNERSHIP_RECONCILED
 ACCEPTED_RISK_RECORDED_FOR_SIGNING_AND_SBOM
 SIGNING_AND_SBOM_ACCEPTED_RISK_ACTIVE
-OPEN_PENDING_PUBLISH_PATH_PROVENANCE
+HOSTED_PROVENANCE_VERIFIED_FOR_RC1
 ```
 
 ## Resulting Boundary
 
-- V100-02, V100-06, and V100-08 are closed.
-- V100-09 remains open pending publish-path provenance.
+- V100-02, V100-06, V100-08, and V100-09 are closed; V100-09 closure is based on TASK-0255/TASK-0256 exact hosted evidence and TASK-0257 public synchronization.
+- V100-09 is closed by TASK-0257 from exact GitHub release assets, both verified attestations, and three-platform installed-package evidence.
 - V100-07 and V100-10 are closed by exact candidate evidence and TASK-0241 acceptance as recorded in the gap register.
 - Open P0 gaps: 0.
 - Decision: `CONDITIONAL GO FOR A SEPARATELY AUTHORIZED PUBLISH TASK`.
 - No `1.0.0` GA or published-RC claim is made.
 
-The single authorized RC evidence action completed as TASK-0240 run `29118452246`. Historical TASK-0241 marker: Publication authorized: No. TASK-0242 later published NuGet RC1 through OIDC. The owner-created exact tag now exists, but TASK-0253 run `29345313517` received HTTP 403 at GitHub prerelease creation; prerelease/assets/provenance remain absent and V100-09 remains open.
+The single authorized RC evidence action completed as TASK-0240 run `29118452246`. Historical TASK-0241 marker: Publication authorized: No. TASK-0242 later published NuGet RC1 through OIDC. TASK-0253's release-create HTTP 403 remains historical; TASK-0255 completed the exact prerelease/assets and TASK-0256 run `29350091782` completed both attestations plus three-platform installed-package proof. TASK-0257 closes V100-09 without a GA claim.

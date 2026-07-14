@@ -4,7 +4,7 @@ namespace AgentContextKit.Tests;
 
 public sealed class IssueTemplateVersionPlaceholderTests
 {
-    private const string CurrentVersion = "0.2.0-alpha.4";
+    private const string CurrentVersion = "1.0.0-rc.1";
     private const string PreviousVersion = "0.2.0-alpha.2";
 
     [Fact]

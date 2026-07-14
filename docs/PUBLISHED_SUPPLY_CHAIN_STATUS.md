@@ -29,9 +29,9 @@ Authenticated completion on 2026-07-14 used only the exact retained TASK-0242 pa
 | nupkg asset | ID `476881883`; `218322` bytes; API digest/download SHA-256 `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d` |
 | snupkg asset | ID `476881892`; `50053` bytes; API digest/download SHA-256 `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d` |
 | Release body SHA-256 | `c5a6c110fea849f8544ffb23818ad5be1b9c83c3faa595dbd2e03eb9506d72f6` |
-| Attestations/platform smoke | Pending TASK-0256 |
+| Attestations/platform smoke | Completed by TASK-0256 run `29350091782`; attestations `35295200`/`35295205`; all three OS jobs PASS |
 
-The TASK-0253 GitHub Actions integration 403 was not retried unchanged. Its job had Contents write, but the release endpoint rejected the integration. Existing authenticated local account `Cynrath` had ADMIN/write access and created the exact release once. NuGet publish count, tag mutation count, and settings/PAT/secret mutation count are zero. V100-09 remains open until both attestations and three-platform installed-package evidence pass.
+The TASK-0253 GitHub Actions integration 403 was not retried unchanged. Its job had Contents write, but the release endpoint rejected the integration. Existing authenticated local account `Cynrath` had ADMIN/write access and created the exact release once. NuGet publish count, tag mutation count, and settings/PAT/secret mutation count are zero. TASK-0256 supplied both attestations and three-platform installed-package evidence; TASK-0257 closes V100-09.
 
 ## TASK-0253 Post-Failure Immutable State
 

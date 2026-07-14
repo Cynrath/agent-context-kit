@@ -2,7 +2,7 @@
 
 This page records an early local milestone that assembled v1.0-target contract, convention, documentation, and release-gate assets. It confirms that those assets are present and linked. It does not prove 1.0 product readiness or approve a release.
 
-Actual 1.0 gaps and blocking evidence are tracked in `docs/V100_GAP_ANALYSIS.md`. The current published release is `v0.2.0-alpha.4`.
+Actual 1.0 gaps and blocking evidence are tracked in `docs/V100_GAP_ANALYSIS.md`. The current complete prerelease is `v1.0.0-rc.1`; this does not claim `1.0.0` GA readiness.
 
 ## Historical Local Readiness Scope
 The v1.0 local readiness review covers:
@@ -33,8 +33,8 @@ powershell -ExecutionPolicy Bypass -File scripts/check-v100-readiness.ps1 -FailO
 - `RepositoryUrl` is `https://github.com/Cynrath/agent-context-kit`.
 - `PackageProjectUrl` is `https://github.com/Cynrath/agent-context-kit`.
 - GitHub repository is public.
-- GitHub Release `v0.2.0-alpha.4` is published as a pre-release.
-- NuGet package `AgentContextKit` version `0.2.0-alpha.4` is published.
+- GitHub Release `v1.0.0-rc.1` is published as a prerelease with exact validated assets.
+- NuGet package `AgentContextKit` version `1.0.0-rc.1` is published; both asset attestations and three-platform installed smoke are verified.
 - NuGet global tool install verification is completed.
 - `ackit sarif` is included in the published package.
 

@@ -1,10 +1,10 @@
 # Next Steps
 
-## Current V100 `1.0.0-rc.1` Full Release Closure — TASK-0255–0257 Planned
+## Current V100 `1.0.0-rc.1` Full Release Closure — Local PASS / Final CI Pending
 
 1. COMPLETED — TASK-0255: exact source/NuGet/tag tuple passed; authenticated ADMIN local `gh` created release `353913024` with exact prepared body and only asset IDs `476881883`/`476881892`; sizes, API digests, and downloaded hashes passed; NuGet/tag/settings mutation zero.
 2. COMPLETED — TASK-0256: correction `83ab0a5`, standard runs `29349905919`/`29349906036`/`29349905891`, and corrected release run `29350091782` pass; attestations `35295200`/`35295205` and three platform jobs pass; zero NuGet/tag/release mutation.
-3. IN PROGRESS — TASK-0257: pin published smoke to RC1, synchronize EN/TR/NuGet/release/supply-chain/V100 evidence, close V100-09, and finish with full validation, final CI, clean local/origin equality.
+3. LOCAL PASS / FINAL CI PENDING — TASK-0257: published smoke pinned to RC1; EN/TR/NuGet/release/supply-chain/V100 evidence synchronized; V100-09 closed; 431/431 full local suite and all gates passed. Finish closure push, final CI, and clean local/origin equality.
 
 New full authorization supersedes obsolete retry/manual-completion boundaries while preserving every historical failure record. NuGet publication/mutation, normal publish, tag mutation, unverified assets, PAT/secret/settings changes, force push, history rewrite, generated `.ackit/` commit, and GA claims remain prohibited.
 
@@ -28,7 +28,7 @@ Historical boundary: TASK-0242/TASK-0244/TASK-0247/TASK-0250/TASK-0253 evidence 
 
 PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 completed TASK-0177 through TASK-0180, then inserted user-prioritized TASK-0187 before TASK-0181 to audit and harden the visible `nuget-release` failed deployments without release/tag/NuGet/deployment mutation.
 
-1. Current published release: `v0.2.0-alpha.4` at exact publish commit `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
+1. Current complete prerelease: `v1.0.0-rc.1` at exact package/tag commit `258918b33c3d1359aac967604ee524e8b66ddf02`; alpha4 remains immutable predecessor evidence.
 2. PROJECT-CONTROL-0109 planning commit `b224c20` is the active entry point; TASK-0177 is hosted-verified and TASK-0178 implementation commit `336c3ee` plus evidence commit `90928f1` are pushed.
 3. PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176: post-0107 audit and state sync; Anthropic and Continue generate targets; safe `ackit hooks`; `ackit diff`; `ackit trim`; `ackit watch` (design-only); ACKIT008 HighEntropyString rule; MCP stdio design-only; final validation and CI gate fix.
 4. Local TASK-0177 validation on 2026-06-18: `dotnet build` clean (0 warnings, 0 errors), focused hook tests 6/6 green, full suite 276/276 green, source `ackit scan --ci` exit 0 with existing Medium `.remember` log findings only, `ackit doctor` 13/13 PASS, `verify-release.ps1` passed, `check-cli-contract` and `check-localization-parity` passed. `check-tracked-vs-untracked-md` is rerun after staging because the new test file is intentionally untracked before commit.

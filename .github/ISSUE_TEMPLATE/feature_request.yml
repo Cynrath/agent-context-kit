@@ -28,7 +28,7 @@ body:
     attributes:
       label: ackit version
       description: Run `ackit version` if this relates to current behavior.
-      placeholder: AgentContextKit 0.2.0-alpha.4
+      placeholder: AgentContextKit 1.0.0-rc.1
   - type: input
     id: os
     attributes:

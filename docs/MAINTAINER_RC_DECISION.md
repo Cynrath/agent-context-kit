@@ -1,9 +1,9 @@
 # Maintainer Release-Candidate Decision
 
 ## Current Decision
-**TASK-0255 COMPLETED THE EXACT GITHUB PRERELEASE AND TWO ASSETS; ATTESTATIONS AND THREE-PLATFORM PROOF REMAIN.**
+**RC1 RELEASE EVIDENCE COMPLETE; V100-09 CLOSED BY TASK-0257.**
 
-The repository owner created exact tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. TASK-0253's Actions integration later received HTTP 403 at release creation despite declared Contents write. New full authorization enabled TASK-0255 to reverify the exact source/NuGet/tag tuple and use authenticated ADMIN local `gh` to create release `353913024` with the prepared body and only exact asset IDs `476881883`/`476881892`. Target/title/body/prerelease state, sizes, API digests, and downloaded hashes passed. NuGet/tag/settings remained unchanged. V100-09 remains open only for both attestations and three-platform installed-package proof; `v0.2.0-alpha.4` remains public guidance until TASK-0257.
+The repository owner created exact tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. TASK-0255 reverified the exact source/NuGet/tag tuple and used authenticated ADMIN local `gh` to create release `353913024` with the prepared body and only exact asset IDs `476881883`/`476881892`. TASK-0256 run `29350091782` created and verified nupkg/snupkg attestations `35295200`/`35295205` and passed installed-package smoke on Windows, Ubuntu, and macOS. NuGet, tag, release body, and assets remained unchanged. TASK-0257 closes V100-09 and makes RC1 the current public prerelease without claiming `1.0.0` GA readiness.
 
 Candidate `1.0.0-rc.1` is accepted against published predecessor `0.2.0-alpha.4`. TASK-0239 local/package evidence and standard CI passed for exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; TASK-0240 hosted run `29118452246` passed on Windows, Ubuntu, and macOS; the post-candidate bridge is documentation/evidence/governance-only; and TASK-0241 closes every P0 gap plus target P1 gaps V100-07, V100-08, and V100-10.
 
@@ -24,9 +24,9 @@ Historical TASK-0241 boundary markers retained for gate/audit compatibility: `Pu
 | Security reporting | Private reporting enabled; `Cynrath` primary; `ShadowFlameC` backup; V100-06 closed by fresh TASK-0232 evidence | Recheck after owner/channel/support-policy change | Security ownership review |
 | Dependency review | Fresh 2026-07-10 vulnerable/deprecated reviews completed with available sources and no findings | Recheck at publication if external state changes | TASK-0242 if authorized |
 | NuGet ownership/signing | Owner identity difference and author signing have bounded accepted-risk dispositions through 2026-09-30; valid repository signature; backup recovery ownership is reconciled | Recheck dispositions by expiry or before the next pre-release review | Maintainer NuGet/supply-chain decision |
-| SBOM/provenance | SBOM is bounded-deferred through 2026-09-30; provenance is implemented for the next exact GitHub Release nupkg but has no hosted publication evidence yet | Require attestation creation/verification in the next publish run | Release workflow |
+| SBOM/provenance | SBOM remains bounded-deferred through 2026-09-30; exact RC1 nupkg and snupkg attestations are created and signer-workflow verified | Reopen provenance after release asset or workflow identity change | Release workflow |
 | Localization parity | TASK-0240 localization gate passed for exact candidate on all three operating systems | Final localization contract accepted | TASK-0241 |
-| Version and release | NuGet `1.0.0-rc.1` published; exact owner-created tag exists; GitHub prerelease/assets/provenance absent after TASK-0253 HTTP 403; `0.2.0-alpha.4` remains latest complete release | Stop and preserve immutable state | TASK-0253 dispatch consumed; no TASK-0254 execution |
+| Version and release | NuGet `1.0.0-rc.1`, exact tag, GitHub prerelease/body/assets, two attestations, and three-platform installed-package smoke verified | Preserve immutable release tuple | TASK-0255/TASK-0256/TASK-0257 |
 
 ## TASK-0240 Evidence Record
 

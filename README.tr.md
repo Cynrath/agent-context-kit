@@ -33,7 +33,7 @@ Repository’nizi analiz edin, temiz agent bağlam dosyaları üretin, task-firs
 Varsayılan komutlar repository içeriğini yerelde işler; repository yüklemez, AI API çağrısı veya telemetri yapmaz ve harici araç çalıştırmaz. Ayrıntılar için [Varsayılan No-Network Politikası](docs/NO_NETWORK_DEFAULT_POLICY.md) belgesine bakın.
 
 > [!IMPORTANT]
-> NuGet `1.0.0-rc.1` şu anda kısmi ve değiştirilemez bir yayın durumundadır. Yetkili recovery tamamen doğrulanana kadar en son eksiksiz sürüm `v0.2.0-alpha.4` olarak kalır; aşağıdaki kurulum örnekleri bu nedenle bilinçli olarak alpha4’e sabitlenmiştir.
+> `v1.0.0-rc.1`, GitHub ve NuGet üzerindeki en güncel eksiksiz ön sürümdür. Tam paket asset’leri, iki attestation ve Windows, Ubuntu, macOS kurulu-paket smoke doğrulamaları tamamlanmıştır. Bu bir release candidate’dır; `1.0.0` GA iddiası değildir.
 
 ---
 
@@ -41,13 +41,13 @@ Varsayılan komutlar repository içeriğini yerelde işler; repository yüklemez
 
 | Alan | Durum |
 | --- | --- |
-| Güncel eksiksiz sürüm | `v0.2.0-alpha.4`; GitHub ve NuGet üzerinde pre-release olarak yayımlandı |
-| RC1 kısmi durum | NuGet `1.0.0-rc.1` vardır ve kurulabilir; sahip tarafından oluşturulan `v1.0.0-rc.1` etiketi tam paket commit’ini gösterir, ancak TASK-0253’ün tek recovery çalıştırması GitHub prerelease oluştururken HTTP 403 aldı; prerelease, asset’ler, attestation’lar ve üç platformlu recovered-package kanıtı hâlâ yoktur |
-| Yayın kanıtı | `98cdf9723a509a347bd0403f6373dafe81ba03fb` commit’inden yayımlandı; global tool kurulumu doğrulandı |
+| Güncel eksiksiz ön sürüm | `v1.0.0-rc.1`; GitHub ve NuGet üzerinde yayımlandı, tam asset’ler, iki attestation ve üç platformlu kurulu-paket smoke doğrulandı |
+| Yayın kanıtı | NuGet repository commit’i ve tam etiket hedefi `258918b33c3d1359aac967604ee524e8b66ddf02`; GitHub ön sürümü [v1.0.0-rc.1](https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1) |
+| Önceki eksiksiz ön sürüm | `v0.2.0-alpha.4` |
 | Çalışma zamanı | .NET 10 |
 | Platformlar | GitHub Actions ile Windows, Ubuntu ve macOS |
 | Gizlilik modeli | Offline-first; MVP repository yüklemez ve uzak AI API çağrısı yapmaz |
-| SARIF | `ackit sarif`, yayımlanmış `0.2.0-alpha.4` paketinde bulunur |
+| SARIF | `ackit sarif`, yayımlanmış `1.0.0-rc.1` paketinde bulunur |
 
 ---
 
@@ -120,7 +120,7 @@ AI coding agent’ları güçlüdür; ancak eksik, eski veya güvensiz bağlam a
 ### NuGet’ten kurulum
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool install --global AgentContextKit --version 1.0.0-rc.1
 ackit version
 ackit --help
 ```
@@ -180,7 +180,7 @@ Pop-Location
 
 ## CLI Komut Haritası
 
-Bu harita yayımlanmış `0.2.0-alpha.4` yardım çıktısı ile [CLI Contract](docs/CLI_CONTRACT.md) ve [CLI Reference](docs/CLI_REFERENCE.md) belgelerini izler.
+Bu harita yayımlanmış `1.0.0-rc.1` yardım çıktısı ile [CLI Contract](docs/CLI_CONTRACT.md) ve [CLI Reference](docs/CLI_REFERENCE.md) belgelerini izler.
 
 ```text
 ackit init [--lang en|tr] [--json]
@@ -277,7 +277,7 @@ Bkz. [Related Projects](docs/RELATED_PROJECTS.md), [Comparison Matrix](docs/RELA
 
 ## Paketleme ve Platform Desteği
 
-Yerel paket doğrulama [Packaging](docs/PACKAGING.md) ve [Release Validation](docs/RELEASE_VALIDATION.md) belgelerinde açıklanır. Güncel eksiksiz paket `0.2.0-alpha.4` bir NuGet global tool’dur. Yayımlanmış paket ve güncel kaynak akışları Windows, Ubuntu ve macOS üzerinde ayrı GitHub Actions smoke workflow’larıyla izlenir.
+Yerel paket doğrulama [Packaging](docs/PACKAGING.md) ve [Release Validation](docs/RELEASE_VALIDATION.md) belgelerinde açıklanır. Güncel eksiksiz ön sürüm `1.0.0-rc.1` bir NuGet global tool’dur. Yayımlanmış paket ve güncel kaynak akışları Windows, Ubuntu ve macOS üzerinde ayrı GitHub Actions smoke workflow’larıyla izlenir.
 
 ## Katkı, Güvenlik ve Lisans
 

@@ -34,7 +34,7 @@ Analyze a repository, generate clean agent context files, create task-first work
 Default commands process repository content locally: no repository upload, AI API call, telemetry, or external-tool invocation. See [No-Network Default Policy](docs/NO_NETWORK_DEFAULT_POLICY.md).
 
 > [!IMPORTANT]
-> NuGet `1.0.0-rc.1` currently exists in a partial immutable publication state. Until the authorized recovery is fully verified, `v0.2.0-alpha.4` remains the latest complete release and the installation examples below intentionally stay pinned to it.
+> `v1.0.0-rc.1` is the latest complete prerelease on GitHub and NuGet. Its exact package assets, attestations, and installed-package smoke on Windows, Ubuntu, and macOS are verified. This is a release candidate, not a `1.0.0` GA claim.
 
 ---
 
@@ -42,15 +42,14 @@ Default commands process repository content locally: no repository upload, AI AP
 
 | Area | Status |
 | --- | --- |
-| Current complete release | `v0.2.0-alpha.4` published on GitHub and NuGet as a pre-release |
-| RC1 partial state | NuGet `1.0.0-rc.1` exists and installs; owner-created tag `v1.0.0-rc.1` targets the exact package commit, but TASK-0253's single recovery run received HTTP 403 creating the GitHub prerelease, so prerelease, assets, attestations, and three-platform recovered-package evidence remain absent |
-| Release evidence | Published from `98cdf9723a509a347bd0403f6373dafe81ba03fb`; NuGet install verified |
+| Current complete prerelease | `v1.0.0-rc.1` published on GitHub and NuGet; exact assets, two attestations, and three-platform installed-package smoke verified |
+| Release evidence | NuGet repository commit and exact tag target `258918b33c3d1359aac967604ee524e8b66ddf02`; GitHub prerelease [v1.0.0-rc.1](https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1) |
 | Package | `AgentContextKit` global tool install verified |
-| Previous release | `v0.2.0-alpha.3` |
+| Previous complete prerelease | `v0.2.0-alpha.4` |
 | Runtime | .NET 10 |
 | Platforms | Windows, Ubuntu, macOS via GitHub Actions smoke flows |
 | Privacy model | Offline-first; no repository upload and no remote AI API calls in the MVP |
-| SARIF | `ackit sarif` is included in the published `0.2.0-alpha.4` package |
+| SARIF | `ackit sarif` is included in the published `1.0.0-rc.1` package |
 
 ---
 
@@ -138,7 +137,7 @@ AgentContextKit gives teams a repeatable local workflow before they hand a repos
 ### Install from NuGet
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool install --global AgentContextKit --version 1.0.0-rc.1
 ackit version
 ackit --help
 ```
@@ -153,7 +152,7 @@ ackit doctor
 
 `scan --ci` returns a non-zero exit code for High or Critical findings. Start with `ackit scan` when you want report-only behavior.
 
-The published `0.2.0-alpha.4` package supports read-only config diagnostics and an explicit baseline workflow:
+The published `1.0.0-rc.1` package supports read-only config diagnostics and an explicit baseline workflow:
 
 ```powershell
 ackit config-check --json
@@ -201,7 +200,7 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
 ```
 
-The published `0.2.0-alpha.4` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands.
+The published `1.0.0-rc.1` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands.
 
 ### Try it on a sample
 
@@ -246,7 +245,7 @@ Pop-Location
 ---
 
 ## CLI Command Map
-This map follows published `0.2.0-alpha.4` `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`.
+This map follows published `1.0.0-rc.1` `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`.
 
 ```text
 ackit init [--lang en|tr] [--json]
@@ -367,10 +366,10 @@ Public release blockers are tracked in [Release Blockers](docs/RELEASE_BLOCKERS.
 
 ## Packaging
 
-Local package validation is documented in [Packaging](docs/PACKAGING.md) and [Release Validation](docs/RELEASE_VALIDATION.md). The `0.2.0-alpha.4` package is published as a NuGet global tool.
+Local package validation is documented in [Packaging](docs/PACKAGING.md) and [Release Validation](docs/RELEASE_VALIDATION.md). The `1.0.0-rc.1` prerelease is published as a NuGet global tool.
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool install --global AgentContextKit --version 1.0.0-rc.1
 ackit version
 ```
 

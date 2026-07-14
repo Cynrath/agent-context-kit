@@ -26,7 +26,7 @@ AgentContextKit is an offline-first .NET CLI that prepares repositories for safe
 - Automatic publishing from push or pull-request events.
 
 ## Next Product Direction
-The complete alpha.4 release includes baseline-aware CI policy, configuration diagnostics, MCP stdio, `ackit watch`, `diff`, `trim`, `README.nuget.md` rendering, and ACKit-first dogfood. NuGet `1.0.0-rc.1` freezes that reviewed surface and is installable, and its owner-created exact tag exists. TASK-0253 nevertheless received HTTP 403 while creating the GitHub prerelease, so prerelease/assets/attestations remain absent and RC1 is still a partial immutable publication, not a completed release or GA claim.
+The complete RC1 prerelease includes baseline-aware CI policy, configuration diagnostics, MCP stdio, `ackit watch`, `diff`, `trim`, `README.nuget.md` rendering, and ACKit-first dogfood. NuGet `1.0.0-rc.1`, exact tag, GitHub prerelease/body/assets, both attestations, and Windows/Ubuntu/macOS installed-package smoke are verified. RC1 is complete as a prerelease, not a `1.0.0` GA claim; alpha4 remains immutable predecessor evidence.
 
 ## Future Optional LLM Scope
 v0.5 may add optional LLM-assisted workflows, but the default product remains offline-first. Any future provider integration must require explicit user consent, dry-run context review, safe secret handling, and local auditability before remote calls or context export.
@@ -38,7 +38,7 @@ v0.5 may add optional LLM-assisted workflows, but the default product remains of
 - Teams cleaning private projects before public release.
 
 ## Current Commands
-This list describes source candidate `1.0.0-rc.1` and the compatible published `0.2.0-alpha.4` package surface.
+This list describes current source and published prerelease `1.0.0-rc.1`; `0.2.0-alpha.4` remains compatible predecessor evidence.
 
 - `init`
 - `scan`

@@ -8,7 +8,7 @@ Current package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.
 Important fields:
 - `PackageId`: `AgentContextKit`
 - `ToolCommandName`: `ackit`
-- `Version`: `1.0.0-rc.1` (NuGet published; tag/GitHub prerelease/provenance incomplete); latest complete release is `0.2.0-alpha.4`
+- `Version`: `1.0.0-rc.1` (latest complete prerelease; NuGet, exact tag, GitHub prerelease/assets, attestations, and three-platform smoke verified)
 - `Authors`: `Cynrath`
 - `PackageLicenseExpression`: `MIT`
 - `PackageReadmeFile`: `README.nuget.md`
@@ -66,23 +66,23 @@ dotnet tool install AgentContextKit --tool-path $tools --add-source $pkg --versi
 Install the published package from NuGet:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool install --global AgentContextKit --version 1.0.0-rc.1
 ackit version
 ackit --help
 ackit scan --ci
 ```
 
 ## Current Published Package
-The current published package is `0.2.0-alpha.4`.
+The current published prerelease is `1.0.0-rc.1`.
 
 Publication evidence:
 - Publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
-- NuGet package verification passed through `scripts/verify-published-package.ps1 -Version 0.2.0-alpha.4`.
-- Global tool install from NuGet passed and `ackit --version` returned `AgentContextKit 0.2.0-alpha.4`.
-- Tag `v0.2.0-alpha.4` and GitHub prerelease `v0.2.0-alpha.4` target `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
+- NuGet package verification passed for exact `1.0.0-rc.1`; repository signature and repository commit match.
+- Global tool install from NuGet passed on Windows, Ubuntu, and macOS and returned `AgentContextKit 1.0.0-rc.1`.
+- Tag `v1.0.0-rc.1` and its GitHub prerelease target `258918b33c3d1359aac967604ee524e8b66ddf02`; exact assets and both attestations are verified.
 
 ## OIDC NuGet Publish
-Version `0.2.0-alpha.4` has been published and install-verified. It is the exact predecessor for prepared candidate `1.0.0-rc.1`. Future publication is allowed only from the reviewed exact commit after all gates pass and a separate authorization, using the manual `.github/workflows/release.yml` workflow and the preconfigured `nuget-release` environment.
+Version `1.0.0-rc.1` has been published and install-verified. Version `0.2.0-alpha.4` remains its exact immutable predecessor. Future versions require a new reviewed exact commit and separate authorization through the manual `.github/workflows/release.yml` workflow and preconfigured `nuget-release` environment.
 
 The workflow uses NuGet Trusted Publishing through `NuGet/login@v1`. API keys, repository secrets for package credentials, local environment credentials, and credential-bearing `NuGet.Config` files are prohibited.
 

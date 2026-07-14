@@ -2,16 +2,16 @@
 
 ## Status
 
-Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its publish dispatch and left a partial immutable state. The owner later created exact tag `v1.0.0-rc.1`. TASK-0252 adapted recovery to verify that tag without mutation and passed standard CI. TASK-0253 consumed one exact recovery dispatch in run `29345313517`; GitHub Release creation returned HTTP 403, leaving prerelease/assets/attestations absent. TASK-0254 was not executed.
+Prepared by TASK-0239, accepted by TASK-0241, and completed by TASK-0255 through TASK-0257. TASK-0255 created the exact GitHub prerelease and attached only the retained validated assets. TASK-0256 run `29350091782` created and verified both attestations and passed Windows, Ubuntu, and macOS installed-package smoke. Historical TASK-0242/TASK-0244/TASK-0247/TASK-0250/TASK-0253 failures remain preserved and distinct from the successful completion.
 
 | Field | Value |
 | --- | --- |
 | Candidate version | `1.0.0-rc.1` |
 | Exact owner-created tag | `v1.0.0-rc.1` at `258918b33c3d1359aac967604ee524e8b66ddf02` |
 | Published predecessor | `0.2.0-alpha.4` |
-| Current published release | `0.2.0-alpha.4` |
+| Current complete prerelease | `1.0.0-rc.1` |
 | Candidate commit | Source candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; later bridge commits are docs/evidence/governance-only |
-| Publication status | Partial immutable state: NuGet and exact tag exist; GitHub prerelease/assets/provenance absent; TASK-0253 dispatch consumed after release creation HTTP 403 |
+| Publication status | Complete prerelease: NuGet, exact tag, GitHub prerelease/body/assets, both attestations, and three-platform installed-package smoke verified |
 | Release body | Publication-ready `docs/RELEASE_BODY_V100_RC1.md` |
 
 ## Version Availability
@@ -45,7 +45,7 @@ After hosted evidence starts, TASK-0240 and TASK-0241 may change documentation, 
 
 - Hosted three-OS exact-candidate evidence completed in TASK-0240 run `29118452246`.
 - Final candidate acceptance and gap reconciliation completed in TASK-0241.
-- TASK-0255 created and fully verified the exact GitHub prerelease/body/nupkg/snupkg without NuGet or tag mutation. V100-09 remains open only for both attestations and TASK-0256 Windows/Ubuntu/macOS installed-package proof.
+- TASK-0255 created and fully verified the exact GitHub prerelease/body/nupkg/snupkg without NuGet or tag mutation. TASK-0256 completed both attestations and Windows/Ubuntu/macOS installed-package proof; TASK-0257 closed V100-09.
 - Author signing and SBOM publication remain bounded accepted risks through their recorded review boundary.
 - `1.0.0` GA readiness is not claimed.
 

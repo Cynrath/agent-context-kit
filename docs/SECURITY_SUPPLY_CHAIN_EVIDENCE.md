@@ -3,7 +3,7 @@
 Open decisions are consolidated in `docs/RELEASE_BLOCKER_BOARD.md` and `docs/MAINTAINER_DECISION_REGISTER.md`. Those summaries do not replace exact evidence in this file.
 
 ## Status
-Local evidence register prepared on 2026-06-12. Published `0.2.0-alpha.2` package/release state was checked on 2026-06-13. Private vulnerability reporting was enabled and independently verified on 2026-06-14. Alpha.2 is NuGet.org repository-signed, but no author signature, SBOM artifact, or accessible GitHub package attestation was found. Other maintainer decisions remain open. This document is not release approval.
+Local evidence register prepared on 2026-06-12. Historical alpha2 package/release state was checked on 2026-06-13, and private vulnerability reporting was independently verified on 2026-06-14. Current RC1 evidence now includes a NuGet.org repository signature, exact repository commit, exact GitHub assets, and two verified GitHub artifact attestations. No author signature or SBOM is claimed. This document records evidence; it is not `1.0.0` GA approval.
 
 ## Status Vocabulary
 - `VERIFIED LOCAL`: reproduced from local source, tests, package inspection, or documented policy.
@@ -26,7 +26,7 @@ Reviewed on 2026-07-10 against current repository docs and read-only GitHub stat
 | Package recovery | RECOVERY OWNERSHIP RECONCILED | `Cynrath` decision owner; `Cyranth` primary NuGet identity; `ShadowFlameC` backup recovery owner; immutable-successor procedure | Recheck after owner/recovery change; no destructive test |
 | Author signing | ACCEPTED RISK | 2026-06-14 bounded deferral remains in force through 2026-09-30 | Revisit by expiry or next pre-release review |
 | SBOM | ACCEPTED RISK | 2026-06-14 bounded deferral remains in force through 2026-09-30 | Revisit by expiry or next pre-release review |
-| Build/package provenance | IMPLEMENTED LOCALLY / HOSTED PENDING | Future authorized publish path contains the control; immutable alpha2/alpha3/alpha4 history is not retroactively changed | Hosted attestation evidence on next authorized publish path |
+| Build/package provenance | VERIFIED PUBLISHED STATE / HOSTED PASS | RC1 nupkg/snupkg attestations `35295200`/`35295205` verify exact retained asset digests through run `29350091782`; immutable alpha2/alpha3/alpha4 history is not retroactively changed | Reopen after release asset or signer-workflow change |
 
 See `docs/V100_MAINTAINER_DECISION_PACKET.md` for exact policy text and status tokens.
 
@@ -41,7 +41,7 @@ The following table preserves the original TASK-0095/TASK-0132 baseline and its 
 | NuGet owner identity | ACCEPTED RISK on 2026-06-14 | NuGet owner/signature identity is `Cyranth`; package/project persona is `Cynrath`; alpha.2 OIDC publish succeeded | Recheck before next pre-release or 2026-09-30; do not claim shared human identity; retain OIDC-only publishing | P1 disposition complete for current scope |
 | NuGet package signature | ACCEPTED RISK: author signing deferred on 2026-06-14 | Alpha.2 has a valid NuGet repository signature and no author signature; `docs/SUPPLY_CHAIN_DECISIONS.md` records rationale/controls | Revisit before next pre-release or 2026-09-30; do not claim author signing | P1 disposition complete for current scope |
 | SBOM | ACCEPTED RISK: publication deferred on 2026-06-14 | Alpha.2 has no SBOM; deterministic .NET 10 generation/privacy/lifecycle are not validated | Revisit before next pre-release or 2026-09-30; retain dependency/package inspection controls | P1 disposition complete for current scope |
-| Build/package provenance | IMPLEMENTED LOCALLY / HOSTED PENDING | `release.yml` attests the exact future GitHub Release nupkg using `actions/attest@v4` and verifies signer workflow; alpha.2 remains unattested | Require successful provenance creation/verification in the next publish run | Required next-release evidence |
+| Build/package provenance | VERIFIED PUBLISHED STATE / HOSTED PASS | `release.yml` attested exact RC1 nupkg and snupkg assets using `actions/attest@v4`; `gh attestation verify` passed for signer workflow; alpha2/alpha3/alpha4 remain unchanged historical evidence | Reopen after package/tag/release asset/signer workflow change | V100-09 evidence complete |
 | Bad-package recovery | PARTIAL MAINTAINER on 2026-06-14 | `docs/PACKAGE_RECOVERY.md` accepts immutable history, activation thresholds, successor/unlist/deprecate flow, communication, and review cadence; OIDC publication works | Verify unlist/deprecate/account-recovery authority and assign backup recovery ownership | P1 blocker remains |
 
 ## Recommended Defaults

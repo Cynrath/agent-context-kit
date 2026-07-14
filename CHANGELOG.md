@@ -6,11 +6,12 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 
 ## [Unreleased]
 
+- TASK-0255 completed the exact `v1.0.0-rc.1` GitHub prerelease and validated nupkg/snupkg assets from retained source artifact `8242162439`. TASK-0256 run `29350091782` verified the immutable release tuple, created and verified attestations `35295200` and `35295205`, and passed installed-package smoke on Windows, Ubuntu, and macOS. TASK-0257 pins published smoke and public guidance to RC1, closes V100-09, and preserves every earlier failed recovery record as historical evidence.
 - TASK-0243 added a NuGet-publish-free exact-existing-package recovery operation with exact artifact/package verification, two release-asset attestations, negative workflow gates, and a three-platform install matrix. TASK-0244 run `29151228607` stopped in a pre-mutation Ubuntu safety gate because a fixture helper invoked Windows-only `powershell`; no tag, GitHub prerelease, asset, or attestation was created, no second dispatch occurred, and the published smoke pin remains `0.2.0-alpha.4`.
 - TASK-0249 fixed accepted-404 native exit handling and passed three-platform CI. TASK-0250 run `29341087462` passed all pre-mutation recovery gates, then GitHub rejected the App token's tag push for missing `workflows` permission. One audit confirmed NuGet/artifact unchanged and tag/release/assets/two attestations absent; TASK-0251 was not executed.
 - TASK-0252 adapted recovery to verify the owner-created exact tag without any tag mutation and passed standard CI. TASK-0253 run `29345313517` passed all immutable gates, then GitHub returned HTTP 403 at prerelease creation. One log read and one audit confirmed package/artifact/tag unchanged and prerelease/assets/two attestations absent; TASK-0254 was not executed.
 
-## [1.0.0-rc.1] - NuGet published; release incomplete
+## [1.0.0-rc.1] - 2026-07-14
 
 ### Candidate scope
 - Freezes the reviewed CLI command/option surface, exit semantics, config schema `1`, baseline schema `1`, JSON schema `2`, SARIF `2.1.0` profile, stable rule/diagnostic identifiers, and generated-file conventions for exact-candidate validation.
@@ -21,9 +22,9 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 - Validates the upgrade path from published immutable predecessor `0.2.0-alpha.4` to a run-unique `1.0.0-rc.1` source candidate without rewriting predecessor config.
 
 ### Known limitations
-- NuGet `1.0.0-rc.1` is available and repository-signed, and owner-created tag `v1.0.0-rc.1` targets its exact repository commit; GitHub prerelease/assets and both attestations remain absent after TASK-0253 release creation received HTTP 403.
+- NuGet `1.0.0-rc.1` is available and repository-signed; exact tag `v1.0.0-rc.1`, GitHub prerelease, validated nupkg/snupkg assets, both attestations, and Windows/Ubuntu/macOS installed-package smoke are complete. Earlier recovery failures remain recorded separately.
 - Author signing and SBOM publication remain documented bounded accepted risks; neither is claimed as implemented.
-- Hosted publish-path provenance remains pending. TASK-0244's single recovery attempt stopped before mutation and its dispatch budget is consumed; immutable NuGet state must be preserved until a new explicit decision.
+- Author signing and SBOM publication remain bounded accepted risks; the exact GitHub release assets have GitHub artifact attestations, but this does not imply author signing or an SBOM.
 - External adoption evidence remains limited, and hosted documentation/GitHub Pages remains deferred.
 
 ### Added

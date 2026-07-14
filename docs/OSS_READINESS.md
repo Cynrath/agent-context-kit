@@ -51,8 +51,8 @@ The first release should be small, working, documented, and honest about limitat
 - GitHub issue templates, pull request template, maintainer guide, contributor onboarding, support matrix, repository hygiene, and issue triage docs are present.
 - README badges are present for `ci`, published-package smoke, source-package smoke, NuGet version, NuGet downloads, license, and .NET 10.
 - GitHub label guidance and repository settings checklist are documented as maintainer-only manual actions.
-- The published NuGet `0.2.0-alpha.4` package includes `ackit sarif`; `0.2.0-alpha.3` remains the previous release.
-- The published `0.2.0-alpha.4` package includes SARIF output, scanner rule catalog hardening, additive JSON `ruleId`, config-driven non-Critical allowlists, expanded scanner patterns, sample gallery docs, demo scenarios, Web UI preview docs, visual asset guidance, MCP stdio, `ackit watch`, `diff`, and `trim`.
+- The published NuGet `1.0.0-rc.1` package includes `ackit sarif`; `0.2.0-alpha.4` remains the immutable predecessor.
+- The published `1.0.0-rc.1` package includes SARIF output, scanner rule catalog hardening, additive JSON `ruleId`, config-driven non-Critical allowlists, expanded scanner patterns, sample gallery docs, demo scenarios, Web UI preview docs, visual asset guidance, MCP stdio, `ackit watch`, `diff`, and `trim`.
 - GitHub Actions CI usage docs and documentation-only workflow examples are present for scan CI, SARIF upload, published-tool smoke, and source-package smoke.
 - Sample gallery and demo scenario docs are present for safe onboarding without committing generated artifacts.
 - Sample repositories cover .NET console, ASP.NET Core Minimal API, Node/TypeScript/Tailwind, generic empty repository health gaps, and safe security fixture wording.

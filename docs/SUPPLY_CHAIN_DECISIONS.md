@@ -30,7 +30,7 @@ Compensating controls:
 Future implementation must define format/version, generator pin, package-to-SBOM relationship, privacy scan, digest, release asset name, retention, and verification.
 
 ## GitHub Artifact Provenance
-**Decision: IMPLEMENT for the next published release.**
+**Decision: IMPLEMENTED AND HOSTED-VERIFIED FOR `1.0.0-rc.1`.**
 
 The manual `publish` job now:
 1. publishes and verifies NuGet;
@@ -40,7 +40,7 @@ The manual `publish` job now:
 5. uses `actions/attest@v4` with `attestations: write` and `id-token: write` only in the publish job;
 6. verifies the result with `gh attestation verify` and the exact release workflow identity.
 
-The read-only `verify-existing` job retains `contents: read` only and cannot attest, publish, tag, or edit a release. No provenance claim is made for `v0.2.0-alpha.2`; the control requires a future successful release run.
+The read-only `verify-existing` job retains `contents: read` only and cannot attest, publish, tag, or edit a release. The dedicated `attest-existing` operation verified the immutable RC1 tuple, created and verified nupkg/snupkg attestations `35295200`/`35295205`, and rechecked release state in run `29350091782`. No provenance claim is made retroactively for alpha2/alpha3/alpha4.
 
 ## Review
 Revisit all three decisions before the next release candidate, after a workflow permission/action change, or by 2026-09-30.
@@ -49,6 +49,6 @@ Revisit all three decisions before the next release candidate, after a workflow 
 
 Decision date: 2026-07-10. The V100 minimum baseline is OIDC Trusted Publishing, immutable versions, no tag movement or package replacement, commit/tag/release alignment, package metadata/content and digest inspection, NuGet repository-signature verification, release asset verification, upgrade/rollback evidence, reconciled recovery ownership, and provenance/attestation evidence on the next authorized publish path.
 
-Author signing and SBOM remain bounded accepted risks within the 2026-06-14 through 2026-09-30 review scope. Status: `MAINTAINER_DECISION_RECORDED`, `RECOVERY_OWNERSHIP_RECONCILED`, `ACCEPTED_RISK_RECORDED_FOR_SIGNING_AND_SBOM`, and `OPEN_PENDING_HOSTED_PROVENANCE_EVIDENCE`.
+Author signing and SBOM remain bounded accepted risks within the 2026-06-14 through 2026-09-30 review scope. Status: `MAINTAINER_DECISION_RECORDED`, `RECOVERY_OWNERSHIP_RECONCILED`, `ACCEPTED_RISK_RECORDED_FOR_SIGNING_AND_SBOM`, and `HOSTED_PROVENANCE_VERIFIED_FOR_RC1`.
 
-TASK-0241 conditionally accepts `1.0.0-rc.1` but does not execute the publish path. Status remains `MAINTAINER_DECISION_RECORDED / RECOVERY_OWNERSHIP_RECONCILED / SIGNING_AND_SBOM_ACCEPTED_RISK_ACTIVE / OPEN_PENDING_PUBLISH_PATH_PROVENANCE`; only a separately authorized OIDC TASK-0242 may create and verify exact package/release attestation.
+TASK-0241 conditionally accepted `1.0.0-rc.1` without executing publication. TASK-0255/TASK-0256 later completed exact release assets and both attestations, and TASK-0257 closes V100-09. Current status: `MAINTAINER_DECISION_RECORDED / RECOVERY_OWNERSHIP_RECONCILED / SIGNING_AND_SBOM_ACCEPTED_RISK_ACTIVE / HOSTED_PROVENANCE_VERIFIED_FOR_RC1`.

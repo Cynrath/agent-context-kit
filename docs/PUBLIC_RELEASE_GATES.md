@@ -10,7 +10,7 @@ The gate script wraps existing checks:
 ## Current Published State
 - GitHub repository public: yes.
 - `master` pushed: yes.
-- `v0.2.0-alpha.4` tag pushed: yes.
+- Exact `v1.0.0-rc.1` tag exists at the package repository commit.
 - Package metadata URLs are final and should pass the metadata gate.
 - GitHub Release page: completed.
 - NuGet publish: completed.
@@ -37,7 +37,7 @@ Run before future public release announcements or follow-up release work:
 powershell -ExecutionPolicy Bypass -File scripts/check-public-release-gates.ps1 -FailOnIssues
 ```
 
-In the published `0.2.0-alpha.4` state, this gate should pass when the working tree is clean, package metadata is final, no tracked artifacts are present, and the release tag exists locally.
+In the published `1.0.0-rc.1` state, this gate should pass when the working tree is clean, package metadata is final, no tracked artifacts are present, and the exact release tag exists locally.
 
 ## Maintainer-Only Actions
 This script does not:

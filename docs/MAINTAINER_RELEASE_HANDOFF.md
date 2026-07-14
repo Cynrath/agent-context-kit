@@ -2,9 +2,13 @@
 
 The completed alpha.2 scope is in `docs/V020_ALPHA2_SCOPE.md`. PROJECT-CONTROL-0102 authorized the validated normal pushes and exact-SHA OIDC release sequence for `v0.2.0-alpha.2`.
 
-This handoff records the completed `v0.2.0-alpha.2`, `v0.2.0-alpha.3`, and `v0.2.0-alpha.4` published state.
+This handoff records the completed `v0.2.0-alpha.2`, `v0.2.0-alpha.3`, `v0.2.0-alpha.4`, and `v1.0.0-rc.1` published states.
 
 Future release sequences must not use API keys. Publication is allowed only through the manual OIDC workflow after the exact release commit passes all required hosted jobs.
+
+## RC1 Publication And Provenance Evidence
+
+NuGet `AgentContextKit 1.0.0-rc.1` is immutable at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`. Exact tag `v1.0.0-rc.1` targets that commit. TASK-0255 completed GitHub prerelease `353913024` with prepared body and only validated assets `476881883`/`476881892`. TASK-0256 run `29350091782` created and verified attestations `35295200`/`35295205` and passed installed-package smoke on Windows, Ubuntu, and macOS. NuGet was not republished; tag, body, and assets were not mutated. This is a complete prerelease, not `1.0.0` GA.
 
 ## Alpha.4 Publication Evidence
 
@@ -62,14 +66,15 @@ gh workflow run release-candidate-evidence.yml `
 ## Current Published State
 - GitHub repository public: yes, `https://github.com/Cynrath/agent-context-kit`.
 - `master` pushed: yes.
-- `v0.2.0-alpha.4` tag pushed: yes, at `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
+- Exact `v1.0.0-rc.1` tag exists: yes, at `258918b33c3d1359aac967604ee524e8b66ddf02`.
 - GitHub Actions latest `master` run is green per maintainer-provided release status.
 - Repository description is set.
 - Repository topics are set.
-- GitHub Release page for `v0.2.0-alpha.4`: completed as a pre-release.
-- NuGet publish for `AgentContextKit` `0.2.0-alpha.4`: completed.
-- NuGet global tool install verification for `0.2.0-alpha.4`: completed.
-- `README.nuget.md` package README fix shipped with this release.
+- GitHub Release page for `v1.0.0-rc.1`: completed as a prerelease with exact assets.
+- NuGet publish for `AgentContextKit` `1.0.0-rc.1`: completed and immutable.
+- NuGet global tool install verification for `1.0.0-rc.1`: completed on Windows, Ubuntu, and macOS.
+- Exact nupkg and snupkg attestations: completed and verified.
+- `README.nuget.md` source is synchronized; the already-published package embeds its immutable earlier copy.
 - `RepositoryUrl` is `https://github.com/Cynrath/agent-context-kit`.
 - `PackageProjectUrl` is `https://github.com/Cynrath/agent-context-kit`.
 - `PackageId` is `AgentContextKit`.
@@ -86,7 +91,7 @@ Previous release states:
 Maintainer verification evidence:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool install --global AgentContextKit --version 1.0.0-rc.1
 ackit version
 ackit --help
 ```
@@ -94,20 +99,20 @@ ackit --help
 Expected version output:
 
 ```text
-AgentContextKit 0.2.0-alpha.4
+AgentContextKit 1.0.0-rc.1
 ```
 
 If the tool is already installed, use:
 
 ```powershell
-dotnet tool update --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool update --global AgentContextKit --version 1.0.0-rc.1
 ```
 
-## Verified NuGet Smoke Test (Current Release)
-Completed alpha.4 smoke test evidence:
+## Verified NuGet Smoke Test (Current Prerelease)
+Completed RC1 smoke evidence:
 
-- Temporary tool-path install from NuGet: `dotnet tool install AgentContextKit --tool-path <temp> --version 0.2.0-alpha.4`
-- `ackit --version` returned `AgentContextKit 0.2.0-alpha.4`
+- Temporary tool-path install from NuGet: `dotnet tool install AgentContextKit --tool-path <temp> --version 1.0.0-rc.1`
+- `ackit --version` returned `AgentContextKit 1.0.0-rc.1` on Windows, Ubuntu, and macOS
 - `ackit doctor`: 13/13 PASS in the repository root
 - `ackit scan --ci`: exit 0 (expected Medium/Low findings)
 

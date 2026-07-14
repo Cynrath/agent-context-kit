@@ -3,7 +3,7 @@
 AgentContextKit package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj`.
 
 ## Current Status
-Source/package metadata is `AgentContextKit` `1.0.0-rc.1`. NuGet RC1 is published and repository-signed at commit `258918b33c3d1359aac967604ee524e8b66ddf02`, and owner-created exact tag `v1.0.0-rc.1` targets that commit. TASK-0253 received HTTP 403 while creating the GitHub prerelease, so prerelease/assets/provenance remain absent. `0.2.0-alpha.4` remains the latest complete release and exact hosted predecessor.
+Source/package metadata and the latest complete prerelease are `AgentContextKit` `1.0.0-rc.1`. NuGet RC1 is published and repository-signed at commit `258918b33c3d1359aac967604ee524e8b66ddf02`; exact tag `v1.0.0-rc.1`, GitHub prerelease, validated nupkg/snupkg assets, both attestations, and Windows/Ubuntu/macOS installed-package smoke are complete. `0.2.0-alpha.4` remains the immutable hosted predecessor.
 
 Shared package metadata:
 - `RepositoryUrl` is `https://github.com/Cynrath/agent-context-kit`.
@@ -13,11 +13,11 @@ Shared package metadata:
 
 Publication state:
 - GitHub Actions latest `master` run is green.
-- GitHub Release page for `v0.2.0-alpha.4` is completed as a pre-release.
-- NuGet publish is completed for `0.2.0-alpha.4`.
-- NuGet global tool install verification is completed for `0.2.0-alpha.4`.
-- Publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb` (commit `98cdf97`).
-- `README.nuget.md` package README is shipped with this release.
+- GitHub Release page for `v1.0.0-rc.1` is completed as a prerelease.
+- NuGet publish is completed for `1.0.0-rc.1`; it was not republished during release recovery.
+- NuGet global tool install verification is completed on Windows, Ubuntu, and macOS.
+- Repository commit and exact tag target: `258918b33c3d1359aac967604ee524e8b66ddf02`.
+- The already-published RC1 package embeds its immutable package README; later source README improvements are not retroactive.
 
 Previous release state:
 - GitHub Release page for `v0.2.0-alpha.2` is completed as a pre-release.
@@ -67,7 +67,7 @@ The script is local-only and read-only. It does not pack, push, publish, tag, re
 Install the currently published global tool:
 
 ```powershell
-dotnet tool install --global AgentContextKit --version 0.2.0-alpha.4
+dotnet tool install --global AgentContextKit --version 1.0.0-rc.1
 ackit version
 ackit --help
 ```
@@ -75,14 +75,14 @@ ackit --help
 Expected version output:
 
 ```text
-AgentContextKit 0.2.0-alpha.4
+AgentContextKit 1.0.0-rc.1
 ```
 
 ## Required Fields
 - `PackAsTool`: `true`
 - `ToolCommandName`: `ackit`
 - `PackageId`: `AgentContextKit`
-- `Version`: `1.0.0-rc.1` in current source; published install examples remain `0.2.0-alpha.4` until a separately authorized publish completes
+- `Version`: `1.0.0-rc.1` in current source and published install examples
 - `Authors`: `Cynrath`
 - `Company`: `Cynrath`
 - `PackageReadmeFile`: `README.nuget.md`

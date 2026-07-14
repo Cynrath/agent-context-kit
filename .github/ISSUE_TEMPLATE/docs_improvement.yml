@@ -30,7 +30,7 @@ body:
     id: ackit-version
     attributes:
       label: ackit version
-      placeholder: AgentContextKit 0.2.0-alpha.4 or not applicable
+      placeholder: AgentContextKit 1.0.0-rc.1 or not applicable
   - type: input
     id: os
     attributes:

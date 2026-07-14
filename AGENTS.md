@@ -76,9 +76,9 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 - GitHub Actions: .github/workflows
 
 ## Release Status
-- Current complete release: `v0.2.0-alpha.4`. NuGet `1.0.0-rc.1` exists in a partial immutable state; TASK-0244/TASK-0247 stopped before mutation and TASK-0250's tag push was rejected, so tag, GitHub prerelease, and provenance remain absent.
-- Current publish SHA: `98cdf9723a509a347bd0403f6373dafe81ba03fb`.
-- Previous release: `v0.2.0-alpha.3` published and verified; pushed, released, and published.
+- Current complete prerelease: `v1.0.0-rc.1`; NuGet, exact tag, GitHub prerelease/body/assets, both attestations, and three-platform installed smoke are verified. This is not a `1.0.0` GA claim.
+- Exact package/tag commit: `258918b33c3d1359aac967604ee524e8b66ddf02`.
+- Previous complete prerelease: `v0.2.0-alpha.4` published and verified.
 - NuGet global tool install verification: completed for `0.2.0-alpha.4`.
 - GitHub Release page: completed for `v0.2.0-alpha.4`.
 - Published-package smoke workflow is pinned to `AgentContextKit` `0.2.0-alpha.4` (TASK-0223).
@@ -87,7 +87,7 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 ## Risk Summary
 - No risk findings in the latest local scan.
 - `0.2.0-alpha.4` is published and verified by TASK-0220; do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
-- `1.0.0-rc.1` NuGet publication is immutable at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`; TASK-0250's latest recovery dispatch `29341087462` is consumed and remote state is unchanged, so do not republish/reuse it or fix/retry/create/move its tag/release/provenance without a new explicit recovery decision.
+- `1.0.0-rc.1` NuGet publication, exact tag, GitHub release body, and exact assets are immutable at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`; do not republish, reuse, move, replace, or delete them. Historical failed recovery evidence remains preserved.
 
 ## Recommended Checks
 - `dotnet build AgentContextKit.sln -c Release --no-restore`

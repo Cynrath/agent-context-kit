@@ -33,16 +33,16 @@ Exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` passed standard runs 
 | NuGet ownership | Public owner profile `Cyranth` versus package author/project persona `Cynrath` | ACCEPTED RISK through 2026-09-30 |
 | Signing | NuGet repository signing verified; author signing remains bounded-deferred | ACCEPTED RISK through 2026-09-30 |
 | SBOM | Publication remains bounded-deferred | ACCEPTED RISK through 2026-09-30 |
-| Provenance | Control implemented locally; exact evidence requires the next authorized publish path | OPEN_PENDING_PUBLISH_PATH_PROVENANCE |
+| Provenance | Exact RC1 nupkg/snupkg attestations created and signer-workflow verified; immutable release recheck passed | HOSTED_PROVENANCE_VERIFIED_FOR_RC1 / CLOSED_BY_TASK_0257 |
 | Package recovery | Immutable-successor procedure plus `Cynrath` decision ownership and `ShadowFlameC` backup recovery ownership | RECOVERY_OWNERSHIP_RECONCILED |
-| Version and release plan | NuGet RC1 and owner-created exact tag exist; TASK-0253 release creation returned HTTP 403; prerelease/assets/provenance absent | PARTIAL IMMUTABLE PUBLICATION / TASK-0253 STOPPED |
+| Version and release plan | NuGet RC1, exact tag, GitHub prerelease/body/assets, both attestations, and three-platform installed-package smoke verified | COMPLETE PRERELEASE / TASK-0257 CLOSURE |
 
 ## Open Gap Boundary
-`docs/V100_GAP_ANALYSIS.md` remains the source of truth. Open P0 gaps are 0. V100-01 through V100-05, V100-07, V100-08, and V100-10 close by TASK-0241; V100-06 remains closed; V100-09 remains open pending publish-path provenance.
+`docs/V100_GAP_ANALYSIS.md` remains the source of truth. Open P0 and target P1 gaps are 0. V100-01 through V100-05, V100-07, V100-08, and V100-10 close by TASK-0241; V100-06 remains closed; V100-09 closes by TASK-0257 from exact release/assets/attestations/three-platform evidence.
 
 TASK-0239 reran the complete candidate suite: installed ACKit `0.2.0-alpha.4`, doctor 13/13, scan exit 0, source CLI `1.0.0-rc.1`, restore/build/test 431/431, Unicode temp guard, all V100/contract/config/JSON/localization/security/RC gates, fresh dependency review, both performance invocations, 428-file Markdown link audit, and package/install/upgrade evidence. TASK-0240 then confirmed the exact candidate on all three hosted operating systems.
 
-The current decision is **TASK-0253 STOPPED AFTER RELEASE CREATE HTTP 403**. NuGet RC1 and its exact owner-created tag are verified; prerelease/assets/provenance remain absent. Historical TASK-0241 gate marker: Publication authorized: No.
+The current decision is **RC1 COMPLETE PRERELEASE / V100-09 CLOSED BY TASK-0257**. NuGet RC1, exact tag, GitHub prerelease/body/assets, both attestations, and three-platform installed-package proof are verified. TASK-0253's release-create HTTP 403 and TASK-0241 marker `Publication authorized: No` remain historical boundaries.
 
 ## Local Gate
 ```powershell

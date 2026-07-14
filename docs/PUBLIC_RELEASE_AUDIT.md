@@ -3,11 +3,11 @@
 This document records the local-only public release audit workflow after the current GitHub and NuGet publication.
 
 ## Current Status
-GitHub source publication and NuGet publication are complete for `0.2.0-alpha.4`.
+GitHub source publication and NuGet publication are complete for prerelease `1.0.0-rc.1`.
 
 - GitHub repository public: yes.
 - `master` pushed: yes.
-- `v0.2.0-alpha.4` tag pushed: yes.
+- Exact `v1.0.0-rc.1` tag exists at package repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`.
 - Package URL blockers are resolved.
 - GitHub Release page: completed.
 - NuGet publish: completed.
@@ -58,7 +58,7 @@ See [PUBLIC_RELEASE_GATES.md](PUBLIC_RELEASE_GATES.md).
 Remote tag push, GitHub Actions status, GitHub Release page status, repository topics, and NuGet package availability are external checks and must be verified through GitHub/NuGet or maintainer-controlled commands.
 
 ## Required Manual Follow-Up
-For the published `0.2.0-alpha.4` state:
+For the published `1.0.0-rc.1` state:
 1. Keep the GitHub Release page and NuGet package linked from maintainer-facing docs.
 2. Keep `docs/CODEX_FOR_OSS_APPLICATION.md` as the submitted Codex for OSS application reference.
 3. Re-run `scripts/audit-public-release.ps1 -FailOnIssues` before future release announcements.

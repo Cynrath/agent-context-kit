@@ -24,9 +24,9 @@
 - Never leave a newly created `.md` task file, plan, queue row, or test file uncommitted. New files must be added and committed in the same logical commit that creates them, or in an immediately following commit, before any push.
 
 ## Release Status
-- Current complete release: `v0.2.0-alpha.4`. NuGet `1.0.0-rc.1` exists in a partial immutable state; TASK-0244/TASK-0247 stopped before mutation and TASK-0250's tag push was rejected, so tag, GitHub prerelease, and provenance remain absent.
-- Current publish SHA: `92984c6448332aa24b7cff94647f627bf944e535`.
-- Previous release: `v0.2.0-alpha.2` published and verified; pushed, released, and published.
+- Current complete prerelease: `v1.0.0-rc.1`; NuGet, exact tag, GitHub prerelease/body/assets, both attestations, and three-platform installed smoke are verified. This is not a `1.0.0` GA claim.
+- Exact package/tag commit: `258918b33c3d1359aac967604ee524e8b66ddf02`.
+- Previous complete prerelease: `v0.2.0-alpha.4` published and verified.
 - Main stack: `.NET`, `.NET CLI / .NET Tool`, and `GitHub Actions`.
 - `0.2.0-alpha.3` is published and verified by TASK-0206. `RB-003` and `RB-008` are closed by TASK-0202. Do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
 

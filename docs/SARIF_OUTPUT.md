@@ -3,9 +3,9 @@
 ## External SARIF
 Current `ackit sarif` emits AgentContextKit results only. External SARIF import is not implemented. The design in `docs/EXTERNAL_OUTPUT_IMPORT_BOUNDARY.md` keeps upstream tool/rule identities namespaced and does not merge them into ACKIT findings automatically.
 
-AgentContextKit published `0.2.0-alpha.4` package and current source can write scanner findings as SARIF 2.1.0 for CI review and future GitHub Code Scanning workflows.
+AgentContextKit published `1.0.0-rc.1` package and current source can write scanner findings as SARIF 2.1.0 for CI review and future GitHub Code Scanning workflows.
 
-Availability note: the published NuGet package `AgentContextKit` `0.2.0-alpha.4` includes `ackit sarif`.
+Availability note: the published NuGet package `AgentContextKit` `1.0.0-rc.1` includes `ackit sarif`.
 
 TASK-0092 conditionally freezes SARIF `2.1.0`, repository-relative locations, visible findings, and the no-raw-match privacy boundary for release-candidate preparation.
 
@@ -94,7 +94,7 @@ Use the output file path to read or upload the SARIF artifact.
 The example workflow is stored at `docs/examples/github-actions-sarif-upload.yml`.
 
 It shows two documentation-only approaches:
-- use the published `0.2.0-alpha.4` package; or
+- use the published `1.0.0-rc.1` package; or
 - build and install the current source package locally in CI.
 
 The example is not active. It is not copied into `.github/workflows`, and this task does not upload SARIF to GitHub Code Scanning.
