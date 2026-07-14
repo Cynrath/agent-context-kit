@@ -1,5 +1,13 @@
 # AgentContextKit Context Pack
 
+## TASK-0255–0257 `1.0.0-rc.1` Full Release Closure — Planned
+
+Clean synchronized entry HEAD/origin is `177810dc2e7dc14304541430cb074c13efc19612`. ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 passed. TASK-0255/0256/0257 were created once with `ackit task` and fully planned before implementation.
+
+The new full authorization permits authenticated local `gh` creation of the exact existing-tag prerelease and validated TASK-0242 assets, a minimal attestation-only workflow with validated retries, three-platform RC1 installation smoke, and repository/public/V100 closure. NuGet/package mutation, normal publish, tag mutation, unverified assets, PAT/secret/settings changes, force/history rewrite, `.ackit/` commit, and GA claims remain forbidden.
+
+Historical TASK-0242/TASK-0244/TASK-0247/TASK-0250/TASK-0253 failure evidence remains intact. TASK-0255 diagnoses and completes the release; TASK-0256 verifies/attests it and runs three-platform smoke; TASK-0257 updates the smoke pin and closes current public/V100 evidence only after full success.
+
 ## TASK-0252–0254 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0253 Stopped
 
 Clean synchronized entry HEAD is `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`. ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified. TASK-0252/0253/0254 were created once with `ackit task` and fully planned before implementation.

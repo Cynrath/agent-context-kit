@@ -1,6 +1,6 @@
 # Project Execution Queue
 
-## V100 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0253 Stopped
+## V100 `1.0.0-rc.1` Full Release Closure — TASK-0255–0257 Planned
 
 | Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- | --- |
@@ -20,8 +20,11 @@
 | 14 | Completed / pushed / CI pass | TASK-0252 existing exact tag recovery workflow adaptation | Exact existing-tag verification replaces tag absence/creation; every tag mutation is prohibited | Owner-created exact tag plus explicit authorization | Workflow/helpers/tests/recovery/supply-chain/task/queue/handoff docs | 431/431; commit `5f6c4ce`; runs `29344903472`, `29344903420`, `29344903850` PASS | First normal push completed; no recovery dispatch or release mutation |
 | 15 | Stopped / dispatch consumed / remote unchanged | TASK-0253 authorized prerelease asset and attestation recovery | Single run passed immutable gates, then release creation returned HTTP 403 | TASK-0252 exact-HEAD standard CI green | Remote failure plus task/hosted/supply-chain/V100 evidence | Run/job `29345313517`/`87127346868`; log once; audit once | No rerun/second dispatch/manual completion/settings change/tag mutation; NuGet publish zero |
 | 16 | Not executed | TASK-0254 three-platform smoke/public/provenance closure | Success-only pin/public/V100 closure withheld | TASK-0253 success not met | Failure-state docs only | Published smoke alpha4; V100-09 open | Final factual documentation push only; no immutable release mutation |
+| 17 | Planned | TASK-0255 authenticated GitHub prerelease and exact asset completion | Diagnose TASK-0253 integration 403 and create/verify exact release through authenticated local `gh` | New full authorization; exact source/package/tag facts | Task plus release/hosted/supply-chain/queue/handoff evidence | Exact artifact/hash/signature/tag/release/body/asset verification | Exact GitHub prerelease/two-asset mutation only; zero NuGet/tag/settings mutation |
+| 18 | Planned / blocked on TASK-0255 | TASK-0256 attestation-only workflow and three-platform release verification | Verify existing release, attest nupkg/snupkg, and install/smoke RC1 on three OSes | TASK-0255 complete release | Workflow/helpers/static fixtures/task/release/hosted/supply-chain/handoff docs | Focused/full local suite, standard CI, hosted verification run | Attestation write only; no NuGet/tag/release mutation |
+| 19 | Planned / success-only | TASK-0257 public status provenance and final CI closure | RC1 smoke pin, README/public/V100 closure, and final synchronized green state | TASK-0255/TASK-0256 complete | Published-smoke workflow, README/changelog/release/V100/task/queue/handoff docs | Full local suite plus final standard CI and equality checks | Normal repository commits/pushes only |
 
-Execution rule: TASK-0242 publish and TASK-0244/TASK-0247/TASK-0250/TASK-0253 recovery budgets are consumed and their records remain immutable. The owner-created `v1.0.0-rc.1` tag is exact and immutable. TASK-0252 is complete; TASK-0253 stopped at release-create HTTP 403; TASK-0254 was not executed. No NuGet publication, normal publish, second dispatch/rerun, manual upload/completion, tag mutation, settings mutation, history rewrite, force push, or GA claim is authorized.
+Execution rule: TASK-0242/TASK-0244/TASK-0247/TASK-0250/TASK-0253 remain immutable historical records. New full authorization allows TASK-0255 exact authenticated prerelease/assets, TASK-0256 attestation-only workflow dispatch and validated retries, and TASK-0257 repository closure. NuGet publication/mutation, normal publish, tag mutation, unverified assets, settings/PAT/secret change, force push, history rewrite, generated `.ackit/` commit, and GA claim remain prohibited.
 
 ## Historical PROJECT-CONTROL-0109 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |

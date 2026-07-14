@@ -1,8 +1,8 @@
 # Next Tasks
 
-## V100 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0253 Stopped
+## V100 `1.0.0-rc.1` Full Release Closure — TASK-0255–0257 Planned
 
-TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 published NuGet but stopped before tag/release/provenance. Later recovery histories remain distinct and intact. The authenticated repository owner created exact tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. TASK-0252 verified that tag without mutation and passed CI. TASK-0253's one run passed immutable gates but received HTTP 403 creating the GitHub prerelease, so TASK-0254 was not executed.
+New explicit full operational authorization received on 2026-07-14 supersedes only obsolete retry/manual-completion boundaries while preserving all historical evidence. Clean synchronized entry is `177810dc2e7dc14304541430cb074c13efc19612`. TASK-0255 owns authenticated local GitHub prerelease/exact-asset completion, TASK-0256 owns attestation-only workflow plus three-platform verification, and TASK-0257 owns RC1 published-smoke/public/V100/final-CI closure. NuGet republication and every tag mutation remain prohibited.
 
 | Order | Task | Status | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
@@ -22,8 +22,11 @@ TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, an
 | 14 | TASK-0252 existing exact tag recovery workflow adaptation | COMPLETED / PUSHED / CI PASS | Exact existing tag accepted; every recovery tag mutation removed; fail-closed release/asset/attestation checks added | Owner-created exact tag plus explicit authorization | 431/431; commit `5f6c4ce`; runs `29344903472`, `29344903420`, `29344903850` PASS | Normal push only; no release dispatch |
 | 15 | TASK-0253 authorized prerelease asset and attestation recovery | STOPPED / DISPATCH CONSUMED / REMOTE UNCHANGED | Run passed immutable gates, then GitHub Release creation returned HTTP 403 | TASK-0252 exact-HEAD CI green | Run/job `29345313517`/`87127346868`; failed log once; immutable audit once | No rerun, second dispatch, manual completion, settings change, or tag mutation |
 | 16 | TASK-0254 three-platform smoke, public status, and provenance closure | NOT EXECUTED | Success-only smoke pin/V100-09 closure withheld after TASK-0253 failure | TASK-0253 success not met | Failure-state documentation only | Smoke pin alpha4; V100-09 open |
+| 17 | TASK-0255 authenticated GitHub prerelease and exact asset completion | PLANNED | Diagnose Actions integration 403; use authenticated local `gh` to create/verify the exact prerelease and retained TASK-0242 assets | New full authorization; immutable artifact/tag facts | Identity/permissions, artifact/NuGet/tag/release/body/asset/digest/hash verification | GitHub Release/asset write only; zero NuGet/tag/settings mutation |
+| 18 | TASK-0256 attestation-only workflow and three-platform release verification | PLANNED / BLOCKED ON TASK-0255 | Add minimal exact-existing-release attestation operation and Windows/Ubuntu/macOS NuGet install smoke | TASK-0255 exact release complete | Focused/full local gates, standard CI, hosted attestation run and three platform jobs | OIDC attestations only; no NuGet/tag/release mutation |
+| 19 | TASK-0257 public status provenance and final CI closure | PLANNED / SUCCESS-ONLY | Pin published smoke to RC1, synchronize EN/TR/NuGet/public/V100 evidence, close V100-09, final CI | TASK-0255 and TASK-0256 complete | Complete local suite, final three workflows, final remote/local equality | Normal repository commits/pushes only |
 
-NuGet `1.0.0-rc.1` and its exact tag remain immutable and unchanged; GitHub prerelease/assets/two attestations are absent. Complete release and published-smoke pin remain `v0.2.0-alpha.4`. The TASK-0253 dispatch budget is consumed. NuGet operation, normal publish, second dispatch/rerun, manual completion, settings change, tag mutation, force push, history rewrite, or GA claim remains prohibited.
+NuGet `1.0.0-rc.1` and exact tag `v1.0.0-rc.1` remain immutable. Current authorization permits exact GitHub prerelease/assets, attestation workflow dispatch/retry after validated correction, three-platform verification, smoke-pin/docs/V100 closure, and normal commits/pushes. NuGet publication/mutation, normal publish, tag mutation, unverified asset upload, force push, history rewrite, generated `.ackit/` commit, or GA claim remains prohibited.
 
 ## Historical Execution Record
 

@@ -2,6 +2,10 @@
 
 ## Active V100 Release-Candidate Chain
 
+- TASK-0255 through TASK-0257 are the active fully authorized RC1 completion chain. Entry `master`/`origin/master` is clean at `177810dc2e7dc14304541430cb074c13efc19612`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
+- TASK-0255 will diagnose the TASK-0253 Actions integration HTTP 403, reverify the frozen source/NuGet/tag tuple, and create/verify the exact prerelease plus nupkg/snupkg through the authenticated local `gh` identity.
+- TASK-0256 will add a minimal attestation-only exact-existing-release workflow, enforce release/body/asset/hash verification before provenance, verify both attestations, and run Windows/Ubuntu/macOS installed-package smoke.
+- TASK-0257 is success-only: pin published smoke to RC1, synchronize EN/TR/NuGet/release/supply-chain/V100 evidence, close V100-09, and require final green standard CI plus clean local/origin equality.
 - TASK-0252 through TASK-0254 are the latest authorized closure chain. Entry HEAD was `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 were verified.
 - The authenticated repository owner created exact immutable tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. The recovery workflow must verify this tag and contain no tag creation, push, move, delete, or ref API mutation.
 - TASK-0252 is complete and pushed at `5f6c4ce`; exact-tag/release/asset/attestation fixtures and the full suite passed with 431/431 tests, and standard runs `29344903472`, `29344903420`, and `29344903850` passed.
@@ -17,7 +21,7 @@
 - TASK-0249 completed at `ca4b469` and passed standard runs `29340782994`, `29340783184`, and `29340782999`, including the expected-404 fixtures on Windows, Ubuntu, and macOS.
 - TASK-0250 consumed its single dispatch in run `29341087462`. Safety, exact artifact/package, and repeated remote-state gates passed; the GitHub App token's tag push was then rejected for missing `workflows` permission. One log read and one audit proved remote tag/release/assets/two attestations absent and NuGet/artifact unchanged.
 - TASK-0251 is not executed. Published smoke remains alpha4 and V100-09 remains open.
-- NuGet RC1 must never be republished, changed, unlisted, or replaced. No normal publish operation, second recovery dispatch/rerun, tag mutation, manual upload/completion, settings mutation, force push, history rewrite, or GA-readiness claim is authorized.
+- NuGet RC1 must never be republished, changed, unlisted, or replaced; the exact tag must never be moved/recreated/deleted. New authorization permits only exact validated GitHub prerelease/assets, attestation verification, three-platform smoke, and normal repository closure. No normal publish, unverified asset, settings/PAT/secret mutation, force push, history rewrite, `.ackit/` commit, or GA-readiness claim is authorized.
 
 ## v0.1.0-alpha
 - Solution foundation.

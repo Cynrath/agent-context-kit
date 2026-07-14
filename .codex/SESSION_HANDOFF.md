@@ -1,5 +1,15 @@
 # AgentContextKit Session Handoff
 
+## TASK-0255–0257 `1.0.0-rc.1` Full Release Closure — Planned
+
+- Full operational authorization received on 2026-07-14. Clean synchronized entry is `master`/`origin/master` at `177810dc2e7dc14304541430cb074c13efc19612`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 passed.
+- TASK-0255, TASK-0256, and TASK-0257 were created exactly once with `ackit task` and fully specified before implementation.
+- TASK-0255 owns read-only state/input diagnosis plus authenticated local `gh` creation/verification of the exact existing-tag prerelease and only the retained TASK-0242 nupkg/snupkg.
+- TASK-0256 owns minimal attestation-only workflow/test implementation, exact release/body/asset verification, two attestations, and Windows/Ubuntu/macOS installed-package smoke.
+- TASK-0257 is success-only and owns the RC1 published-smoke pin, EN/TR/NuGet/public/release/supply-chain/V100 synchronization, V100-09 closure, and final CI/equality checks.
+- New authorization supersedes obsolete retry/manual-completion boundaries only. TASK-0242/TASK-0244/TASK-0247/TASK-0250/TASK-0253 remain factual historical evidence.
+- NuGet publication/mutation, normal publish, tag mutation, unverified assets, PAT/secret/settings changes, force push, history rewrite, generated `.ackit/` commit, and `1.0.0` GA claims remain prohibited.
+
 ## TASK-0252–0254 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0253 Stopped
 
 - New explicit authorization received on 2026-07-14. Clean synchronized entry is `master` at `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
