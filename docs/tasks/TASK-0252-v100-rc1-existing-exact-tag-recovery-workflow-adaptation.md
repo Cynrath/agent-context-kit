@@ -117,7 +117,7 @@ Record the implementation commit, local test counts/results, exact CI run IDs, t
 
 ## Completion notes
 
-Status: `COMPLETED LOCALLY / PENDING PUSH AND EXACT-HEAD STANDARD CI`.
+Status: `COMPLETED / PUSHED / EXACT-HEAD STANDARD CI PASS`.
 
 Implementation result:
 
@@ -139,7 +139,10 @@ Validation evidence:
 - Unicode root-directory guard: 0 before / 0 after.
 - `git diff --check`: PASS.
 - Tracked `.ackit/`: 0.
-- Implementation commit: the commit containing this completion record with message `fix: recover RC1 from verified existing exact tag`.
+- Implementation commit: `5f6c4ce2d0ab9745207196e6b01371653adfe009` (`fix: recover RC1 from verified existing exact tag`).
+- Exact-HEAD `ci` run `29344903472`: PASS; Windows job `87125919219`, Ubuntu job `87125919223`.
+- Exact-HEAD `cross-platform-smoke` run `29344903420`: PASS; Windows job `87125918858`, Ubuntu job `87125918859`, macOS job `87125918909`.
+- Exact-HEAD `cross-platform-source-smoke` run `29344903850`: PASS; Windows job `87125920260`, Ubuntu job `87125920328`, macOS job `87125920330`.
 - Remote mutation in TASK-0252: none; recovery dispatch 0; NuGet publish 0; tag mutation 0.
 
-TASK-0253 remains blocked until this commit is pushed and exact-HEAD `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` all pass.
+TASK-0253 was unblocked only after all three exact-HEAD workflows passed.

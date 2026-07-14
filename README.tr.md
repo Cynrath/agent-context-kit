@@ -42,7 +42,7 @@ Varsayılan komutlar repository içeriğini yerelde işler; repository yüklemez
 | Alan | Durum |
 | --- | --- |
 | Güncel eksiksiz sürüm | `v0.2.0-alpha.4`; GitHub ve NuGet üzerinde pre-release olarak yayımlandı |
-| RC1 kısmi durum | NuGet `1.0.0-rc.1` vardır ve kurulabilir; TASK-0244/TASK-0247 mutation öncesi durdu, TASK-0250 tag push reddiyle durdu; tag, GitHub prerelease ve provenance hâlâ yoktur |
+| RC1 kısmi durum | NuGet `1.0.0-rc.1` vardır ve kurulabilir; sahip tarafından oluşturulan `v1.0.0-rc.1` etiketi tam paket commit’ini gösterir, ancak TASK-0253’ün tek recovery çalıştırması GitHub prerelease oluştururken HTTP 403 aldı; prerelease, asset’ler, attestation’lar ve üç platformlu recovered-package kanıtı hâlâ yoktur |
 | Yayın kanıtı | `98cdf9723a509a347bd0403f6373dafe81ba03fb` commit’inden yayımlandı; global tool kurulumu doğrulandı |
 | Çalışma zamanı | .NET 10 |
 | Platformlar | GitHub Actions ile Windows, Ubuntu ve macOS |

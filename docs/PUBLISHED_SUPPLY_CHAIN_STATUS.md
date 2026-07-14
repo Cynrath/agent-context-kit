@@ -1,5 +1,24 @@
 # Published Supply-Chain Status
 
+## TASK-0253 Post-Failure Immutable State
+
+One post-failure audit on 2026-07-14 after recovery run `29345313517`, job `87127346868`:
+
+| Field | State |
+| --- | --- |
+| NuGet package | `AgentContextKit 1.0.0-rc.1` present and unchanged |
+| NuGet nupkg SHA-256 | `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5` |
+| Repository signature | Verified (`NuGet.org Repository by Microsoft`) |
+| Repository commit | `258918b33c3d1359aac967604ee524e8b66ddf02` |
+| Source artifact | `8242162439` valid; digest `sha256:cd5550b2172aa0e4ff9bf700f6eefb04dfd8dbd88c8d7fee22914c1769533b3f` |
+| Exact tag | `v1.0.0-rc.1` unchanged at `258918b33c3d1359aac967604ee524e8b66ddf02` |
+| GitHub prerelease/assets | Absent after `gh release create` returned HTTP 403 |
+| nupkg attestation | Absent for candidate digest `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d` |
+| snupkg attestation | Absent for candidate digest `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d` |
+| Recovery matrix | Skipped |
+
+The single TASK-0253 dispatch passed safety, exact source artifact/package/signature/content/install validation, and repeated immutable-state checks. Release creation then failed with `HTTP 403: Resource not accessible by integration`. The failed log and remote state were each inspected exactly once. Dispatch count is one, NuGet publish count is zero, TASK-0254 was not executed, published smoke remains `0.2.0-alpha.4`, and V100-09 remains open. No rerun, redispatch, manual completion, settings change, tag mutation, or force push occurred.
+
 ## TASK-0252 Entry State — Owner-Created Exact Tag
 
 Read-only entry verification on 2026-07-14 establishes the new recovery precondition without rewriting TASK-0250 history:
@@ -15,7 +34,7 @@ Read-only entry verification on 2026-07-14 establishes the new recovery precondi
 | nupkg attestation | Absent for candidate digest `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d` |
 | snupkg attestation | Absent for candidate digest `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d` |
 
-TASK-0252 may adapt and validate the exact-existing-tag workflow but performs no remote release mutation. TASK-0253 owns exactly one future recovery dispatch after green standard CI. NuGet publication, normal publish, tag mutation, second dispatch/rerun, manual completion, settings change, force push, and GA claims remain prohibited.
+TASK-0252 adapted and validated the exact-existing-tag workflow without remote release mutation. TASK-0253 later consumed its one dispatch as recorded above. NuGet publication, normal publish, tag mutation, second dispatch/rerun, manual completion, settings change, force push, and GA claims remain prohibited.
 
 ## TASK-0250 Post-Failure Immutable State
 

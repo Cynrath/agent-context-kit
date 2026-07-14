@@ -1,10 +1,10 @@
 # Next Steps
 
-## Current V100 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0252–0254 Planned
+## Current V100 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0253 Stopped
 
-1. COMPLETED LOCALLY / PENDING PUSH AND CI — TASK-0252: `recover-existing` verifies owner-created exact tag `v1.0.0-rc.1` at `258918b33c3d1359aac967604ee524e8b66ddf02`, contains no tag mutation, and fail-closes release/asset/two-attestation preconditions. Focused tests and full local suite pass (431/431); implementation commit, first push, and three green standard workflows remain.
-2. PLANNED / BLOCKED ON TASK-0252 CI — TASK-0253: run one immutable preflight, dispatch `recover-existing` exactly once, watch once, and either record complete prerelease/assets/attestations/three-platform success or obey the strict remote-failure boundary.
-3. PLANNED / SUCCESS-ONLY — TASK-0254: pin published smoke to `1.0.0-rc.1`, synchronize public/release/supply-chain/V100/README/handoff evidence, close V100-09 only if complete, run final validation, push once, and wait for final CI.
+1. COMPLETED / PUSHED / CI PASS — TASK-0252: commit `5f6c4ce`; 431/431 local tests and standard runs `29344903472`, `29344903420`, `29344903850` passed; recovery verifies the exact owner-created tag and contains no tag mutation.
+2. STOPPED / DISPATCH CONSUMED / REMOTE UNCHANGED — TASK-0253: run `29345313517`, job `87127346868`, passed immutable gates and failed at `gh release create` with HTTP 403. Failed log once; immutable audit once; prerelease/assets/two attestations absent; matrix skipped.
+3. NOT EXECUTED — TASK-0254: success criteria not met; published smoke remains `0.2.0-alpha.4`; V100-09 remains open; only factual failure-state documentation and standard CI are in scope.
 
 Historical chain status follows and must not be rewritten:
 
@@ -22,7 +22,7 @@ Historical chain status follows and must not be rewritten:
 12. STOPPED / DISPATCH CONSUMED / REMOTE UNCHANGED — TASK-0250: run `29341087462` passed pre-mutation gates, then GitHub rejected the App token tag push for missing `workflows` permission. One log read and one audit completed; tag/release/assets/two attestations remain absent.
 13. NOT EXECUTED — TASK-0251: success criteria not met; smoke pin remains `0.2.0-alpha.4`, V100-09 remains open, README release status remains unchanged.
 
-Hard boundary: TASK-0242/TASK-0244/TASK-0247/TASK-0250 budgets and evidence are consumed. The owner-created exact tag is immutable. TASK-0253 alone has exactly one new dispatch after TASK-0252 CI. No NuGet push, normal publish, second dispatch/rerun, manual completion/upload, version reuse, tag mutation, settings/security/collaborator mutation, `.ackit/` commit, force push, history rewrite, premature V100-09 closure, or GA claim.
+Hard boundary: TASK-0242/TASK-0244/TASK-0247/TASK-0250/TASK-0253 budgets and evidence are consumed. The owner-created exact tag is immutable. No NuGet push, normal publish, second dispatch/rerun, manual completion/upload, version reuse, tag mutation, settings/security/collaborator mutation, `.ackit/` commit, force push, history rewrite, premature V100-09 closure, or GA claim.
 
 PROJECT-CONTROL-0108 closed TASK-0168 through TASK-0176 with 270/270 tests green. PROJECT-CONTROL-0109 completed TASK-0177 through TASK-0180, then inserted user-prioritized TASK-0187 before TASK-0181 to audit and harden the visible `nuget-release` failed deployments without release/tag/NuGet/deployment mutation.
 

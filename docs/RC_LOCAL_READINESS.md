@@ -35,14 +35,14 @@ Exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b` passed standard runs 
 | SBOM | Publication remains bounded-deferred | ACCEPTED RISK through 2026-09-30 |
 | Provenance | Control implemented locally; exact evidence requires the next authorized publish path | OPEN_PENDING_PUBLISH_PATH_PROVENANCE |
 | Package recovery | Immutable-successor procedure plus `Cynrath` decision ownership and `ShadowFlameC` backup recovery ownership | RECOVERY_OWNERSHIP_RECONCILED |
-| Version and release plan | TASK-0242 partially published NuGet RC1; tag/release/provenance absent; recovery not authorized | PARTIAL IMMUTABLE PUBLICATION / STOPPED |
+| Version and release plan | NuGet RC1 and owner-created exact tag exist; TASK-0253 release creation returned HTTP 403; prerelease/assets/provenance absent | PARTIAL IMMUTABLE PUBLICATION / TASK-0253 STOPPED |
 
 ## Open Gap Boundary
 `docs/V100_GAP_ANALYSIS.md` remains the source of truth. Open P0 gaps are 0. V100-01 through V100-05, V100-07, V100-08, and V100-10 close by TASK-0241; V100-06 remains closed; V100-09 remains open pending publish-path provenance.
 
 TASK-0239 reran the complete candidate suite: installed ACKit `0.2.0-alpha.4`, doctor 13/13, scan exit 0, source CLI `1.0.0-rc.1`, restore/build/test 431/431, Unicode temp guard, all V100/contract/config/JSON/localization/security/RC gates, fresh dependency review, both performance invocations, 428-file Markdown link audit, and package/install/upgrade evidence. TASK-0240 then confirmed the exact candidate on all three hosted operating systems.
 
-The current decision is **STOPPED AFTER PARTIAL IMMUTABLE PUBLICATION**. NuGet RC1 is verified; tag/release/provenance remain absent. Historical TASK-0241 gate marker: Publication authorized: No.
+The current decision is **TASK-0253 STOPPED AFTER RELEASE CREATE HTTP 403**. NuGet RC1 and its exact owner-created tag are verified; prerelease/assets/provenance remain absent. Historical TASK-0241 gate marker: Publication authorized: No.
 
 ## Local Gate
 ```powershell

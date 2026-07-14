@@ -18,7 +18,7 @@ Current status date: 2026-07-11. `0.2.0-alpha.3` and `0.2.0-alpha.4` are publish
 | V100-10 localization | FINAL_LOCALIZATION_CONTRACT_ACCEPTED / CLOSED_BY_TASK_0241 | Reopen after localization/contract change |
 | Candidate version | `1.0.0-rc.1` accepted at `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; predecessor `0.2.0-alpha.4` | CONDITIONAL GO for separately authorized publish task |
 | Open P0 gaps | `0` | V100-09 is a publish-path P1 boundary |
-| Publication | PARTIAL / STOPPED | NuGet exists; tag/release/provenance absent; new explicit recovery decision required |
+| Publication | PARTIAL / TASK-0253 STOPPED | NuGet and exact owner-created tag exist; GitHub prerelease/assets/provenance absent after release-create HTTP 403; V100-09 open |
 
 See `docs/V100_MAINTAINER_DECISION_PACKET.md`. TASK-0242 authorization is limited to the exact RC1 OIDC publication and evidence path; it does not authorize repository settings changes, version reuse, tag movement, recovery, manual upload, force push, or a 1.0 GA claim.
 

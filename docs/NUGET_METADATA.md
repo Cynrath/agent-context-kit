@@ -3,7 +3,7 @@
 AgentContextKit package metadata is defined in `src/AgentContextKit.Cli/AgentContextKit.Cli.csproj`.
 
 ## Current Status
-Source/package metadata is `AgentContextKit` `1.0.0-rc.1`. NuGet RC1 is published and repository-signed at commit `258918b33c3d1359aac967604ee524e8b66ddf02`, but tag/GitHub prerelease/provenance remain absent after TASK-0244 and TASK-0247 both stopped before mutation. `0.2.0-alpha.4` remains the latest complete release and exact hosted predecessor.
+Source/package metadata is `AgentContextKit` `1.0.0-rc.1`. NuGet RC1 is published and repository-signed at commit `258918b33c3d1359aac967604ee524e8b66ddf02`, and owner-created exact tag `v1.0.0-rc.1` targets that commit. TASK-0253 received HTTP 403 while creating the GitHub prerelease, so prerelease/assets/provenance remain absent. `0.2.0-alpha.4` remains the latest complete release and exact hosted predecessor.
 
 Shared package metadata:
 - `RepositoryUrl` is `https://github.com/Cynrath/agent-context-kit`.

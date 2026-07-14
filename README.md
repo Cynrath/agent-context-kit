@@ -43,7 +43,7 @@ Default commands process repository content locally: no repository upload, AI AP
 | Area | Status |
 | --- | --- |
 | Current complete release | `v0.2.0-alpha.4` published on GitHub and NuGet as a pre-release |
-| RC1 partial state | NuGet `1.0.0-rc.1` exists and installs; TASK-0244/TASK-0247 stopped before mutation and TASK-0250's tag push was rejected, so tag, GitHub prerelease, and provenance remain absent |
+| RC1 partial state | NuGet `1.0.0-rc.1` exists and installs; owner-created tag `v1.0.0-rc.1` targets the exact package commit, but TASK-0253's single recovery run received HTTP 403 creating the GitHub prerelease, so prerelease, assets, attestations, and three-platform recovered-package evidence remain absent |
 | Release evidence | Published from `98cdf9723a509a347bd0403f6373dafe81ba03fb`; NuGet install verified |
 | Package | `AgentContextKit` global tool install verified |
 | Previous release | `v0.2.0-alpha.3` |

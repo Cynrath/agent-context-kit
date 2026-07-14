@@ -1,9 +1,9 @@
 # Maintainer Release-Candidate Decision
 
 ## Current Decision
-**TASK-0250 STOPPED AFTER TAG PUSH REJECTION; REMOTE RELEASE STATE UNCHANGED.**
+**TASK-0253 STOPPED AFTER GITHUB RELEASE CREATION RETURNED HTTP 403; REMOTE RELEASE STATE UNCHANGED.**
 
-TASK-0249 corrected the expected-404 exit-state defect and passed exact-HEAD standard CI. TASK-0250 then consumed one authorized `recover-existing` dispatch in run `29341087462`. All safety/artifact/package/recheck gates passed, but GitHub rejected the GitHub App token's tag push for missing `workflows` permission. One log read and one immutable audit proved NuGet/artifact unchanged and tag/release/assets/two attestations absent. TASK-0251 is not executed; V100-09 remains open and `v0.2.0-alpha.4` remains the latest complete prerelease.
+The repository owner created exact tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. TASK-0252 changed recovery to verify that tag without mutation and passed exact-HEAD standard CI. TASK-0253 then consumed one authorized `recover-existing` dispatch in run `29345313517`. All safety/artifact/package/tag/release-state gates passed, but `gh release create` returned `HTTP 403: Resource not accessible by integration`. One log read and one immutable audit proved NuGet/artifact/tag unchanged and prerelease/assets/two attestations absent. TASK-0254 is not executed; V100-09 remains open and `v0.2.0-alpha.4` remains the latest complete prerelease.
 
 Candidate `1.0.0-rc.1` is accepted against published predecessor `0.2.0-alpha.4`. TASK-0239 local/package evidence and standard CI passed for exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; TASK-0240 hosted run `29118452246` passed on Windows, Ubuntu, and macOS; the post-candidate bridge is documentation/evidence/governance-only; and TASK-0241 closes every P0 gap plus target P1 gaps V100-07, V100-08, and V100-10.
 
@@ -26,7 +26,7 @@ Historical TASK-0241 boundary markers retained for gate/audit compatibility: `Pu
 | NuGet ownership/signing | Owner identity difference and author signing have bounded accepted-risk dispositions through 2026-09-30; valid repository signature; backup recovery ownership is reconciled | Recheck dispositions by expiry or before the next pre-release review | Maintainer NuGet/supply-chain decision |
 | SBOM/provenance | SBOM is bounded-deferred through 2026-09-30; provenance is implemented for the next exact GitHub Release nupkg but has no hosted publication evidence yet | Require attestation creation/verification in the next publish run | Release workflow |
 | Localization parity | TASK-0240 localization gate passed for exact candidate on all three operating systems | Final localization contract accepted | TASK-0241 |
-| Version and release | NuGet `1.0.0-rc.1` published; tag/GitHub prerelease/provenance absent; `0.2.0-alpha.4` remains latest complete release | Stop and preserve immutable state | New recovery authorization required |
+| Version and release | NuGet `1.0.0-rc.1` published; exact owner-created tag exists; GitHub prerelease/assets/provenance absent after TASK-0253 HTTP 403; `0.2.0-alpha.4` remains latest complete release | Stop and preserve immutable state | TASK-0253 dispatch consumed; no TASK-0254 execution |
 
 ## TASK-0240 Evidence Record
 

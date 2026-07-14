@@ -1,12 +1,12 @@
 # AgentContextKit Context Pack
 
-## TASK-0252–0254 `1.0.0-rc.1` Existing-Tag Recovery Closure — Planned
+## TASK-0252–0254 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0253 Stopped
 
 Clean synchronized entry HEAD is `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`. ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified. TASK-0252/0253/0254 were created once with `ackit task` and fully planned before implementation.
 
-The authenticated repository owner created exact immutable tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`; local and remote resolution match. GitHub prerelease/assets and both candidate-digest attestations are absent at entry. TASK-0252 must replace recovery tag absence/creation with fail-closed exact-tag verification and pass standard CI. TASK-0253 then owns exactly one authorized NuGet-publish-free dispatch. TASK-0254 executes only after complete success and owns the RC1 smoke pin, public evidence synchronization, and conditional V100-09 closure.
+The authenticated repository owner created exact immutable tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`; local and remote resolution match. TASK-0252 replaced recovery tag absence/creation with fail-closed exact-tag verification, completed at `5f6c4ce2d0ab9745207196e6b01371653adfe009`, and passed standard runs `29344903472`, `29344903420`, and `29344903850`.
 
-TASK-0252 planning commit is `56ba2f3dcde4db0529ef3249027ecd30ae8e9ea5`. The implementation is complete locally: focused exact-tag/release/asset/attestation fixtures and static gates pass; Release build is 0 warnings/errors; 431/431 tests pass; ACKit doctor is 13/13 and scan exits 0; V100/supply-chain/package/Markdown/Unicode/diff/`.ackit` gates pass. The implementation commit, first push, and exact-HEAD hosted CI remain pending; recovery dispatch count is still zero.
+TASK-0252 planning commit is `56ba2f3dcde4db0529ef3249027ecd30ae8e9ea5`. TASK-0253 passed its immutable preflight and dispatched exactly once as run `29345313517`. Recovery job `87127346868` passed safety/artifact/package/tag/recheck gates, then `gh release create` returned HTTP 403. One failed-log read and one audit proved package/artifact/tag unchanged and prerelease/assets/two attestations absent; the matrix was skipped. Dispatch count is one, NuGet publish count is zero, and TASK-0254 was not executed. Published smoke remains alpha4 and V100-09 remains open.
 
 NuGet RC1 and the existing exact tag are immutable. NuGet publication, normal publish, tag mutation, second dispatch/rerun, manual release completion/upload/attestation, settings change, force/history rewrite, `.ackit/` commit, and GA claims remain prohibited. TASK-0242, TASK-0244, TASK-0247, and TASK-0250 failure evidence remains unchanged.
 

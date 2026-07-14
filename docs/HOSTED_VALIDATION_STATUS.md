@@ -1,5 +1,15 @@
 # Hosted Validation Status
 
+## TASK-0252 Standard CI — PASS
+
+TASK-0252 implementation commit `5f6c4ce2d0ab9745207196e6b01371653adfe009` passed `ci` run `29344903472`, published alpha4 `cross-platform-smoke` run `29344903420`, and `cross-platform-source-smoke` run `29344903850`. Source-smoke jobs `87125920260` (Windows), `87125920328` (Ubuntu), and `87125920330` (macOS) exercised the exact-existing-tag state fixtures and recovery static gates.
+
+## TASK-0253 Recovery Run — Release Create 403 / Hard Stop
+
+Exactly one `recover-existing` dispatch returned run [`29345313517`](https://github.com/Cynrath/agent-context-kit/actions/runs/29345313517), recovery job `87127346868`. Safety, exact source artifact/package/signature/content/install validation, and repeated exact tag/release/asset/attestation checks passed. `Create GitHub prerelease from verified exact existing tag` then failed because `gh release create` returned `HTTP 403: Resource not accessible by integration` for the releases endpoint.
+
+Release verification, both attestation steps, completed-recovery verification, and the recovery matrix were skipped; matrix placeholder job `87127568071` is skipped. The failed log was read once and one immutable audit confirmed source artifact/NuGet/exact tag unchanged, prerelease/assets absent, and both attestations absent. State: `TASK_0253_DISPATCH_CONSUMED / RELEASE_CREATE_403 / REMOTE_STATE_UNCHANGED / NO_RERUN`.
+
 ## TASK-0249 Standard CI — PASS
 
 TASK-0249 implementation commit `ca4b46967d18c03c8f39a5bf8e2dacb5745d249e` passed `ci` run `29340782994`, published alpha4 `cross-platform-smoke` run `29340783184`, and `cross-platform-source-smoke` run `29340782999`. The source-smoke run executed the expected-404 success/fail-closed fixtures on Windows, Ubuntu, and macOS.

@@ -1,11 +1,13 @@
 # AgentContextKit Session Handoff
 
-## TASK-0252–0254 `1.0.0-rc.1` Existing-Tag Recovery Closure — Planned
+## TASK-0252–0254 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0253 Stopped
 
 - New explicit authorization received on 2026-07-14. Clean synchronized entry is `master` at `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
 - Local and remote `v1.0.0-rc.1` resolve to exact release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. GitHub prerelease, release assets, nupkg attestation, and snupkg attestation are absent at entry.
-- TASK-0252, TASK-0253, and TASK-0254 were created exactly once with `ackit task` and fully planned before implementation. TASK-0252 removes all recovery tag mutation and verifies the existing exact tag; TASK-0253 owns exactly one authorized recovery dispatch after green CI; TASK-0254 is success-only public/smoke/V100 closure.
-- TASK-0252 is complete locally. Focused recovery fixtures/static gates and the full suite pass: Release build 0 warnings/errors, 431/431 tests, ACKit doctor 13/13, scan exit 0, all requested V100/supply-chain/package/Markdown gates, Unicode guard 0/0, diff clean, and tracked `.ackit/` count 0. Planning commit is `56ba2f3dcde4db0529ef3249027ecd30ae8e9ea5`; implementation commit/push and exact-HEAD hosted CI are pending.
+- TASK-0252, TASK-0253, and TASK-0254 were created exactly once with `ackit task` and fully planned before implementation.
+- TASK-0252 completed at `5f6c4ce2d0ab9745207196e6b01371653adfe009`. Focused recovery fixtures/static gates and the full suite passed: Release build 0 warnings/errors, 431/431 tests, ACKit doctor 13/13, scan exit 0, all requested V100/supply-chain/package/Markdown gates, Unicode guard 0/0, diff clean, and tracked `.ackit/` count 0. Exact-HEAD standard runs `29344903472`, `29344903420`, and `29344903850` passed.
+- TASK-0253 immutable preflight passed and exactly one dispatch produced run `29345313517`, job `87127346868`. Safety/artifact/package/tag/recheck gates passed; `gh release create` then returned HTTP 403. The failed log was read once and one audit proved package/artifact/tag unchanged and prerelease/assets/two attestations absent; recovery matrix skipped.
+- TASK-0254 was not executed. Published smoke remains `0.2.0-alpha.4`; V100-09 remains open.
 - NuGet republish, normal publish, tag creation/push/move/delete, second dispatch/rerun, manual asset upload/attestation, settings changes, force push, history rewrite, `.ackit/` commit, and GA claims are prohibited.
 - TASK-0242, TASK-0244, TASK-0247, and TASK-0250 evidence remains historical and unchanged.
 

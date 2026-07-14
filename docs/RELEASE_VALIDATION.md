@@ -1,5 +1,13 @@
 # Release Validation
 
+## TASK-0252–0254 Existing-Tag Recovery Closure Result
+
+TASK-0252 commit `5f6c4ce2d0ab9745207196e6b01371653adfe009` removed every recovery tag mutation, added exact-existing-tag and absent release/asset/attestation verification, passed 431/431 local tests, and passed standard runs `29344903472`, `29344903420`, and `29344903850`.
+
+TASK-0253 then passed its one immutable preflight and dispatched `recover-existing` exactly once as run `29345313517`. Recovery job `87127346868` passed safety, exact artifact/package/signature/content/install validation, and repeated remote-state checks. `gh release create` failed with HTTP 403 before any GitHub Release existed. One failed-log read and one immutable audit proved package/artifact/exact tag unchanged and prerelease/assets/two attestations absent. The recovery matrix was skipped, NuGet publish count is zero, and no rerun, second dispatch, manual completion, permission/settings change, or tag mutation occurred.
+
+TASK-0254 was not executed. Published smoke and complete-release guidance remain `0.2.0-alpha.4`; V100-09 remains open.
+
 ## TASK-0249–0251 Recovery Closure Result
 
 TASK-0249 commit `ca4b46967d18c03c8f39a5bf8e2dacb5745d249e` corrected accepted-404 exit-state handling and passed standard runs `29340782994`, `29340783184`, and `29340782999`. TASK-0250 then passed its exact immutable preflight and dispatched `recover-existing` exactly once as run `29341087462`.

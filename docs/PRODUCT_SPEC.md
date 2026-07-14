@@ -26,7 +26,7 @@ AgentContextKit is an offline-first .NET CLI that prepares repositories for safe
 - Automatic publishing from push or pull-request events.
 
 ## Next Product Direction
-The complete alpha.4 release includes baseline-aware CI policy, configuration diagnostics, MCP stdio, `ackit watch`, `diff`, `trim`, `README.nuget.md` rendering, and ACKit-first dogfood. NuGet `1.0.0-rc.1` freezes that reviewed surface and is installable, but TASK-0244 and TASK-0247 recovery attempts both stopped before mutation; tag/GitHub prerelease/provenance remain absent, so this is a partial immutable publication, not a completed release or GA claim.
+The complete alpha.4 release includes baseline-aware CI policy, configuration diagnostics, MCP stdio, `ackit watch`, `diff`, `trim`, `README.nuget.md` rendering, and ACKit-first dogfood. NuGet `1.0.0-rc.1` freezes that reviewed surface and is installable, and its owner-created exact tag exists. TASK-0253 nevertheless received HTTP 403 while creating the GitHub prerelease, so prerelease/assets/attestations remain absent and RC1 is still a partial immutable publication, not a completed release or GA claim.
 
 ## Future Optional LLM Scope
 v0.5 may add optional LLM-assisted workflows, but the default product remains offline-first. Any future provider integration must require explicit user consent, dry-run context review, safe secret handling, and local auditability before remote calls or context export.

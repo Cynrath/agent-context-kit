@@ -2,10 +2,11 @@
 
 ## Active V100 Release-Candidate Chain
 
-- TASK-0252 through TASK-0254 are the active authorized closure chain. Entry HEAD is `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
+- TASK-0252 through TASK-0254 are the latest authorized closure chain. Entry HEAD was `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 were verified.
 - The authenticated repository owner created exact immutable tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. The recovery workflow must verify this tag and contain no tag creation, push, move, delete, or ref API mutation.
-- TASK-0252 is complete locally: exact-tag/release/asset/attestation fixtures and the full suite pass with 431/431 tests, 0 build warnings/errors, ACKit 13/13, clean Unicode/diff/Markdown/package/V100 gates, and no tracked `.ackit/`. Its implementation push and exact-HEAD `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` remain required before any dispatch.
-- TASK-0253 may dispatch `recover-existing` exactly once. On complete success TASK-0254 pins published smoke to RC1, synchronizes public evidence, and closes V100-09 only with the full immutable proof set.
+- TASK-0252 is complete and pushed at `5f6c4ce`; exact-tag/release/asset/attestation fixtures and the full suite passed with 431/431 tests, and standard runs `29344903472`, `29344903420`, and `29344903850` passed.
+- TASK-0253 consumed its one `recover-existing` dispatch in run `29345313517`. All immutable gates passed, then GitHub Release creation returned HTTP 403. One log read and one audit proved package/artifact/tag unchanged and prerelease/assets/two attestations absent; the recovery matrix was skipped.
+- TASK-0254 was not executed. Published smoke remains `0.2.0-alpha.4`, V100-09 remains open, and public status records the partial immutable RC1 without claiming GA readiness.
 - TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 then published NuGet RC1 through OIDC but stopped after propagation verification timed out; its partial-failure history remains immutable.
 - TASK-0243 is complete and pushed at `3b979972ba24b6acd4f0eecca49ff3dcc2c8cdff`; pre-recovery `ci`, published alpha4 smoke, and RC1 source smoke passed.
 - TASK-0244 consumed its single recovery dispatch in run `29151228607`. The Ubuntu recovery safety gate exposed a Windows-only `powershell` child call before any mutation; tag/release/attestations remain absent and no second dispatch or automatic correction is allowed.

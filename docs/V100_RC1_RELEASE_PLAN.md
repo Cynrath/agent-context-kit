@@ -2,16 +2,16 @@
 
 ## Status
 
-Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its publish dispatch and left NuGet-only immutable state. TASK-0244 and TASK-0247 failed before mutation. TASK-0249 fixed expected-404 handling and passed standard CI. TASK-0250 consumed the next exact recovery dispatch in run `29341087462`; its GitHub App token tag push was rejected for missing `workflows` permission, leaving remote release state unchanged. TASK-0251 was not executed.
+Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its publish dispatch and left a partial immutable state. The owner later created exact tag `v1.0.0-rc.1`. TASK-0252 adapted recovery to verify that tag without mutation and passed standard CI. TASK-0253 consumed one exact recovery dispatch in run `29345313517`; GitHub Release creation returned HTTP 403, leaving prerelease/assets/attestations absent. TASK-0254 was not executed.
 
 | Field | Value |
 | --- | --- |
 | Candidate version | `1.0.0-rc.1` |
-| Recovery tag target (not created) | `v1.0.0-rc.1`, only at `258918b33c3d1359aac967604ee524e8b66ddf02` |
+| Exact owner-created tag | `v1.0.0-rc.1` at `258918b33c3d1359aac967604ee524e8b66ddf02` |
 | Published predecessor | `0.2.0-alpha.4` |
 | Current published release | `0.2.0-alpha.4` |
 | Candidate commit | Source candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; later bridge commits are docs/evidence/governance-only |
-| Publication status | Partial immutable state: NuGet published; tag/release/provenance absent; TASK-0244, TASK-0247, and TASK-0250 recovery budgets consumed without remote mutation |
+| Publication status | Partial immutable state: NuGet and exact tag exist; GitHub prerelease/assets/provenance absent; TASK-0253 dispatch consumed after release creation HTTP 403 |
 | Release body | Publication-ready `docs/RELEASE_BODY_V100_RC1.md` |
 
 ## Version Availability
@@ -43,9 +43,9 @@ After hosted evidence starts, TASK-0240 and TASK-0241 may change documentation, 
 
 ## Open Risks
 
-- Hosted three-OS exact-candidate evidence is pending TASK-0240.
-- Final candidate acceptance and gap reconciliation are pending TASK-0241.
-- V100-09 provenance remains open because TASK-0250's tag push was rejected before creating tag/release/assets or attestations; a new explicit decision is required for any future recovery attempt.
+- Hosted three-OS exact-candidate evidence completed in TASK-0240 run `29118452246`.
+- Final candidate acceptance and gap reconciliation completed in TASK-0241.
+- V100-09 provenance remains open because TASK-0253 received HTTP 403 before creating the GitHub prerelease/assets or attestations; the recovered-package matrix was skipped.
 - Author signing and SBOM publication remain bounded accepted risks through their recorded review boundary.
 - `1.0.0` GA readiness is not claimed.
 
@@ -64,7 +64,7 @@ Before publication, correct the source with a normal successor commit and rerun 
 
 ## Post-Publish Validation
 
-TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. TASK-0243 implemented exact-package recovery. TASK-0244 failed before mutation on a Windows-only fixture call. TASK-0246 fixed that call and passed standard CI. TASK-0247 stopped after the expected absent-release probe. TASK-0249 fixed that exit state and passed standard CI. TASK-0250 run `29341087462` passed safety plus exact artifact/package/signature/install/recheck validation, then its GitHub App tag push was rejected for missing `workflows` permission. The one audit confirmed unchanged package/artifact evidence and absent tag/release/two attestations. TASK-0251 did not change the smoke pin or V100-09. Do not republish, reuse, fix-and-retry, rerun, or dispatch again without a new explicit decision.
+TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. TASK-0243 implemented exact-package recovery. TASK-0244 failed before mutation on a Windows-only fixture call. TASK-0246 fixed that call and passed standard CI. TASK-0247 stopped after the expected absent-release probe. TASK-0249 fixed that exit state and passed standard CI. TASK-0250 stopped at tag push. The owner later created the exact tag. TASK-0252 removed all tag mutation from recovery and passed standard CI. TASK-0253 run `29345313517` passed safety plus exact artifact/package/signature/install/tag/recheck validation, then `gh release create` returned HTTP 403. One audit confirmed unchanged package/artifact/tag evidence and absent prerelease/assets/two attestations. TASK-0254 did not change the smoke pin or V100-09. Do not republish, reuse, fix-and-retry, rerun, redispatch, complete manually, change settings, or mutate the exact tag.
 
 ## TASK-0239 Evidence
 

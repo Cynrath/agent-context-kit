@@ -111,4 +111,6 @@ Record TASK-0253/TASK-0254 commits, final validation results and test count, fin
 
 ## Completion notes
 
-Status: `PLANNED / SUCCESS-ONLY AFTER TASK-0253`.
+Status: `NOT EXECUTED / TASK-0253 SUCCESS CRITERIA NOT MET`.
+
+TASK-0253 run `29345313517` failed at GitHub prerelease creation with HTTP 403 after all pre-mutation gates passed. Its one dispatch budget is consumed, and the immutable post-failure audit found the exact tag unchanged while prerelease/assets/two attestations remained absent. Therefore this success-only task did not change `.github/workflows/cross-platform-smoke.yml`, did not pin public guidance to RC1, did not run the recovered-package matrix, and did not close V100-09. Published smoke remains `0.2.0-alpha.4`; V100-09 remains open.
