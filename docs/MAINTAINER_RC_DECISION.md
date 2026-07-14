@@ -1,7 +1,9 @@
 # Maintainer Release-Candidate Decision
 
 ## Current Decision
-**TASK-0242 STOPPED AFTER PARTIAL IMMUTABLE PUBLICATION.**
+**TASK-0250 STOPPED AFTER TAG PUSH REJECTION; REMOTE RELEASE STATE UNCHANGED.**
+
+TASK-0249 corrected the expected-404 exit-state defect and passed exact-HEAD standard CI. TASK-0250 then consumed one authorized `recover-existing` dispatch in run `29341087462`. All safety/artifact/package/recheck gates passed, but GitHub rejected the GitHub App token's tag push for missing `workflows` permission. One log read and one immutable audit proved NuGet/artifact unchanged and tag/release/assets/two attestations absent. TASK-0251 is not executed; V100-09 remains open and `v0.2.0-alpha.4` remains the latest complete prerelease.
 
 Candidate `1.0.0-rc.1` is accepted against published predecessor `0.2.0-alpha.4`. TASK-0239 local/package evidence and standard CI passed for exact candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; TASK-0240 hosted run `29118452246` passed on Windows, Ubuntu, and macOS; the post-candidate bridge is documentation/evidence/governance-only; and TASK-0241 closes every P0 gap plus target P1 gaps V100-07, V100-08, and V100-10.
 

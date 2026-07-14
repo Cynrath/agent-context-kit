@@ -104,6 +104,49 @@ There is no destructive rollback. If preflight fails, do not dispatch. If the on
 
 ## Completion evidence
 
-Status: `PLANNED / BLOCKED ON TASK-0249 GREEN CI`.
+Status: `STOPPED / SINGLE DISPATCH CONSUMED / TAG PUSH REJECTED / REMOTE STATE UNCHANGED`.
 
-No workflow dispatch or remote mutation occurred while this plan was created.
+TASK-0249 implementation commit `ca4b46967d18c03c8f39a5bf8e2dacb5745d249e` passed standard runs `29340782994`, `29340783184`, and `29340782999`. The source-smoke run passed the expected-404 regression on Windows, Ubuntu, and macOS.
+
+The single immutable preflight passed with a clean synchronized repository and this exact tuple:
+
+| Evidence | Exact value |
+| --- | --- |
+| Automation commit | `ca4b46967d18c03c8f39a5bf8e2dacb5745d249e` |
+| Release commit | `258918b33c3d1359aac967604ee524e8b66ddf02` |
+| Source run / artifact | `29131335084` / `8242162439` |
+| Artifact digest | `sha256:cd5550b2172aa0e4ff9bf700f6eefb04dfd8dbd88c8d7fee22914c1769533b3f` |
+| Candidate nupkg SHA-256 | `86c2338e5766c3ebe18f234df85b976be449feaf2890a1cec05b561f97c1db4d` |
+| Candidate snupkg SHA-256 | `f1570e7cfbad411199140cc68fd58c898639060ceaa3b6575adcaf15e2d93b3d` |
+| NuGet-served nupkg SHA-256 | `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5` |
+| NuGet signature/content/commit | PASS / equivalent excluding `.signature.p7s` / `258918b33c3d1359aac967604ee524e8b66ddf02` |
+| Tag/release/two attestations | Absent before dispatch |
+
+Exactly one `recover-existing` dispatch was accepted. The dispatch response directly returned run [`29341087462`](https://github.com/Cynrath/agent-context-kit/actions/runs/29341087462); no discovery query was needed. One `gh run watch --exit-status --interval 30` observed the failure in job `87112724358`.
+
+The run passed:
+
+- `Run exact recovery safety gates`;
+- `Validate exact source artifact and existing NuGet package`;
+- `Recheck exact remote recovery state`.
+
+It then failed in `Create exact immutable tag and GitHub prerelease`. The failed log was read exactly once. `git push origin refs/tags/v1.0.0-rc.1` was rejected by GitHub:
+
+```text
+refusing to allow a GitHub App to create or update workflow
+.github/workflows/cross-platform-source-smoke.yml without `workflows` permission
+```
+
+The rejection occurred before `gh release create`; release verification, both attestations, completed-recovery verification, and the Windows/Ubuntu/macOS recovery matrix were skipped.
+
+One post-failure immutable-state audit then proved:
+
+- source artifact valid and unchanged at the recorded digest;
+- NuGet package present and unchanged at SHA-256 `346570f28a738c0f08d0eaa2a3ddb3f4dbcd4121d801530173bb2c40c03d23d5`;
+- NuGet repository signature valid and repository commit still `258918b33c3d1359aac967604ee524e8b66ddf02`;
+- remote `v1.0.0-rc.1` tag absent;
+- GitHub prerelease and assets absent;
+- nupkg attestation absent;
+- snupkg attestation absent.
+
+No NuGet login/push/change/unlist/replace/delete, normal publish operation, rerun, second dispatch, manual upload, tag movement, settings change, force push, or history rewrite occurred. The TASK-0250 dispatch budget is consumed. TASK-0251 success-only work is prohibited.

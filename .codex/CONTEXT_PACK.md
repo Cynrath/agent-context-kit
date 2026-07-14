@@ -1,12 +1,12 @@
 # AgentContextKit Context Pack
 
-## TASK-0249–0251 `1.0.0-rc.1` Recovery Closure — TASK-0249 Current
+## TASK-0249–0251 `1.0.0-rc.1` Recovery Closure — TASK-0250 Stopped
 
 Clean synchronized entry HEAD is `5d2cece457240e7fe3a99275c5afa757acbb4bab`. ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified. TASK-0249/0250/0251 were created once with `ackit task` and fully planned before implementation.
 
-TASK-0249 plan commit is `35600b6`. Its shared fail-closed PowerShell helper is used at both recovery checkpoints; accepted-404/native-exit/subsequent-code and 200/401/403/429/500/network fixtures pass locally. Full validation passed with build 0 warnings/0 errors, 431/431 tests, ACKit doctor 13/13, scan exit 0, all requested local gates, Unicode guard, and no tracked `.ackit/`. Push-triggered Windows/Ubuntu/macOS evidence is still required. TASK-0250 permits exactly one new `recover-existing` dispatch only after green standard CI; it binds source run `29131335084`, artifact `8242162439`, release commit `258918b33c3d1359aac967604ee524e8b66ddf02`, and the full recorded digests/hashes. TASK-0251 is success-only for the RC1 published-smoke pin, public/provenance sync, and evidence-backed V100-09 closure.
+TASK-0249 plan `35600b6` and implementation `ca4b469` are pushed; local validation and standard runs `29340782994`, `29340783184`, and `29340782999` passed. TASK-0250 immutable preflight passed for source run `29131335084`, artifact `8242162439`, release commit `258918b33c3d1359aac967604ee524e8b66ddf02`, and the full recorded digests/hashes. Exactly one dispatch produced run `29341087462`. Safety/artifact/package/recheck gates passed, then GitHub rejected the App token tag push for missing `workflows` permission. One failed-log read and one audit proved remote state unchanged. TASK-0251 is not executed; smoke remains alpha4 and V100-09 remains open.
 
-NuGet RC1 cannot be republished or changed. Normal publish, second recovery dispatch/rerun, manual upload, tag movement, settings change, force/history rewrite, `.ackit/` commit, and 1.0 GA claims remain forbidden. TASK-0242, TASK-0244, and TASK-0247 failure evidence remains historical and unchanged. Any new remote recovery failure triggers one log read, one remote audit, documentation, and immediate safe stop.
+NuGet RC1 cannot be republished or changed. Normal publish, recovery correction/rerun/second dispatch, manual completion/upload, tag movement, settings change, force/history rewrite, `.ackit/` commit, and 1.0 GA claims remain forbidden. TASK-0242, TASK-0244, TASK-0247, and TASK-0250 failure evidence remains historical and unchanged.
 
 ## TASK-0243–0248 Historical Exact-Package Recovery — Stopped
 

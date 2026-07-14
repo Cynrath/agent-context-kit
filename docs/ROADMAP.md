@@ -9,10 +9,10 @@
 - TASK-0246 fixed the cross-platform `pwsh` test host, strengthened mutation-order gates, polished all README sources, and passed standard runs `29182095416`, `29182095415`, and `29182095423`.
 - TASK-0247 consumed its single recovery dispatch in run `29182188201`. Exact artifact/package/signature/install validation passed, then the step exited after the expected absent-release probe and before every remote mutation. One failed-log read and one audit confirmed tag/release/two attestations absent.
 - TASK-0248 is not executed. Published smoke remains `0.2.0-alpha.4`, V100-09 remains open, RC1 remains incomplete, and 1.0 GA readiness is not claimed.
-- TASK-0249 is complete locally: the shared fail-closed helper and accepted-404/non-404 fixtures pass, as do 431/431 tests and all local gates. Push-triggered standard CI remains required before TASK-0250.
-- TASK-0250 is planned after TASK-0249 standard CI is fully green: run one immutable preflight and exactly one new NuGet-publish-free `recover-existing` dispatch.
-- TASK-0251 is success-only: pin published smoke to RC1, synchronize public/provenance evidence, and close V100-09 only when every exact criterion is proven.
-- NuGet RC1 must never be republished, changed, unlisted, or replaced. No normal publish operation, recovery rerun/second dispatch, tag movement, manual upload, settings mutation, force push, history rewrite, or GA-readiness claim is authorized.
+- TASK-0249 completed at `ca4b469` and passed standard runs `29340782994`, `29340783184`, and `29340782999`, including the expected-404 fixtures on Windows, Ubuntu, and macOS.
+- TASK-0250 consumed its single dispatch in run `29341087462`. Safety, exact artifact/package, and repeated remote-state gates passed; the GitHub App token's tag push was then rejected for missing `workflows` permission. One log read and one audit proved remote tag/release/assets/two attestations absent and NuGet/artifact unchanged.
+- TASK-0251 is not executed. Published smoke remains alpha4 and V100-09 remains open.
+- NuGet RC1 must never be republished, changed, unlisted, or replaced. No normal publish operation, recovery correction/rerun/second dispatch, tag movement, manual upload/completion, settings mutation, force push, history rewrite, or GA-readiness claim is authorized.
 
 ## v0.1.0-alpha
 - Solution foundation.

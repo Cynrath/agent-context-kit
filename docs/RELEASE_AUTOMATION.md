@@ -53,6 +53,8 @@ TASK-0247 was the only newly authorized execution of this recovery path. After T
 
 TASK-0249 records the later explicit authorization to correct that exit-state defect without mutating release state. The correction is local-first and must pass the three standard workflows, including Windows/Ubuntu/macOS execution of the expected-404 fixtures, before the separately authorized single TASK-0250 recovery dispatch can occur. TASK-0247 remains an unchanged failed historical record.
 
+TASK-0249 passed at `ca4b469` with standard runs `29340782994`, `29340783184`, and `29340782999`. TASK-0250 run `29341087462` then passed every safety/artifact/package/recheck gate, but GitHub rejected its non-force tag push because the GitHub App token lacked `workflows` permission for a ref targeting a commit with workflow changes. The run stopped before `gh release create`; one log read and one audit confirmed no remote mutation. The dispatch is consumed and the repository-settings/manual/retry paths remain prohibited.
+
 ## Existing Release Recovery Verification
 `scripts/verify-existing-release.ps1` performs a read-only verification of NuGet availability, repository-signed package validity, full disposable installed-tool smoke, exact tag target, GitHub pre-release state, required `.nupkg`/`.snupkg` assets, package metadata, and SHA-256 evidence. NuGet and GitHub Release package hashes are recorded independently because NuGet repository signing can change the served package bytes.
 

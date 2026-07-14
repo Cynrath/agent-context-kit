@@ -1,8 +1,8 @@
 # Next Tasks
 
-## V100 `1.0.0-rc.1` Exact-Package Recovery Closure — TASK-0249 Current
+## V100 `1.0.0-rc.1` Exact-Package Recovery Closure — TASK-0250 Stopped
 
-TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 published NuGet but stopped before tag/release/provenance. TASK-0244 and TASK-0247 later failed before mutation for separate cross-platform/exit-state defects; all three histories remain unchanged. A new bounded decision authorizes TASK-0249 through TASK-0251 without any second NuGet push.
+TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 published NuGet but stopped before tag/release/provenance. TASK-0244 and TASK-0247 later failed before mutation; TASK-0249 fixed the exit-state defect and passed CI. TASK-0250's tag push was rejected without remote mutation, so TASK-0251 was not executed. Every history remains distinct and intact.
 
 | Order | Task | Status | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
@@ -16,11 +16,11 @@ TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, an
 | 8 | TASK-0246 cross-platform recovery safety gate host fix | COMPLETED / PUSHED / CI PASS | Replace Windows-only child host with `pwsh`, prove mutation ordering, and polish all README sources | New explicit authorization | 431/431; runs `29182095416`, `29182095415`, `29182095423` PASS | No release dispatch/mutation in TASK-0246 |
 | 9 | TASK-0247 authorized exact-package recovery execution | STOPPED / DISPATCH CONSUMED / NO MUTATION | Single run passed exact artifact/package smoke then exited after expected absent-release probe | TASK-0246 standard CI green | Run `29182188201`; failed log once; immutable audit once | No retry/fix/second dispatch; new decision required |
 | 10 | TASK-0248 post-recovery smoke pin, README, and evidence closure | NOT EXECUTED | Success-only smoke pin/V100-09 closure prohibited after TASK-0247 failure | TASK-0247 success not met | Failure docs and final standard CI only | Smoke pin remains alpha4; V100-09 remains open |
-| 11 | TASK-0249 expected-404 recovery exit-state correction | COMPLETED LOCALLY / AWAITING PUSHED CI | Shared fail-closed release-absence helper clears only a verified 404 native exit state; 431/431 and local gates pass | New explicit authorization | Focused fixtures and full local suite PASS; standard CI pending | Local code/docs plus normal push only; no release mutation |
-| 12 | TASK-0250 authorized exact-existing-package recovery execution | PLANNED | Run one immutable preflight and exactly one NuGet-publish-free recovery dispatch | TASK-0249 standard CI fully green | Exact artifact/package/tag/release/assets/attestations plus recovery matrix | Exactly one dispatch; safe-stop on any remote failure |
-| 13 | TASK-0251 post-recovery smoke, provenance, and public-status closure | PLANNED / SUCCESS-ONLY | Pin published smoke to RC1, synchronize README/release/V100 evidence, and wait for final CI | TASK-0250 complete success | Full local gates plus final standard CI | No release mutation; normal docs/workflow-pin push only |
+| 11 | TASK-0249 expected-404 recovery exit-state correction | COMPLETED / PUSHED / CI PASS | Shared fail-closed release-absence helper clears only a verified 404 native exit state | New explicit authorization | 431/431; runs `29340782994`, `29340783184`, `29340782999` PASS | No release mutation |
+| 12 | TASK-0250 authorized exact-existing-package recovery execution | STOPPED / DISPATCH CONSUMED / REMOTE UNCHANGED | Run passed safety/artifact/recheck, then GitHub App token tag push was rejected for missing `workflows` permission | TASK-0249 standard CI green | Run `29341087462`; failed log once; immutable audit once | No rerun, second dispatch, manual completion, or settings change |
+| 13 | TASK-0251 post-recovery smoke, provenance, and public-status closure | NOT EXECUTED | Success-only criteria not met; smoke pin/V100-09/README release status unchanged | TASK-0250 full success not met | Failure documentation only | Smoke pin alpha4; V100-09 open |
 
-NuGet `1.0.0-rc.1` is immutable and installable, but the RC release remains incomplete at TASK-0249 entry. Complete release remains `v0.2.0-alpha.4`. The new authorization permits the local TASK-0249 correction, one new TASK-0250 recovery dispatch after green CI, and success-only TASK-0251 closure. It never permits a NuGet push, normal publish operation, recovery rerun/second dispatch, manual upload, tag movement, settings change, force push, history rewrite, or GA claim.
+NuGet `1.0.0-rc.1` remains immutable and unchanged; the RC release remains incomplete. Complete release remains `v0.2.0-alpha.4`. TASK-0250 consumed the one new recovery dispatch in run `29341087462`; its remote tag push was rejected and the single audit proved tag/release/assets/attestations absent. No retry/rerun/second dispatch, settings change, manual completion, NuGet operation, tag movement, force push, history rewrite, smoke-pin/V100-09 closure, or GA claim is authorized.
 
 ## Historical Execution Record
 

@@ -106,6 +106,14 @@ If TASK-0250 is incomplete, do not execute this task. For local/final-CI-only is
 
 ## Completion evidence
 
-Status: `PLANNED / SUCCESS-ONLY / BLOCKED ON TASK-0250`.
+Status: `NOT EXECUTED / TASK-0250 SUCCESS CRITERIA NOT MET`.
 
-No smoke-pin, public release status, V100-09, or remote release mutation occurred while this plan was created.
+TASK-0250 run `29341087462` failed when the GitHub App token's tag push was rejected for missing `workflows` permission. The one post-failure audit proved the tag, GitHub prerelease/assets, and both attestations remain absent. Therefore:
+
+- published smoke remains pinned to `0.2.0-alpha.4`;
+- `v0.2.0-alpha.4` remains the latest complete prerelease;
+- V100-09 remains open;
+- README current-release/install guidance remains alpha4; only the factual TASK-0250 failure note was synchronized;
+- no TASK-0251 success commit, release mutation, or 1.0 GA claim is allowed.
+
+This factual non-execution record does not rewrite TASK-0242, TASK-0244, TASK-0247, or TASK-0250.

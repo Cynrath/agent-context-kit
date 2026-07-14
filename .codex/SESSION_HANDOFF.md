@@ -1,12 +1,13 @@
 # AgentContextKit Session Handoff
 
-## TASK-0249–0251 `1.0.0-rc.1` Recovery Closure — TASK-0249 Current
+## TASK-0249–0251 `1.0.0-rc.1` Recovery Closure — TASK-0250 Stopped
 
 - New explicit authorization received on 2026-07-14 for TASK-0249 through TASK-0251. Entry is clean synchronized `master` at `5d2cece457240e7fe3a99275c5afa757acbb4bab`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
-- TASK-0249 plan commit `35600b6` precedes implementation. The shared helper, both workflow call sites, positive/negative fixtures, static ordering/publication guards, and release/recovery docs are implemented. Local validation passed: build 0/0, tests 431/431, ACKit 13/13 plus scan exit 0, all requested V100/release/security/status/Markdown gates, Unicode guard, and no tracked `.ackit/`. Push and standard CI remain.
-- TASK-0250 is planned only after green TASK-0249 CI: one immutable preflight and exactly one new `recover-existing` dispatch using source run `29131335084`, artifact `8242162439`, and release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. NuGet publication is forbidden.
-- TASK-0251 is success-only: RC1 published-smoke pin, exact provenance/V100-09 closure, README/status synchronization, final normal push, and final standard CI.
-- TASK-0242, TASK-0244, and TASK-0247 failure histories remain intact. On any TASK-0250 remote failure: one log read, one remote audit, documentation, and safe stop without rerun or manual completion.
+- TASK-0249 plan commit `35600b6` and implementation commit `ca4b469` are pushed. Local validation passed with 431/431 and standard runs `29340782994`, `29340783184`, `29340782999` passed; the expected-404 fixture ran on all three operating systems.
+- TASK-0250 immutable preflight passed the exact artifact/package/signature/content/commit/absence tuple. Exactly one dispatch returned run `29341087462`, job `87112724358`; no discovery was needed and one watch observed failure.
+- The run passed safety, artifact/package/install, and repeated remote-state checks. GitHub then rejected `git push origin refs/tags/v1.0.0-rc.1` because the App token lacked `workflows` permission. `gh release create` and all later release/attestation/matrix steps were skipped.
+- The failed log was read once. One audit proved NuGet/artifact unchanged and tag/release/assets/two attestations absent. No retry/rerun/second dispatch/manual completion/settings change is authorized.
+- TASK-0251 is not executed. Published smoke remains `0.2.0-alpha.4`; V100-09 remains open; README release claims and 1.0 GA status remain unchanged.
 
 ## TASK-0246–0248 Historical Recovery Attempt — TASK-0247 Stopped
 

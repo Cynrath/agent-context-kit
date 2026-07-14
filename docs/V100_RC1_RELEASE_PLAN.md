@@ -2,7 +2,7 @@
 
 ## Status
 
-Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its publish dispatch and left NuGet-only immutable state. TASK-0244 failed before mutation. TASK-0246 fixed the cross-platform safety fixture and passed standard CI. TASK-0247 consumed the newly authorized exact recovery dispatch in run `29182188201`, which again stopped before mutation; TASK-0248 was not executed.
+Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its publish dispatch and left NuGet-only immutable state. TASK-0244 and TASK-0247 failed before mutation. TASK-0249 fixed expected-404 handling and passed standard CI. TASK-0250 consumed the next exact recovery dispatch in run `29341087462`; its GitHub App token tag push was rejected for missing `workflows` permission, leaving remote release state unchanged. TASK-0251 was not executed.
 
 | Field | Value |
 | --- | --- |
@@ -11,7 +11,7 @@ Prepared by TASK-0239 and accepted by TASK-0241. TASK-0242 consumed its publish 
 | Published predecessor | `0.2.0-alpha.4` |
 | Current published release | `0.2.0-alpha.4` |
 | Candidate commit | Source candidate `548b6affd0da25cb379ec1b153b1064fd5ff6f0b`; later bridge commits are docs/evidence/governance-only |
-| Publication status | Partial immutable state: NuGet published; tag/release/provenance absent; TASK-0244 and TASK-0247 recovery budgets consumed before mutation |
+| Publication status | Partial immutable state: NuGet published; tag/release/provenance absent; TASK-0244, TASK-0247, and TASK-0250 recovery budgets consumed without remote mutation |
 | Release body | Publication-ready `docs/RELEASE_BODY_V100_RC1.md` |
 
 ## Version Availability
@@ -45,7 +45,7 @@ After hosted evidence starts, TASK-0240 and TASK-0241 may change documentation, 
 
 - Hosted three-OS exact-candidate evidence is pending TASK-0240.
 - Final candidate acceptance and gap reconciliation are pending TASK-0241.
-- V100-09 provenance remains open because TASK-0247 stopped before creating tag/release/assets or attestations; a new explicit decision is required for any workflow correction or future recovery attempt.
+- V100-09 provenance remains open because TASK-0250's tag push was rejected before creating tag/release/assets or attestations; a new explicit decision is required for any future recovery attempt.
 - Author signing and SBOM publication remain bounded accepted risks through their recorded review boundary.
 - `1.0.0` GA readiness is not claimed.
 
@@ -64,7 +64,7 @@ Before publication, correct the source with a normal successor commit and rerun 
 
 ## Post-Publish Validation
 
-TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. TASK-0243 implemented exact-package recovery. TASK-0244 failed before mutation on a Windows-only fixture call. TASK-0246 fixed that call and passed standard CI. TASK-0247 run `29182188201` passed safety plus exact artifact/package/signature/install verification, then exited after the expected absent-release probe and before mutation. The one-time audit confirmed unchanged package/artifact evidence and absent tag/release/two attestations. TASK-0248 did not change the smoke pin or V100-09. Do not republish, reuse, fix-and-retry, rerun, or dispatch again without a new explicit decision.
+TASK-0242 verified NuGet availability, repository signature/commit, digest, and global install after its partial failure. TASK-0243 implemented exact-package recovery. TASK-0244 failed before mutation on a Windows-only fixture call. TASK-0246 fixed that call and passed standard CI. TASK-0247 stopped after the expected absent-release probe. TASK-0249 fixed that exit state and passed standard CI. TASK-0250 run `29341087462` passed safety plus exact artifact/package/signature/install/recheck validation, then its GitHub App tag push was rejected for missing `workflows` permission. The one audit confirmed unchanged package/artifact evidence and absent tag/release/two attestations. TASK-0251 did not change the smoke pin or V100-09. Do not republish, reuse, fix-and-retry, rerun, or dispatch again without a new explicit decision.
 
 ## TASK-0239 Evidence
 

@@ -1,5 +1,15 @@
 # Hosted Validation Status
 
+## TASK-0249 Standard CI — PASS
+
+TASK-0249 implementation commit `ca4b46967d18c03c8f39a5bf8e2dacb5745d249e` passed `ci` run `29340782994`, published alpha4 `cross-platform-smoke` run `29340783184`, and `cross-platform-source-smoke` run `29340782999`. The source-smoke run executed the expected-404 success/fail-closed fixtures on Windows, Ubuntu, and macOS.
+
+## TASK-0250 Recovery Run — Tag Push Rejected / Hard Stop
+
+The exact immutable preflight passed, then exactly one `recover-existing` dispatch returned run [`29341087462`](https://github.com/Cynrath/agent-context-kit/actions/runs/29341087462), job `87112724358`. Safety, exact source artifact/package/signature/content/install validation, and repeated remote-state absence checks passed. `git push origin refs/tags/v1.0.0-rc.1` was then rejected because the GitHub App token lacked `workflows` permission to create a ref targeting a commit that contains `.github/workflows/cross-platform-source-smoke.yml`.
+
+The failed log was read once. `gh release create` did not run; release verification, both attestations, completed-recovery verification, and all three recovered-package matrix jobs were skipped. One immutable-state audit confirmed source artifact and NuGet unchanged, remote tag absent, GitHub prerelease/assets absent, and both attestations absent. State: `TASK_0250_DISPATCH_CONSUMED / TAG_PUSH_REJECTED / REMOTE_STATE_UNCHANGED / NO_RERUN`.
+
 ## TASK-0242 Release Run — Partial Failure / Hard Stop
 
 Release run [`29131335084`](https://github.com/Cynrath/agent-context-kit/actions/runs/29131335084) targeted exact HEAD `258918b33c3d1359aac967604ee524e8b66ddf02`. Validate job `86487127197` passed. Publish job `86487525013` completed OIDC login and NuGet publish, then failed because the package did not become available to its verification runner inside the bounded retry window. Tag, GitHub prerelease, provenance, and attestation steps were skipped. One-time follow-up verified NuGet availability/signature/repository commit and global install, while tag/release/attestation remained absent. User-required hard stop applies; no recovery or second dispatch occurred.

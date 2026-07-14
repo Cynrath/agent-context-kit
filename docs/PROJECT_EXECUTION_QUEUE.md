@@ -1,6 +1,6 @@
 # Project Execution Queue
 
-## V100 `1.0.0-rc.1` Exact-Package Recovery Closure — TASK-0249 Current
+## V100 `1.0.0-rc.1` Exact-Package Recovery Closure — TASK-0250 Stopped
 
 | Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- | --- |
@@ -14,11 +14,11 @@
 | 8 | Completed / pushed / CI pass | TASK-0246 cross-platform recovery safety gate host fix | Use `pwsh`, preserve pre-mutation gates, and polish all README sources | New explicit authorization | Script/workflow tests, README/docs/task/handoff files | 431/431; runs `29182095416`, `29182095415`, `29182095423` PASS | No release mutation |
 | 9 | Stopped / dispatch consumed / no mutation | TASK-0247 authorized exact-package recovery execution | One exact-existing-package recovery dispatch | TASK-0246 CI green | Hosted/supply-chain/V100/task/handoff evidence | Run `29182188201`; log once; immutable audit once | No fix/rerun/second dispatch/manual upload |
 | 10 | Not executed | TASK-0248 smoke pin, README, and evidence closure | Pin/current-release/V100-09 sync withheld because recovery failed | TASK-0247 success not met | Failure-state docs only | Smoke pin alpha4; V100-09 open |
-| 11 | Completed locally / awaiting pushed CI | TASK-0249 expected-404 recovery exit-state correction | Correct the accepted-404 native exit leak with one shared fail-closed helper | New explicit authorization | Workflow/helper/tests/task/queue/handoff files | Focused fixtures, 431/431, all local gates PASS; standard CI pending | No workflow dispatch or release mutation |
-| 12 | Planned | TASK-0250 authorized exact-existing-package recovery | Execute exactly one NuGet-publish-free recovery after immutable preflight | TASK-0249 CI green | Hosted/supply-chain/release/V100/task/handoff evidence | One dispatch/watch/view; exact package/tag/release/assets/attestations/three-OS smoke | No rerun, second dispatch, manual upload, or NuGet operation |
-| 13 | Planned / success-only | TASK-0251 post-recovery smoke/provenance/public sync | Pin RC1 smoke and close public/V100 evidence only after complete recovery | TASK-0250 full success | Published smoke, README, changelog, release/V100/queue/handoff files | Full local suite and final standard CI | Normal commit/push only; immutable release unchanged |
+| 11 | Completed / pushed / CI pass | TASK-0249 expected-404 recovery exit-state correction | Correct the accepted-404 native exit leak with one shared fail-closed helper | New explicit authorization | Workflow/helper/tests/task/queue/handoff files | 431/431; runs `29340782994`, `29340783184`, `29340782999` PASS | No release mutation |
+| 12 | Stopped / dispatch consumed / remote unchanged | TASK-0250 authorized exact-existing-package recovery | Single run passed pre-mutation gates, then tag push was rejected for missing GitHub App `workflows` permission | TASK-0249 CI green | Hosted/supply-chain/release/V100/task/handoff evidence | Run `29341087462`; log once; immutable audit once | No rerun/second dispatch/manual completion/settings change |
+| 13 | Not executed | TASK-0251 post-recovery smoke/provenance/public sync | Success-only pin/public/V100 closure withheld | TASK-0250 success not met | Failure-state docs only | Smoke pin alpha4; V100-09 open |
 
-Execution rule: TASK-0242 publish, TASK-0244 recovery, and TASK-0247 recovery budgets remain consumed and their records remain immutable. The new TASK-0249–0251 decision authorizes one local correction and exactly one new recovery dispatch after green CI. It does not authorize NuGet publication, normal publish, rerun/second dispatch, manual upload, tag movement, settings mutation, history rewrite, force push, or GA claim. Smoke-pin/V100-09 closure is success-only.
+Execution rule: TASK-0242 publish and TASK-0244/TASK-0247/TASK-0250 recovery budgets are consumed and their records remain immutable. No NuGet publication, normal publish, recovery correction/rerun/second dispatch, manual upload/completion, tag movement, settings mutation, history rewrite, force push, smoke-pin/V100-09 closure, or GA claim is authorized.
 
 ## Historical PROJECT-CONTROL-0109 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |

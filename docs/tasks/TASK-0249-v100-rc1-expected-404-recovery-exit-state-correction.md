@@ -125,7 +125,7 @@ Before dispatch, correct failures with normal successor commits and rerun local 
 
 ## Completion evidence
 
-Status: `COMPLETED LOCALLY / AWAITING PUSHED STANDARD CI`.
+Status: `COMPLETED / PUSHED / STANDARD CI PASS`.
 
 Planning started from clean synchronized HEAD `5d2cece457240e7fe3a99275c5afa757acbb4bab`; task-first plan commit `35600b6` was created before implementation.
 
@@ -147,4 +147,12 @@ Validation evidence on 2026-07-14:
 - Unicode temporary-path guard passed and `git ls-files .ackit` returned no tracked path;
 - no workflow dispatch, NuGet operation, tag/release/asset/attestation mutation, settings change, force push, history rewrite, or GA claim occurred.
 
-Hosted evidence remains pending. TASK-0250 must not dispatch until the exact TASK-0249 implementation HEAD passes `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke`.
+Implementation commit `ca4b46967d18c03c8f39a5bf8e2dacb5745d249e` was pushed normally. Exact-HEAD standard CI passed:
+
+| Workflow | Run | Result |
+| --- | ---: | --- |
+| `ci` | `29340782994` | PASS |
+| `cross-platform-smoke` | `29340783184` | PASS |
+| `cross-platform-source-smoke` | `29340782999` | PASS; expected-404 safety fixtures passed on Windows, Ubuntu, and macOS |
+
+TASK-0249 therefore satisfied the TASK-0250 dispatch prerequisite without any release or package mutation.

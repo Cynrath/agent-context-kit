@@ -7,6 +7,7 @@ This project follows Semantic Versioning where practical before `1.0.0`.
 ## [Unreleased]
 
 - TASK-0243 added a NuGet-publish-free exact-existing-package recovery operation with exact artifact/package verification, two release-asset attestations, negative workflow gates, and a three-platform install matrix. TASK-0244 run `29151228607` stopped in a pre-mutation Ubuntu safety gate because a fixture helper invoked Windows-only `powershell`; no tag, GitHub prerelease, asset, or attestation was created, no second dispatch occurred, and the published smoke pin remains `0.2.0-alpha.4`.
+- TASK-0249 fixed accepted-404 native exit handling and passed three-platform CI. TASK-0250 run `29341087462` passed all pre-mutation recovery gates, then GitHub rejected the App token's tag push for missing `workflows` permission. One audit confirmed NuGet/artifact unchanged and tag/release/assets/two attestations absent; TASK-0251 was not executed.
 
 ## [1.0.0-rc.1] - NuGet published; release incomplete
 

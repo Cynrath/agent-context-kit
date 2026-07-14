@@ -1,5 +1,11 @@
 # Release Validation
 
+## TASK-0249–0251 Recovery Closure Result
+
+TASK-0249 commit `ca4b46967d18c03c8f39a5bf8e2dacb5745d249e` corrected accepted-404 exit-state handling and passed standard runs `29340782994`, `29340783184`, and `29340782999`. TASK-0250 then passed its exact immutable preflight and dispatched `recover-existing` exactly once as run `29341087462`.
+
+The run passed safety, exact artifact/package/signature/content/install validation, and repeated tag/release absence gates. The GitHub App token's non-force tag push was rejected for missing `workflows` permission before `gh release create`. One log read and one audit proved NuGet/artifact unchanged and tag/release/assets/two attestations absent. No retry, rerun, second dispatch, manual completion, or settings change is permitted. TASK-0251 was not executed; smoke stays alpha4 and V100-09 stays open.
+
 ## V100 `1.0.0-rc.1` Candidate Preparation (TASK-0239)
 
 Candidate `1.0.0-rc.1` was prepared against published predecessor `0.2.0-alpha.4`; its publication body is retained in `RELEASE_BODY_V100_RC1.md`. TASK-0242 published the NuGet package but stopped before tag/GitHub prerelease/provenance. Public complete-release guidance remains pinned to alpha4; RC1 is documented as a partial immutable state.
