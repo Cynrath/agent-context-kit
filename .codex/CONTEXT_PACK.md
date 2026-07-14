@@ -1,5 +1,13 @@
 # AgentContextKit Context Pack
 
+## TASK-0252–0254 `1.0.0-rc.1` Existing-Tag Recovery Closure — Planned
+
+Clean synchronized entry HEAD is `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`. ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified. TASK-0252/0253/0254 were created once with `ackit task` and fully planned before implementation.
+
+The authenticated repository owner created exact immutable tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`; local and remote resolution match. GitHub prerelease/assets and both candidate-digest attestations are absent at entry. TASK-0252 must replace recovery tag absence/creation with fail-closed exact-tag verification and pass standard CI. TASK-0253 then owns exactly one authorized NuGet-publish-free dispatch. TASK-0254 executes only after complete success and owns the RC1 smoke pin, public evidence synchronization, and conditional V100-09 closure.
+
+NuGet RC1 and the existing exact tag are immutable. NuGet publication, normal publish, tag mutation, second dispatch/rerun, manual release completion/upload/attestation, settings change, force/history rewrite, `.ackit/` commit, and GA claims remain prohibited. TASK-0242, TASK-0244, TASK-0247, and TASK-0250 failure evidence remains unchanged.
+
 ## TASK-0249–0251 `1.0.0-rc.1` Recovery Closure — TASK-0250 Stopped
 
 Clean synchronized entry HEAD is `5d2cece457240e7fe3a99275c5afa757acbb4bab`. ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified. TASK-0249/0250/0251 were created once with `ackit task` and fully planned before implementation.

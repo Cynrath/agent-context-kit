@@ -1,6 +1,6 @@
 # Project Execution Queue
 
-## V100 `1.0.0-rc.1` Exact-Package Recovery Closure — TASK-0250 Stopped
+## V100 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0252–0254 Planned
 
 | Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- | --- |
@@ -17,8 +17,11 @@
 | 11 | Completed / pushed / CI pass | TASK-0249 expected-404 recovery exit-state correction | Correct the accepted-404 native exit leak with one shared fail-closed helper | New explicit authorization | Workflow/helper/tests/task/queue/handoff files | 431/431; runs `29340782994`, `29340783184`, `29340782999` PASS | No release mutation |
 | 12 | Stopped / dispatch consumed / remote unchanged | TASK-0250 authorized exact-existing-package recovery | Single run passed pre-mutation gates, then tag push was rejected for missing GitHub App `workflows` permission | TASK-0249 CI green | Hosted/supply-chain/release/V100/task/handoff evidence | Run `29341087462`; log once; immutable audit once | No rerun/second dispatch/manual completion/settings change |
 | 13 | Not executed | TASK-0251 post-recovery smoke/provenance/public sync | Success-only pin/public/V100 closure withheld | TASK-0250 success not met | Failure-state docs only | Smoke pin alpha4; V100-09 open |
+| 14 | Planned | TASK-0252 existing exact tag recovery workflow adaptation | Replace tag absence/creation with exact existing-tag verification and prohibit every tag mutation | Owner-created exact tag plus explicit authorization | Workflow/helpers/tests/recovery/supply-chain/task/queue/handoff docs | Focused scripts, full local suite, then three standard workflows | First normal push; no recovery dispatch or release mutation |
+| 15 | Planned / blocked on TASK-0252 CI | TASK-0253 authorized prerelease asset and attestation recovery | One exact recovery dispatch from the immutable existing tag | TASK-0252 exact-HEAD standard CI green | Remote release plus task/hosted/supply-chain/V100 evidence | One preflight/dispatch/watch/view/evidence sequence | Exactly one dispatch; strict failure boundary; zero NuGet publish |
+| 16 | Planned / success-only | TASK-0254 three-platform smoke/public/provenance closure | RC1 smoke pin, public status, README parity, and conditional V100-09 closure | TASK-0253 complete success | Published-smoke workflow, README/changelog/release/V100/task/queue/handoff docs | Final full local suite and three standard workflows | Second final normal push; no immutable release mutation |
 
-Execution rule: TASK-0242 publish and TASK-0244/TASK-0247/TASK-0250 recovery budgets are consumed and their records remain immutable. No NuGet publication, normal publish, recovery correction/rerun/second dispatch, manual upload/completion, tag movement, settings mutation, history rewrite, force push, smoke-pin/V100-09 closure, or GA claim is authorized.
+Execution rule: TASK-0242 publish and TASK-0244/TASK-0247/TASK-0250 recovery budgets are consumed and their records remain immutable. The owner-created `v1.0.0-rc.1` tag is exact and immutable. TASK-0252 may adapt the workflow without dispatch; TASK-0253 has exactly one new recovery dispatch after green CI; TASK-0254 is success-only. No NuGet publication, normal publish, second dispatch/rerun, manual upload/completion, tag mutation, settings mutation, history rewrite, force push, or GA claim is authorized.
 
 ## Historical PROJECT-CONTROL-0109 Track
 | Order | Status | Task | Priority | Blocking status | Expected files | Validation required | Remote write required? | Done criteria |

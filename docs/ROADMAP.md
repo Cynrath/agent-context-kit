@@ -2,6 +2,10 @@
 
 ## Active V100 Release-Candidate Chain
 
+- TASK-0252 through TASK-0254 are the active authorized closure chain. Entry HEAD is `7c46a3d573ae1f7208a2bb75557ea643190ea6ef`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 are verified.
+- The authenticated repository owner created exact immutable tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. The recovery workflow must verify this tag and contain no tag creation, push, move, delete, or ref API mutation.
+- TASK-0252 adapts and proves the exact-existing-tag recovery path, then requires green `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` before any dispatch.
+- TASK-0253 may dispatch `recover-existing` exactly once. On complete success TASK-0254 pins published smoke to RC1, synchronizes public evidence, and closes V100-09 only with the full immutable proof set.
 - TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 then published NuGet RC1 through OIDC but stopped after propagation verification timed out; its partial-failure history remains immutable.
 - TASK-0243 is complete and pushed at `3b979972ba24b6acd4f0eecca49ff3dcc2c8cdff`; pre-recovery `ci`, published alpha4 smoke, and RC1 source smoke passed.
 - TASK-0244 consumed its single recovery dispatch in run `29151228607`. The Ubuntu recovery safety gate exposed a Windows-only `powershell` child call before any mutation; tag/release/attestations remain absent and no second dispatch or automatic correction is allowed.
@@ -12,7 +16,7 @@
 - TASK-0249 completed at `ca4b469` and passed standard runs `29340782994`, `29340783184`, and `29340782999`, including the expected-404 fixtures on Windows, Ubuntu, and macOS.
 - TASK-0250 consumed its single dispatch in run `29341087462`. Safety, exact artifact/package, and repeated remote-state gates passed; the GitHub App token's tag push was then rejected for missing `workflows` permission. One log read and one audit proved remote tag/release/assets/two attestations absent and NuGet/artifact unchanged.
 - TASK-0251 is not executed. Published smoke remains alpha4 and V100-09 remains open.
-- NuGet RC1 must never be republished, changed, unlisted, or replaced. No normal publish operation, recovery correction/rerun/second dispatch, tag movement, manual upload/completion, settings mutation, force push, history rewrite, or GA-readiness claim is authorized.
+- NuGet RC1 must never be republished, changed, unlisted, or replaced. No normal publish operation, second recovery dispatch/rerun, tag mutation, manual upload/completion, settings mutation, force push, history rewrite, or GA-readiness claim is authorized.
 
 ## v0.1.0-alpha
 - Solution foundation.

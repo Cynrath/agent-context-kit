@@ -1,8 +1,8 @@
 # Next Tasks
 
-## V100 `1.0.0-rc.1` Exact-Package Recovery Closure — TASK-0250 Stopped
+## V100 `1.0.0-rc.1` Existing-Tag Recovery Closure — TASK-0252–0254 Planned
 
-TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 published NuGet but stopped before tag/release/provenance. TASK-0244 and TASK-0247 later failed before mutation; TASK-0249 fixed the exit-state defect and passed CI. TASK-0250's tag push was rejected without remote mutation, so TASK-0251 was not executed. Every history remains distinct and intact.
+TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, and final acceptance. TASK-0242 published NuGet but stopped before tag/release/provenance. TASK-0244 and TASK-0247 later failed before mutation; TASK-0249 fixed the exit-state defect and passed CI. TASK-0250's tag push was rejected without remote mutation, so TASK-0251 was not executed. The authenticated repository owner has now created exact tag `v1.0.0-rc.1` at release commit `258918b33c3d1359aac967604ee524e8b66ddf02`. TASK-0252 through TASK-0254 form the newly authorized recovery/closure chain; every earlier history remains distinct and intact.
 
 | Order | Task | Status | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
@@ -19,8 +19,11 @@ TASK-0239 through TASK-0241 completed candidate preparation, hosted evidence, an
 | 11 | TASK-0249 expected-404 recovery exit-state correction | COMPLETED / PUSHED / CI PASS | Shared fail-closed release-absence helper clears only a verified 404 native exit state | New explicit authorization | 431/431; runs `29340782994`, `29340783184`, `29340782999` PASS | No release mutation |
 | 12 | TASK-0250 authorized exact-existing-package recovery execution | STOPPED / DISPATCH CONSUMED / REMOTE UNCHANGED | Run passed safety/artifact/recheck, then GitHub App token tag push was rejected for missing `workflows` permission | TASK-0249 standard CI green | Run `29341087462`; failed log once; immutable audit once | No rerun, second dispatch, manual completion, or settings change |
 | 13 | TASK-0251 post-recovery smoke, provenance, and public-status closure | NOT EXECUTED | Success-only criteria not met; smoke pin/V100-09/README release status unchanged | TASK-0250 full success not met | Failure documentation only | Smoke pin alpha4; V100-09 open |
+| 14 | TASK-0252 existing exact tag recovery workflow adaptation | PLANNED | Verify the existing exact tag and remove every recovery tag mutation path | Owner-created exact tag plus explicit authorization | Focused recovery tests, full local suite, then three standard workflows | One normal push with plan/implementation; no release dispatch |
+| 15 | TASK-0253 authorized prerelease asset and attestation recovery | PLANNED / BLOCKED ON TASK-0252 CI | Dispatch `recover-existing` exactly once and verify prerelease/assets/attestations/three-platform recovery smoke | TASK-0252 exact-HEAD CI green | One immutable preflight, dispatch, watch, view, and evidence audit | Exactly one recovery dispatch; zero NuGet publish; strict remote-failure stop |
+| 16 | TASK-0254 three-platform smoke, public status, and provenance closure | PLANNED / SUCCESS-ONLY | Pin published smoke to RC1, synchronize public evidence, and close V100-09 only if complete | TASK-0253 complete success | Full local suite plus final three standard workflows | Second and final normal push; no immutable release mutation |
 
-NuGet `1.0.0-rc.1` remains immutable and unchanged; the RC release remains incomplete. Complete release remains `v0.2.0-alpha.4`. TASK-0250 consumed the one new recovery dispatch in run `29341087462`; its remote tag push was rejected and the single audit proved tag/release/assets/attestations absent. No retry/rerun/second dispatch, settings change, manual completion, NuGet operation, tag movement, force push, history rewrite, smoke-pin/V100-09 closure, or GA claim is authorized.
+NuGet `1.0.0-rc.1` remains immutable and unchanged; the RC release remains incomplete until TASK-0253 succeeds. Complete release remains `v0.2.0-alpha.4` at planning time. The existing exact tag is immutable and must not be created, pushed, moved, or deleted by this chain. Exactly one new `recover-existing` dispatch is authorized only after TASK-0252 CI is green; NuGet operation, normal publish, second dispatch/rerun, manual completion, settings change, force push, history rewrite, or GA claim remains prohibited.
 
 ## Historical Execution Record
 
