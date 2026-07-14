@@ -193,6 +193,7 @@ foreach ($marker in @(
         '$attestationExit = $LASTEXITCODE',
         '$attestationExit -eq 0',
         'HTTP/\S+\s+404\b',
+        '$global:LASTEXITCODE = 0',
         'return $false',
         'Unable to query exact release asset attestation state',
         "steps.attestation-state.outputs.nupkg_exists != 'true'",

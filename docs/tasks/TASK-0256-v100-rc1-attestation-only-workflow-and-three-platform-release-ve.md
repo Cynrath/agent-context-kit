@@ -118,7 +118,7 @@ Record implementation commit, local validation, standard CI runs/jobs, attestati
 
 ## Completion notes
 
-Status: `IMPLEMENTED / LOCAL VALIDATION PASS / HOSTED DISPATCH PENDING`.
+Status: `FIRST HOSTED DISPATCH FAILED PRE-ATTESTATION / ROOT CAUSE CORRECTED / RETRY VALIDATION PENDING`.
 
 - Added `attest-existing` to `.github/workflows/release.yml` with only `contents: read`, `id-token: write`, and `attestations: write`. It cannot publish NuGet, create/edit/upload/delete a release, or mutate/push a tag.
 - Before attestation it verifies current automation HEAD/origin, release ancestry, exact remote tag target, prepared body, non-draft prerelease identity/title, exact two asset names/sizes/API digests/downloaded hashes, NuGet repository signature/content equivalence, and repository commit.
@@ -127,4 +127,8 @@ Status: `IMPLEMENTED / LOCAL VALIDATION PASS / HOSTED DISPATCH PENDING`.
 - Added `scripts/verify-existing-release-assets.ps1` and network-free fixtures for wrong tag/target/title/body/draft state, missing/extra asset, size, API digest, and downloaded hash. Static negative fixtures reject NuGet publication, tag mutation, release creation, missing attestation verification, and missing macOS coverage.
 - Live read-only validation against release `353913024` exposed and corrected current `gh release view --json` title field usage from obsolete `title` to `name`; the exact live body/asset verification then passed.
 - Local validation passed: ACKit doctor 13/13; scan exit 0; restore; Release build 0 warnings/0 errors; 431/431 tests; focused exact-release/recovery/supply-chain fixtures; release/V100/security/supply-chain/Markdown gates; YAML parse; Unicode guard 0 before/0 after; tracked `.ackit` count 0; `git diff --check` clean.
-- Hosted standard CI, attestation dispatch, attestation IDs, and three-platform job evidence remain pending the implementation push.
+- Initial local implementation validation was complete before the first implementation push.
+- Implementation commit `0a9abd04cc515c049d60a7cbbcc2d446a355fb15` passed exact-HEAD standard runs: `ci` `29349381415`, `cross-platform-smoke` `29349381490`, and `cross-platform-source-smoke` `29349381465`.
+- First `attest-existing` dispatch run `29349599514`, job `87142124518`, passed safety and exact release/package verification, then stopped in `Query exact attestation state`. Both attestation actions, both CLI verifications, final recheck, and matrix job `87142353303` were skipped.
+- Root cause: the expected attestation HTTP 404 was correctly classified as absent, but its native `$LASTEXITCODE=1` remained at script end and made the step fail without throwing. One post-failure audit confirmed both attestations absent and tag `v1.0.0-rc.1` unchanged at the release commit.
+- Correction explicitly sets `$global:LASTEXITCODE = 0` only on the verified 404 path. Static regression coverage now fails if this accepted-404 exit-state reset is removed. No NuGet, tag, release, asset, or attestation mutation occurred in the failed run.

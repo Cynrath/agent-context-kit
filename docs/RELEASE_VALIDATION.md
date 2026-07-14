@@ -12,6 +12,8 @@ The manual `attest-existing` operation accepts the already complete exact releas
 
 `scripts/verify-existing-release-assets.ps1` implements the exact release/body/asset contract. `scripts/test-existing-release-assets.ps1` covers positive and wrong tag/target/title/body/draft/hash/size/API-digest/missing/extra-asset fixtures. Static workflow fixtures require both attestation actions, both CLI verifications, final immutable revalidation, and the Windows/Ubuntu/macOS installed-package matrix. Local implementation validation passed with 431/431 tests, ACKit, release/V100/supply-chain/Markdown gates, YAML parsing, Unicode guard 0/0, and no tracked `.ackit` artifact. Hosted evidence remains pending.
 
+Implementation commit `0a9abd04cc515c049d60a7cbbcc2d446a355fb15` passed all three standard workflows. First attestation run `29349599514` passed exact release/package gates, then failed pre-attestation because the verified-404 branch left native `$LASTEXITCODE=1`; no attestation or other immutable release mutation occurred. The accepted-404 path now resets only that known native failure state, and static coverage requires the reset before a corrected retry.
+
 ## TASK-0252–0254 Existing-Tag Recovery Closure Result
 
 TASK-0252 commit `5f6c4ce2d0ab9745207196e6b01371653adfe009` removed every recovery tag mutation, added exact-existing-tag and absent release/asset/attestation verification, passed 431/431 local tests, and passed standard runs `29344903472`, `29344903420`, and `29344903850`.

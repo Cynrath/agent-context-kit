@@ -759,6 +759,7 @@ jobs:
 
             $attestationText = ($attestationOutput | Out-String)
             if ($attestationText -match "(?m)^HTTP/\S+\s+404\b" -or $attestationText -match "\(HTTP 404\)") {
+              $global:LASTEXITCODE = 0
               return $false
             }
             throw "Unable to query exact release asset attestation state. gh exit code: $attestationExit"

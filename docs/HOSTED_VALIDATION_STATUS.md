@@ -6,6 +6,8 @@ Local authenticated account `Cynrath` with repository `ADMIN` permission complet
 
 TASK-0256 now has a locally green `attest-existing` implementation: exact release/body/assets and repository-signed NuGet equivalence precede two conditional attestations; both CLI verifications and final immutable recheck are mandatory; a dependent Windows/Ubuntu/macOS installed-package matrix follows. Local validation passed 431/431 tests, all focused/static gates, YAML parsing, ACKit, and Unicode 0/0. Hosted standard CI and manual attestation execution remain pending.
 
+Implementation commit `0a9abd04cc515c049d60a7cbbcc2d446a355fb15` passed standard runs `29349381415`, `29349381490`, and `29349381465`. First attestation run `29349599514`, job `87142124518`, passed safety and exact release/package verification but returned exit 1 after a correctly recognized absent-attestation HTTP 404 because native `$LASTEXITCODE` was not reset. Attestation creation/verification/final recheck and matrix `87142353303` were skipped. One audit confirmed both attestations absent and the exact tag unchanged. The correction resets native exit state only for the verified 404 and adds a static regression; no identical retry occurs before validation/push.
+
 ## TASK-0252 Standard CI — PASS
 
 TASK-0252 implementation commit `5f6c4ce2d0ab9745207196e6b01371653adfe009` passed `ci` run `29344903472`, published alpha4 `cross-platform-smoke` run `29344903420`, and `cross-platform-source-smoke` run `29344903850`. Source-smoke jobs `87125920260` (Windows), `87125920328` (Ubuntu), and `87125920330` (macOS) exercised the exact-existing-tag state fixtures and recovery static gates.
