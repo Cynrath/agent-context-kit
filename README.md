@@ -38,6 +38,26 @@ Default commands process repository content locally: no repository upload, AI AP
 
 ---
 
+## OpenAI Build Week 2026 — ACKit Optimize
+
+ACKit Optimize is new, post-`1.0.0-rc.1` current-source work: `ackit optimize` discovers supported AI-agent instruction surfaces, resolves nested `AGENTS.md` scope, reports stable duplication/conflict/safety/quality findings and deterministic context estimates, exports console/JSON/Markdown/SARIF/offline HTML, and can create an explicit-path review proposal without rewriting source files.
+
+The published RC1 foundation predates this feature. It was not republished or retroactively changed; use the source workflow below for judging.
+
+This Build Week work was developed in OpenAI Codex with GPT-5.6. Codex/GPT-5.6 assisted with repository inspection, implementation, tests, documentation, command execution, failure diagnosis, and read-only CI monitoring. The checked-in Optimize runtime itself is deterministic C#: it makes no model/API call, requires no API key, and never lets a model silently rewrite instructions. Product scope, acceptance criteria, safety/release policy, commit/push authorization, conflict resolution, proposal acceptance, and every release/package/tag/deployment decision remained human-controlled.
+
+```powershell
+dotnet restore AgentContextKit.sln
+dotnet build AgentContextKit.sln -c Release --no-restore
+Push-Location samples/ackit-optimize-demo
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json --proposal .ackit/reports/optimized-instructions.md
+Pop-Location
+```
+
+See [Build Week 2026 evidence and judging guide](docs/BUILD_WEEK_2026.md) for the pre-existing/new boundary, exact implementation commit range, model/human decision split, demo metrics, CI links, limitations, and reproducible validation.
+
+---
+
 ## Project Status
 
 | Area | Status |
@@ -50,6 +70,7 @@ Default commands process repository content locally: no repository upload, AI AP
 | Platforms | Windows, Ubuntu, macOS via GitHub Actions smoke flows |
 | Privacy model | Offline-first; no repository upload and no remote AI API calls in the MVP |
 | SARIF | `ackit sarif` is included in the published `1.0.0-rc.1` package |
+| Build Week feature | `ackit optimize` is verified in current source only; published RC1 predates it |
 
 ---
 
@@ -116,7 +137,7 @@ AgentContextKit gives teams a repeatable local workflow before they hand a repos
 | Scan repository | `ackit scan` | Stack, docs, tests, CI, Docker, agent files, risky paths |
 | Filter scan scope | `ackit scan --include <glob> --exclude <glob>` | Current-source ad-hoc include/exclude filters |
 | Fail CI on risk | `ackit scan --ci` | Non-zero exit on high or critical findings |
-| Audit agent instructions | `ackit optimize` | Post-RC1 current-source scope, conflict, quality, and context-cost findings; no source rewrite |
+| Audit agent instructions | `ackit optimize` | Post-RC1 current-source scope, conflict, quality, and context-cost findings plus optional explicit-path review proposal; no source rewrite/apply mode |
 | Record reviewed findings | `ackit baseline` | Sanitized local baseline for opt-in new-finding CI policy |
 | Generate SARIF | `ackit sarif` | Privacy-first SARIF 2.1.0 report from the published package or current source |
 | Build HTML report | `ackit report` | Offline static scan report |

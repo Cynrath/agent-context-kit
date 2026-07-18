@@ -103,4 +103,17 @@ Use normal successor commits to correct public docs or implementation. Never rew
 
 ## Completion notes
 
-Status: `PLANNED / DEPENDS ON TASK-0261`.
+Status: `ACTIVE / PUBLIC DOCUMENTATION PREPARED / LOCAL FINAL VALIDATION PASS / PUBLIC-DOC COMMIT PENDING`.
+
+Started from clean synchronized commit `7bf37cb83de64c7950e0bd27336fbc26758eb56a` after TASK-0261 CI, published-package smoke, and three-platform current-source smoke all completed successfully. Public documentation now distinguishes immutable RC1 from current-source Optimize, discloses Codex/GPT-5.6 assistance and human decision boundaries, and provides reproducible source/demo instructions. Exact TASK-0262 commits, final validation totals, hosted runs, and clean local/origin equality will be recorded only after they exist.
+
+Local pre-commit validation on 2026-07-18:
+
+- Installed ACKit `1.0.0-rc.1`: version commands PASS; config-check default valid with 0 diagnostics; doctor 13/13 PASS; `scan --ci` exit 0 over 663 files with only reviewed Medium/Low historical findings.
+- Current source: config-check PASS; doctor 13/13 PASS; `scan --ci` exit 0 over 663 files with the same reviewed findings.
+- Restore PASS; Release build PASS with 0 warnings and 0 errors; full suite 463 passed, 0 failed, 0 skipped; focused Optimize Core/report/proposal/demo/CLI filter 31 passed, 0 failed, 0 skipped.
+- CLI contract, EN/TR localization parity, JSON schemas/goldens/live contract tests, config/generated conventions, package metadata, sample smoke, and local Markdown links (464 files, 222 targets) PASS.
+- Demo smoke PASS for console, JSON stdout/file, Markdown, SARIF 2.1.0, self-contained offline HTML, and proposal: 4 sources, 16 rules, 4 scopes, 1 valid override, 10 findings, 270 whole-surface estimated tokens, and proposal 192 -> 156. `--ci` returned expected exit 2; source files matched HEAD and before/after hashes; all generated outputs were removed.
+- Installed/current-source public-release redact check returned expected exit 1 for the same five pre-existing Low local-path findings. Changed-file hygiene found 0 absolute local-path files, 0 secret-token files, and 0 email/PII files. No tracked `.ackit`, `bin`, `obj`, Node dependency, SARIF, or package artifact matched the hygiene gate.
+- `git diff --check` PASS. Optional repository-wide formatter returned exit 2 only for five pre-existing `FINALNEWLINE` diagnostics in untouched tests; all five matched the previously recorded list and there was no unexpected finding.
+- Read-only immutable-release check: local and remote `v1.0.0-rc.1` resolve to `258918b33c3d1359aac967604ee524e8b66ddf02`; prerelease ID `353913024` remains non-draft with target `258918b...`; exact asset IDs `476881883`/`476881892`, sizes `218322`/`50053`, and SHA-256 digests match the historical record; each digest still has exactly one repository attestation. No release/tag/asset/attestation mutation command was issued.

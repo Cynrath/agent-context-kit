@@ -6,6 +6,7 @@
 - `docs/FIRST_FIVE_MINUTES.md`: published-tool tutorial from install to scan, generated context, and first task.
 - `docs/PREPARE_REPOSITORY_FOR_AI_AGENTS.md`: existing-repository security, config, agent instruction, task-first, and CI-readiness workflow.
 - `docs/PRODUCT_SPEC.md`: product scope and MVP goals.
+- `docs/BUILD_WEEK_2026.md`: ACKit Optimize pre-existing/new boundary, exact implementation range, Codex/GPT-5.6 and human-control disclosure, judging workflow, evidence, and limitations.
 - `docs/ROADMAP.md`: version roadmap.
 - `docs/RELATED_PROJECTS.md`: initial related-tool license, offline, overlap, complement, privacy, and decision matrix.
 - `docs/OFFLINE_OSS_ECOSYSTEM.md`: offline-first evaluation criteria and ecosystem category model.
@@ -25,7 +26,7 @@
 - `docs/EXAMPLES.md`: common command flows.
 - `docs/EXAMPLE_WORKFLOWS.md`: copy-paste-ready local workflow collections.
 - `docs/SAMPLE_GALLERY.md`: sample repository gallery with expected stacks, health gaps, commands, and risk behavior.
-- `docs/DEMO_SCENARIOS.md`: guided published package, source, sample, Web UI, report, and SARIF demos.
+- `docs/DEMO_SCENARIOS.md`: guided published package, ACKit Optimize Build Week, source, sample, Web UI, report, and SARIF demos.
 - `docs/GITHUB_ACTIONS_USAGE.md`: GitHub Actions CI usage, SARIF, and smoke workflow guidance.
 - `docs/CODE_SCANNING_DECISION.md`: CodeQL and Code Scanning default/opt-in decision.
 - `docs/SARIF_UPLOAD_WORKFLOW_DESIGN.md`: manual, job-scoped Code Scanning upload design.

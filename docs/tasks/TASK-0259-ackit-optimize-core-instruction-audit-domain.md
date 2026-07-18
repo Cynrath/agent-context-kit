@@ -101,7 +101,7 @@ Remove the additive Core files/tests through a normal successor commit. Existing
 
 ## Completion notes
 
-Status: `IMPLEMENTED / LOCAL VALIDATION PASS / HOSTED CI PENDING`.
+Status: `COMPLETED / COMMIT d49bd446 / LOCAL AND HOSTED VALIDATION PASS`.
 
 - Added the dependency-free `IInstructionAuditor`, source/scope/rule/finding/metrics domain, 15 stable `ACKITOPT001`-`ACKITOPT015` rules, deterministic fingerprints/order, conservative Markdown and Continue JSON parsing, nested `AGENTS.md` precedence, valid scoped-override classification, stale-reference checks, cancellation, and local `ceil(characters / 4)` context estimates.
 - Added a synthetic nested-scope fixture and 12 focused regression tests covering all 15 rule IDs, source lines, valid overrides, ignore/include/exclude behavior, stable ordering/metrics, cancellation, stale dot-directory paths, historical-context exclusion, and secret-safe finding evidence.
@@ -110,4 +110,8 @@ Status: `IMPLEMENTED / LOCAL VALIDATION PASS / HOSTED CI PENDING`.
 - Current-source `doctor`: 13/13 PASS. Current-source `scan --ci`: exit 0 over 646 files with no Critical/High finding; only pre-existing classified Medium/Low repository-artifact findings remain.
 - Whitespace formatting verification passes for all new/modified Optimize source and test files. The repository-wide optional format check separately reports only five pre-existing task-unrelated test files with missing final newlines; none was modified or suppressed.
 - Real-repository dogfood: 9 instruction sources, 123 parsed rules, 52 resolved scopes, 1 valid scoped override, and 51 review findings. The only stale-reference findings are inside the intentionally invalid synthetic fixture.
-- No implementation commit or hosted result is claimed yet; those are recorded after the focused Core push exists.
+- Exact task commit: `d49bd446b227b1b77038b50f2f704c483168af52`.
+- CI run `29650061884`: PASS — https://github.com/Cynrath/agent-context-kit/actions/runs/29650061884
+- Published-package smoke run `29650061875`: PASS — https://github.com/Cynrath/agent-context-kit/actions/runs/29650061875
+- Current-source smoke run `29650061881`: PASS — https://github.com/Cynrath/agent-context-kit/actions/runs/29650061881
+- No workflow dispatch/rerun, package publication, release/tag/asset/attestation mutation, deployment, or immutable RC1 change occurred.

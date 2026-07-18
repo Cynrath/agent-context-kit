@@ -15,10 +15,10 @@ AgentContextKit MVP is local-only.
 - No automatic redaction is performed.
 
 ## Generated Output
-Generated files can include project structure and stack information. Review generated files before committing or sharing them.
+Generated files can include project structure, stack information, instruction wording, relative source paths, and source line mappings. Review generated files before committing or sharing them.
 
 ## Risk Reports
-Human, JSON, HTML, Web UI, baseline, and SARIF outputs omit raw scanner match values. Paths, rule metadata, messages, and finding existence can still be sensitive, so treat reports as local review artifacts until approved for sharing.
+Human, JSON, HTML, Web UI, baseline, and SARIF outputs omit raw scanner match values. Optimize finding outputs use sanitized evidence; review proposals additionally sanitize recognized secret/PII/local-path patterns before rendering retained instruction text. Relative paths, rule metadata, instruction meaning, messages, and finding existence can still be sensitive, so treat reports/proposals as local review artifacts until approved for sharing.
 
 ## User Responsibility
 Before publishing a repository, manually review:

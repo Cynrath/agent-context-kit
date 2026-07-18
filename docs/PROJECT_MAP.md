@@ -38,6 +38,7 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - `CONTRIBUTING.md`
 - `docs/AI_WORKFLOW.md`
 - `docs/BASELINE_MODEL.md`
+- `docs/BUILD_WEEK_2026.md`
 - `docs/CONFIGURATION_DIAGNOSTICS.md`
 - `docs/ARCHITECTURE.md`
 - `docs/ECOSYSTEM_POSITIONING.md`

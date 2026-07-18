@@ -92,7 +92,7 @@ Remove the additive proposal generator/option/fixture/docs via normal successor 
 
 ## Completion notes
 
-Status: `IMPLEMENTED / LOCAL VALIDATION PASS / COMMIT AND HOSTED VALIDATION PENDING`.
+Status: `COMPLETED / COMMIT 7bf37cb / LOCAL AND HOSTED VALIDATION PASS`.
 
 Implemented so far:
 
@@ -110,10 +110,18 @@ Local completion evidence on 2026-07-18:
 - Proposal safety coverage: success/error source hashes, explicit path/extension/containment, instruction-source rejection, symbolic-link/junction rejection where supported, atomic create-new concurrency, skip-existing, cancellation, secret/PII/local-path sanitization, mandatory-category retention, source mapping, unresolved decisions, and deterministic ordering all PASS.
 - Demo smoke: console, JSON stdout/file, Markdown, SARIF 2.1.0, self-contained HTML, and proposal PASS; 4 sources, 16 rules, 4 scopes, 1 valid override, 10 findings, 270 whole-surface estimated tokens, and parsed-rule proposal 192 -> 156 (36 avoided). Re-run skipped the existing proposal; all four source instruction SHA-256 hashes remained unchanged; generated `.ackit` output was removed.
 - CLI contract, EN/TR localization parity, JSON schema/golden/live outputs, Markdown links, config/generated conventions, package metadata, and sample smoke gates: PASS.
-- Installed and current-source doctor: 13/13 PASS. Installed/current-source `scan --ci`: exit 0 with only previously reviewed Medium/Low repository findings and no new Optimize-task finding. Installed/current-source public-release redact check: exit 0 with only five pre-existing Low local-path findings outside this task.
+- Installed and current-source doctor: 13/13 PASS. Installed/current-source `scan --ci`: exit 0 with only previously reviewed Medium/Low repository findings and no new Optimize-task finding. Installed/current-source public-release redact check: expected exit 1 with exactly five pre-existing Low local-path findings outside this task and no new Optimize-task finding.
 - Changed-file format verification: PASS. Repository-wide `dotnet format --verify-no-changes` reports only five pre-existing `FINALNEWLINE` findings in untouched tests (`CatalogRuleStabilityTests.cs`, `NightlyWorkflowYamlGuardTests.cs`, `PromptPackEdgeCaseTests.cs`, `SarifRoundtripTests.cs`, and `ScanIncludeExcludeTests.cs`); they are not regressions and were not broadened into this task.
 - `git diff --check`: PASS. No generated `.ackit`, package, SARIF, HTML, proposal, `bin`, or `obj` artifact is intended for tracking.
 
 Data/migration/security/permission/compatibility/deployment impact: no database or migration; additive current-source CLI/schema behavior; local reads and one explicit atomic non-overwriting Markdown artifact write; no credential, permission, provider, telemetry, upload, deployment, publication, release, tag, asset, attestation, or immutable RC1 mutation.
 
 Rollback: remove the additive proposal interface/models/generator/CLI option/schema metadata, demo fixture/tests/docs, and source-smoke assertion in a normal successor commit. Source instructions need no restoration because the implementation never changes them.
+
+Commit and hosted evidence:
+
+- Exact task commit: `7bf37cb83de64c7950e0bd27336fbc26758eb56a`.
+- CI run `29653163763`: PASS — https://github.com/Cynrath/agent-context-kit/actions/runs/29653163763
+- Published-package cross-platform smoke run `29653163773`: PASS — https://github.com/Cynrath/agent-context-kit/actions/runs/29653163773
+- Current-source cross-platform smoke run `29653163760`: PASS on Windows, Ubuntu, and macOS, including Optimize JSON/proposal/SARIF assertions — https://github.com/Cynrath/agent-context-kit/actions/runs/29653163760
+- All hosted runs target exact commit `7bf37cb83de64c7950e0bd27336fbc26758eb56a`; no manual dispatch/rerun occurred.

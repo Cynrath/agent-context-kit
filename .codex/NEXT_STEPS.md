@@ -6,7 +6,8 @@
 - TASK-0258 planning commit `a227c045` is pushed; `ci` `29648931050`, published smoke `29648931085`, and source smoke `29648931149` passed without manual dispatch.
 - TASK-0259 Core is committed/pushed at `d49bd446`; `ci` `29650061884`, published smoke `29650061875`, and source smoke `29650061881` passed.
 - TASK-0260 is complete at `c79932a`; CI, source-package smoke, and published-package smoke all passed (`29651733106`, `29651733085`, `29651733087`).
-- TASK-0261 proposal/demo implementation is locally complete: 463/463 tests, zero-warning build, all task gates, and six-format no-mutation demo smoke pass. Commit/push separately, verify all three hosted workflows, then continue without stopping through TASK-0262.
+- TASK-0261 proposal/demo is complete at `7bf37cb8`; 463/463 tests, zero-warning build, all task gates, six-format no-mutation demo smoke, and hosted runs `29653163763`, `29653163773`, and `29653163760` passed.
+- TASK-0262 is active and locally green: public Build Week docs plus restore, build 0/0, full 463/463, focused 31/31, demo/contracts/security/docs/ACKit gates passed. Make the focused public-doc commit and verify its three workflows, then add the exact evidence closure commit, verify final workflows, and finish with clean local/origin equality.
 - Keep Optimize deterministic, offline, non-overwriting, current-source-only until a separate human release decision.
 - Do not dispatch workflows, publish packages, mutate tags/releases/assets/attestations, deploy, change settings/secrets, force-push, or rewrite history.
 

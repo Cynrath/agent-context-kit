@@ -37,6 +37,12 @@ AgentContextKit runs locally against a repository path. The MVP does not upload 
 - SARIF artifacts use repository-relative paths and do not include raw scanner match values.
 - GitHub Code Scanning upload is not automatic; upload workflows remain maintainer-only and example-only unless explicitly enabled.
 
+## ACKit Optimize Safety Boundary
+
+Current-source `ackit optimize` is deterministic and local. Audit mode is read-only. Report/proposal writes require explicit repository-relative paths, reject traversal, and skip existing targets. Proposal output additionally rejects supported instruction-source targets and existing symbolic-link/junction parent traversal, uses atomic create-new writes, sanitizes recognized secret/PII/local-path values, maps consolidations to source lines, retains mandatory safety/verification/deployment/documentation/release rules, and leaves conflicts or unsafe actions unresolved. There is no apply mode and no model/API call.
+
+Optimize JSON/SARIF omit raw instruction bodies. The review proposal necessarily carries sanitized candidate wording and relative provenance, so it remains a local artifact until a human privacy and semantic review approves sharing or source edits.
+
 ## Scanner Precision Notes
 - The full "User Action Per Severity" table lives in `docs/SCANNER_RULES.md`; this model defers to that table for operator guidance.
 - Real environment files such as `.env` and `.env.local` are Critical.

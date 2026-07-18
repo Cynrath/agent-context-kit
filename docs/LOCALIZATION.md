@@ -43,7 +43,7 @@ Every command that advertises `--lang en|tr` is covered by the localization pari
 
 Human-readable headings, labels, summaries, yes/no values, generated-file statuses, and known argument errors may be localized. Stack names, severity enum names, scanner rule IDs, configuration diagnostic codes, file paths, and Core diagnostic/finding messages remain stable technical values.
 
-`ackit optimize` follows the same boundary. Console headings, metric labels, review warnings, generated-file status, and known argument errors have English/Turkish parity. `ACKITOPT` IDs, severity/category tokens, fingerprints, paths, normalized evidence/remediation, JSON fields, SARIF fields, and process exit decisions remain language-independent.
+`ackit optimize` follows the same boundary. Console headings, metric labels, review warnings, report/proposal generated-file status, and known format/output/proposal argument errors have English/Turkish parity. The proposal document itself is a technical English review artifact. `ACKITOPT` IDs, severity/category tokens, fingerprints, paths, normalized evidence/remediation, proposal mappings/metrics, JSON fields, SARIF fields, and process exit decisions remain language-independent.
 
 JSON field names, command names, status tokens, rule IDs, diagnostic codes, and exit codes remain language-independent. JSON and SARIF must not gain translated aliases or language-specific values.
 

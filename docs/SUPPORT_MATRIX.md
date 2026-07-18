@@ -34,6 +34,7 @@ This matrix documents the tested and intended support surface for AgentContextKi
 - Scanning: `ackit scan`, `ackit scan --ci`, `ackit scan --json`.
 - Generation: `ackit generate`, `ackit task`.
 - Local artifacts: `ackit report`, `ackit webui`, `ackit prompt-pack`, `ackit context-export`.
+- Current-source instruction audit: `ackit optimize` console/JSON/Markdown/SARIF/offline HTML and explicit review proposal. Published `1.0.0-rc.1` predates this command.
 - Safety checks: `ackit redact-check`, `ackit doctor`.
 - Local automation helpers: `ackit mcp`, `ackit watch`, `ackit diff`, `ackit trim`.
 
@@ -45,7 +46,7 @@ This matrix documents the tested and intended support surface for AgentContextKi
 - Running without a supported .NET tool host.
 
 ## Validation Source
-The current support claim is based on local validation plus GitHub Actions `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` success for Windows, Ubuntu, and macOS.
+The current support claim is based on local validation plus GitHub Actions `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` success for Windows, Ubuntu, and macOS. Build Week source-smoke run `29653163760` exercises Optimize JSON, proposal creation, proposal review markers, and SARIF from the exact implementation SHA `7bf37cb83de64c7950e0bd27336fbc26758eb56a` on all three operating systems.
 
 TASK-0058 read-only GitHub CLI observation confirmed all three workflows are passing on latest `master`.
 

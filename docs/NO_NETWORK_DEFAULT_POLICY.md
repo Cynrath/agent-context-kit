@@ -5,10 +5,10 @@ Status: authoritative documentation for current default AgentContextKit behavior
 ## Default Guarantee Boundary
 After the tool is installed, normal AgentContextKit commands operate on local repository files and do not upload repository content, call an AI/model API, invoke an external tool, send telemetry, create a hosted report, upload SARIF, push Git, publish packages, or modify remote repository/security settings.
 
-Default commands include local scan, doctor, config diagnostics, baseline, SARIF/report/Web UI generation, prompt-pack dry run, approved local context-export manifest, agent file generation, and task/handoff generation.
+Default commands include local scan, doctor, config diagnostics, baseline, SARIF/report/Web UI generation, prompt-pack dry run, approved local context-export manifest, agent file generation, task/handoff generation, and current-source `ackit optimize` instruction auditing/proposal generation.
 
 ## Local Outputs
-Generated `.ackit/` reports, Web UI, prompt packs, context exports, SARIF, baselines, and external-tool experiments are local artifacts. Ignore rules and repository-relative output checks reduce accidental commits, but users must still review `git status` and content before sharing.
+Generated `.ackit/` reports, Web UI, prompt packs, context exports, SARIF, Optimize reports/proposals, baselines, and external-tool experiments are local artifacts. Ignore rules and repository-relative output checks reduce accidental commits, but users must still review `git status` and content before sharing. Optimize does not call GPT-5.6 or another model at runtime; its audit/proposal path is deterministic local code.
 
 ## What Offline Does Not Mean
 - Package/tool installation itself may require a package source.
