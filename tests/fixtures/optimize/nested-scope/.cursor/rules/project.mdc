@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+
+# Cursor rules
+
+- Keep release tags immutable.

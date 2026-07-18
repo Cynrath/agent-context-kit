@@ -2,11 +2,14 @@
 
 ## Active snapshot — OpenAI Build Week 2026 ACKit Optimize (2026-07-18)
 
-- Entry state: clean `master` and `origin/master` at `6998e269af4962bbe70a9cb4044727d25dc1a06d`.
+- Entry baseline: clean `master` and `origin/master` at `6998e269af4962bbe70a9cb4044727d25dc1a06d`.
 - Baseline: installed `AgentContextKit 1.0.0-rc.1`; report-only scan and `scan --ci` exit 0 over 626 files; doctor 13/13 PASS; restore PASS; Release build 0 warnings/0 errors; tests 431 passed, 0 failed, 0 skipped.
 - Verified gap: no `ackit optimize` help/CLI entry and no Core instruction discovery/scope/normalization/metrics/finding/proposal model. This is new post-RC1 Build Week scope, not an RC1 defect or retroactive release claim.
-- Task chain created with installed `ackit task`: TASK-0258 baseline/control (active), TASK-0259 Core domain, TASK-0260 CLI/outputs, TASK-0261 proposal/demo, TASK-0262 documentation/final validation.
-- Next exact action: validate and separately commit/push planning/control docs, verify push-triggered CI, then implement TASK-0259.
+- Task chain created with installed `ackit task`: TASK-0258 baseline/control, TASK-0259 Core domain (active), TASK-0260 CLI/outputs, TASK-0261 proposal/demo, TASK-0262 documentation/final validation.
+- TASK-0258 planning commit `a227c04531ed085ef08d6ee722d904011d21401c` is pushed. Push-triggered runs `29648931050`, `29648931085`, and `29648931149` passed; no workflow dispatch occurred.
+- TASK-0259 local state: dependency-free Core auditor and synthetic fixture are implemented; 15 stable rules, nested scope/precedence, conservative normalization, metrics, cancellation, stale-path and safety checks are covered. Focused tests pass 12/12, full tests 443/443, build 0 warnings/errors, current-source doctor 13/13, and scan exit 0 with no High/Critical finding.
+- Real-repository dogfood resolves 9 durable instruction sources, 123 rules, 52 scopes, 1 valid override, and 51 findings. Generated historical handoff/context logs are intentionally excluded from instruction discovery.
+- Next exact action: run final TASK-0259 repository gates, commit/push the focused Core phase, verify push-triggered CI, then implement TASK-0260.
 - Authorization: normal focused commits/pushes plus read-only push-triggered CI monitoring. Prohibited: workflow dispatch/rerun, deployment, publication, tag/release/asset/attestation mutation, settings/secrets changes, force push/history rewrite, or GA claim.
 - Build Week range: `6998e269af4962bbe70a9cb4044727d25dc1a06d..FINAL_HEAD`; final SHA is intentionally unset until verified.
 

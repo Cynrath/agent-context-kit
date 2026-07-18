@@ -107,6 +107,9 @@ Use normal successor commits to remove or correct Build Week planning records. N
 
 ## Completion notes
 
-Status: `IN PROGRESS / PLANNING BASELINE VERIFIED`.
+Status: `COMPLETED`.
 
-Planning commit and hosted CI evidence will be recorded after the separate planning push.
+- Planning/control commit: `a227c04531ed085ef08d6ee722d904011d21401c` (`docs: plan ACKit Optimize build week work`), normally pushed to `origin/master` from the clean baseline.
+- Push-triggered CI passed: `ci` run `29648931050` (Windows and Ubuntu), published-package `cross-platform-smoke` run `29648931085`, and source `cross-platform-source-smoke` run `29648931149` (Ubuntu, Windows, and macOS).
+- No workflow was manually dispatched. No package, tag, release, asset, attestation, deployment, setting, secret, or immutable RC1 evidence was mutated.
+- TASK-0259 implementation began only after the separate planning push and hosted checks passed.

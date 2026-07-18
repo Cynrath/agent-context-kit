@@ -10,7 +10,7 @@ At baseline commit `6998e269af4962bbe70a9cb4044727d25dc1a06d`, Core can enumerat
 
 ## Scope
 
-- Discover root and nested `AGENTS.md` plus supported Claude, Anthropic, Copilot, Cursor, Continue, Codex handoff/context, and workflow/development instruction surfaces.
+- Discover root and nested `AGENTS.md` plus supported Claude, Anthropic, Copilot, Cursor, Continue, and workflow/development instruction surfaces. Historical generated handoff/context logs are deliberately not treated as durable instruction sources.
 - Reuse repository ignore-directory, `.ackit` config ignore-path, and optional include/exclude glob conventions without reading dependency/generated/binary content.
 - Record normalized repository-relative path, source type, directory scope, deterministic precedence, inheritance behavior, character/word/line/token estimates, and parsed rules with original source location.
 - Resolve applicable instruction sources for deterministic repository subtrees and identify valid narrower `AGENTS.md` overrides without treating every override as a conflict.
@@ -101,4 +101,13 @@ Remove the additive Core files/tests through a normal successor commit. Existing
 
 ## Completion notes
 
-Status: `PLANNED / BLOCKED ON TASK-0258 PLANNING COMMIT`.
+Status: `IMPLEMENTED / LOCAL VALIDATION PASS / HOSTED CI PENDING`.
+
+- Added the dependency-free `IInstructionAuditor`, source/scope/rule/finding/metrics domain, 15 stable `ACKITOPT001`-`ACKITOPT015` rules, deterministic fingerprints/order, conservative Markdown and Continue JSON parsing, nested `AGENTS.md` precedence, valid scoped-override classification, stale-reference checks, cancellation, and local `ceil(characters / 4)` context estimates.
+- Added a synthetic nested-scope fixture and 12 focused regression tests covering all 15 rule IDs, source lines, valid overrides, ignore/include/exclude behavior, stable ordering/metrics, cancellation, stale dot-directory paths, historical-context exclusion, and secret-safe finding evidence.
+- Historical `.codex/HANDOFF.md` and `.codex/CONTEXT_PACK.md` artifacts were excluded after dogfood proved they contain narrative state rather than durable instructions; scanning them produced non-actionable historical conflict noise.
+- Focused tests: 12 passed, 0 failed, 0 skipped. Full suite: 443 passed, 0 failed, 0 skipped. Release build: 0 warnings, 0 errors.
+- Current-source `doctor`: 13/13 PASS. Current-source `scan --ci`: exit 0 over 646 files with no Critical/High finding; only pre-existing classified Medium/Low repository-artifact findings remain.
+- Whitespace formatting verification passes for all new/modified Optimize source and test files. The repository-wide optional format check separately reports only five pre-existing task-unrelated test files with missing final newlines; none was modified or suppressed.
+- Real-repository dogfood: 9 instruction sources, 123 parsed rules, 52 resolved scopes, 1 valid scoped override, and 51 review findings. The only stale-reference findings are inside the intentionally invalid synthetic fixture.
+- No implementation commit or hosted result is claimed yet; those are recorded after the focused Core push exists.

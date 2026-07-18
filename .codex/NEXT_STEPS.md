@@ -2,9 +2,10 @@
 
 ## Active Build Week sequence (2026-07-18)
 
-- Baseline is clean/synchronized `master` at `6998e269af4962bbe70a9cb4044727d25dc1a06d`; installed tool is immutable RC1 and the baseline suite is 431/431 green with 0 build warnings/errors.
-- Finalize TASK-0258 task/queue/handoff documentation, run planning gates, commit/push separately, and verify push-triggered hosted CI.
-- Continue without stopping through TASK-0259, TASK-0260, TASK-0261, and TASK-0262 in order.
+- Baseline is `6998e269af4962bbe70a9cb4044727d25dc1a06d`; installed tool is immutable RC1 and the baseline suite was 431/431 green with 0 build warnings/errors.
+- TASK-0258 planning commit `a227c045` is pushed; `ci` `29648931050`, published smoke `29648931085`, and source smoke `29648931149` passed without manual dispatch.
+- TASK-0259 Core is implemented locally: 12/12 focused and 443/443 full tests pass, Release build is 0/0, current-source ACKit has no High/Critical finding, and dogfood is bounded to 51 review findings across 9 durable instruction surfaces. Commit/push and hosted CI are next.
+- Continue without stopping through TASK-0260, TASK-0261, and TASK-0262 in order after the TASK-0259 push-triggered checks pass.
 - Keep Optimize deterministic, offline, non-overwriting, current-source-only until a separate human release decision.
 - Do not dispatch workflows, publish packages, mutate tags/releases/assets/attestations, deploy, change settings/secrets, force-push, or rewrite history.
 

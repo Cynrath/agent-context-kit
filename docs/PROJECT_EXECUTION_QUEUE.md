@@ -6,8 +6,8 @@ Clean synchronized baseline: `6998e269af4962bbe70a9cb4044727d25dc1a06d` on 2026-
 
 | Order | Status | Task | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
-| BW1 | In progress | TASK-0258 Build Week baseline and control | Pin baseline, scope, evidence, tasks, and authorization before code | Clean synchronized `6998e269...` | ACKit/Git/docs/tracked-file/diff gates; separate planning push and CI | Normal planning push only |
-| BW2 | Planned | TASK-0259 Optimize Core audit domain | Discovery, nested scope/inheritance, normalization, metrics, stable findings | TASK-0258 planning commit/CI | Focused Core tests, full build/test, ACKit gates | Normal validated push only |
+| BW1 | Completed | TASK-0258 Build Week baseline and control | Pin baseline, scope, evidence, tasks, and authorization before code | Clean synchronized `6998e269...` | Planning commit `a227c045`; runs `29648931050`, `29648931085`, `29648931149` PASS | Normal planning push completed; no dispatch |
+| BW2 | In progress / local pass | TASK-0259 Optimize Core audit domain | Discovery, nested scope/inheritance, normalization, metrics, stable findings | TASK-0258 planning commit/CI PASS | 12/12 focused; 443/443 full; build 0/0; ACKit no High/Critical; hosted CI pending push | Normal validated push only |
 | BW3 | Planned | TASK-0260 Optimize CLI and outputs | Console/JSON/Markdown/SARIF/offline HTML, schemas, localization, exits | TASK-0259 | CLI/output/golden/localization/full tests and source smoke | Normal validated push only |
 | BW4 | Planned | TASK-0261 non-destructive proposal and demo | Explicit-path proposal, mappings, unresolved decisions, synthetic demo | TASK-0260 | Mutation guards, fixture/golden/demo/full tests | Normal validated push only |
 | BW5 | Planned | TASK-0262 Build Week docs and final validation | Public attribution/evidence, reproducible judging, full local/hosted closure | TASK-0261 | Complete Phase 6 gates plus final push-triggered CI | No release/package/tag/deploy action |

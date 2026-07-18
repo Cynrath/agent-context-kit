@@ -9,6 +9,15 @@ public interface IRepositoryScanner
         IReadOnlyList<string>? excludeGlobs = null);
 }
 
+public interface IInstructionAuditor
+{
+    InstructionAuditResult Audit(
+        string repositoryPath,
+        AckitConfig? config = null,
+        InstructionAuditOptions? options = null,
+        CancellationToken cancellationToken = default);
+}
+
 public interface IStackDetector
 {
     IReadOnlyList<StackInfo> Detect(string repositoryPath, IReadOnlyList<string> relativeFiles);
