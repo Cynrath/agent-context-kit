@@ -43,6 +43,13 @@ $samples = @(
             @{ Args = @("scan", "--ci") },
             @{ Args = @("redact-check", "--profile", "public-release") }
         )
+    },
+    @{
+        Name = "ackit-optimize-demo"
+        Path = "samples/ackit-optimize-demo"
+        Commands = @(
+            @{ Args = @("optimize", "--json") }
+        )
     }
 )
 

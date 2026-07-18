@@ -99,7 +99,7 @@ Remove the additive command, writers, schema branch, docs, and tests with a norm
 
 ## Completion notes
 
-Status: `IMPLEMENTED / LOCAL VALIDATION PASS / HOSTED VALIDATION PENDING`.
+Status: `COMPLETED / COMMIT c79932a / LOCAL AND HOSTED VALIDATION PASS`.
 
 Implemented current-source surfaces:
 
@@ -118,6 +118,13 @@ Local evidence on 2026-07-18:
 - Installed/current-source doctor: 13/13 PASS. Installed/current-source `scan --ci`: exit 0 with the previously reviewed Medium/Low repository findings and no High/Critical finding.
 - CLI contract, localization parity, JSON contract assets, Markdown links, and config/generated conventions: passed. `git diff --check`: passed.
 - The tracked-versus-untracked guard correctly remains pending until this task's five new files are staged/committed; it will be rerun before push.
+
+Commit and hosted evidence:
+
+- Exact task commit: `c79932af3271038e00a37270c50a6fb518e8db38`.
+- CI run `29651733106`: PASS — https://github.com/Cynrath/agent-context-kit/actions/runs/29651733106
+- Source-package smoke run `29651733085`: PASS — https://github.com/Cynrath/agent-context-kit/actions/runs/29651733085
+- Published-package smoke run `29651733087`: PASS — https://github.com/Cynrath/agent-context-kit/actions/runs/29651733087
 
 Data/migration/security/permission/deployment impact: no database or migration; local reads and explicit non-overwriting local report writes only; no new permission, provider, telemetry, upload, deployment, publication, tag, release, asset, or attestation action.
 

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace AgentContextKit.Core;
 
@@ -35,6 +36,7 @@ public sealed class InstructionAuditReportWriter : IInstructionAuditReportWriter
             exitCode = context.ExitCode,
             format = "json",
             output,
+            proposal = context.Proposal is null ? null : ToProposal(context.Proposal),
             auditSummary = BuildSummary(result),
             instructionMetrics = ToMetrics(result.Metrics),
             sources = result.Sources.Select(source => new
@@ -404,6 +406,25 @@ public sealed class InstructionAuditReportWriter : IInstructionAuditReportWriter
         };
     }
 
+    private static object ToProposal(InstructionOptimizationProposalOutputInfo proposal)
+    {
+        return new
+        {
+            output = proposal.Output,
+            metrics = new
+            {
+                before = ToContentMetrics(proposal.Metrics.Before),
+                after = ToContentMetrics(proposal.Metrics.After),
+                saved = ToContentMetrics(proposal.Metrics.Saved),
+                estimationMethod = proposal.Metrics.EstimationMethod
+            },
+            retainedRuleCount = proposal.RetainedRuleCount,
+            consolidationCount = proposal.ConsolidationCount,
+            unresolvedDecisionCount = proposal.UnresolvedDecisionCount,
+            mandatoryConstraintCategories = proposal.MandatoryConstraintCategories
+        };
+    }
+
     private static object ToLocation(InstructionLocation location)
     {
         return new
@@ -530,7 +551,8 @@ public sealed class InstructionAuditReportWriter : IInstructionAuditReportWriter
         return new JsonSerializerOptions
         {
             WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
     }
 

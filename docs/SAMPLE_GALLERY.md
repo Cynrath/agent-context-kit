@@ -16,6 +16,7 @@ For scanner configuration examples that are safe to copy into demo repositories,
 | `samples/node-tooling` | Node, TypeScript, and Tailwind CSS sample stack detection without `node_modules`. |
 | `samples/generic-empty-repo` | Missing repository health signals in a nearly empty repository. |
 | `samples/security-fixture-repo` | Safe security fixture wording without real secrets or exact sensitive token prefixes. |
+| `samples/ackit-optimize-demo` | Post-RC1 Build Week instruction audit with nested scope, duplicates, a real conflict, a valid override, stale/vague rules, and non-destructive proposal metrics. |
 
 ## `samples/dotnet-console`
 - Path: `samples/dotnet-console`
@@ -170,3 +171,26 @@ Pop-Location
 Do not commit generated `.ackit/` outputs. They can contain local paths and are not public release artifacts.
 
 Public screenshots from samples must follow [VISUAL_ASSETS.md](VISUAL_ASSETS.md) and [WEB_UI_PREVIEW.md](WEB_UI_PREVIEW.md). Prefer sanitized screenshots from safe sample repositories when README visuals are added.
+
+## `samples/ackit-optimize-demo`
+
+- Path: `samples/ackit-optimize-demo`
+- Purpose: safe synthetic judging fixture for current-source ACKit Optimize; it is not part of the immutable `1.0.0-rc.1` package.
+- Instruction surfaces: root `AGENTS.md`, nested `src/web/AGENTS.md`, root `CLAUDE.md`, and `docs/AI_WORKFLOW.md`.
+- Expected scope behavior: four sources, four resolved scopes, and one valid npm-to-pnpm subtree override.
+- Expected audit: 16 parsed rules and 10 findings: two `ACKITOPT001`, one `ACKITOPT002`, two `ACKITOPT007`, one each of `ACKITOPT008`, `ACKITOPT009`, `ACKITOPT012`, `ACKITOPT013`, and `ACKITOPT014`.
+- Expected whole-surface estimate: 1,080 characters, 142 words, 39 lines, and 270 estimated tokens; duplicated estimate 24 tokens and avoidable estimate 35 tokens.
+- Expected proposal rule-body metrics: 765 characters / 115 words / 16 lines / 192 estimated tokens before; 624 / 92 / 13 / 156 after; 141 / 23 / 3 / 36 avoided.
+- Expected proposal: 13 retained rules, two consolidation groups, two unresolved safety decisions, and preserved Deployment, Documentation, Release, Security, and Verification categories.
+
+```powershell
+Push-Location samples/ackit-optimize-demo
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --format sarif --output .ackit/reports/instructions.sarif
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --format html --output .ackit/reports/instructions.html --proposal .ackit/reports/optimized-instructions.md
+Get-Content .ackit/reports/instructions.sarif | ConvertFrom-Json | Out-Null
+Pop-Location
+```
+
+All generated outputs remain ignored local artifacts. The committed fixture contains no credential value, private path, customer data, or generated report.

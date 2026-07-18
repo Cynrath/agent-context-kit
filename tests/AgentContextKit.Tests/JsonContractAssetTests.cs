@@ -47,6 +47,11 @@ public sealed class JsonContractAssetTests
             AssertEnvelope(example);
         }
 
+        var optimizeGolden = Assert.Single(goldenExamples, example => GetCommand(example) == "optimize");
+        var proposalSchema = schema["$defs"]?["instructionProposal"]?.AsObject();
+        Assert.NotNull(proposalSchema);
+        AssertRequiredFields(optimizeGolden["proposal"]?.AsObject(), ReadStrings(proposalSchema["required"]), []);
+
         using var repo = CreateHealthyRepository();
         var liveOutputs = RunLiveJsonCommands(repo.Path);
         Assert.Equal(ExpectedCommands.Order(), liveOutputs.Keys.Order());
@@ -158,7 +163,7 @@ public sealed class JsonContractAssetTests
             ("init", ["init", "--json"]),
             ("config-check", ["config-check", "--json"]),
             ("scan", ["scan", "--json"]),
-            ("optimize", ["optimize", "--json"]),
+            ("optimize", ["optimize", "--json", "--proposal", ".ackit/reports/contract-proposal.md"]),
             ("baseline", ["baseline", "--output", ".ackit-baseline.json", "--json"]),
             ("sarif", ["sarif", "--output", ".ackit/reports/contract.sarif", "--json"]),
             ("report", ["report", "--output", ".ackit/reports/contract.html", "--json"]),

@@ -111,7 +111,9 @@ Config diagnostics include stable `code`, `severity`, one-based `line`, optional
 
 ## Optimize JSON
 
-`ackit optimize --json` and `ackit optimize --format json` are equivalent and write one schema-v2 JSON object to stdout. An explicit `--output <repo-relative.json>` writes the same review contract to a non-existing file and prints localized generated-file status to stdout.
+`ackit optimize --json` and `ackit optimize --format json` are equivalent and write one schema-v2 JSON object to stdout. An explicit `--output <repo-relative.json>` writes the same review contract to a non-existing file and prints localized generated-file status to stdout. If `--proposal <repo-relative.md>` is also explicit, the JSON adds a `proposal` object with non-overwriting output status, parsed-rule before/after/saved metrics, retained/consolidation/unresolved counts, and mandatory-category names. It does not embed raw instruction bodies.
+
+The abbreviated example below represents `ackit optimize --json --proposal .ackit/reports/optimized-instructions.md`; without `--proposal`, the optional `proposal` property is omitted.
 
 ```json
 {
@@ -127,6 +129,23 @@ Config diagnostics include stable `code`, `severity`, one-based `line`, optional
     "path": "stdout",
     "status": "StandardOutput",
     "created": false
+  },
+  "proposal": {
+    "output": {
+      "path": ".ackit/reports/optimized-instructions.md",
+      "status": "Created",
+      "created": true
+    },
+    "metrics": {
+      "before": { "characters": 765, "words": 115, "lines": 16, "estimatedTokens": 192 },
+      "after": { "characters": 624, "words": 92, "lines": 13, "estimatedTokens": 156 },
+      "saved": { "characters": 141, "words": 23, "lines": 3, "estimatedTokens": 36 },
+      "estimationMethod": "Parsed instruction-body estimated tokens are a deterministic local estimate, not billing."
+    },
+    "retainedRuleCount": 13,
+    "consolidationCount": 2,
+    "unresolvedDecisionCount": 2,
+    "mandatoryConstraintCategories": ["Deployment", "Documentation", "Release", "Security", "Verification"]
   },
   "auditSummary": {
     "sourceCount": 0,
@@ -160,7 +179,7 @@ Config diagnostics include stable `code`, `severity`, one-based `line`, optional
 
 Successful findings contain stable `ACKITOPT` rule IDs, fingerprints, severity/category, repository-relative source file and one-based line range, directory scope, sanitized explanation/evidence/remediation, related locations, and both `deterministic` and `heuristic` booleans. Source rule bodies and absolute repository paths are omitted. Error payloads include `command`, `exitCode: 1`, and a stable `error.code` without echoing unsafe path values.
 
-The Optimize branch is additive to schema v2 and covered by `docs/schemas/ackit-command-output-v2.schema.json` plus the sanitized golden fixture. Published `1.0.0-rc.1` predates this branch even though current source retains the existing package version metadata; Build Week availability is established by source commit evidence, not by rewriting that release.
+The Optimize branch and optional proposal metadata are additive to schema v2 and covered by `docs/schemas/ackit-command-output-v2.schema.json`, the sanitized golden fixture, and live-output tests. Published `1.0.0-rc.1` predates this branch even though current source retains the existing package version metadata; Build Week availability is established by source commit evidence, not by rewriting that release.
 
 ## Example
 ```powershell

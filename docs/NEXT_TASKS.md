@@ -4,8 +4,8 @@
 
 1. Completed: TASK-0258 planning commit `a227c045` is pushed and all three push-triggered workflow runs passed.
 2. Completed: TASK-0259 Core instruction audit domain is pushed at `d49bd446`; all three push-triggered workflows passed.
-3. In progress / local pass: TASK-0260 additive `ackit optimize` CLI/output/schema/localization contracts; commit/push and hosted workflow evidence are next.
-4. Execute TASK-0261 explicit-path non-overwriting proposal and synthetic demo.
+3. Completed: TASK-0260 additive `ackit optimize` CLI/output/schema/localization contracts at `c79932a`; CI/source-smoke/published-smoke runs `29651733106`, `29651733085`, and `29651733087` passed.
+4. In progress / local pass: TASK-0261 explicit-path non-overwriting proposal and synthetic demo; 463/463 full tests, zero-warning build, all task gates, and the six-format no-mutation demo smoke pass. Commit/push and hosted evidence are next.
 5. Execute TASK-0262 truthful Build Week public documentation, complete local gates, normal pushes, hosted CI monitoring, and final clean local/origin equality.
 
 Published NuGet `1.0.0-rc.1`, tag `v1.0.0-rc.1`, GitHub release/assets/attestations, and historical recovery evidence are immutable and predate this work. Optimize is current-source Build Week work until a separate human-controlled release decision. No workflow dispatch, package publication, tag/release/asset mutation, deployment, settings/secrets change, force push, history rewrite, or GA claim is authorized.

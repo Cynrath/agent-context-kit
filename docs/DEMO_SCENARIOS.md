@@ -4,6 +4,33 @@ Optional external-tool demos are not part of the standard scenarios. Any future 
 
 These scenarios show safe, local ways to try AgentContextKit. They do not push, tag, publish NuGet packages, create GitHub Releases, upload SARIF, or call remote LLM providers.
 
+## Three-Minute ACKit Optimize Build Week Demo
+
+Build once from the repository root, then audit the tracked synthetic fixture from its own directory:
+
+```powershell
+dotnet restore AgentContextKit.sln
+dotnet build AgentContextKit.sln -c Release --no-restore
+Push-Location samples/ackit-optimize-demo
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --format sarif --output .ackit/reports/instructions.sarif
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --format html --output .ackit/reports/instructions.html --proposal .ackit/reports/optimized-instructions.md
+Get-Content .ackit/reports/instructions.sarif | ConvertFrom-Json | Select-Object version
+Get-Content .ackit/reports/optimized-instructions.md -TotalCount 45
+Pop-Location
+```
+
+Narration checkpoints:
+
+1. Console/JSON show four instruction sources, nested applicability, one valid scoped override, stable `ACKITOPT` findings, and clearly labeled local token estimates.
+2. The safety conflict remains Critical and unresolved; ACKit does not guess which instruction wins.
+3. SARIF parses as 2.1.0 and the HTML is self-contained/offline.
+4. The explicit proposal maps two safe consolidation groups back to source lines, preserves five mandatory categories, and reports a deterministic 192-to-156 estimated-token change for parsed rule bodies.
+5. Re-running the same commands skips existing outputs; `AGENTS.md`, nested instructions, and other sources are never overwritten.
+
+This is current-source Build Week functionality. NuGet `1.0.0-rc.1` predates it and remains immutable.
+
 ## Published Package Demo
 Use the published NuGet package for stable commands:
 

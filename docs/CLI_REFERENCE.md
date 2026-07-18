@@ -89,6 +89,7 @@ dotnet run --project src/AgentContextKit.Cli -- optimize --json
 dotnet run --project src/AgentContextKit.Cli -- optimize --format markdown --output .ackit/reports/instructions.md
 dotnet run --project src/AgentContextKit.Cli -- optimize --format sarif --output .ackit/reports/instructions.sarif
 dotnet run --project src/AgentContextKit.Cli -- optimize --format html --output .ackit/reports/instructions.html
+dotnet run --project src/AgentContextKit.Cli -- optimize --json --proposal .ackit/reports/optimized-instructions.md
 dotnet run --project src/AgentContextKit.Cli -- optimize --include 'src/**' --exclude 'src/generated/**' --ci
 ```
 
@@ -98,11 +99,14 @@ Behavior:
 - `--json` aliases `--format json`; JSON is written to stdout unless `--output <repo-relative.json>` is explicit.
 - Markdown, SARIF, and HTML require `--output` with `.md`, `.sarif`, and `.html` respectively.
 - Output paths must be repository-relative and stay inside the repository. Existing files are skipped, never overwritten.
+- `--proposal <repo-relative.md>` optionally creates a separate review-only Markdown proposal. The path is mandatory when the option is present, must end in `.md` or `.markdown`, must differ from `--output`, cannot target any discovered or supported instruction source, and cannot traverse an existing symbolic-link/junction directory.
+- Proposal generation consolidates exact duplicates and only conservative same-scope near-duplicates with identical polarity, normalized core, command fragments, repository references, and mandatory-constraint categories. It retains valid scoped overrides, maps every consolidated occurrence to source lines, and leaves conflicts/unsafe actions unresolved for human decision.
+- Proposal before/after metrics cover parsed rule bodies. The artifact is a dry run: no `--apply` behavior exists, and source instruction files remain unchanged on success, skip-existing, and error paths.
 - Repeatable `--include` and `--exclude` globs use the same `*`, `**`, and `?` syntax as `scan` and are applied to instruction discovery.
 - `--ci` returns `2` for any Critical instruction finding, `1` for any High finding when no Critical finding exists, and `0` otherwise.
 - Every finding includes a stable rule ID, severity, category, repository-relative source and line range, directory scope, sanitized evidence, safe remediation, stable fingerprint, related locations, and deterministic/heuristic classification.
 - Metrics report characters, words, lines, and `ceiling(normalized UTF-16 characters / 4)` estimated tokens for total, exact-duplicate, and avoidable instruction context. This is a deterministic size estimate, not exact tokenizer output or model billing.
-- The command performs no provider call, telemetry, upload, source rewrite, proposal application, release action, or hidden output write.
+- The command performs no provider call, telemetry, upload, source rewrite, proposal application, release action, or hidden output write. Only explicitly requested report/proposal paths can be created.
 
 Published package boundary:
 

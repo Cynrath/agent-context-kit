@@ -1,6 +1,6 @@
 # Project Map
 
-Updated: 2026-07-10
+Updated: 2026-07-18
 
 ## Stack
 - .NET: .sln/.slnx/*proj/Program.cs
@@ -247,6 +247,10 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - `README.md`
 - `README.tr.md`
 - `samples/README.md`
+- `samples/ackit-optimize-demo/AGENTS.md`
+- `samples/ackit-optimize-demo/CLAUDE.md`
+- `samples/ackit-optimize-demo/src/web/AGENTS.md`
+- `samples/ackit-optimize-demo/docs/AI_WORKFLOW.md`
 - `samples/dotnet-console/Program.cs`
 - `samples/dotnet-console/README.md`
 - `samples/dotnet-console/Sample.Console.csproj`
@@ -306,6 +310,10 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - `src/AgentContextKit.Core/Doctor.cs`
 - `src/AgentContextKit.Core/FileSystem.cs`
 - `src/AgentContextKit.Core/Generation.cs`
+- `src/AgentContextKit.Core/InstructionAuditing.cs`
+- `src/AgentContextKit.Core/InstructionAuditModels.cs`
+- `src/AgentContextKit.Core/InstructionAuditReporting.cs`
+- `src/AgentContextKit.Core/InstructionOptimization.cs`
 - `src/AgentContextKit.Core/Models.cs`
 - `src/AgentContextKit.Core/Sarif.cs`
 - `src/AgentContextKit.Core/Scanning.cs`
@@ -317,6 +325,11 @@ Sample projects remain under `samples/`, but their ASP.NET Core, Minimal API, No
 - `tests/AgentContextKit.Tests/PerformanceResourceEvidenceTests.cs`
 - `tests/AgentContextKit.Tests/ConfigurationValidationTests.cs`
 - `tests/AgentContextKit.Tests/LocalizationParityTests.cs`
+- `tests/AgentContextKit.Tests/InstructionAuditTests.cs`
+- `tests/AgentContextKit.Tests/InstructionAuditReportWriterTests.cs`
+- `tests/AgentContextKit.Tests/InstructionOptimizationProposalTests.cs`
+- `tests/AgentContextKit.Tests/OptimizeCommandTests.cs`
+- `tests/AgentContextKit.Tests/OptimizeDemoFixtureTests.cs`
 - `tests/fixtures/upgrade/v0.2.0-alpha.2-config.yml`
 - `tests/fixtures/upgrade/baseline-schema-v1.json`
 - `tests/fixtures/contracts/command-output-v2-golden.json`

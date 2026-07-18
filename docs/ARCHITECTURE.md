@@ -20,6 +20,9 @@ tests/
 
 ## Core Services
 - `IRepositoryScanner`
+- `IInstructionAuditor`
+- `IInstructionOptimizationProposalGenerator`
+- `IInstructionAuditReportWriter`
 - `IStackDetector`
 - `IProjectMapBuilder`
 - `IRiskScanner`
@@ -66,6 +69,8 @@ The same `BaselineEvaluation` instance can be passed to SARIF, HTML report, and 
 
 `ITextProvider` owns shared English/Turkish human-readable CLI chrome such as headings, labels, summaries, generated-file statuses, and known argument errors. The CLI may compose these labels with stable technical values from Core. Command/option names, severity names, rule IDs, diagnostic codes, paths, JSON fields/status tokens, and exit decisions remain language-independent. `scripts/check-localization-parity.ps1` and `LocalizationParityTests` enforce that boundary across every language-aware command.
 
+The post-`1.0.0-rc.1` Build Week instruction-audit path is split across three Core boundaries. `InstructionAuditor` discovers supported local instruction surfaces, parses source-located rules, resolves nested `AGENTS.md` scope and valid overrides, computes deterministic context estimates, and emits stable `ACKITOPT` findings. `InstructionAuditReportWriter` maps that domain to JSON, Markdown, SARIF 2.1.0, and self-contained HTML. `InstructionOptimizationProposalGenerator` performs only review-safe consolidation, preserves source mappings and mandatory constraints, leaves conflicts unresolved, sanitizes rendered rule text, and writes solely to an explicit non-instruction Markdown path without overwrite. The CLI owns option validation, localization, output selection, and exit decisions; no required network or provider path is introduced.
+
 These SARIF, rule catalog, and config allowlist capabilities are part of current source and the published `1.0.0-rc.1` package. For RC upgrade evidence, published immutable `0.2.0-alpha.4` is the exact predecessor; `0.2.0-alpha.3` remains older historical release evidence.
 
 `StackDetector` uses repository file paths plus limited local reads of project/source files through `IFileSystem`. This keeps stack detection offline and testable while allowing project SDK signals such as `Microsoft.NET.Sdk.Web`, `Microsoft.NET.Sdk.Razor`, `Microsoft.NET.Sdk.BlazorWebAssembly`, and `Microsoft.NET.Sdk.Worker`.
@@ -79,4 +84,4 @@ Optional future LLM integration is documented in `docs/LLM_INTEGRATION_ARCHITECT
 Release readiness tooling lives in repository scripts and documentation rather than Core runtime services. Package metadata gates, public release audits, source archive hygiene, and maintainer handoff steps are local-only release checks and do not push, tag-push, publish, upload content, or call remote providers.
 
 ## Output Schema
-Human-readable CLI output is optimized for short terminal feedback. JSON output is produced by the CLI layer from Core models and includes `schemaVersion` and `toolVersion` metadata for automation.
+Human-readable CLI output is optimized for short terminal feedback. JSON output is produced by the CLI/Core report adapter from Core models and includes `schemaVersion` and `toolVersion` metadata for automation. Optimize proposal metadata is optional and additive under schema v2; it contains output status and aggregate metrics/counts, not raw instruction bodies.

@@ -130,7 +130,7 @@ $helpLines = @(
     "ackit init [--lang en|tr] [--json]",
     "ackit config-check [--lang en|tr] [--json]",
     "ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]",
-    "ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]",
+    "ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--proposal <repo-relative.md>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]",
     "ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]",
     "ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]",
     "ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]",

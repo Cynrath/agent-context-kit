@@ -201,15 +201,20 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --include 'src/**' --exclude '**/*.bak' --ci
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json
+dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --proposal .ackit/reports/optimized-instructions.md
 ```
 
-The published `1.0.0-rc.1` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands. It predates ACKit Optimize; the Build Week command is currently demonstrated from source and does not retroactively change the RC1 package, tag, release, assets, or attestations.
+The published `1.0.0-rc.1` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands. It predates ACKit Optimize; the Build Week command is currently demonstrated from source and does not retroactively change the RC1 package, tag, release, assets, or attestations. `--proposal` requires an explicit repository-relative Markdown path, skips existing output, never targets instruction sources, and has no apply mode.
 
 ### Try it on a sample
 
 ```powershell
 Push-Location samples/dotnet-console
 dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci
+Pop-Location
+
+Push-Location samples/ackit-optimize-demo
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json --proposal .ackit/reports/optimized-instructions.md
 Pop-Location
 ```
 

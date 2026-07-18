@@ -94,6 +94,7 @@ public sealed class LocalizationParityTests
         {
             new ErrorCase(["sarif"], "requires --output", "gerektirir"),
             new ErrorCase(["optimize", "--format", "markdown"], "require --output", "--output"),
+            new ErrorCase(["optimize", "--proposal="], "--proposal requires", "--proposal için"),
             new ErrorCase(["context-export"], "requires explicit --approve", "açık bir --approve onayı gerektirir"),
             new ErrorCase(["context-export", "--approve"], "requires --prompt-pack", "--prompt-pack <repo-relative.md> gerektirir"),
             new ErrorCase(["task"], "requires a title", "bir başlık gerektirir"),

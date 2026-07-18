@@ -10,6 +10,7 @@ They intentionally avoid secrets, environment files, uploads, backups, private k
 - `node-tooling`: Node, TypeScript, and Tailwind CSS stack detection.
 - `generic-empty-repo`: nearly empty repository health-gap demo.
 - `security-fixture-repo`: safe security fixture wording without real secrets.
+- `ackit-optimize-demo`: synthetic nested instruction scopes, duplicates, conflict, valid override, stale/vague rules, and proposal metrics.
 
 See `../docs/SAMPLE_GALLERY.md` for expected stacks, health gaps, commands, generated files, and risk behavior.
 
@@ -35,5 +36,9 @@ Pop-Location
 
 Push-Location samples/security-fixture-repo
 dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- redact-check --profile public-release
+Pop-Location
+
+Push-Location samples/ackit-optimize-demo
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json --proposal .ackit/reports/optimized-instructions.md
 Pop-Location
 ```

@@ -48,6 +48,19 @@
       "exitCode": 0,
       "format": "json",
       "output": { "path": "stdout", "status": "StandardOutput", "created": false, "message": "Report written to standard output." },
+      "proposal": {
+        "output": { "path": ".ackit/reports/optimized-instructions.md", "status": "Created", "created": true, "message": "Review-only optimize proposal created." },
+        "metrics": {
+          "before": { "characters": 84, "words": 14, "lines": 2, "estimatedTokens": 21 },
+          "after": { "characters": 42, "words": 7, "lines": 1, "estimatedTokens": 11 },
+          "saved": { "characters": 42, "words": 7, "lines": 1, "estimatedTokens": 11 },
+          "estimationMethod": "Parsed instruction-body estimated tokens are a deterministic local estimate, not billing."
+        },
+        "retainedRuleCount": 1,
+        "consolidationCount": 1,
+        "unresolvedDecisionCount": 0,
+        "mandatoryConstraintCategories": ["Verification"]
+      },
       "auditSummary": {
         "sourceCount": 0,
         "ruleCount": 0,

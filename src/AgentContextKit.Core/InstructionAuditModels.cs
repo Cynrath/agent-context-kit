@@ -47,7 +47,8 @@ public sealed record InstructionAuditReportContext(
     DateTimeOffset GeneratedAtUtc,
     string RepositoryName,
     bool CiMode,
-    int ExitCode);
+    int ExitCode,
+    InstructionOptimizationProposalOutputInfo? Proposal = null);
 
 public sealed record InstructionAuditOutputInfo(
     string Path,
@@ -156,6 +157,46 @@ public sealed record InstructionAuditResult(
     IReadOnlyList<InstructionScopedOverride> ScopedOverrides,
     IReadOnlyList<InstructionFinding> Findings,
     InstructionAuditMetrics Metrics);
+
+public sealed record InstructionOptimizationProposalMetrics(
+    InstructionContentMetrics Before,
+    InstructionContentMetrics After,
+    InstructionContentMetrics Saved,
+    string EstimationMethod);
+
+public sealed record InstructionConsolidation(
+    string Kind,
+    InstructionLocation Kept,
+    IReadOnlyList<InstructionLocation> Removed,
+    string Reason);
+
+public sealed record InstructionUnresolvedDecision(
+    string RuleId,
+    string Fingerprint,
+    RiskSeverity Severity,
+    InstructionFindingCategory Category,
+    string Explanation,
+    IReadOnlyList<InstructionLocation> Locations);
+
+public sealed record InstructionMandatoryConstraint(
+    string Category,
+    IReadOnlyList<InstructionLocation> RetainedLocations);
+
+public sealed record InstructionOptimizationProposal(
+    string Markdown,
+    InstructionOptimizationProposalMetrics Metrics,
+    IReadOnlyList<InstructionRule> RetainedRules,
+    IReadOnlyList<InstructionConsolidation> Consolidations,
+    IReadOnlyList<InstructionUnresolvedDecision> UnresolvedDecisions,
+    IReadOnlyList<InstructionMandatoryConstraint> MandatoryConstraints);
+
+public sealed record InstructionOptimizationProposalOutputInfo(
+    InstructionAuditOutputInfo Output,
+    InstructionOptimizationProposalMetrics Metrics,
+    int RetainedRuleCount,
+    int ConsolidationCount,
+    int UnresolvedDecisionCount,
+    IReadOnlyList<string> MandatoryConstraintCategories);
 
 public sealed record InstructionAuditRule(
     string Id,

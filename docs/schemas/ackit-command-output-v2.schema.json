@@ -39,6 +39,7 @@
     "exitCode": { "type": "integer", "enum": [0, 1, 2] },
     "format": { "type": "string", "enum": ["json"] },
     "output": { "$ref": "#/$defs/generatedFile" },
+    "proposal": { "$ref": "#/$defs/instructionProposal" },
     "auditSummary": { "$ref": "#/$defs/instructionAuditSummary" },
     "instructionMetrics": { "$ref": "#/$defs/instructionMetrics" },
     "sources": { "type": "array", "items": { "$ref": "#/$defs/instructionSource" } },
@@ -229,6 +230,29 @@
         "duplicated": { "$ref": "#/$defs/contentMetrics" },
         "avoidable": { "$ref": "#/$defs/contentMetrics" },
         "estimationMethod": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "instructionProposal": {
+      "type": "object",
+      "required": ["output", "metrics", "retainedRuleCount", "consolidationCount", "unresolvedDecisionCount", "mandatoryConstraintCategories"],
+      "properties": {
+        "output": { "$ref": "#/$defs/generatedFile" },
+        "metrics": {
+          "type": "object",
+          "required": ["before", "after", "saved", "estimationMethod"],
+          "properties": {
+            "before": { "$ref": "#/$defs/contentMetrics" },
+            "after": { "$ref": "#/$defs/contentMetrics" },
+            "saved": { "$ref": "#/$defs/contentMetrics" },
+            "estimationMethod": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": true
+        },
+        "retainedRuleCount": { "type": "integer", "minimum": 0 },
+        "consolidationCount": { "type": "integer", "minimum": 0 },
+        "unresolvedDecisionCount": { "type": "integer", "minimum": 0 },
+        "mandatoryConstraintCategories": { "type": "array", "items": { "type": "string" } }
       },
       "additionalProperties": true
     },

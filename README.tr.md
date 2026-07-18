@@ -167,15 +167,20 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json
+dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --proposal .ackit/reports/optimized-instructions.md
 ```
 
-Yayımlanmış `1.0.0-rc.1` paketi ACKit Optimize’dan önce gelir. Build Week komutu şu anda kaynak koddan gösterilir; RC1 paketi, etiketi, GitHub Release’i, asset’leri veya attestation kayıtları geriye dönük değiştirilmemiştir.
+Yayımlanmış `1.0.0-rc.1` paketi ACKit Optimize’dan önce gelir. Build Week komutu şu anda kaynak koddan gösterilir; RC1 paketi, etiketi, GitHub Release’i, asset’leri veya attestation kayıtları geriye dönük değiştirilmemiştir. `--proposal`, açıkça verilen depo-köküne-göreli bir Markdown yolu ister, var olan çıktıyı atlar, yönerge kaynaklarını hedeflemez ve apply modu içermez.
 
 ### Örnek üzerinde deneyin
 
 ```powershell
 Push-Location samples/dotnet-console
 dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci
+Pop-Location
+
+Push-Location samples/ackit-optimize-demo
+dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json --proposal .ackit/reports/optimized-instructions.md
 Pop-Location
 ```
 

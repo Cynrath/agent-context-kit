@@ -18,6 +18,20 @@ public interface IInstructionAuditor
         CancellationToken cancellationToken = default);
 }
 
+public interface IInstructionOptimizationProposalGenerator
+{
+    InstructionOptimizationProposal Build(
+        InstructionAuditResult audit,
+        string repositoryName,
+        CancellationToken cancellationToken = default);
+
+    GeneratedFileResult Generate(
+        string repositoryPath,
+        string relativeOutputPath,
+        InstructionAuditResult audit,
+        InstructionOptimizationProposal proposal);
+}
+
 public interface IInstructionAuditReportWriter
 {
     string RenderJson(
@@ -167,6 +181,16 @@ public interface IFileSystem
     string ReadAllText(string path);
 
     void WriteAllText(string path, string content);
+
+    bool WriteAllTextIfNotExists(string path, string content)
+    {
+        if (FileExists(path))
+        {
+            return false;
+        }
+        WriteAllText(path, content);
+        return true;
+    }
 
     long GetFileLength(string path);
 

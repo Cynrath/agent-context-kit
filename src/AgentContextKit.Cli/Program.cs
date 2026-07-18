@@ -68,7 +68,7 @@ public static class Program
         Console.WriteLine("  ackit init [--lang en|tr] [--json]");
         Console.WriteLine("  ackit config-check [--lang en|tr] [--json]");
         Console.WriteLine("  ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]");
-        Console.WriteLine("  ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]");
+        Console.WriteLine("  ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--proposal <repo-relative.md>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]");
         Console.WriteLine("  ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]");
@@ -384,6 +384,20 @@ public static class Program
             return WriteOptimizeArgumentError("ConsoleOutputUnsupported", "optimizeConsoleOutputUnsupported", false, language, services);
         }
 
+        var proposalPath = GetOption(args, "--proposal");
+        if (HasOption(args, "--proposal") && string.IsNullOrWhiteSpace(proposalPath))
+        {
+            return WriteOptimizeArgumentError("InvalidProposal", "optimizeInvalidProposal", machineOutput, language, services);
+        }
+        if (!string.IsNullOrWhiteSpace(outputPath) && !string.IsNullOrWhiteSpace(proposalPath) &&
+            string.Equals(
+                outputPath.Trim().Replace('\\', '/'),
+                proposalPath.Trim().Replace('\\', '/'),
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return WriteOptimizeArgumentError("InvalidProposal", "optimizeInvalidProposal", machineOutput, language, services);
+        }
+
         IReadOnlyList<string> includeGlobs;
         IReadOnlyList<string> excludeGlobs;
         try
@@ -417,17 +431,53 @@ public static class Program
             return WriteOptimizeArgumentError("AuditFailed", "optimizeAuditFailed", machineOutput, language, services);
         }
 
-        var exitCode = GetInstructionAuditExitCode(audit, ci);
         var repositoryName = GetRepositoryName(repositoryPath);
+        InstructionOptimizationProposal? proposal = null;
+        GeneratedFileResult? generatedProposal = null;
+        if (!string.IsNullOrWhiteSpace(proposalPath))
+        {
+            try
+            {
+                proposal = services.InstructionOptimizationProposalGenerator.Build(audit, repositoryName);
+                generatedProposal = services.InstructionOptimizationProposalGenerator.Generate(
+                    repositoryPath,
+                    proposalPath,
+                    audit,
+                    proposal);
+            }
+            catch (InvalidOperationException)
+            {
+                return WriteOptimizeArgumentError("InvalidProposal", "optimizeInvalidProposal", machineOutput, language, services);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                return WriteOptimizeArgumentError("ProposalWriteFailed", "optimizeProposalWriteFailed", machineOutput, language, services);
+            }
+        }
+
+        var exitCode = GetInstructionAuditExitCode(audit, ci);
         var context = new InstructionAuditReportContext(
             Version,
             services.Clock.UtcNow,
             repositoryName,
             ci,
-            exitCode);
+            exitCode,
+            proposal is null || generatedProposal is null
+                ? null
+                : new InstructionOptimizationProposalOutputInfo(
+                    InstructionAuditOutputInfo.From(generatedProposal),
+                    proposal.Metrics,
+                    proposal.RetainedRules.Count,
+                    proposal.Consolidations.Count,
+                    proposal.UnresolvedDecisions.Count,
+                    proposal.MandatoryConstraints.Select(item => item.Category).ToArray()));
 
         try
         {
+            if (generatedProposal is not null && !(format == "json" && string.IsNullOrWhiteSpace(outputPath)))
+            {
+                PrintGeneratedResult(generatedProposal, services.TextProvider, language);
+            }
             switch (format)
             {
                 case "json":
@@ -2204,6 +2254,7 @@ public static class Program
                string.Equals(option, "--prompt-pack", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--stdio", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--output", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(option, "--proposal", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--format", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--include", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--exclude", StringComparison.OrdinalIgnoreCase);
@@ -2239,6 +2290,7 @@ public static class Program
             repositoryScanner,
             new InstructionAuditor(fileSystem),
             new InstructionAuditReportWriter(fileSystem),
+            new InstructionOptimizationProposalGenerator(fileSystem),
             new AgentInstructionGenerator(fileSystem, templateRenderer, clock),
             new HtmlReportGenerator(fileSystem, clock),
             new WebUiGenerator(fileSystem, clock),
@@ -2262,6 +2314,7 @@ public static class Program
         IRepositoryScanner RepositoryScanner,
         IInstructionAuditor InstructionAuditor,
         IInstructionAuditReportWriter InstructionAuditReportWriter,
+        IInstructionOptimizationProposalGenerator InstructionOptimizationProposalGenerator,
         IAgentInstructionGenerator AgentInstructionGenerator,
         IHtmlReportGenerator HtmlReportGenerator,
         IWebUiGenerator WebUiGenerator,

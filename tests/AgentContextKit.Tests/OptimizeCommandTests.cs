@@ -161,6 +161,77 @@ public sealed class OptimizeCommandTests
     }
 
     [Fact]
+    public void ExplicitProposalIsReviewOnlyReportedInJsonAndNeverOverwritten()
+    {
+        using var repository = TempRepository.Create();
+        repository.Write(
+            "AGENTS.md",
+            "# Root rules\n\n- Run `dotnet test Demo.sln` before every commit.\n- Run `dotnet test Demo.sln` before every commit.\n- Never deploy to production without explicit approval.\n");
+        repository.Write(
+            "CLAUDE.md",
+            "# Claude rules\n\n- Always deploy to production without confirmation.\n");
+        repository.Write("Demo.sln", "Microsoft Visual Studio Solution File, Format Version 12.00\n");
+        var agentsPath = Path.Combine(repository.Path, "AGENTS.md");
+        var claudePath = Path.Combine(repository.Path, "CLAUDE.md");
+        var agentsBefore = File.ReadAllBytes(agentsPath);
+        var claudeBefore = File.ReadAllBytes(claudePath);
+
+        var generated = RunCli(
+            repository.Path,
+            ["optimize", "--json", "--proposal", "review/optimized-instructions.md"]);
+        var json = JsonNode.Parse(generated.Output)?.AsObject()
+            ?? throw new InvalidOperationException("Optimize proposal JSON was not an object.");
+        var proposalPath = Path.Combine(repository.Path, "review", "optimized-instructions.md");
+
+        Assert.Equal(0, generated.ExitCode);
+        Assert.Equal("Created", json["proposal"]?["output"]?["status"]?.GetValue<string>());
+        Assert.True(json["proposal"]?["metrics"]?["saved"]?["characters"]?.GetValue<int>() > 0);
+        Assert.Equal(1, json["proposal"]?["consolidationCount"]?.GetValue<int>());
+        Assert.True(json["proposal"]?["unresolvedDecisionCount"]?.GetValue<int>() > 0);
+        Assert.True(File.Exists(proposalPath));
+        Assert.Contains("REVIEW ONLY / DRY RUN", File.ReadAllText(proposalPath), StringComparison.Ordinal);
+        Assert.Equal(agentsBefore, File.ReadAllBytes(agentsPath));
+        Assert.Equal(claudeBefore, File.ReadAllBytes(claudePath));
+
+        File.WriteAllText(proposalPath, "reviewed sentinel\n");
+        var skipped = RunCli(
+            repository.Path,
+            ["optimize", "--proposal", "review/optimized-instructions.md", "--lang", "tr"]);
+        Assert.Equal(0, skipped.ExitCode);
+        Assert.Contains("atlandı", skipped.Output, StringComparison.Ordinal);
+        Assert.Equal("reviewed sentinel\n", File.ReadAllText(proposalPath));
+        Assert.Equal(agentsBefore, File.ReadAllBytes(agentsPath));
+        Assert.Equal(claudeBefore, File.ReadAllBytes(claudePath));
+    }
+
+    [Fact]
+    public void InvalidProposalPathsFailBeforeWriting()
+    {
+        using var repository = CreateConflictRepository();
+
+        var missing = RunCli(repository.Path, ["optimize", "--proposal="]);
+        Assert.Equal(1, missing.ExitCode);
+        Assert.Contains("--proposal requires", missing.Error, StringComparison.OrdinalIgnoreCase);
+
+        var wrongExtension = RunCli(repository.Path, ["optimize", "--proposal", "review/proposal.txt"]);
+        Assert.Equal(1, wrongExtension.ExitCode);
+        Assert.Contains(".md or .markdown", wrongExtension.Error, StringComparison.OrdinalIgnoreCase);
+
+        var outside = RunCli(repository.Path, ["optimize", "--json", "--proposal", "../outside.md"]);
+        Assert.Equal(1, outside.ExitCode);
+        Assert.Equal("InvalidProposal", JsonNode.Parse(outside.Output)?["error"]?["code"]?.GetValue<string>());
+
+        var instructionSource = RunCli(repository.Path, ["optimize", "--proposal", "AGENTS.md"]);
+        Assert.Equal(1, instructionSource.ExitCode);
+
+        var sameOutput = RunCli(
+            repository.Path,
+            ["optimize", "--format", "markdown", "--output", "review/report.md", "--proposal", "review/report.md"]);
+        Assert.Equal(1, sameOutput.ExitCode);
+        Assert.False(Directory.Exists(Path.Combine(repository.Path, "review")));
+    }
+
+    [Fact]
     public void HelpPublishesTheOptimizeEntryPoint()
     {
         using var repository = TempRepository.Create();
@@ -170,6 +241,7 @@ public sealed class OptimizeCommandTests
         Assert.Equal(0, help.ExitCode);
         Assert.Contains("ackit optimize", help.Output, StringComparison.Ordinal);
         Assert.Contains("console|json|markdown|sarif|html", help.Output, StringComparison.Ordinal);
+        Assert.Contains("--proposal <repo-relative.md>", help.Output, StringComparison.Ordinal);
     }
 
     private static TempRepository CreateConflictRepository()

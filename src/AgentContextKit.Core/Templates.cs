@@ -479,6 +479,16 @@ public sealed class TextProvider : ITextProvider
             ["en"] = "ackit optimize could not create the requested local report.",
             ["tr"] = "ackit optimize istenen yerel raporu oluşturamadı."
         },
+        ["optimizeInvalidProposal"] = new()
+        {
+            ["en"] = "ackit optimize --proposal requires a non-empty repository-relative .md or .markdown path that is different from report output and is not an instruction source.",
+            ["tr"] = "ackit optimize --proposal için rapor çıktısından farklı, bir yönerge kaynağı olmayan, boş olmayan ve depo köküne göreli bir .md veya .markdown yolu gerekir."
+        },
+        ["optimizeProposalWriteFailed"] = new()
+        {
+            ["en"] = "ackit optimize could not create the requested local review proposal.",
+            ["tr"] = "ackit optimize istenen yerel inceleme önerisini oluşturamadı."
+        },
     };
 
     public string Get(string key, LanguageCode language)
