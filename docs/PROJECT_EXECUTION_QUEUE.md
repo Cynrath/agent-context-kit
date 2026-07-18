@@ -1,5 +1,19 @@
 # Project Execution Queue
 
+## OpenAI Build Week 2026 — ACKit Optimize (Active)
+
+Clean synchronized baseline: `6998e269af4962bbe70a9cb4044727d25dc1a06d` on 2026-07-18. The published `v1.0.0-rc.1` package/tag/release/assets/attestations predate this track and remain immutable. User authorization permits focused commits, normal `master` pushes, and read-only monitoring of push-triggered CI after validation; it does not permit workflow dispatch, deployment, publication, tag/release/asset mutation, settings/secrets changes, force push, or history rewrite.
+
+| Order | Status | Task | Purpose | Dependency | Expected validation | Remote/destructive boundary |
+| ---: | --- | --- | --- | --- | --- | --- |
+| BW1 | In progress | TASK-0258 Build Week baseline and control | Pin baseline, scope, evidence, tasks, and authorization before code | Clean synchronized `6998e269...` | ACKit/Git/docs/tracked-file/diff gates; separate planning push and CI | Normal planning push only |
+| BW2 | Planned | TASK-0259 Optimize Core audit domain | Discovery, nested scope/inheritance, normalization, metrics, stable findings | TASK-0258 planning commit/CI | Focused Core tests, full build/test, ACKit gates | Normal validated push only |
+| BW3 | Planned | TASK-0260 Optimize CLI and outputs | Console/JSON/Markdown/SARIF/offline HTML, schemas, localization, exits | TASK-0259 | CLI/output/golden/localization/full tests and source smoke | Normal validated push only |
+| BW4 | Planned | TASK-0261 non-destructive proposal and demo | Explicit-path proposal, mappings, unresolved decisions, synthetic demo | TASK-0260 | Mutation guards, fixture/golden/demo/full tests | Normal validated push only |
+| BW5 | Planned | TASK-0262 Build Week docs and final validation | Public attribution/evidence, reproducible judging, full local/hosted closure | TASK-0261 | Complete Phase 6 gates plus final push-triggered CI | No release/package/tag/deploy action |
+
+The Build Week commit range is baseline `6998e269af4962bbe70a9cb4044727d25dc1a06d` exclusive through the eventual final Build Week HEAD inclusive. Exact commits and hosted run URLs will be recorded only after they exist.
+
 ## V100 `1.0.0-rc.1` Full Release Closure — Completed
 
 | Order | Status | Task | Purpose | Dependencies | Expected files | Validation | Remote/destructive boundary |

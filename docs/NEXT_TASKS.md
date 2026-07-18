@@ -1,5 +1,15 @@
 # Next Tasks
 
+## Active: OpenAI Build Week 2026 — ACKit Optimize
+
+1. Complete and separately push TASK-0258 planning from clean baseline `6998e269af4962bbe70a9cb4044727d25dc1a06d`; verify push-triggered CI.
+2. Execute TASK-0259 Core instruction audit domain with deterministic nested-scope fixtures and focused tests.
+3. Execute TASK-0260 additive `ackit optimize` CLI/output/schema/localization contracts.
+4. Execute TASK-0261 explicit-path non-overwriting proposal and synthetic demo.
+5. Execute TASK-0262 truthful Build Week public documentation, complete local gates, normal pushes, hosted CI monitoring, and final clean local/origin equality.
+
+Published NuGet `1.0.0-rc.1`, tag `v1.0.0-rc.1`, GitHub release/assets/attestations, and historical recovery evidence are immutable and predate this work. Optimize is current-source Build Week work until a separate human-controlled release decision. No workflow dispatch, package publication, tag/release/asset mutation, deployment, settings/secrets change, force push, history rewrite, or GA claim is authorized.
+
 ## V100 `1.0.0-rc.1` Full Release Closure — Completed
 
 New explicit full operational authorization received on 2026-07-14 supersedes only obsolete retry/manual-completion boundaries while preserving all historical evidence. Clean synchronized entry is `177810dc2e7dc14304541430cb074c13efc19612`. TASK-0255 owns authenticated local GitHub prerelease/exact-asset completion, TASK-0256 owns attestation-only workflow plus three-platform verification, and TASK-0257 owns RC1 published-smoke/public/V100/final-CI closure. NuGet republication and every tag mutation remain prohibited.

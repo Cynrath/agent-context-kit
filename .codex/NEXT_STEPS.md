@@ -1,5 +1,13 @@
 # Next Steps
 
+## Active Build Week sequence (2026-07-18)
+
+- Baseline is clean/synchronized `master` at `6998e269af4962bbe70a9cb4044727d25dc1a06d`; installed tool is immutable RC1 and the baseline suite is 431/431 green with 0 build warnings/errors.
+- Finalize TASK-0258 task/queue/handoff documentation, run planning gates, commit/push separately, and verify push-triggered hosted CI.
+- Continue without stopping through TASK-0259, TASK-0260, TASK-0261, and TASK-0262 in order.
+- Keep Optimize deterministic, offline, non-overwriting, current-source-only until a separate human release decision.
+- Do not dispatch workflows, publish packages, mutate tags/releases/assets/attestations, deploy, change settings/secrets, force-push, or rewrite history.
+
 ## Current V100 `1.0.0-rc.1` Full Release Closure — Completed
 
 1. COMPLETED — TASK-0255: exact source/NuGet/tag tuple passed; authenticated ADMIN local `gh` created release `353913024` with exact prepared body and only asset IDs `476881883`/`476881892`; sizes, API digests, and downloaded hashes passed; NuGet/tag/settings mutation zero.

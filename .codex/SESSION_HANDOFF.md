@@ -1,5 +1,15 @@
 # AgentContextKit Session Handoff
 
+## Active snapshot — OpenAI Build Week 2026 ACKit Optimize (2026-07-18)
+
+- Entry state: clean `master` and `origin/master` at `6998e269af4962bbe70a9cb4044727d25dc1a06d`.
+- Baseline: installed `AgentContextKit 1.0.0-rc.1`; report-only scan and `scan --ci` exit 0 over 626 files; doctor 13/13 PASS; restore PASS; Release build 0 warnings/0 errors; tests 431 passed, 0 failed, 0 skipped.
+- Verified gap: no `ackit optimize` help/CLI entry and no Core instruction discovery/scope/normalization/metrics/finding/proposal model. This is new post-RC1 Build Week scope, not an RC1 defect or retroactive release claim.
+- Task chain created with installed `ackit task`: TASK-0258 baseline/control (active), TASK-0259 Core domain, TASK-0260 CLI/outputs, TASK-0261 proposal/demo, TASK-0262 documentation/final validation.
+- Next exact action: validate and separately commit/push planning/control docs, verify push-triggered CI, then implement TASK-0259.
+- Authorization: normal focused commits/pushes plus read-only push-triggered CI monitoring. Prohibited: workflow dispatch/rerun, deployment, publication, tag/release/asset/attestation mutation, settings/secrets changes, force push/history rewrite, or GA claim.
+- Build Week range: `6998e269af4962bbe70a9cb4044727d25dc1a06d..FINAL_HEAD`; final SHA is intentionally unset until verified.
+
 ## TASK-0255–0257 `1.0.0-rc.1` Full Release Closure — Completed
 
 - Full operational authorization received on 2026-07-14. Clean synchronized entry is `master`/`origin/master` at `177810dc2e7dc14304541430cb074c13efc19612`; ACKit `1.0.0-rc.1`, doctor 13/13, and scan exit 0 passed.
