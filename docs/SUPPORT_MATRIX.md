@@ -46,7 +46,7 @@ This matrix documents the tested and intended support surface for AgentContextKi
 - Running without a supported .NET tool host.
 
 ## Validation Source
-The current support claim is based on local validation plus GitHub Actions `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` success for Windows, Ubuntu, and macOS. Build Week source-smoke run `29653163760` exercises Optimize JSON, proposal creation, proposal review markers, and SARIF from the exact implementation SHA `7bf37cb83de64c7950e0bd27336fbc26758eb56a` on all three operating systems.
+The current support claim is based on local validation plus GitHub Actions `ci`, `cross-platform-smoke`, and `cross-platform-source-smoke` success for Windows, Ubuntu, and macOS. Build Week source-smoke run `29653893249` exercises Optimize JSON, proposal creation, proposal review markers, and SARIF from the exact public documentation SHA `00c9fea3893776f0bc9026f688a15d7a92d2ffb3` on all three operating systems.
 
 TASK-0058 read-only GitHub CLI observation confirmed all three workflows are passing on latest `master`.
 

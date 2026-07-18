@@ -33,13 +33,13 @@ The baseline did not contain an `ackit optimize` help entry, instruction discove
 
 ## Commit boundary and ledger
 
-The pre-feature baseline is exclusive. The exact implementation range currently verified is:
+The pre-feature baseline is exclusive. The exact public Build Week feature-and-documentation range is:
 
 ```text
-6998e269af4962bbe70a9cb4044727d25dc1a06d..7bf37cb83de64c7950e0bd27336fbc26758eb56a
+6998e269af4962bbe70a9cb4044727d25dc1a06d..00c9fea3893776f0bc9026f688a15d7a92d2ffb3
 ```
 
-That range contains 70 changed paths and these focused commits:
+That range contains 78 changed paths and these five focused commits:
 
 | Commit | Task | Verified purpose |
 | --- | --- | --- |
@@ -47,14 +47,15 @@ That range contains 70 changed paths and these focused commits:
 | [`d49bd446b227b1b77038b50f2f704c483168af52`](https://github.com/Cynrath/agent-context-kit/commit/d49bd446b227b1b77038b50f2f704c483168af52) | TASK-0259 | Core discovery, scope, normalization, metrics, 15-rule catalog, deterministic findings, fixtures, and focused tests |
 | [`c79932af3271038e00a37270c50a6fb518e8db38`](https://github.com/Cynrath/agent-context-kit/commit/c79932af3271038e00a37270c50a6fb518e8db38) | TASK-0260 | CLI plus console/JSON/Markdown/SARIF/offline-HTML output, schemas/goldens, localization, exits, and source smoke |
 | [`7bf37cb83de64c7950e0bd27336fbc26758eb56a`](https://github.com/Cynrath/agent-context-kit/commit/7bf37cb83de64c7950e0bd27336fbc26758eb56a) | TASK-0261 | Explicit non-destructive proposal, atomic/symlink-safe output, source mapping, demo fixture, docs, and regression coverage |
+| [`00c9fea3893776f0bc9026f688a15d7a92d2ffb3`](https://github.com/Cynrath/agent-context-kit/commit/00c9fea3893776f0bc9026f688a15d7a92d2ffb3) | TASK-0262 | Public Build Week boundary/attribution/judging guide, README EN/TR disclosure, safety/privacy/product/support documentation, and final local evidence |
 
-TASK-0262 adds the public Build Week narrative and final validation evidence after the implementation range. A Git commit cannot embed its own future SHA without changing that SHA; the exact TASK-0262 documentation commit is therefore recorded by the immediately following evidence-only commit and by the final completion report. This is an explicit audit constraint, not an omitted or rewritten history entry.
+An immediate evidence-only successor records the hosted results for `00c9fea`; it does not change the feature or public-documentation boundary above. A Git commit cannot embed its own future SHA or push-triggered run IDs without changing that SHA and triggering different runs. The final evidence-closure SHA and its hosted results are therefore supplied by the immutable Git history and final completion report. This is an explicit audit constraint, not omitted or rewritten history.
 
 To reproduce the range without relying on rewritten history:
 
 ```powershell
-git log --reverse --format='%H %s' 6998e269af4962bbe70a9cb4044727d25dc1a06d..7bf37cb83de64c7950e0bd27336fbc26758eb56a
-git diff --stat 6998e269af4962bbe70a9cb4044727d25dc1a06d..7bf37cb83de64c7950e0bd27336fbc26758eb56a
+git log --reverse --format='%H %s' 6998e269af4962bbe70a9cb4044727d25dc1a06d..00c9fea3893776f0bc9026f688a15d7a92d2ffb3
+git diff --stat 6998e269af4962bbe70a9cb4044727d25dc1a06d..00c9fea3893776f0bc9026f688a15d7a92d2ffb3
 ```
 
 ## How Codex and GPT-5.6 were used
@@ -117,7 +118,7 @@ Generated `.ackit/` reports are local/ignored review artifacts. Do not commit th
 
 ## Verification evidence
 
-Every implementation commit was normally pushed only after local validation; all three push-triggered workflows completed successfully for each exact SHA.
+Every feature/public-documentation commit was normally pushed only after local validation; all three push-triggered workflows completed successfully for each exact SHA.
 
 | Commit | CI | Published-package smoke | Current-source smoke |
 | --- | --- | --- | --- |
@@ -125,8 +126,9 @@ Every implementation commit was normally pushed only after local validation; all
 | `d49bd446` | [29650061884](https://github.com/Cynrath/agent-context-kit/actions/runs/29650061884) | [29650061875](https://github.com/Cynrath/agent-context-kit/actions/runs/29650061875) | [29650061881](https://github.com/Cynrath/agent-context-kit/actions/runs/29650061881) |
 | `c79932af` | [29651733106](https://github.com/Cynrath/agent-context-kit/actions/runs/29651733106) | [29651733087](https://github.com/Cynrath/agent-context-kit/actions/runs/29651733087) | [29651733085](https://github.com/Cynrath/agent-context-kit/actions/runs/29651733085) |
 | `7bf37cb8` | [29653163763](https://github.com/Cynrath/agent-context-kit/actions/runs/29653163763) | [29653163773](https://github.com/Cynrath/agent-context-kit/actions/runs/29653163773) | [29653163760](https://github.com/Cynrath/agent-context-kit/actions/runs/29653163760) |
+| `00c9fea3` | [29653893305](https://github.com/Cynrath/agent-context-kit/actions/runs/29653893305) | [29653893245](https://github.com/Cynrath/agent-context-kit/actions/runs/29653893245) | [29653893249](https://github.com/Cynrath/agent-context-kit/actions/runs/29653893249) |
 
-Latest verified local implementation totals before the documentation-only closure:
+Latest verified local totals at the public documentation commit:
 
 - Release build: 0 warnings, 0 errors;
 - full tests: 463 passed, 0 failed, 0 skipped;

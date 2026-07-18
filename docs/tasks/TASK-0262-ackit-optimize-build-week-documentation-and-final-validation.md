@@ -103,9 +103,17 @@ Use normal successor commits to correct public docs or implementation. Never rew
 
 ## Completion notes
 
-Status: `ACTIVE / PUBLIC DOCUMENTATION PREPARED / LOCAL FINAL VALIDATION PASS / PUBLIC-DOC COMMIT PENDING`.
+Status: `FINAL EVIDENCE CLOSURE`; completion condition is this evidence-only commit's three standard workflows passing plus clean local/origin equality. Its self-referential SHA/run evidence is recorded in the final report.
 
 Started from clean synchronized commit `7bf37cb83de64c7950e0bd27336fbc26758eb56a` after TASK-0261 CI, published-package smoke, and three-platform current-source smoke all completed successfully. Public documentation now distinguishes immutable RC1 from current-source Optimize, discloses Codex/GPT-5.6 assistance and human decision boundaries, and provides reproducible source/demo instructions. Exact TASK-0262 commits, final validation totals, hosted runs, and clean local/origin equality will be recorded only after they exist.
+
+Public feature/documentation commit and hosted evidence:
+
+- Exact commit: `00c9fea3893776f0bc9026f688a15d7a92d2ffb3`.
+- CI run `29653893305`: PASS — https://github.com/Cynrath/agent-context-kit/actions/runs/29653893305
+- Published-package cross-platform smoke run `29653893245`: PASS on Windows, Ubuntu, and macOS — https://github.com/Cynrath/agent-context-kit/actions/runs/29653893245
+- Current-source cross-platform smoke run `29653893249`: PASS on Windows, Ubuntu, and macOS, including Optimize JSON/proposal/SARIF — https://github.com/Cynrath/agent-context-kit/actions/runs/29653893249
+- The following evidence-only commit records these results. Its own exact SHA and push-triggered results cannot be self-embedded and are supplied by the final completion report after verification.
 
 Local pre-commit validation on 2026-07-18:
 
