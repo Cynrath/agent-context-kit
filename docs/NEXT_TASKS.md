@@ -3,8 +3,8 @@
 ## Active: OpenAI Build Week 2026 — ACKit Optimize
 
 1. Completed: TASK-0258 planning commit `a227c045` is pushed and all three push-triggered workflow runs passed.
-2. Validate, commit, and push TASK-0259 Core instruction audit domain; record hosted CI after the 12/12 focused and 443/443 full local pass.
-3. Execute TASK-0260 additive `ackit optimize` CLI/output/schema/localization contracts.
+2. Completed: TASK-0259 Core instruction audit domain is pushed at `d49bd446`; all three push-triggered workflows passed.
+3. In progress / local pass: TASK-0260 additive `ackit optimize` CLI/output/schema/localization contracts; commit/push and hosted workflow evidence are next.
 4. Execute TASK-0261 explicit-path non-overwriting proposal and synthetic demo.
 5. Execute TASK-0262 truthful Build Week public documentation, complete local gates, normal pushes, hosted CI monitoring, and final clean local/origin equality.
 

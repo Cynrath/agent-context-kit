@@ -9,6 +9,7 @@ public sealed class LocalizationParityTests
         new("init", ["init"]),
         new("config-check", ["config-check"]),
         new("scan", ["scan"]),
+        new("optimize", ["optimize"]),
         new("baseline", ["baseline"]),
         new("sarif", ["sarif", "--output", ".ackit/reports/parity.sarif"]),
         new("report", ["report", "--output", ".ackit/reports/parity.html"]),
@@ -28,6 +29,7 @@ public sealed class LocalizationParityTests
         new("init", ["init"], "Detected agent instruction files:", "Algılanan agent yönerge dosyaları:"),
         new("config-check", ["config-check"], "Configuration check", "Yapılandırma kontrolü"),
         new("scan", ["scan"], "Repository health:", "Repository sağlığı:"),
+        new("optimize", ["optimize"], "ACKit Optimize instruction audit", "ACKit Optimize yönerge denetimi"),
         new("baseline", ["baseline"], "Baseline created", "Baseline oluşturuldu"),
         new("sarif", ["sarif", "--output", ".ackit/reports/parity.sarif"], "SARIF findings", "SARIF bulguları"),
         new("report", ["report", "--output", ".ackit/reports/parity.html"], "Risk findings", "Risk bulguları"),
@@ -91,6 +93,7 @@ public sealed class LocalizationParityTests
         var cases = new[]
         {
             new ErrorCase(["sarif"], "requires --output", "gerektirir"),
+            new ErrorCase(["optimize", "--format", "markdown"], "require --output", "--output"),
             new ErrorCase(["context-export"], "requires explicit --approve", "açık bir --approve onayı gerektirir"),
             new ErrorCase(["context-export", "--approve"], "requires --prompt-pack", "--prompt-pack <repo-relative.md> gerektirir"),
             new ErrorCase(["task"], "requires a title", "bir başlık gerektirir"),

@@ -623,7 +623,7 @@ public sealed class InstructionAuditor : IInstructionAuditor
                         InstructionAuditRuleCatalog.RedundantNearDuplicate,
                         redundant,
                         [left],
-                        $"Normalized token similarity is {similarity:0.00}, at or above the conservative 0.88 review threshold.");
+                        $"Normalized token similarity is {similarity.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)}, at or above the conservative 0.88 review threshold.");
                 }
             }
         }

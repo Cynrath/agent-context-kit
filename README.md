@@ -99,6 +99,7 @@ AgentContextKit gives teams a repeatable local workflow before they hand a repos
 | Goal | Start here |
 | --- | --- |
 | Check whether a repository is ready for AI-assisted work | `ackit doctor` then `ackit scan --ci` |
+| Audit agent instruction quality and context cost | Current source: `ackit optimize` |
 | Create agent instructions for the current project | `ackit generate --target all` |
 | Start a traceable implementation task | `ackit task "Describe the focused change"` |
 | Review findings visually without a server | `ackit report` or `ackit webui` |
@@ -115,6 +116,7 @@ AgentContextKit gives teams a repeatable local workflow before they hand a repos
 | Scan repository | `ackit scan` | Stack, docs, tests, CI, Docker, agent files, risky paths |
 | Filter scan scope | `ackit scan --include <glob> --exclude <glob>` | Current-source ad-hoc include/exclude filters |
 | Fail CI on risk | `ackit scan --ci` | Non-zero exit on high or critical findings |
+| Audit agent instructions | `ackit optimize` | Post-RC1 current-source scope, conflict, quality, and context-cost findings; no source rewrite |
 | Record reviewed findings | `ackit baseline` | Sanitized local baseline for opt-in new-finding CI policy |
 | Generate SARIF | `ackit sarif` | Privacy-first SARIF 2.1.0 report from the published package or current source |
 | Build HTML report | `ackit report` | Offline static scan report |
@@ -198,9 +200,10 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --json
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --include 'src/**' --exclude '**/*.bak' --ci
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
+dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json
 ```
 
-The published `1.0.0-rc.1` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands.
+The published `1.0.0-rc.1` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands. It predates ACKit Optimize; the Build Week command is currently demonstrated from source and does not retroactively change the RC1 package, tag, release, assets, or attestations.
 
 ### Try it on a sample
 
@@ -245,12 +248,13 @@ Pop-Location
 ---
 
 ## CLI Command Map
-This map follows published `1.0.0-rc.1` `--help`, `docs/CLI_CONTRACT.md`, and `docs/CLI_REFERENCE.md`.
+This map combines the immutable published `1.0.0-rc.1` foundation with documented current-source additions in `docs/CLI_CONTRACT.md` and `docs/CLI_REFERENCE.md`. `ackit optimize` is post-RC1 and is not in the published package.
 
 ```text
 ackit init [--lang en|tr] [--json]
 ackit config-check [--lang en|tr] [--json]
 ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
+ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
 ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]
 ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]
 ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]

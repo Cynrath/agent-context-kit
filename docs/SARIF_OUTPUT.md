@@ -5,11 +5,25 @@ Current `ackit sarif` emits AgentContextKit results only. External SARIF import 
 
 AgentContextKit published `1.0.0-rc.1` package and current source can write scanner findings as SARIF 2.1.0 for CI review and future GitHub Code Scanning workflows.
 
-Availability note: the published NuGet package `AgentContextKit` `1.0.0-rc.1` includes `ackit sarif`.
+Availability note: the published NuGet package `AgentContextKit` `1.0.0-rc.1` includes scanner `ackit sarif`. It predates the separate post-RC1 `ackit optimize --format sarif` current-source workflow.
 
 TASK-0092 conditionally freezes SARIF `2.1.0`, repository-relative locations, visible findings, and the no-raw-match privacy boundary for release-candidate preparation.
 
 The local machine-readable profile is `docs/schemas/ackit-sarif-profile-v1.schema.json`, with a sanitized golden fixture at `tests/fixtures/contracts/sarif-profile-v1-golden.json`. The profile adds AgentContextKit tool/privacy requirements and does not replace the official complete SARIF schema.
+
+Optimize SARIF has its own additive local profile at `docs/schemas/ackit-optimize-sarif-profile-v1.schema.json` and golden fixture at `tests/fixtures/contracts/optimize-sarif-profile-v1-golden.json`.
+
+## Optimize SARIF
+
+Current source can render instruction audit findings as SARIF 2.1.0:
+
+```powershell
+dotnet run --project src/AgentContextKit.Cli -- optimize --format sarif --output .ackit/reports/instructions.sarif
+```
+
+The command requires an explicit repository-relative `.sarif` path and skips an existing file without overwriting it. Its driver name is `AgentContextKit Optimize`; the rule catalog contains `ACKITOPT001`-`ACKITOPT015`. Results include repository-relative `/` artifact URIs, one-based line regions, related locations, a stable fingerprint, category, directory scope, sanitized evidence/remediation, and deterministic/heuristic classification.
+
+Optimize SARIF does not include raw instruction bodies, absolute repository roots, external asset references, uploads, or Code Scanning mutation. Critical/High findings map to `error`, Medium to `warning`, and Low/Info to `note`. The `--ci` process exit is independent of the selected output format.
 
 ## What SARIF Is
 SARIF is a standard JSON format for static analysis results. Security platforms and CI systems can read it to show findings with rules, severity levels, messages, and file locations.
@@ -117,7 +131,7 @@ permissions:
 Keep upload workflows maintainer-reviewed because Code Scanning is a public repository integration surface.
 
 ## Limitations
-- The first SARIF MVP uses file-level locations.
-- Full line and column mapping is reserved for a later version.
+- Scanner `ackit sarif` uses file-level locations. Optimize SARIF includes line ranges when the Markdown parser can identify them; columns are not emitted.
 - SARIF upload is documentation-only in this task.
 - Pattern-based scanner results still require maintainer review before public release decisions.
+- Heuristic Optimize findings remain human-review signals even when represented in SARIF.

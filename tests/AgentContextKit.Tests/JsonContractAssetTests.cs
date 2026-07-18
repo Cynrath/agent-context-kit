@@ -9,6 +9,7 @@ public sealed class JsonContractAssetTests
         "init",
         "config-check",
         "scan",
+        "optimize",
         "baseline",
         "sarif",
         "report",
@@ -99,6 +100,31 @@ public sealed class JsonContractAssetTests
     }
 
     [Fact]
+    public void OptimizeSarifProfileAndGoldenFixtureKeepInstructionReviewContract()
+    {
+        var root = LocateRepositoryRoot();
+        var schema = LoadObject(root, "docs/schemas/ackit-optimize-sarif-profile-v1.schema.json");
+        var golden = LoadObject(root, "tests/fixtures/contracts/optimize-sarif-profile-v1-golden.json");
+
+        AssertRequiredFields(golden, ReadStrings(schema["required"]), []);
+        Assert.Equal("2.1.0", golden["version"]?.GetValue<string>());
+        Assert.Equal("AgentContextKit Optimize", golden["runs"]?[0]?["tool"]?["driver"]?["name"]?.GetValue<string>());
+        var rule = Assert.Single(golden["runs"]?[0]?["tool"]?["driver"]?["rules"]?.AsArray() ?? []);
+        Assert.Matches("^ACKITOPT[0-9]{3}$", rule?["id"]?.GetValue<string>() ?? "");
+
+        var result = Assert.Single(golden["runs"]?[0]?["results"]?.AsArray() ?? []);
+        Assert.Matches("^ACKITOPT[0-9]{3}$", result?["ruleId"]?.GetValue<string>() ?? "");
+        Assert.Matches("^[a-f0-9]{64}$", result?["fingerprints"]?["ackitOptimize/v1"]?.GetValue<string>() ?? "");
+        Assert.True(result?["locations"]?[0]?["physicalLocation"]?["region"]?["startLine"]?.GetValue<int>() >= 1);
+        var uri = result?["locations"]?[0]?["physicalLocation"]?["artifactLocation"]?["uri"]?.GetValue<string>() ?? "";
+        Assert.DoesNotContain(':', uri);
+        Assert.DoesNotContain('\\', uri);
+        Assert.NotNull(result?["properties"]?["deterministic"]);
+        Assert.NotNull(result?["properties"]?["heuristic"]);
+        Assert.Null(result?["match"]);
+    }
+
+    [Fact]
     public void ContractAssetsDoNotContainPrivateLiteralPatterns()
     {
         var root = LocateRepositoryRoot();
@@ -107,9 +133,11 @@ public sealed class JsonContractAssetTests
             "docs/schemas/ackit-command-output-v2.schema.json",
             "docs/schemas/ackit-baseline-v1.schema.json",
             "docs/schemas/ackit-sarif-profile-v1.schema.json",
+            "docs/schemas/ackit-optimize-sarif-profile-v1.schema.json",
             "tests/fixtures/contracts/command-output-v2-golden.json",
             "tests/fixtures/contracts/baseline-v1-golden.json",
-            "tests/fixtures/contracts/sarif-profile-v1-golden.json"
+            "tests/fixtures/contracts/sarif-profile-v1-golden.json",
+            "tests/fixtures/contracts/optimize-sarif-profile-v1-golden.json"
         };
 
         foreach (var path in paths)
@@ -130,6 +158,7 @@ public sealed class JsonContractAssetTests
             ("init", ["init", "--json"]),
             ("config-check", ["config-check", "--json"]),
             ("scan", ["scan", "--json"]),
+            ("optimize", ["optimize", "--json"]),
             ("baseline", ["baseline", "--output", ".ackit-baseline.json", "--json"]),
             ("sarif", ["sarif", "--output", ".ackit/reports/contract.sarif", "--json"]),
             ("report", ["report", "--output", ".ackit/reports/contract.html", "--json"]),

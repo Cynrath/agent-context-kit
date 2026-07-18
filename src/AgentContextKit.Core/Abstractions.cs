@@ -18,6 +18,32 @@ public interface IInstructionAuditor
         CancellationToken cancellationToken = default);
 }
 
+public interface IInstructionAuditReportWriter
+{
+    string RenderJson(
+        InstructionAuditResult result,
+        InstructionAuditReportContext context,
+        InstructionAuditOutputInfo output);
+
+    string RenderMarkdown(InstructionAuditResult result, string repositoryName);
+
+    string RenderSarif(InstructionAuditResult result, string toolVersion);
+
+    string RenderHtml(InstructionAuditResult result, string repositoryName);
+
+    GeneratedFileResult Generate(
+        string repositoryPath,
+        string relativeOutputPath,
+        InstructionAuditReportFormat format,
+        string content);
+
+    GeneratedFileResult GenerateJson(
+        string repositoryPath,
+        string relativeOutputPath,
+        InstructionAuditResult result,
+        InstructionAuditReportContext context);
+}
+
 public interface IStackDetector
 {
     IReadOnlyList<StackInfo> Detect(string repositoryPath, IReadOnlyList<string> relativeFiles);

@@ -82,6 +82,7 @@ AI coding agent’ları güçlüdür; ancak eksik, eski veya güvensiz bağlam a
 | Amaç | İlk komutlar |
 | --- | --- |
 | Repository AI destekli çalışmaya hazır mı? | `ackit doctor`, ardından `ackit scan --ci` |
+| Agent talimat kalitesini ve bağlam maliyetini denetlemek | Güncel kaynak kod: `ackit optimize` |
 | Proje için agent talimatları üretmek | `ackit generate --target all` |
 | İzlenebilir bir geliştirme işi başlatmak | `ackit task "Odaklı değişikliği açıklayın"` |
 | Bulguları sunucusuz görsel incelemek | `ackit report` veya `ackit webui` |
@@ -98,6 +99,7 @@ AI coding agent’ları güçlüdür; ancak eksik, eski veya güvensiz bağlam a
 | Repository’yi tara | `ackit scan` | Stack, doküman, test, CI, Docker, agent ve riskli yol sinyalleri |
 | Tarama kapsamını filtrele | `ackit scan --include <glob> --exclude <glob>` | Ad-hoc include/exclude filtreleri |
 | Riskte CI’ı durdur | `ackit scan --ci` | High veya Critical bulguda sıfırdan farklı çıkış |
+| Agent talimatlarını denetle | `ackit optimize` | RC1 sonrası güncel kaynak kodda kapsam, çelişki, kalite ve bağlam maliyeti bulguları; kaynak dosya yeniden yazılmaz |
 | İncelenmiş bulguları kaydet | `ackit baseline` | Yeni bulgu politikasına uygun yerel sanitize baseline |
 | SARIF üret | `ackit sarif` | Gizlilik-öncelikli SARIF 2.1.0 raporu |
 | HTML rapor oluştur | `ackit report` | Çevrimdışı statik tarama raporu |
@@ -164,7 +166,10 @@ dotnet test AgentContextKit.sln -c Release --no-build
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- --help
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
+dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json
 ```
+
+Yayımlanmış `1.0.0-rc.1` paketi ACKit Optimize’dan önce gelir. Build Week komutu şu anda kaynak koddan gösterilir; RC1 paketi, etiketi, GitHub Release’i, asset’leri veya attestation kayıtları geriye dönük değiştirilmemiştir.
 
 ### Örnek üzerinde deneyin
 
@@ -180,12 +185,13 @@ Pop-Location
 
 ## CLI Komut Haritası
 
-Bu harita yayımlanmış `1.0.0-rc.1` yardım çıktısı ile [CLI Contract](docs/CLI_CONTRACT.md) ve [CLI Reference](docs/CLI_REFERENCE.md) belgelerini izler.
+Bu harita değiştirilemez yayımlanmış `1.0.0-rc.1` temelini [CLI Contract](docs/CLI_CONTRACT.md) ve [CLI Reference](docs/CLI_REFERENCE.md) içindeki güncel kaynak kod ekleriyle birlikte gösterir. `ackit optimize`, RC1 sonrası eklenmiştir ve yayımlanmış pakette yoktur.
 
 ```text
 ackit init [--lang en|tr] [--json]
 ackit config-check [--lang en|tr] [--json]
 ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
+ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
 ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]
 ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]
 ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]

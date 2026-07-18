@@ -24,7 +24,7 @@ During development, run the CLI through:
 dotnet run --project src/AgentContextKit.Cli -- <command>
 ```
 
-Current package note: published prerelease `1.0.0-rc.1` preserves the frozen command surface that includes `ackit sarif`. Alpha4 is the immutable upgrade predecessor; older alpha references elsewhere are historical evidence.
+Current package note: published prerelease `1.0.0-rc.1` preserves the frozen command surface that includes `ackit sarif`. It predates the post-RC1 Build Week `ackit optimize` source addition. Alpha4 is the immutable upgrade predecessor; older alpha references elsewhere are historical evidence.
 
 ## Stable Command Surface
 The v1.0 target command surface is:
@@ -33,6 +33,7 @@ The v1.0 target command surface is:
 ackit init [--lang en|tr] [--json]
 ackit config-check [--lang en|tr] [--json]
 ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
+ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
 ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]
 ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]
 ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]
@@ -64,6 +65,7 @@ ackit help
 - Keep offline-first behavior as the default.
 - Keep public release actions outside the CLI command contract.
 - Keep command identifiers, scanner rule IDs, config diagnostic IDs, exit semantics, and the documented SARIF profile stable within the same target contract.
+- Treat `ackit optimize` as a current-source, post-RC1 additive contract. Do not imply that it exists in the immutable `1.0.0-rc.1` package.
 - Localized human-readable prose is not byte-for-byte stable; localization must not change technical tokens or machine-readable contracts.
 
 The selected exact source-impacting candidate is the TASK-0239 commit containing version/workflow/fixture/test preparation. TASK-0240 and TASK-0241 must remain docs/evidence/governance-only; any later behavior change invalidates hosted evidence and reopens the selection and freeze.
@@ -73,10 +75,12 @@ The selected exact source-impacting candidate is the TASK-0239 commit containing
 - Human-readable headings, labels, summaries, and known argument errors are localized; command names, option names, rule/diagnostic IDs, paths, and exit decisions remain stable.
 - `scripts/check-localization-parity.ps1` release-gates all language-aware commands, invalid-invocation parity, and JSON invariance.
 - `--json`: emits machine-readable JSON where supported.
-- `--ci`: applies only to `scan`; default mode evaluates every finding, while explicit baseline mode evaluates only new High/Critical findings.
+- `--ci`: applies to `scan` and `optimize`. Scan default mode evaluates every finding, while explicit baseline mode evaluates only new High/Critical findings. Optimize has no baseline mode and evaluates its instruction findings.
 - `--baseline <repo-relative.json>`: opts `scan` into baseline classification/new-finding CI policy and adds the same classification metadata to `sarif`, `report`, or `webui` output.
-- `--include <glob>` (repeatable, `scan` only): restrict `scan` to relative paths matching at least one glob. Globs support `*` (single segment), `**` (any depth), and `?` (single character). If no `--include` is set, every file is considered. Empty or whitespace-only globs are rejected and return exit `1` with an "Invalid argument" error.
-- `--exclude <glob>` (repeatable, `scan` only): drop relative paths matching any glob. Same glob syntax as `--include`. Applied after `--include`. Empty or whitespace-only globs are rejected and return exit `1`.
+- `--include <glob>` (repeatable, `scan` and `optimize`): restrict discovery to relative paths matching at least one glob. Globs support `*` (single segment), `**` (any depth), and `?` (single character). If no `--include` is set, every otherwise eligible path is considered. Empty or whitespace-only globs are rejected and return exit `1` with an "Invalid argument" error.
+- `--exclude <glob>` (repeatable, `scan` and `optimize`): drop relative paths matching any glob. Same glob syntax as `--include`. Applied after `--include`. Empty or whitespace-only globs are rejected and return exit `1`.
+- `--format console|json|markdown|sarif|html`: selects `ackit optimize` output. `--json` is an alias for JSON and conflicts with a non-JSON format.
+- `--output <repo-relative-file>`: optional for Optimize JSON, required for Optimize Markdown/SARIF/HTML, and unsupported for Optimize console output.
 - `--update`: permits explicit replacement only for `ackit baseline`.
 - `--target`: selects the generator or hooks target where supported. Current hooks targets are `codex`, `claude`, `anthropic`, and `continue`.
 - `--shell pwsh|sh`: selects hook script syntax where hooks need a script. Continue hooks are shell-agnostic, but only these two shell values are accepted.
@@ -91,6 +95,7 @@ Generated local artifacts must stay repository-relative:
 - `.ackit/prompt-packs/prompt-pack.md`
 - `.ackit/context-exports/context-export-manifest.json`
 - `.ackit-baseline.json`
+- Explicit Optimize artifacts such as `.ackit/reports/instructions.json`, `.ackit/reports/instructions.md`, `.ackit/reports/instructions.sarif`, or `.ackit/reports/instructions.html`
 - `docs/tasks/TASK-####.md`
 
 Generated artifact directories under `.ackit/` are ignored by default.
@@ -107,6 +112,8 @@ Stable expectations:
 
 `scan --baseline <path> --ci` is an explicit alternate policy: every finding remains visible, but only new High/Critical findings fail the process. Missing, malformed, incompatible, or tampered baseline files return `1`.
 
+`optimize` is report-only by default and returns `0` even when findings exist. `optimize --ci` returns `2` for Critical findings, `1` for High findings when no Critical finding exists, and `0` otherwise. Invalid formats or output paths return `1`. Output format and language do not change the decision.
+
 `config-check` is read-only. Missing/valid/warning-only config returns `0`; Error diagnostics return `1`. It does not change the existing config reader fallback used by other commands and never auto-migrates the file.
 
 Exit decisions are language- and output-format-independent. When a JSON payload includes `exitCode`, it must equal the process exit code returned for the equivalent human-readable invocation.
@@ -117,6 +124,7 @@ JSON output is documented in `docs/JSON_OUTPUT.md`.
 Stable expectations:
 - JSON output includes `schemaVersion`, `toolVersion`, `generatedAtUtc`, and `command` where supported.
 - Repository-scoped JSON output includes repository metadata.
+- Optimize JSON includes sanitized instruction summaries, deterministic metrics, sources, scopes, valid scoped overrides, findings, and output status. It never includes an absolute repository root or raw instruction bodies.
 - Human output and JSON output use the same process exit code.
 - JSON schema can still be revised before v1.0; v1.0 should freeze or explicitly version any breaking changes.
 
@@ -134,6 +142,7 @@ The stable CLI contract does not include:
 - Repository upload.
 - GitHub Code Scanning upload.
 - Automatic redaction or deletion.
+- Automatic instruction rewriting or conflict resolution.
 
 These remain maintainer-only or future explicitly documented tasks.
 

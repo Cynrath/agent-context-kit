@@ -9,6 +9,7 @@ Supported commands:
 - `ackit init --json`
 - `ackit config-check --json`
 - `ackit scan --json`
+- `ackit optimize --json`
 - `ackit baseline --json`
 - `ackit sarif --json`
 - `ackit report --json`
@@ -70,6 +71,7 @@ Schema version `2` adds:
 - `baseline` on current-source `baseline --json` and opt-in `scan --baseline <path> --json` output. The existing-versus-new classification is documented in [BASELINE_MODEL.md](BASELINE_MODEL.md).
 - `config`, `diagnosticSummary`, and sanitized `diagnostics` on current-source `config-check --json` output.
 - `target`, `install`, `dryRun`, `shell`, `mode`, and planned hook `files` with sanitized `contentLength` on current-source `hooks --json` output.
+- `format`, `output`, `auditSummary`, `instructionMetrics`, `sources`, `scopes`, `scopedOverrides`, and `instructionFindings` on post-RC1 current-source `optimize --json` output.
 
 ## Exit Codes
 Human output and JSON output use the same exit code strategy.
@@ -91,6 +93,12 @@ See [EXIT_CODES.md](EXIT_CODES.md) for the full exit code matrix.
 - `1`: new high findings or baseline load/integrity error
 - `2`: new critical findings
 
+`optimize --ci`:
+
+- `0`: no High/Critical instruction findings
+- `1`: High instruction findings and no Critical finding
+- `2`: any Critical instruction finding
+
 `doctor`:
 - `0`: no failed high/critical checks
 - `1`: at least one failed high/critical check
@@ -100,6 +108,59 @@ See [EXIT_CODES.md](EXIT_CODES.md) for the full exit code matrix.
 - `1`: one or more Error diagnostics
 
 Config diagnostics include stable `code`, `severity`, one-based `line`, optional `key`, and sanitized `message`. Raw values and full config lines are not emitted. `config.migrationRequired` is true for obsolete keys or unsupported schema versions; the command does not rewrite the file.
+
+## Optimize JSON
+
+`ackit optimize --json` and `ackit optimize --format json` are equivalent and write one schema-v2 JSON object to stdout. An explicit `--output <repo-relative.json>` writes the same review contract to a non-existing file and prints localized generated-file status to stdout.
+
+```json
+{
+  "schemaVersion": 2,
+  "toolVersion": "1.0.0-rc.1",
+  "generatedAtUtc": "2026-07-18T12:00:00+00:00",
+  "command": "optimize",
+  "repositoryName": "synthetic-demo",
+  "ciMode": false,
+  "exitCode": 0,
+  "format": "json",
+  "output": {
+    "path": "stdout",
+    "status": "StandardOutput",
+    "created": false
+  },
+  "auditSummary": {
+    "sourceCount": 0,
+    "ruleCount": 0,
+    "scopeCount": 0,
+    "scopedOverrideCount": 0,
+    "findingCount": 0,
+    "deterministicCount": 0,
+    "heuristicCount": 0,
+    "severity": {
+      "total": 0,
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "info": 0
+    }
+  },
+  "instructionMetrics": {
+    "total": { "characters": 0, "words": 0, "lines": 0, "estimatedTokens": 0 },
+    "duplicated": { "characters": 0, "words": 0, "lines": 0, "estimatedTokens": 0 },
+    "avoidable": { "characters": 0, "words": 0, "lines": 0, "estimatedTokens": 0 },
+    "estimationMethod": "Estimated tokens = ceiling of normalized UTF-16 character count divided by 4. This is a deterministic local size estimate, not exact tokenizer output or model billing."
+  },
+  "sources": [],
+  "scopes": [],
+  "scopedOverrides": [],
+  "instructionFindings": []
+}
+```
+
+Successful findings contain stable `ACKITOPT` rule IDs, fingerprints, severity/category, repository-relative source file and one-based line range, directory scope, sanitized explanation/evidence/remediation, related locations, and both `deterministic` and `heuristic` booleans. Source rule bodies and absolute repository paths are omitted. Error payloads include `command`, `exitCode: 1`, and a stable `error.code` without echoing unsafe path values.
+
+The Optimize branch is additive to schema v2 and covered by `docs/schemas/ackit-command-output-v2.schema.json` plus the sanitized golden fixture. Published `1.0.0-rc.1` predates this branch even though current source retains the existing package version metadata; Build Week availability is established by source commit evidence, not by rewriting that release.
 
 ## Example
 ```powershell

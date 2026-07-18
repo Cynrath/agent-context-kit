@@ -109,6 +109,15 @@ jobs:
               & $env:ACKIT_EXE init --lang en
               & $env:ACKIT_EXE scan --ci
               & $env:ACKIT_EXE generate --target all --lang en
+              $optimizeJson = & $env:ACKIT_EXE optimize --json | ConvertFrom-Json
+              if ($optimizeJson.command -ne "optimize" -or $optimizeJson.schemaVersion -ne 2) {
+                throw "Unexpected ackit optimize JSON contract."
+              }
+              & $env:ACKIT_EXE optimize --format sarif --output .ackit/reports/optimize.sarif
+              $optimizeSarif = Get-Content -Raw .ackit/reports/optimize.sarif | ConvertFrom-Json
+              if ($optimizeSarif.version -ne "2.1.0" -or $optimizeSarif.runs[0].tool.driver.name -ne "AgentContextKit Optimize") {
+                throw "Unexpected ackit optimize SARIF contract."
+              }
               & $env:ACKIT_EXE task "Cross platform source smoke test" --lang en
               & $env:ACKIT_EXE report --output .ackit/reports/smoke.html
               & $env:ACKIT_EXE webui --output .ackit/webui/index.html

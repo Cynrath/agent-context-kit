@@ -20,6 +20,7 @@
         "init",
         "config-check",
         "scan",
+        "optimize",
         "baseline",
         "sarif",
         "report",
@@ -36,6 +37,14 @@
     "repositoryName": { "type": "string", "minLength": 1 },
     "ciMode": { "type": "boolean" },
     "exitCode": { "type": "integer", "enum": [0, 1, 2] },
+    "format": { "type": "string", "enum": ["json"] },
+    "output": { "$ref": "#/$defs/generatedFile" },
+    "auditSummary": { "$ref": "#/$defs/instructionAuditSummary" },
+    "instructionMetrics": { "$ref": "#/$defs/instructionMetrics" },
+    "sources": { "type": "array", "items": { "$ref": "#/$defs/instructionSource" } },
+    "scopes": { "type": "array", "items": { "$ref": "#/$defs/instructionScope" } },
+    "scopedOverrides": { "type": "array", "items": { "$ref": "#/$defs/scopedOverride" } },
+    "instructionFindings": { "type": "array", "items": { "$ref": "#/$defs/instructionFinding" } },
     "fileCount": { "type": "integer", "minimum": 0 },
     "target": { "type": "string" },
     "profile": { "type": "string" },
@@ -102,6 +111,10 @@
     {
       "if": { "properties": { "command": { "const": "scan" } }, "required": ["command"] },
       "then": { "required": ["ciMode", "exitCode", "repositoryPath", "repositoryName", "fileCount", "stacks", "health", "riskSummary", "findings", "suppressionSummary", "suppressions"] }
+    },
+    {
+      "if": { "properties": { "command": { "const": "optimize" } }, "required": ["command"] },
+      "then": { "required": ["repositoryName", "ciMode", "exitCode", "format", "output", "auditSummary", "instructionMetrics", "sources", "scopes", "scopedOverrides", "instructionFindings"] }
     },
     {
       "if": { "properties": { "command": { "const": "baseline" } }, "required": ["command"] },
@@ -179,6 +192,111 @@
         "path": { "type": "string" },
         "message": { "type": "string" },
         "match": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "instructionAuditSummary": {
+      "type": "object",
+      "required": ["sourceCount", "ruleCount", "scopeCount", "scopedOverrideCount", "findingCount", "deterministicCount", "heuristicCount", "severity"],
+      "properties": {
+        "sourceCount": { "type": "integer", "minimum": 0 },
+        "ruleCount": { "type": "integer", "minimum": 0 },
+        "scopeCount": { "type": "integer", "minimum": 0 },
+        "scopedOverrideCount": { "type": "integer", "minimum": 0 },
+        "findingCount": { "type": "integer", "minimum": 0 },
+        "deterministicCount": { "type": "integer", "minimum": 0 },
+        "heuristicCount": { "type": "integer", "minimum": 0 },
+        "severity": { "$ref": "#/$defs/riskSummary" }
+      },
+      "additionalProperties": true
+    },
+    "contentMetrics": {
+      "type": "object",
+      "required": ["characters", "words", "lines", "estimatedTokens"],
+      "properties": {
+        "characters": { "type": "integer", "minimum": 0 },
+        "words": { "type": "integer", "minimum": 0 },
+        "lines": { "type": "integer", "minimum": 0 },
+        "estimatedTokens": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "instructionMetrics": {
+      "type": "object",
+      "required": ["total", "duplicated", "avoidable", "estimationMethod"],
+      "properties": {
+        "total": { "$ref": "#/$defs/contentMetrics" },
+        "duplicated": { "$ref": "#/$defs/contentMetrics" },
+        "avoidable": { "$ref": "#/$defs/contentMetrics" },
+        "estimationMethod": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "instructionSource": {
+      "type": "object",
+      "required": ["path", "type", "directoryScope", "precedence", "appliesToDescendants", "inheritedApplicability", "metrics", "ruleCount"],
+      "properties": {
+        "path": { "type": "string" },
+        "type": { "type": "string" },
+        "directoryScope": { "type": "string" },
+        "precedence": { "type": "integer" },
+        "appliesToDescendants": { "type": "boolean" },
+        "inheritedApplicability": { "type": "string" },
+        "metrics": { "$ref": "#/$defs/contentMetrics" },
+        "ruleCount": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "instructionScope": {
+      "type": "object",
+      "required": ["directoryScope", "applicableSourcePaths", "scopedOverrideCount"],
+      "properties": {
+        "directoryScope": { "type": "string" },
+        "applicableSourcePaths": { "type": "array", "items": { "type": "string" } },
+        "scopedOverrideCount": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "instructionLocation": {
+      "type": "object",
+      "required": ["path", "startLine", "endLine", "directoryScope"],
+      "properties": {
+        "path": { "type": "string" },
+        "startLine": { "type": "integer", "minimum": 1 },
+        "endLine": { "type": "integer", "minimum": 1 },
+        "directoryScope": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "scopedOverride": {
+      "type": "object",
+      "required": ["directoryScope", "broaderRule", "narrowerRule", "reason"],
+      "properties": {
+        "directoryScope": { "type": "string" },
+        "broaderRule": { "$ref": "#/$defs/instructionLocation" },
+        "narrowerRule": { "$ref": "#/$defs/instructionLocation" },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "instructionFinding": {
+      "type": "object",
+      "required": ["ruleId", "fingerprint", "severity", "category", "sourceFile", "startLine", "endLine", "directoryScope", "explanation", "evidence", "remediation", "deterministic", "heuristic", "relatedLocations"],
+      "properties": {
+        "ruleId": { "type": "string", "pattern": "^ACKITOPT[0-9]{3}$" },
+        "fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "severity": { "type": "string" },
+        "category": { "type": "string" },
+        "sourceFile": { "type": "string" },
+        "startLine": { "type": "integer", "minimum": 1 },
+        "endLine": { "type": "integer", "minimum": 1 },
+        "directoryScope": { "type": "string" },
+        "explanation": { "type": "string", "minLength": 1 },
+        "evidence": { "type": "string", "minLength": 1 },
+        "remediation": { "type": "string", "minLength": 1 },
+        "deterministic": { "type": "boolean" },
+        "heuristic": { "type": "boolean" },
+        "relatedLocations": { "type": "array", "items": { "$ref": "#/$defs/instructionLocation" } }
       },
       "additionalProperties": true
     },

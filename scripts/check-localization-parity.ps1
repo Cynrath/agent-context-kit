@@ -55,7 +55,7 @@ $tests = if ($null -ne $testsPath) { Get-Content -Raw $testsPath } else { "" }
 $docs = if ($null -ne $docsPath) { Get-Content -Raw $docsPath } else { "" }
 
 $commands = @(
-    "init", "config-check", "scan", "baseline", "sarif", "report", "webui",
+    "init", "config-check", "scan", "optimize", "baseline", "sarif", "report", "webui",
     "prompt-pack", "context-export", "generate", "task", "redact-check", "doctor"
 )
 
@@ -67,6 +67,9 @@ foreach ($command in $commands) {
 foreach ($marker in @(
     '["usage"] = new()',
     '["scanSummary"] = new()',
+    '["optimizeSummary"] = new()',
+    '["optimizeReviewOnly"] = new()',
+    '["optimizeInvalidFormat"] = new()',
     '["repositoryHealth"] = new()',
     '["baselineClassification"] = new()',
     '["suppressedFindings"] = new()',

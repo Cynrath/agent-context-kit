@@ -43,6 +43,8 @@ Every command that advertises `--lang en|tr` is covered by the localization pari
 
 Human-readable headings, labels, summaries, yes/no values, generated-file statuses, and known argument errors may be localized. Stack names, severity enum names, scanner rule IDs, configuration diagnostic codes, file paths, and Core diagnostic/finding messages remain stable technical values.
 
+`ackit optimize` follows the same boundary. Console headings, metric labels, review warnings, generated-file status, and known argument errors have English/Turkish parity. `ACKITOPT` IDs, severity/category tokens, fingerprints, paths, normalized evidence/remediation, JSON fields, SARIF fields, and process exit decisions remain language-independent.
+
 JSON field names, command names, status tokens, rule IDs, diagnostic codes, and exit codes remain language-independent. JSON and SARIF must not gain translated aliases or language-specific values.
 
 ## Release Gate
@@ -52,4 +54,4 @@ Run:
 powershell -ExecutionPolicy Bypass -File scripts/check-localization-parity.ps1 -FailOnIssues
 ```
 
-The gate verifies all 13 JSON-capable commands are represented, runs focused English/Turkish human/error/JSON tests, smokes Turkish help, and parses Turkish-mode JSON. Generated templates remain a separate content surface; this gate does not require a resource framework or rewrite every template.
+The gate verifies all 14 JSON-capable commands are represented, runs focused English/Turkish human/error/JSON tests, smokes Turkish help, and parses Turkish-mode JSON. Generated templates remain a separate content surface; this gate does not require a resource framework or rewrite every template.

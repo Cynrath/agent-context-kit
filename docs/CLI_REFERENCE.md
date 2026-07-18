@@ -12,7 +12,7 @@ During development, run commands through:
 dotnet run --project src/AgentContextKit.Cli -- <command>
 ```
 
-Availability note: the published NuGet package `AgentContextKit` `1.0.0-rc.1` includes `ackit sarif`.
+Availability note: the published NuGet package `AgentContextKit` `1.0.0-rc.1` includes `ackit sarif` but predates `ackit optimize`. Optimize is a post-RC1 Build Week addition in current source and is not available from the immutable RC1 package.
 
 See [EXIT_CODES.md](EXIT_CODES.md) for the full exit code matrix.
 
@@ -24,7 +24,7 @@ Select output/template language. Unknown values fall back to `en`.
 Emit machine-readable JSON where supported. Current JSON output schema version: `2`.
 
 ### `--ci`
-CI mode for `ackit scan`. Without a baseline, High findings return exit code `1` and Critical findings return exit code `2`. With an explicit baseline, only new High/Critical findings affect the exit code.
+CI mode for `ackit scan` and `ackit optimize`. Scan baseline mode evaluates only new High/Critical findings. Optimize has no baseline mode: High instruction findings return `1`, Critical instruction findings return `2`, and no High/Critical instruction finding returns `0`.
 
 ## Commands
 ### `ackit init`
@@ -78,6 +78,36 @@ Risk findings include stable `ACKIT` rule IDs in JSON output. See [SCANNER_RULES
 The published `1.0.0-rc.1` package reports sanitized config suppression counts and reasons in human and JSON scan output. This additive audit surface is documented in [SUPPRESSION_AUDIT.md](SUPPRESSION_AUDIT.md).
 
 Exit codes are documented in [EXIT_CODES.md](EXIT_CODES.md).
+
+### `ackit optimize`
+
+Audits supported repository AI-agent instruction surfaces with deterministic, local-first discovery, scope resolution, normalization, metrics, and stable `ACKITOPT001`-`ACKITOPT015` findings.
+
+```powershell
+dotnet run --project src/AgentContextKit.Cli -- optimize
+dotnet run --project src/AgentContextKit.Cli -- optimize --json
+dotnet run --project src/AgentContextKit.Cli -- optimize --format markdown --output .ackit/reports/instructions.md
+dotnet run --project src/AgentContextKit.Cli -- optimize --format sarif --output .ackit/reports/instructions.sarif
+dotnet run --project src/AgentContextKit.Cli -- optimize --format html --output .ackit/reports/instructions.html
+dotnet run --project src/AgentContextKit.Cli -- optimize --include 'src/**' --exclude 'src/generated/**' --ci
+```
+
+Behavior:
+
+- Console output is the default and is review-only. Findings do not change the default exit code.
+- `--json` aliases `--format json`; JSON is written to stdout unless `--output <repo-relative.json>` is explicit.
+- Markdown, SARIF, and HTML require `--output` with `.md`, `.sarif`, and `.html` respectively.
+- Output paths must be repository-relative and stay inside the repository. Existing files are skipped, never overwritten.
+- Repeatable `--include` and `--exclude` globs use the same `*`, `**`, and `?` syntax as `scan` and are applied to instruction discovery.
+- `--ci` returns `2` for any Critical instruction finding, `1` for any High finding when no Critical finding exists, and `0` otherwise.
+- Every finding includes a stable rule ID, severity, category, repository-relative source and line range, directory scope, sanitized evidence, safe remediation, stable fingerprint, related locations, and deterministic/heuristic classification.
+- Metrics report characters, words, lines, and `ceiling(normalized UTF-16 characters / 4)` estimated tokens for total, exact-duplicate, and avoidable instruction context. This is a deterministic size estimate, not exact tokenizer output or model billing.
+- The command performs no provider call, telemetry, upload, source rewrite, proposal application, release action, or hidden output write.
+
+Published package boundary:
+
+- `ackit optimize` was implemented after `1.0.0-rc.1`; use current-source execution for Build Week judging.
+- The RC1 package, tag, release, assets, and attestations remain immutable and do not contain this command.
 
 ### `ackit baseline`
 Creates a deterministic, sanitized local finding baseline. This command is included in the published `1.0.0-rc.1` package.

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Cynrath/agent-context-kit/blob/master/docs/schemas/ackit-optimize-sarif-profile-v1.schema.json",
+  "title": "ACKit Optimize SARIF 2.1.0 profile v1",
+  "description": "Local privacy, source-region, and instruction-finding profile layered on SARIF 2.1.0. It is not a replacement for the complete SARIF specification.",
+  "type": "object",
+  "required": ["$schema", "version", "runs"],
+  "properties": {
+    "$schema": { "const": "https://json.schemastore.org/sarif-2.1.0.json" },
+    "version": { "const": "2.1.0" },
+    "runs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["tool", "results"],
+        "properties": {
+          "tool": {
+            "type": "object",
+            "required": ["driver"],
+            "properties": {
+              "driver": {
+                "type": "object",
+                "required": ["name", "version", "rules"],
+                "properties": {
+                  "name": { "const": "AgentContextKit Optimize" },
+                  "version": { "type": "string", "minLength": 1 },
+                  "rules": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": ["id", "name", "shortDescription", "fullDescription", "help", "properties"],
+                      "properties": {
+                        "id": { "type": "string", "pattern": "^ACKITOPT[0-9]{3}$" },
+                        "name": { "type": "string", "minLength": 1 }
+                      },
+                      "additionalProperties": true
+                    }
+                  }
+                },
+                "additionalProperties": true
+              }
+            },
+            "additionalProperties": true
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["ruleId", "level", "message", "locations", "relatedLocations", "fingerprints", "properties"],
+              "properties": {
+                "ruleId": { "type": "string", "pattern": "^ACKITOPT[0-9]{3}$" },
+                "level": { "type": "string", "enum": ["error", "warning", "note"] },
+                "message": { "type": "object", "required": ["text"] },
+                "locations": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["physicalLocation"],
+                    "properties": {
+                      "physicalLocation": {
+                        "type": "object",
+                        "required": ["artifactLocation", "region"],
+                        "properties": {
+                          "artifactLocation": {
+                            "type": "object",
+                            "required": ["uri"],
+                            "properties": { "uri": { "type": "string", "minLength": 1 } }
+                          },
+                          "region": {
+                            "type": "object",
+                            "required": ["startLine", "endLine"],
+                            "properties": {
+                              "startLine": { "type": "integer", "minimum": 1 },
+                              "endLine": { "type": "integer", "minimum": 1 }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "relatedLocations": { "type": "array" },
+                "fingerprints": { "type": "object", "required": ["ackitOptimize/v1"] },
+                "properties": {
+                  "type": "object",
+                  "required": ["category", "directoryScope", "evidence", "remediation", "deterministic", "heuristic"]
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -4,8 +4,9 @@
 
 - Baseline is `6998e269af4962bbe70a9cb4044727d25dc1a06d`; installed tool is immutable RC1 and the baseline suite was 431/431 green with 0 build warnings/errors.
 - TASK-0258 planning commit `a227c045` is pushed; `ci` `29648931050`, published smoke `29648931085`, and source smoke `29648931149` passed without manual dispatch.
-- TASK-0259 Core is implemented locally: 12/12 focused and 443/443 full tests pass, Release build is 0/0, current-source ACKit has no High/Critical finding, and dogfood is bounded to 51 review findings across 9 durable instruction surfaces. Commit/push and hosted CI are next.
-- Continue without stopping through TASK-0260, TASK-0261, and TASK-0262 in order after the TASK-0259 push-triggered checks pass.
+- TASK-0259 Core is committed/pushed at `d49bd446`; `ci` `29650061884`, published smoke `29650061875`, and source smoke `29650061881` passed.
+- TASK-0260 is locally complete pending commit/hosted validation: 454/454 full tests, 10/10 focused Optimize tests, Release build 0 warnings/errors, all CLI/JSON/localization/link/config gates, and a disposable five-format no-mutation smoke passed.
+- Continue without stopping through TASK-0261 and TASK-0262 after the TASK-0260 push-triggered checks pass.
 - Keep Optimize deterministic, offline, non-overwriting, current-source-only until a separate human release decision.
 - Do not dispatch workflows, publish packages, mutate tags/releases/assets/attestations, deploy, change settings/secrets, force-push, or rewrite history.
 

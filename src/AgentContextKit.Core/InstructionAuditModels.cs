@@ -34,6 +34,43 @@ public enum InstructionRulePolarity
     Prefer
 }
 
+public enum InstructionAuditReportFormat
+{
+    Json,
+    Markdown,
+    Sarif,
+    Html
+}
+
+public sealed record InstructionAuditReportContext(
+    string ToolVersion,
+    DateTimeOffset GeneratedAtUtc,
+    string RepositoryName,
+    bool CiMode,
+    int ExitCode);
+
+public sealed record InstructionAuditOutputInfo(
+    string Path,
+    string Status,
+    bool Created,
+    string Message)
+{
+    public static InstructionAuditOutputInfo StandardOutput { get; } = new(
+        "stdout",
+        "StandardOutput",
+        false,
+        "Report written to standard output.");
+
+    public static InstructionAuditOutputInfo From(GeneratedFileResult result)
+    {
+        return new InstructionAuditOutputInfo(
+            result.Path,
+            result.Status.ToString(),
+            result.Created,
+            result.Message);
+    }
+}
+
 public sealed record InstructionAuditOptions
 {
     public IReadOnlyList<string> IncludeGlobs { get; init; } = Array.Empty<string>();

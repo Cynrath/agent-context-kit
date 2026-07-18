@@ -32,6 +32,7 @@ public static class Program
                 "init" => RunInit(repositoryPath, language, json, services),
                 "config-check" => RunConfigCheck(repositoryPath, language, json, services),
                 "scan" => RunScan(args, repositoryPath, config, language, json, ci, services),
+                "optimize" => RunOptimize(args, repositoryPath, config, language, json, ci, services),
                 "baseline" => RunBaseline(args, repositoryPath, config, language, json, services),
                 "sarif" => RunSarif(args, repositoryPath, config, language, json, services),
                 "report" => RunReport(args, repositoryPath, config, language, json, services),
@@ -67,6 +68,7 @@ public static class Program
         Console.WriteLine("  ackit init [--lang en|tr] [--json]");
         Console.WriteLine("  ackit config-check [--lang en|tr] [--json]");
         Console.WriteLine("  ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]");
+        Console.WriteLine("  ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]");
         Console.WriteLine("  ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]");
         Console.WriteLine("  ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]");
@@ -338,6 +340,203 @@ public static class Program
         }
 
         return values;
+    }
+
+    private static int RunOptimize(
+        string[] args,
+        string repositoryPath,
+        AckitConfig config,
+        LanguageCode language,
+        bool jsonAlias,
+        bool ci,
+        Services services)
+    {
+        var requestedFormat = GetOption(args, "--format");
+        if (HasOption(args, "--format") && string.IsNullOrWhiteSpace(requestedFormat))
+        {
+            return WriteOptimizeArgumentError("InvalidFormat", "optimizeInvalidFormat", jsonAlias, language, services);
+        }
+
+        var format = string.IsNullOrWhiteSpace(requestedFormat)
+            ? (jsonAlias ? "json" : "console")
+            : requestedFormat.Trim().ToLowerInvariant();
+        if (format is not ("console" or "json" or "markdown" or "sarif" or "html"))
+        {
+            return WriteOptimizeArgumentError("InvalidFormat", "optimizeInvalidFormat", jsonAlias, language, services);
+        }
+        if (jsonAlias && format != "json")
+        {
+            return WriteOptimizeArgumentError("ConflictingFormat", "optimizeJsonFormatConflict", true, language, services);
+        }
+
+        var machineOutput = format == "json";
+        var outputPath = GetOption(args, "--output");
+        if (HasOption(args, "--output") && string.IsNullOrWhiteSpace(outputPath))
+        {
+            return WriteOptimizeArgumentError("InvalidOutput", "optimizeInvalidOutput", machineOutput, language, services);
+        }
+        if (format is "markdown" or "sarif" or "html" && string.IsNullOrWhiteSpace(outputPath))
+        {
+            return WriteOptimizeArgumentError("OutputRequired", "optimizeOutputRequired", machineOutput, language, services);
+        }
+        if (format == "console" && !string.IsNullOrWhiteSpace(outputPath))
+        {
+            return WriteOptimizeArgumentError("ConsoleOutputUnsupported", "optimizeConsoleOutputUnsupported", false, language, services);
+        }
+
+        IReadOnlyList<string> includeGlobs;
+        IReadOnlyList<string> excludeGlobs;
+        try
+        {
+            includeGlobs = ParseGlobList(args, "--include");
+            excludeGlobs = ParseGlobList(args, "--exclude");
+        }
+        catch (ArgumentException ex)
+        {
+            return WriteInvalidArgumentError("optimize", ex.Message, machineOutput, language, services);
+        }
+
+        InstructionAuditResult audit;
+        try
+        {
+            audit = services.InstructionAuditor.Audit(
+                repositoryPath,
+                config,
+                new InstructionAuditOptions
+                {
+                    IncludeGlobs = includeGlobs,
+                    ExcludeGlobs = excludeGlobs
+                });
+        }
+        catch (ArgumentException ex)
+        {
+            return WriteInvalidArgumentError("optimize", ex.Message, machineOutput, language, services);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return WriteOptimizeArgumentError("AuditFailed", "optimizeAuditFailed", machineOutput, language, services);
+        }
+
+        var exitCode = GetInstructionAuditExitCode(audit, ci);
+        var repositoryName = GetRepositoryName(repositoryPath);
+        var context = new InstructionAuditReportContext(
+            Version,
+            services.Clock.UtcNow,
+            repositoryName,
+            ci,
+            exitCode);
+
+        try
+        {
+            switch (format)
+            {
+                case "json":
+                    if (string.IsNullOrWhiteSpace(outputPath))
+                    {
+                        Console.Write(services.InstructionAuditReportWriter.RenderJson(
+                            audit,
+                            context,
+                            InstructionAuditOutputInfo.StandardOutput));
+                    }
+                    else
+                    {
+                        var generated = services.InstructionAuditReportWriter.GenerateJson(
+                            repositoryPath,
+                            outputPath,
+                            audit,
+                            context);
+                        PrintGeneratedResult(generated, services.TextProvider, language);
+                    }
+                    break;
+                case "markdown":
+                    WriteOptimizeReport(
+                        repositoryPath,
+                        outputPath!,
+                        InstructionAuditReportFormat.Markdown,
+                        services.InstructionAuditReportWriter.RenderMarkdown(audit, repositoryName),
+                        audit,
+                        language,
+                        services);
+                    break;
+                case "sarif":
+                    WriteOptimizeReport(
+                        repositoryPath,
+                        outputPath!,
+                        InstructionAuditReportFormat.Sarif,
+                        services.InstructionAuditReportWriter.RenderSarif(audit, Version),
+                        audit,
+                        language,
+                        services);
+                    break;
+                case "html":
+                    WriteOptimizeReport(
+                        repositoryPath,
+                        outputPath!,
+                        InstructionAuditReportFormat.Html,
+                        services.InstructionAuditReportWriter.RenderHtml(audit, repositoryName),
+                        audit,
+                        language,
+                        services);
+                    break;
+                default:
+                    PrintInstructionAudit(audit, repositoryName, language, services);
+                    break;
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            return WriteInvalidArgumentError("optimize", ex.Message, machineOutput, language, services);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return WriteOptimizeArgumentError("OutputWriteFailed", "optimizeOutputWriteFailed", machineOutput, language, services);
+        }
+
+        return exitCode;
+    }
+
+    private static void WriteOptimizeReport(
+        string repositoryPath,
+        string outputPath,
+        InstructionAuditReportFormat format,
+        string content,
+        InstructionAuditResult audit,
+        LanguageCode language,
+        Services services)
+    {
+        var generated = services.InstructionAuditReportWriter.Generate(repositoryPath, outputPath, format, content);
+        PrintGeneratedResult(generated, services.TextProvider, language);
+        Console.WriteLine($"{services.TextProvider.Get("instructionFindings", language)}: {audit.Findings.Count}");
+    }
+
+    private static int WriteOptimizeArgumentError(
+        string code,
+        string textKey,
+        bool json,
+        LanguageCode language,
+        Services services)
+    {
+        if (json)
+        {
+            WriteJson(new
+            {
+                schemaVersion = JsonSchemaVersion,
+                toolVersion = Version,
+                generatedAtUtc = services.Clock.UtcNow,
+                command = "optimize",
+                exitCode = ExitError,
+                error = new
+                {
+                    code,
+                    message = services.TextProvider.Get(textKey, LanguageCode.English)
+                }
+            });
+        }
+        else
+        {
+            Console.Error.WriteLine(services.TextProvider.Get(textKey, language));
+        }
+        return ExitError;
     }
 
     private static int WriteInvalidArgumentError(string command, string message, bool json, LanguageCode language, Services services)
@@ -1437,6 +1636,71 @@ public static class Program
         PrintSuppressions(scan.Suppressions, language, services.TextProvider);
     }
 
+    private static void PrintInstructionAudit(
+        InstructionAuditResult audit,
+        string repositoryName,
+        LanguageCode language,
+        Services services)
+    {
+        var text = services.TextProvider;
+        var ruleCount = audit.Sources.Sum(source => source.Rules.Count);
+        Console.WriteLine(text.Get("optimizeSummary", language));
+        Console.WriteLine($"{text.Get("repository", language)}: {repositoryName}");
+        Console.WriteLine($"{text.Get("instructionSources", language)}: {audit.Sources.Count}");
+        Console.WriteLine($"{text.Get("parsedRules", language)}: {ruleCount}");
+        Console.WriteLine($"{text.Get("resolvedScopes", language)}: {audit.Scopes.Count}");
+        Console.WriteLine($"{text.Get("scopedOverrides", language)}: {audit.ScopedOverrides.Count}");
+        Console.WriteLine($"{text.Get("instructionFindings", language)}: {audit.Findings.Count}");
+        Console.WriteLine($"{text.Get("deterministicFindings", language)}: {audit.Findings.Count(finding => !finding.IsHeuristic)}");
+        Console.WriteLine($"{text.Get("heuristicFindings", language)}: {audit.Findings.Count(finding => finding.IsHeuristic)}");
+
+        Console.WriteLine();
+        Console.WriteLine(text.Get("contextEstimate", language));
+        PrintInstructionMetrics(text.Get("totalContext", language), audit.Metrics.Total, language, text);
+        PrintInstructionMetrics(text.Get("duplicatedContext", language), audit.Metrics.Duplicated, language, text);
+        PrintInstructionMetrics(text.Get("avoidableContext", language), audit.Metrics.Avoidable, language, text);
+        Console.WriteLine($"- {text.Get("estimationMethod", language)}: {audit.Metrics.EstimationMethod}");
+
+        Console.WriteLine();
+        if (audit.Sources.Count > 0)
+        {
+            Console.WriteLine($"{text.Get("instructionSources", language)}:");
+            foreach (var source in audit.Sources)
+            {
+                Console.WriteLine($"- {source.Path} [{source.Type}] scope={source.DirectoryScope}; precedence={source.Precedence}; descendants={source.AppliesToDescendants}; applicability={source.InheritedApplicability}");
+            }
+
+            Console.WriteLine();
+        }
+
+        if (audit.Findings.Count == 0)
+        {
+            Console.WriteLine(text.Get("optimizeNoFindings", language));
+        }
+        else
+        {
+            foreach (var finding in audit.Findings)
+            {
+                Console.WriteLine($"- [{finding.Severity}] {finding.RuleId} {finding.Category} {finding.SourcePath}:{finding.StartLine}-{finding.EndLine} ({finding.DirectoryScope}; {(finding.IsHeuristic ? text.Get("heuristic", language) : text.Get("deterministic", language))})");
+                Console.WriteLine($"  {finding.Explanation}");
+                Console.WriteLine($"  {text.Get("evidence", language)}: {finding.Evidence}");
+                Console.WriteLine($"  {text.Get("safeRemediation", language)}: {finding.Remediation}");
+            }
+        }
+
+        Console.WriteLine();
+        Console.WriteLine(text.Get("optimizeReviewOnly", language));
+    }
+
+    private static void PrintInstructionMetrics(
+        string label,
+        InstructionContentMetrics metrics,
+        LanguageCode language,
+        ITextProvider textProvider)
+    {
+        Console.WriteLine($"- {label}: {metrics.Characters} {textProvider.Get("characters", language)}, {metrics.Words} {textProvider.Get("words", language)}, {metrics.Lines} {textProvider.Get("lines", language)}, {metrics.EstimatedTokens} {textProvider.Get("estimatedTokens", language)}");
+    }
+
     private static void PrintBaselineClassification(
         string baselinePath,
         BaselineEvaluation baseline,
@@ -1764,6 +2028,23 @@ public static class Program
         return ExitSuccess;
     }
 
+    private static int GetInstructionAuditExitCode(InstructionAuditResult audit, bool ci)
+    {
+        if (!ci)
+        {
+            return ExitSuccess;
+        }
+        if (audit.Findings.Any(finding => finding.Severity == RiskSeverity.Critical))
+        {
+            return ExitCritical;
+        }
+        if (audit.Findings.Any(finding => finding.Severity == RiskSeverity.High))
+        {
+            return ExitError;
+        }
+        return ExitSuccess;
+    }
+
     private static int WriteBaselineError(string command, BaselineException exception, bool json, DateTimeOffset generatedAtUtc)
     {
         if (json)
@@ -1884,6 +2165,13 @@ public static class Program
         return args.Any(arg => string.Equals(arg, name, StringComparison.OrdinalIgnoreCase));
     }
 
+    private static bool HasOption(string[] args, string name)
+    {
+        return args.Any(arg =>
+            string.Equals(arg, name, StringComparison.OrdinalIgnoreCase) ||
+            arg.StartsWith(name + "=", StringComparison.OrdinalIgnoreCase));
+    }
+
     private static string GetTaskTitle(string[] args)
     {
         var parts = new List<string>();
@@ -1916,6 +2204,7 @@ public static class Program
                string.Equals(option, "--prompt-pack", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--stdio", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--output", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(option, "--format", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--include", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(option, "--exclude", StringComparison.OrdinalIgnoreCase);
     }
@@ -1948,6 +2237,8 @@ public static class Program
             new BaselineStore(fileSystem),
             new BaselineClassifier(),
             repositoryScanner,
+            new InstructionAuditor(fileSystem),
+            new InstructionAuditReportWriter(fileSystem),
             new AgentInstructionGenerator(fileSystem, templateRenderer, clock),
             new HtmlReportGenerator(fileSystem, clock),
             new WebUiGenerator(fileSystem, clock),
@@ -1969,6 +2260,8 @@ public static class Program
         IBaselineStore BaselineStore,
         IBaselineClassifier BaselineClassifier,
         IRepositoryScanner RepositoryScanner,
+        IInstructionAuditor InstructionAuditor,
+        IInstructionAuditReportWriter InstructionAuditReportWriter,
         IAgentInstructionGenerator AgentInstructionGenerator,
         IHtmlReportGenerator HtmlReportGenerator,
         IWebUiGenerator WebUiGenerator,

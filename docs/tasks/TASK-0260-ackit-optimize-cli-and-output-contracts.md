@@ -10,7 +10,7 @@ Published/current baseline help contains no `optimize` command. Existing CLI pat
 
 ## Scope
 
-- Add `ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--proposal <repo-relative.md>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]`.
+- Add `ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]`.
 - Keep console report-only as the default; `--json` aliases JSON format and writes stdout unless an explicit output is supplied.
 - Require `--output` for Markdown, SARIF, and HTML; validate extension and repository containment; skip existing outputs without overwriting.
 - Add report-only exit `0`; invalid/output errors `1`; `--ci` returns `2` for Critical and `1` for High findings, otherwise `0`, independent of format/language.
@@ -21,7 +21,7 @@ Published/current baseline help contains no `optimize` command. Existing CLI pat
 
 ## Out of scope
 
-- Applying changes to source instruction files, remote uploads, Code Scanning upload, provider calls, telemetry, package publication, or release/version selection.
+- Proposal generation and `--proposal` (implemented separately by dependent TASK-0261), applying changes to source instruction files, remote uploads, Code Scanning upload, provider calls, telemetry, package publication, or release/version selection.
 - Changing existing command exits or JSON field meanings.
 
 ## Affected files
@@ -99,4 +99,26 @@ Remove the additive command, writers, schema branch, docs, and tests with a norm
 
 ## Completion notes
 
-Status: `PLANNED / DEPENDS ON TASK-0259`.
+Status: `IMPLEMENTED / LOCAL VALIDATION PASS / HOSTED VALIDATION PENDING`.
+
+Implemented current-source surfaces:
+
+- First-class `ackit optimize` help/dispatch with console, JSON stdout/file, Markdown, SARIF 2.1.0, and self-contained offline HTML.
+- Deterministic review-only default plus format-independent `--ci` exits (`0`/`1`/`2` for no High-or-Critical/High/Critical).
+- Repository-relative explicit output validation, format-specific extensions, skip-existing behavior, include/exclude forwarding, and no instruction-source rewrite.
+- Sanitized schema-v2 JSON, Optimize SARIF profile/golden, source line regions, stable fingerprints, deterministic/heuristic labels, complete metrics, source/scope/override metadata, and EN/TR human parity.
+- Current-source three-platform smoke coverage plus CLI/JSON/SARIF/HTML/localization documentation. Published `1.0.0-rc.1` is explicitly documented as predating Optimize.
+
+Local evidence on 2026-07-18:
+
+- Release build: passed with 0 warnings and 0 errors.
+- Focused Optimize CLI/report tests: 10 passed, 0 failed, 0 skipped. Combined instruction/contract/localization focus: 32 passed, 0 failed, 0 skipped.
+- Full suite: 454 passed, 0 failed, 0 skipped.
+- Disposable end-to-end fixture smoke: console, JSON stdout/file, Markdown, SARIF, and HTML passed; JSON/SARIF parsed; HTML had no network/script reference; existing Markdown output was skipped; instruction-source hashes remained unchanged. Result: 25 findings, 9 sources, 8 resolved scopes.
+- Installed/current-source doctor: 13/13 PASS. Installed/current-source `scan --ci`: exit 0 with the previously reviewed Medium/Low repository findings and no High/Critical finding.
+- CLI contract, localization parity, JSON contract assets, Markdown links, and config/generated conventions: passed. `git diff --check`: passed.
+- The tracked-versus-untracked guard correctly remains pending until this task's five new files are staged/committed; it will be rerun before push.
+
+Data/migration/security/permission/deployment impact: no database or migration; local reads and explicit non-overwriting local report writes only; no new permission, provider, telemetry, upload, deployment, publication, tag, release, asset, or attestation action.
+
+Rollback: remove the additive command, report writer/models, schema/profile/golden assets, docs, tests, and source-smoke steps in a normal successor commit. No user instruction source requires restoration because none is modified.

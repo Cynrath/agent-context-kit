@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "AgentContextKit Optimize",
+          "version": "1.0.0-rc.1",
+          "rules": [
+            {
+              "id": "ACKITOPT001",
+              "name": "ExactDuplicate",
+              "shortDescription": { "text": "An instruction repeats the same normalized constraint in an overlapping scope." },
+              "fullDescription": { "text": "An instruction repeats the same normalized constraint in an overlapping scope." },
+              "help": { "text": "Keep one authoritative occurrence and retain source mapping for removed copies." },
+              "properties": { "category": "Duplication", "defaultSeverity": "Low", "heuristic": false }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "ACKITOPT001",
+          "level": "note",
+          "message": { "text": "An instruction repeats the same normalized constraint in an overlapping scope." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "AGENTS.md" },
+                "region": { "startLine": 8, "endLine": 8 }
+              }
+            }
+          ],
+          "relatedLocations": [],
+          "fingerprints": { "ackitOptimize/v1": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" },
+          "properties": {
+            "category": "Duplication",
+            "directoryScope": ".",
+            "evidence": "The normalized instruction hashes are identical in an overlapping effective scope.",
+            "remediation": "Keep one authoritative occurrence and retain source mapping for removed copies.",
+            "deterministic": true,
+            "heuristic": false
+          }
+        }
+      ]
+    }
+  ]
+}

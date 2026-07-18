@@ -2,6 +2,8 @@
 
 AgentContextKit can generate an offline static HTML report from local scan results.
 
+Current source can also generate a separate post-RC1 instruction audit report with `ackit optimize --format html`. The published `1.0.0-rc.1` package predates Optimize.
+
 ## Command
 Default output:
 
@@ -32,6 +34,16 @@ ackit report --output .ackit/reports/baseline.html --baseline .ackit-baseline.js
 - `.ackit/reports/` is ignored by git.
 - Generated reports can include local repository paths and local audit context. Keep them local; do not attach them to public GitHub Releases or NuGet packages.
 - Baseline mode adds existing/new metrics and a per-finding status column; it does not hide existing findings.
+
+## Optimize HTML
+
+```powershell
+dotnet run --project src/AgentContextKit.Cli -- optimize --format html --output .ackit/reports/instructions.html
+```
+
+Optimize HTML requires an explicit repository-relative `.html` path and skips existing output. It is a self-contained, static review artifact with encoded repository-controlled text, instruction metrics, source/scope metadata, stable finding IDs, line ranges, deterministic/heuristic labels, evidence, remediation, and a no-rewrite review boundary.
+
+The document contains inline CSS only: no script, remote asset, font, image, CDN, telemetry, or network reference. It does not modify any instruction source. Like ordinary generated reports, keep it untracked unless a reviewed fixture is explicitly required.
 
 ## JSON Output
 `ackit report --json` returns generated file metadata and a risk summary:

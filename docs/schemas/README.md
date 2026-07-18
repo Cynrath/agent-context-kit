@@ -5,6 +5,7 @@ These local assets support release-candidate compatibility review:
 - `ackit-command-output-v2.schema.json`: Draft 2020-12 top-level contract for every JSON-capable CLI command.
 - `ackit-baseline-v1.schema.json`: baseline manifest schema `1` and fingerprint algorithm contract.
 - `ackit-sarif-profile-v1.schema.json`: AgentContextKit privacy/tool profile layered on SARIF `2.1.0`.
+- `ackit-optimize-sarif-profile-v1.schema.json`: ACKit Optimize instruction-finding, source-region, fingerprint, and review-metadata profile layered on SARIF `2.1.0`.
 
 Golden fixtures live under `tests/fixtures/contracts/`. They are sanitized examples, not generated release artifacts.
 

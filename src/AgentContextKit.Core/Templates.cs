@@ -329,6 +329,156 @@ public sealed class TextProvider : ITextProvider
             ["en"] = "--repo must be a valid local directory path.",
             ["tr"] = "--repo gecerli bir yerel dizin yolu olmalidir."
         },
+        ["optimizeSummary"] = new()
+        {
+            ["en"] = "ACKit Optimize instruction audit",
+            ["tr"] = "ACKit Optimize yönerge denetimi"
+        },
+        ["instructionSources"] = new()
+        {
+            ["en"] = "Instruction sources",
+            ["tr"] = "Yönerge kaynakları"
+        },
+        ["parsedRules"] = new()
+        {
+            ["en"] = "Parsed rules",
+            ["tr"] = "Ayrıştırılan kurallar"
+        },
+        ["resolvedScopes"] = new()
+        {
+            ["en"] = "Resolved scopes",
+            ["tr"] = "Çözümlenen kapsamlar"
+        },
+        ["scopedOverrides"] = new()
+        {
+            ["en"] = "Valid scoped overrides",
+            ["tr"] = "Geçerli kapsamlı geçersiz kılmalar"
+        },
+        ["instructionFindings"] = new()
+        {
+            ["en"] = "Instruction findings",
+            ["tr"] = "Yönerge bulguları"
+        },
+        ["deterministicFindings"] = new()
+        {
+            ["en"] = "Deterministic findings",
+            ["tr"] = "Deterministik bulgular"
+        },
+        ["heuristicFindings"] = new()
+        {
+            ["en"] = "Heuristic findings",
+            ["tr"] = "Sezgisel bulgular"
+        },
+        ["contextEstimate"] = new()
+        {
+            ["en"] = "Deterministic context-size estimate:",
+            ["tr"] = "Deterministik bağlam boyutu tahmini:"
+        },
+        ["totalContext"] = new()
+        {
+            ["en"] = "Total",
+            ["tr"] = "Toplam"
+        },
+        ["duplicatedContext"] = new()
+        {
+            ["en"] = "Exact duplicated context",
+            ["tr"] = "Tam yinelenen bağlam"
+        },
+        ["avoidableContext"] = new()
+        {
+            ["en"] = "Avoidable context",
+            ["tr"] = "Kaçınılabilir bağlam"
+        },
+        ["estimationMethod"] = new()
+        {
+            ["en"] = "Estimation method",
+            ["tr"] = "Tahmin yöntemi"
+        },
+        ["characters"] = new()
+        {
+            ["en"] = "characters",
+            ["tr"] = "karakter"
+        },
+        ["words"] = new()
+        {
+            ["en"] = "words",
+            ["tr"] = "sözcük"
+        },
+        ["lines"] = new()
+        {
+            ["en"] = "lines",
+            ["tr"] = "satır"
+        },
+        ["estimatedTokens"] = new()
+        {
+            ["en"] = "estimated tokens",
+            ["tr"] = "tahmini token"
+        },
+        ["deterministic"] = new()
+        {
+            ["en"] = "deterministic",
+            ["tr"] = "deterministik"
+        },
+        ["heuristic"] = new()
+        {
+            ["en"] = "heuristic",
+            ["tr"] = "sezgisel"
+        },
+        ["evidence"] = new()
+        {
+            ["en"] = "Evidence",
+            ["tr"] = "Kanıt"
+        },
+        ["safeRemediation"] = new()
+        {
+            ["en"] = "Safe remediation",
+            ["tr"] = "Güvenli iyileştirme"
+        },
+        ["optimizeNoFindings"] = new()
+        {
+            ["en"] = "No instruction audit findings.",
+            ["tr"] = "Yönerge denetimi bulgusu yok."
+        },
+        ["optimizeReviewOnly"] = new()
+        {
+            ["en"] = "Review only: no instruction source was modified and no remote call was made.",
+            ["tr"] = "Yalnızca inceleme: hiçbir yönerge kaynağı değiştirilmedi ve uzak çağrı yapılmadı."
+        },
+        ["optimizeInvalidFormat"] = new()
+        {
+            ["en"] = "ackit optimize --format must be console, json, markdown, sarif, or html.",
+            ["tr"] = "ackit optimize --format değeri console, json, markdown, sarif veya html olmalıdır."
+        },
+        ["optimizeJsonFormatConflict"] = new()
+        {
+            ["en"] = "ackit optimize --json cannot be combined with a non-JSON --format.",
+            ["tr"] = "ackit optimize --json, JSON dışı bir --format ile birlikte kullanılamaz."
+        },
+        ["optimizeOutputRequired"] = new()
+        {
+            ["en"] = "ackit optimize markdown, SARIF, and HTML formats require --output <repo-relative-file>.",
+            ["tr"] = "ackit optimize Markdown, SARIF ve HTML biçimleri için --output <repo-relative-file> gerektirir."
+        },
+        ["optimizeInvalidOutput"] = new()
+        {
+            ["en"] = "ackit optimize --output requires a non-empty repository-relative file path.",
+            ["tr"] = "ackit optimize --output için boş olmayan, depo köküne göreli bir dosya yolu gerekir."
+        },
+        ["optimizeConsoleOutputUnsupported"] = new()
+        {
+            ["en"] = "ackit optimize console format writes to stdout and does not accept --output.",
+            ["tr"] = "ackit optimize console biçimini standart çıktıya yazar ve --output kabul etmez."
+        },
+        ["optimizeAuditFailed"] = new()
+        {
+            ["en"] = "ackit optimize could not read the local instruction surfaces.",
+            ["tr"] = "ackit optimize yerel yönerge yüzeylerini okuyamadı."
+        },
+        ["optimizeOutputWriteFailed"] = new()
+        {
+            ["en"] = "ackit optimize could not create the requested local report.",
+            ["tr"] = "ackit optimize istenen yerel raporu oluşturamadı."
+        },
     };
 
     public string Get(string key, LanguageCode language)

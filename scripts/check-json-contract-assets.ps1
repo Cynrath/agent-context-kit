@@ -42,12 +42,14 @@ Write-Host "Repository: $repoRoot"
 $commandSchema = Read-JsonAsset "docs\schemas\ackit-command-output-v2.schema.json" "Command output schema"
 $baselineSchema = Read-JsonAsset "docs\schemas\ackit-baseline-v1.schema.json" "Baseline schema"
 $sarifSchema = Read-JsonAsset "docs\schemas\ackit-sarif-profile-v1.schema.json" "SARIF profile schema"
+$optimizeSarifSchema = Read-JsonAsset "docs\schemas\ackit-optimize-sarif-profile-v1.schema.json" "Optimize SARIF profile schema"
 $commandGolden = Read-JsonAsset "tests\fixtures\contracts\command-output-v2-golden.json" "Command output golden fixture"
 $baselineGolden = Read-JsonAsset "tests\fixtures\contracts\baseline-v1-golden.json" "Baseline golden fixture"
 $sarifGolden = Read-JsonAsset "tests\fixtures\contracts\sarif-profile-v1-golden.json" "SARIF golden fixture"
+$optimizeSarifGolden = Read-JsonAsset "tests\fixtures\contracts\optimize-sarif-profile-v1-golden.json" "Optimize SARIF golden fixture"
 
 $expectedCommands = @(
-    "init", "config-check", "scan", "baseline", "sarif", "report", "webui",
+    "init", "config-check", "scan", "optimize", "baseline", "sarif", "report", "webui",
     "prompt-pack", "context-export", "generate", "task", "redact-check", "doctor"
 )
 
@@ -100,6 +102,17 @@ if ($null -ne $sarifSchema -and $null -ne $sarifGolden) {
     }
     else {
         Add-Note "SARIF 2.1.0 profile and AgentContextKit tool identity are consistent."
+    }
+}
+
+if ($null -ne $optimizeSarifSchema -and $null -ne $optimizeSarifGolden) {
+    if ($optimizeSarifSchema.properties.version.const -ne "2.1.0" -or
+        $optimizeSarifGolden.version -ne "2.1.0" -or
+        $optimizeSarifGolden.runs[0].tool.driver.name -ne "AgentContextKit Optimize") {
+        Add-Issue "Optimize SARIF profile/golden version or tool identity is inconsistent."
+    }
+    else {
+        Add-Note "Optimize SARIF 2.1.0 profile and tool identity are consistent."
     }
 }
 

@@ -40,6 +40,37 @@
     },
     {
       "schemaVersion": 2,
+      "toolVersion": "1.0.0-rc.1",
+      "generatedAtUtc": "2026-07-18T00:00:00Z",
+      "command": "optimize",
+      "repositoryName": "demo-repository",
+      "ciMode": false,
+      "exitCode": 0,
+      "format": "json",
+      "output": { "path": "stdout", "status": "StandardOutput", "created": false, "message": "Report written to standard output." },
+      "auditSummary": {
+        "sourceCount": 0,
+        "ruleCount": 0,
+        "scopeCount": 0,
+        "scopedOverrideCount": 0,
+        "findingCount": 0,
+        "deterministicCount": 0,
+        "heuristicCount": 0,
+        "severity": { "total": 0, "critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0 }
+      },
+      "instructionMetrics": {
+        "total": { "characters": 0, "words": 0, "lines": 0, "estimatedTokens": 0 },
+        "duplicated": { "characters": 0, "words": 0, "lines": 0, "estimatedTokens": 0 },
+        "avoidable": { "characters": 0, "words": 0, "lines": 0, "estimatedTokens": 0 },
+        "estimationMethod": "Estimated tokens are a deterministic local context-size estimate, not billing."
+      },
+      "sources": [],
+      "scopes": [],
+      "scopedOverrides": [],
+      "instructionFindings": []
+    },
+    {
+      "schemaVersion": 2,
       "toolVersion": "0.2.0-alpha.1",
       "generatedAtUtc": "2026-06-12T00:00:00Z",
       "command": "baseline",
