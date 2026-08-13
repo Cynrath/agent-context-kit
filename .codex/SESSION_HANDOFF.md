@@ -1,5 +1,14 @@
 # AgentContextKit Session Handoff
 
+## TASK-0263 — Nightly local check workflow retirement (2026-08-13)
+
+- User-requested maintenance starts from clean synchronized `master`/`origin/master` at `0ae2418`; installed ACKit is `1.0.0-rc.1`, preflight doctor is 13/13 PASS, and preflight `scan --ci` exits 0.
+- Verified root cause/scope: `.github/workflows/nightly-local-check.yml` duplicates existing push/local validation; `NightlyWorkflowYamlGuardTests.cs` exists only for that workflow, and `YamlDotNet` is used only by those tests.
+- Local implementation deletes the nightly workflow and its two guard tests, removes `YamlDotNet` from the test project, and removes the active nightly section from `docs/HOSTED_CHECKS.md`. Historical TASK-0185/TASK-0186 evidence is preserved.
+- Restore PASS; Release build PASS with 0 warnings/0 errors; full suite PASS with 461 passed, 0 failed, 0 skipped; `verify-release.ps1` exits 0; current-source doctor is 13/13 PASS; current-source `scan --ci` exits 0 over 662 files with only the previously reviewed 4 Medium/5 Low findings; active-reference, workflow-scope, restored-dependency, and diff checks pass.
+- The tracked-vs-untracked guard returned the expected pre-commit exit 1 solely because `docs/tasks/TASK-0263-remove-nightly-local-check-workflow.md` was intentionally untracked. The user subsequently authorized a focused commit and normal `master` push; rerun this guard after commit and before push.
+- No other workflow, runtime/public contract, package/version, release/tag/asset/attestation, deployment, settings/secrets, permission, or remote state is in scope. Final installed ACKit doctor is 13/13 PASS, final `scan --ci` exits 0 over 662 files with the same reviewed 4 Medium/5 Low findings, and final pre-commit `git diff --check` passes. The commit starts from synchronized `master`/`origin/master` at `0ae2418`; its exact SHA, remote equality, clean tree, and push-triggered CI evidence must be supplied in the final report because this handoff file is part of that commit.
+
 ## Active snapshot — OpenAI Build Week 2026 ACKit Optimize (2026-07-18)
 
 - Entry baseline: clean `master` and `origin/master` at `6998e269af4962bbe70a9cb4044727d25dc1a06d`.

@@ -49,9 +49,3 @@ The script does not echo raw `gh` stderr, environment variables, or credentials.
 ## Deployment Notes
 
 The `nuget-release` GitHub Deployments page can show historical failed deployment status entries from the release workflow environment. Those entries are not the same as current `master` CI status. This script reports recent Actions workflow runs only; it does not alter deployment history or release state.
-
-## Nightly Local Check
-
-`.github/workflows/nightly-local-check.yml` is a scheduled, dispatch-only workflow that re-runs the same local-only gates as the on-push `ci.yml` plus `scripts/verify-release.ps1` and `scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues`. It runs daily at `05:17 UTC` and uploads the `ackit scan --ci --json` and `ackit doctor --json` outputs as workflow artifacts (`nightly-scan-<os>`, `nightly-doctor-<os>`, 14-day retention).
-
-The workflow uses only `contents: read` and the default `GITHUB_TOKEN`; it does not publish, tag, push, create releases, or call remote providers. Local developers do not need to install or schedule anything to keep the nightly check green — the workflow runs entirely on GitHub-hosted runners.
