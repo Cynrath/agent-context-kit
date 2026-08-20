@@ -24,7 +24,7 @@ During development, run the CLI through:
 dotnet run --project src/AgentContextKit.Cli -- <command>
 ```
 
-Current package note: published prerelease `1.0.0-rc.1` preserves the frozen command surface that includes `ackit sarif`. It predates the post-RC1 Build Week `ackit optimize` source addition. Alpha4 is the immutable upgrade predecessor; older alpha references elsewhere are historical evidence.
+Current package note: published prerelease `1.0.0-rc.1` preserves the frozen command surface that includes `ackit sarif`. It predates the post-RC1 `ackit optimize` source addition. Alpha4 is the immutable upgrade predecessor; older alpha references elsewhere are historical evidence.
 
 ## Stable Command Surface
 The v1.0 target command surface is:
