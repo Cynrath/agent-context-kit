@@ -37,13 +37,11 @@ Varsayılan komutlar repository içeriğini yerelde işler; repository yüklemez
 
 ---
 
-## OpenAI Build Week 2026 — ACKit Optimize
+## ACKit Optimize
 
-ACKit Optimize, `1.0.0-rc.1` sonrasında güncel kaynak koda eklenen yeni çalışmadır: `ackit optimize` desteklenen AI-agent yönerge yüzeylerini keşfeder, iç içe `AGENTS.md` kapsamını çözer, kararlı tekrar/çelişki/güvenlik/kalite bulguları ve deterministik bağlam tahminleri üretir; console/JSON/Markdown/SARIF/çevrimdışı HTML çıktısı verir ve kaynak dosyaları yeniden yazmadan açıkça belirtilen bir inceleme önerisi oluşturabilir.
+`ackit optimize`, `1.0.0-rc.1` sonrasında güncel kaynak koda eklenen işlevdir. Desteklenen AI-agent yönerge yüzeylerini keşfeder, iç içe `AGENTS.md` kapsamını çözer, kararlı tekrar/çelişki/güvenlik/kalite bulguları ve deterministik bağlam tahminleri üretir; console/JSON/Markdown/SARIF/çevrimdışı HTML çıktısı verir ve kaynak dosyaları yeniden yazmadan açıkça belirtilen bir inceleme önerisi oluşturabilir.
 
-Yayımlanmış RC1 temeli bu özellikten önce gelir; yeniden yayımlanmamış veya geriye dönük değiştirilmemiştir. Jüri akışı için aşağıdaki kaynak-kod komutları kullanılmalıdır.
-
-Bu Build Week çalışması OpenAI Codex içinde GPT-5.6 ile geliştirildi. Codex/GPT-5.6; repository inceleme, uygulama, test, dokümantasyon, komut çalıştırma, hata tanısı ve salt-okunur CI izleme işlerine yardımcı oldu. Commit’teki Optimize çalışma zamanı ise deterministik C# kodudur: model/API çağrısı yapmaz, API anahtarı istemez ve bir modelin yönergeleri sessizce yeniden yazmasına izin vermez. Ürün kapsamı, kabul kriterleri, güvenlik/yayın politikası, commit/push yetkisi, çelişki çözümü, öneri kabulü ve tüm release/paket/etiket/deployment kararları insan kontrolünde kaldı.
+Yayımlanmış RC1 bu özellikten önce gelir ve değiştirilmemiştir. Optimize çalışma zamanı deterministik yerel C# kodudur; model/API çağrısı yapmaz, API anahtarı istemez ve bir modelin yönergeleri sessizce yeniden yazmasına izin vermez.
 
 ```powershell
 dotnet restore AgentContextKit.sln
@@ -52,8 +50,6 @@ Push-Location samples/ackit-optimize-demo
 dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json --proposal .ackit/reports/optimized-instructions.md
 Pop-Location
 ```
-
-Önceden var olan/yeni sınırı, tam uygulama commit aralığı, model/insan karar ayrımı, demo metrikleri, CI bağlantıları, sınırlamalar ve yeniden üretilebilir doğrulama için İngilizce [Build Week 2026 kanıt ve jüri rehberine](docs/BUILD_WEEK_2026.md) bakın.
 
 ---
 
@@ -68,7 +64,7 @@ Pop-Location
 | Platformlar | GitHub Actions ile Windows, Ubuntu ve macOS |
 | Gizlilik modeli | Offline-first; MVP repository yüklemez ve uzak AI API çağrısı yapmaz |
 | SARIF | `ackit sarif`, yayımlanmış `1.0.0-rc.1` paketinde bulunur |
-| Build Week özelliği | `ackit optimize` yalnız güncel kaynak kodda doğrulanmıştır; yayımlanmış RC1 bu özellikten önce gelir |
+| Optimize | `ackit optimize` yalnız güncel kaynak kodda doğrulanmıştır; yayımlanmış RC1 bu özellikten önce gelir |
 
 ---
 
@@ -191,7 +187,7 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --proposal .ackit/reports/optimized-instructions.md
 ```
 
-Yayımlanmış `1.0.0-rc.1` paketi ACKit Optimize’dan önce gelir. Build Week komutu şu anda kaynak koddan gösterilir; RC1 paketi, etiketi, GitHub Release’i, asset’leri veya attestation kayıtları geriye dönük değiştirilmemiştir. `--proposal`, açıkça verilen depo-köküne-göreli bir Markdown yolu ister, var olan çıktıyı atlar, yönerge kaynaklarını hedeflemez ve apply modu içermez.
+Yayımlanmış `1.0.0-rc.1` paketi ACKit Optimize’dan önce gelir. Komut şu anda kaynak koddan gösterilir; RC1 paketi, etiketi, GitHub Release’i, asset’leri veya attestation kayıtları geriye dönük değiştirilmemiştir. `--proposal`, açıkça verilen depo-köküne-göreli bir Markdown yolu ister, var olan çıktıyı atlar, yönerge kaynaklarını hedeflemez ve apply modu içermez.
 
 ### Örnek üzerinde deneyin
 
