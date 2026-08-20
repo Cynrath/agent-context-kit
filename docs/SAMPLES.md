@@ -76,7 +76,7 @@ dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c
 Pop-Location
 ```
 
-Expected behavior is recorded in [BUILD_WEEK_2026.md](BUILD_WEEK_2026.md) and [SAMPLE_GALLERY.md](SAMPLE_GALLERY.md). Generated `.ackit/` output remains local and ignored.
+Expected behavior is recorded in [SAMPLE_GALLERY.md](SAMPLE_GALLERY.md). Generated `.ackit/` output remains local and ignored.
 
 ## Safety
 Do not add secrets, `.env` files, dumps, backups, uploads, private keys, package outputs, `node_modules`, `bin`, or `obj` directories to samples.
