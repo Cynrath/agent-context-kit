@@ -1,0 +1,109 @@
+name: One-time ACKit docs cleanup
+
+on:
+  push:
+    paths:
+      - .github/workflows/cleanup-build-week.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v5
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Normalize obsolete Build Week wording
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          exact = {
+              'docs/tasks/TASK-0258-build-week-ackit-optimize-baseline-and-control.md': 'docs/tasks/TASK-0258-ackit-optimize-baseline-and-control.md',
+              'docs/tasks/TASK-0262-ackit-optimize-build-week-documentation-and-final-validation.md': 'docs/tasks/TASK-0262-ackit-optimize-documentation-and-final-validation.md',
+              'OpenAI Build Week 2026 — ACKit Optimize': 'ACKit Optimize',
+              'OpenAI Build Week 2026': 'ACKit Optimize development',
+              'pre-Build-Week': 'pre-Optimize',
+              'pre-Build Week': 'pre-Optimize',
+              'Build Week': 'Optimize',
+              'build-week': 'optimize',
+          }
+
+          changed = []
+          for path in Path('.').rglob('*.md'):
+              if '.git' in path.parts:
+                  continue
+              original = path.read_text(encoding='utf-8')
+              lines = []
+              for line in original.splitlines(keepends=True):
+                  if 'BUILD_WEEK_2026.md' in line:
+                      continue
+                  for old, new in exact.items():
+                      line = line.replace(old, new)
+                  lines.append(line)
+              updated = ''.join(lines)
+              if updated != original:
+                  path.write_text(updated, encoding='utf-8', newline='')
+                  changed.append(path.as_posix())
+
+          print('Changed Markdown files:')
+          for item in changed:
+              print(f'  {item}')
+          PY
+
+      - name: Verify obsolete wording is gone
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git grep -nEI 'Build Week|build-week|BUILD_WEEK_2026' -- '*.md'; then
+            echo 'Obsolete Build Week wording remains.' >&2
+            exit 1
+          fi
+          if git grep -nF 'TASK-0258-build-week-ackit-optimize-baseline-and-control.md' -- '*.md'; then
+            echo 'Old TASK-0258 path remains.' >&2
+            exit 1
+          fi
+          if git grep -nF 'TASK-0262-ackit-optimize-build-week-documentation-and-final-validation.md' -- '*.md'; then
+            echo 'Old TASK-0262 path remains.' >&2
+            exit 1
+          fi
+          git diff --check
+
+      - name: Restore build and test
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet restore AgentContextKit.sln
+          dotnet build AgentContextKit.sln -c Release --no-restore
+          dotnet test AgentContextKit.sln -c Release --no-build
+
+      - name: Validate local Markdown links
+        shell: bash
+        run: |
+          set -euo pipefail
+          pwsh -NoProfile -File scripts/check-local-markdown-links.ps1
+
+      - name: Commit cleanup directly to master
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -- .github/workflows/cleanup-build-week.yml
+          git add -u -- '*.md'
+          git status --short
+          git diff --cached --check
+          git commit -m 'docs: finish ACKit Optimize cleanup'
+          git push origin HEAD:master
+          git push origin --delete cleanup/build-week-final || true
