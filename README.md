@@ -38,13 +38,11 @@ Default commands process repository content locally: no repository upload, AI AP
 
 ---
 
-## OpenAI Build Week 2026 — ACKit Optimize
+## ACKit Optimize
 
-ACKit Optimize is new, post-`1.0.0-rc.1` current-source work: `ackit optimize` discovers supported AI-agent instruction surfaces, resolves nested `AGENTS.md` scope, reports stable duplication/conflict/safety/quality findings and deterministic context estimates, exports console/JSON/Markdown/SARIF/offline HTML, and can create an explicit-path review proposal without rewriting source files.
+`ackit optimize` is post-`1.0.0-rc.1` current-source functionality. It discovers supported AI-agent instruction surfaces, resolves nested `AGENTS.md` scope, reports stable duplication/conflict/safety/quality findings and deterministic context estimates, exports console/JSON/Markdown/SARIF/offline HTML, and can create an explicit-path review proposal without rewriting source files.
 
-The published RC1 foundation predates this feature. It was not republished or retroactively changed; use the source workflow below for judging.
-
-This Build Week work was developed in OpenAI Codex with GPT-5.6. Codex/GPT-5.6 assisted with repository inspection, implementation, tests, documentation, command execution, failure diagnosis, and read-only CI monitoring. The checked-in Optimize runtime itself is deterministic C#: it makes no model/API call, requires no API key, and never lets a model silently rewrite instructions. Product scope, acceptance criteria, safety/release policy, commit/push authorization, conflict resolution, proposal acceptance, and every release/package/tag/deployment decision remained human-controlled.
+The published RC1 predates this feature and remains unchanged. Optimize is deterministic local C#: it makes no model/API call, requires no API key, and never lets a model silently rewrite instructions.
 
 ```powershell
 dotnet restore AgentContextKit.sln
@@ -53,8 +51,6 @@ Push-Location samples/ackit-optimize-demo
 dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json --proposal .ackit/reports/optimized-instructions.md
 Pop-Location
 ```
-
-See [Build Week 2026 evidence and judging guide](docs/BUILD_WEEK_2026.md) for the pre-existing/new boundary, exact implementation commit range, model/human decision split, demo metrics, CI links, limitations, and reproducible validation.
 
 ---
 
@@ -70,7 +66,7 @@ See [Build Week 2026 evidence and judging guide](docs/BUILD_WEEK_2026.md) for th
 | Platforms | Windows, Ubuntu, macOS via GitHub Actions smoke flows |
 | Privacy model | Offline-first; no repository upload and no remote AI API calls in the MVP |
 | SARIF | `ackit sarif` is included in the published `1.0.0-rc.1` package |
-| Build Week feature | `ackit optimize` is verified in current source only; published RC1 predates it |
+| Optimize | `ackit optimize` is verified in current source only; published RC1 predates it |
 
 ---
 
@@ -225,7 +221,7 @@ dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Relea
 dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --proposal .ackit/reports/optimized-instructions.md
 ```
 
-The published `1.0.0-rc.1` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands. It predates ACKit Optimize; the Build Week command is currently demonstrated from source and does not retroactively change the RC1 package, tag, release, assets, or attestations. `--proposal` requires an explicit repository-relative Markdown path, skips existing output, never targets instruction sources, and has no apply mode.
+The published `1.0.0-rc.1` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands. It predates ACKit Optimize; the command is currently demonstrated from source and does not retroactively change the RC1 package, tag, release, assets, or attestations. `--proposal` requires an explicit repository-relative Markdown path, skips existing output, never targets instruction sources, and has no apply mode.
 
 ### Try it on a sample
 
