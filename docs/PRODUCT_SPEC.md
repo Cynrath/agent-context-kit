@@ -30,9 +30,9 @@ AgentContextKit is an offline-first .NET CLI that prepares repositories for safe
 ## Next Product Direction
 The complete RC1 prerelease includes baseline-aware CI policy, configuration diagnostics, MCP stdio, `ackit watch`, `diff`, `trim`, `README.nuget.md` rendering, and ACKit-first dogfood. NuGet `1.0.0-rc.1`, exact tag, GitHub prerelease/body/assets, both attestations, and Windows/Ubuntu/macOS installed-package smoke are verified. RC1 is complete as a prerelease, not a `1.0.0` GA claim; alpha4 remains immutable predecessor evidence.
 
-## Build Week Current-Source Addition
+## Current-Source Optimize
 
-OpenAI Build Week 2026 adds `ackit optimize` after RC1. It discovers supported instruction surfaces, resolves nested `AGENTS.md` scope, emits stable `ACKITOPT` findings and deterministic size estimates, supports console/JSON/Markdown/SARIF/offline HTML, and can create an explicit-path review proposal. The proposal is non-overwriting and has no apply mode. See `docs/BUILD_WEEK_2026.md`; no successor package version or publication is selected.
+`ackit optimize` was added after RC1. It discovers supported instruction surfaces, resolves nested `AGENTS.md` scope, emits stable `ACKITOPT` findings and deterministic size estimates, supports console/JSON/Markdown/SARIF/offline HTML, and can create an explicit-path review proposal. The proposal is non-overwriting and has no apply mode. The feature is currently documented and validated from source; no successor package version or publication is claimed here.
 
 ## Future Optional LLM Scope
 v0.5 may add optional LLM-assisted workflows, but the default product remains offline-first. Any future provider integration must require explicit user consent, dry-run context review, safe secret handling, and local auditability before remote calls or context export.
