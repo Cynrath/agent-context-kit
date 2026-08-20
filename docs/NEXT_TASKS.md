@@ -8,7 +8,7 @@
 4. Completed: TASK-0261 explicit-path non-overwriting proposal and synthetic demo at `7bf37cb8`; local validation and runs `29653163763`, `29653163773`, and `29653163760` passed, including three-platform source Optimize smoke.
 5. Final evidence closure: TASK-0262 public feature/documentation commit `00c9fea3` passed local gates and hosted runs `29653893305`, `29653893245`, and `29653893249`. No subsequent Optimize task is selected. Closure is complete when this immediate evidence-only successor's three standard workflows pass and clean local/origin equality is proved; its self-evidence belongs in the final report.
 
-Published NuGet `1.0.0-rc.1`, tag `v1.0.0-rc.1`, GitHub release/assets/attestations, and historical recovery evidence are immutable and predate this work. Optimize is current-source Optimize work until a separate human-controlled release decision. No workflow dispatch, package publication, tag/release/asset mutation, deployment, settings/secrets change, force push, history rewrite, or GA claim is authorized.
+Published NuGet `1.0.0-rc.1`, tag `v1.0.0-rc.1`, GitHub release/assets/attestations, and historical recovery evidence are immutable and predate this work. Optimize is current-source functionality until a separate human-controlled release decision. No workflow dispatch, package publication, tag/release/asset mutation, deployment, settings/secrets change, force push, history rewrite, or GA claim is authorized.
 
 ## V100 `1.0.0-rc.1` Full Release Closure — Completed
 

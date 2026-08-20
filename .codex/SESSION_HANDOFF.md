@@ -9,7 +9,7 @@
 - The tracked-vs-untracked guard returned the expected pre-commit exit 1 solely because `docs/tasks/TASK-0263-remove-nightly-local-check-workflow.md` was intentionally untracked. The user subsequently authorized a focused commit and normal `master` push; rerun this guard after commit and before push.
 - No other workflow, runtime/public contract, package/version, release/tag/asset/attestation, deployment, settings/secrets, permission, or remote state is in scope. Final installed ACKit doctor is 13/13 PASS, final `scan --ci` exits 0 over 662 files with the same reviewed 4 Medium/5 Low findings, and final pre-commit `git diff --check` passes. The commit starts from synchronized `master`/`origin/master` at `0ae2418`; its exact SHA, remote equality, clean tree, and push-triggered CI evidence must be supplied in the final report because this handoff file is part of that commit.
 
-## Active snapshot — ACKit Optimize development ACKit Optimize (2026-07-18)
+## Active snapshot — ACKit Optimize (2026-07-18)
 
 - Entry baseline: clean `master` and `origin/master` at `6998e269af4962bbe70a9cb4044727d25dc1a06d`.
 - Baseline: installed `AgentContextKit 1.0.0-rc.1`; report-only scan and `scan --ci` exit 0 over 626 files; doctor 13/13 PASS; restore PASS; Release build 0 warnings/0 errors; tests 431 passed, 0 failed, 0 skipped.
