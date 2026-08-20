@@ -4,7 +4,7 @@ Optional external-tool demos are not part of the standard scenarios. Any future 
 
 These scenarios show safe, local ways to try AgentContextKit. They do not push, tag, publish NuGet packages, create GitHub Releases, upload SARIF, or call remote LLM providers.
 
-## Three-Minute ACKit Optimize Build Week Demo
+## Three-Minute ACKit Optimize Demo
 
 Build once from the repository root, then audit the tracked synthetic fixture from its own directory:
 
@@ -29,7 +29,7 @@ Narration checkpoints:
 4. The explicit proposal maps two safe consolidation groups back to source lines, preserves five mandatory categories, and reports a deterministic 192-to-156 estimated-token change for parsed rule bodies.
 5. Re-running the same commands skips existing outputs; `AGENTS.md`, nested instructions, and other sources are never overwritten.
 
-This is current-source Build Week functionality. NuGet `1.0.0-rc.1` predates it and remains immutable.
+This is current-source functionality. NuGet `1.0.0-rc.1` predates it and remains immutable.
 
 ## Published Package Demo
 Use the published NuGet package for stable commands:
