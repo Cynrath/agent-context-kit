@@ -6,7 +6,7 @@ Add an explicit-path, review-only optimized instruction proposal and a safe synt
 
 ## Current verified state and root cause
 
-TASK-0259/TASK-0260 provide audit data and output contracts, but users still need a reviewable consolidation artifact. Existing generators already enforce repository-relative skip-existing behavior; there is no safe instruction proposal or Build Week demo fixture.
+TASK-0259/TASK-0260 provide audit data and output contracts, but users still need a reviewable consolidation artifact. Existing generators already enforce repository-relative skip-existing behavior; there is no safe instruction proposal or dedicated Optimize demo fixture.
 
 ## Scope
 
