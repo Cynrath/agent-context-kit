@@ -12,7 +12,7 @@ During development, run commands through:
 dotnet run --project src/AgentContextKit.Cli -- <command>
 ```
 
-Availability note: the published NuGet package `AgentContextKit` `1.0.0-rc.1` includes `ackit sarif` but predates `ackit optimize`. Optimize is a post-RC1 Build Week addition in current source and is not available from the immutable RC1 package.
+Availability note: the published NuGet package `AgentContextKit` `1.0.0-rc.1` includes `ackit sarif` but predates `ackit optimize`. Optimize is a post-RC1 addition in current source and is not available from the immutable RC1 package.
 
 See [EXIT_CODES.md](EXIT_CODES.md) for the full exit code matrix.
 
@@ -110,7 +110,7 @@ Behavior:
 
 Published package boundary:
 
-- `ackit optimize` was implemented after `1.0.0-rc.1`; use current-source execution for Build Week judging.
+- `ackit optimize` was implemented after `1.0.0-rc.1`; use current-source execution to evaluate this command.
 - The RC1 package, tag, release, assets, and attestations remain immutable and do not contain this command.
 
 ### `ackit baseline`
@@ -177,7 +177,6 @@ Safety behavior:
 
 ### `ackit webui`
 Generates an offline static Web UI prototype for local scan review. Existing Web UI files are skipped.
-
 ```powershell
 ackit webui
 ackit webui --output .ackit/webui/current.html
