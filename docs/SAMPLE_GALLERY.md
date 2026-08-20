@@ -16,7 +16,7 @@ For scanner configuration examples that are safe to copy into demo repositories,
 | `samples/node-tooling` | Node, TypeScript, and Tailwind CSS sample stack detection without `node_modules`. |
 | `samples/generic-empty-repo` | Missing repository health signals in a nearly empty repository. |
 | `samples/security-fixture-repo` | Safe security fixture wording without real secrets or exact sensitive token prefixes. |
-| `samples/ackit-optimize-demo` | Post-RC1 Build Week instruction audit with nested scope, duplicates, a real conflict, a valid override, stale/vague rules, and non-destructive proposal metrics. |
+| `samples/ackit-optimize-demo` | Post-RC1 instruction audit with nested scope, duplicates, a real conflict, a valid override, stale/vague rules, and non-destructive proposal metrics. |
 
 ## `samples/dotnet-console`
 - Path: `samples/dotnet-console`
@@ -175,7 +175,7 @@ Public screenshots from samples must follow [VISUAL_ASSETS.md](VISUAL_ASSETS.md)
 ## `samples/ackit-optimize-demo`
 
 - Path: `samples/ackit-optimize-demo`
-- Purpose: safe synthetic judging fixture for current-source ACKit Optimize; it is not part of the immutable `1.0.0-rc.1` package.
+- Purpose: safe synthetic current-source fixture for ACKit Optimize; it is not part of the immutable `1.0.0-rc.1` package.
 - Instruction surfaces: root `AGENTS.md`, nested `src/web/AGENTS.md`, root `CLAUDE.md`, and `docs/AI_WORKFLOW.md`.
 - Expected scope behavior: four sources, four resolved scopes, and one valid npm-to-pnpm subtree override.
 - Expected audit: 16 parsed rules and 10 findings: two `ACKITOPT001`, one `ACKITOPT002`, two `ACKITOPT007`, one each of `ACKITOPT008`, `ACKITOPT009`, `ACKITOPT012`, `ACKITOPT013`, and `ACKITOPT014`.
