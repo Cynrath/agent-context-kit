@@ -179,7 +179,7 @@ The abbreviated example below represents `ackit optimize --json --proposal .acki
 
 Successful findings contain stable `ACKITOPT` rule IDs, fingerprints, severity/category, repository-relative source file and one-based line range, directory scope, sanitized explanation/evidence/remediation, related locations, and both `deterministic` and `heuristic` booleans. Source rule bodies and absolute repository paths are omitted. Error payloads include `command`, `exitCode: 1`, and a stable `error.code` without echoing unsafe path values.
 
-The Optimize branch and optional proposal metadata are additive to schema v2 and covered by `docs/schemas/ackit-command-output-v2.schema.json`, the sanitized golden fixture, and live-output tests. Published `1.0.0-rc.1` predates this branch even though current source retains the existing package version metadata; Build Week availability is established by source commit evidence, not by rewriting that release.
+The Optimize branch and optional proposal metadata are additive to schema v2 and covered by `docs/schemas/ackit-command-output-v2.schema.json`, the sanitized golden fixture, and live-output tests. Published `1.0.0-rc.1` predates this branch even though current source retains the existing package version metadata; current-source availability is established by source commit evidence, not by rewriting that release.
 
 ## Example
 ```powershell
