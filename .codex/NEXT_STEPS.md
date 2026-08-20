@@ -1,13 +1,13 @@
 # Next Steps
 
-## Active Build Week sequence (2026-07-18)
+## Active Optimize sequence (2026-07-18)
 
 - Baseline is `6998e269af4962bbe70a9cb4044727d25dc1a06d`; installed tool is immutable RC1 and the baseline suite was 431/431 green with 0 build warnings/errors.
 - TASK-0258 planning commit `a227c045` is pushed; `ci` `29648931050`, published smoke `29648931085`, and source smoke `29648931149` passed without manual dispatch.
 - TASK-0259 Core is committed/pushed at `d49bd446`; `ci` `29650061884`, published smoke `29650061875`, and source smoke `29650061881` passed.
 - TASK-0260 is complete at `c79932a`; CI, source-package smoke, and published-package smoke all passed (`29651733106`, `29651733085`, `29651733087`).
 - TASK-0261 proposal/demo is complete at `7bf37cb8`; 463/463 tests, zero-warning build, all task gates, six-format no-mutation demo smoke, and hosted runs `29653163763`, `29653163773`, and `29653163760` passed.
-- TASK-0262 public feature/docs commit `00c9fea3` passed local gates and runs `29653893305`, `29653893245`, and `29653893249`. No subsequent Build Week task is selected. Closure condition: this exact evidence-only successor's three push-triggered workflows pass and clean local/origin equality is proved; its self SHA/runs are recorded in the final report. No implementation/release/package/tag/deploy work remains.
+- TASK-0262 public feature/docs commit `00c9fea3` passed local gates and runs `29653893305`, `29653893245`, and `29653893249`. No subsequent Optimize task is selected. Closure condition: this exact evidence-only successor's three push-triggered workflows pass and clean local/origin equality is proved; its self SHA/runs are recorded in the final report. No implementation/release/package/tag/deploy work remains.
 - Keep Optimize deterministic, offline, non-overwriting, current-source-only until a separate human release decision.
 - Do not dispatch workflows, publish packages, mutate tags/releases/assets/attestations, deploy, change settings/secrets, force-push, or rewrite history.
 

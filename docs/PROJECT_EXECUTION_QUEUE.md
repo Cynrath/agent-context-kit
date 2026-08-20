@@ -1,18 +1,18 @@
 # Project Execution Queue
 
-## OpenAI Build Week 2026 — ACKit Optimize (Active)
+## ACKit Optimize (Active)
 
 Clean synchronized baseline: `6998e269af4962bbe70a9cb4044727d25dc1a06d` on 2026-07-18. The published `v1.0.0-rc.1` package/tag/release/assets/attestations predate this track and remain immutable. User authorization permits focused commits, normal `master` pushes, and read-only monitoring of push-triggered CI after validation; it does not permit workflow dispatch, deployment, publication, tag/release/asset mutation, settings/secrets changes, force push, or history rewrite.
 
 | Order | Status | Task | Purpose | Dependency | Expected validation | Remote/destructive boundary |
 | ---: | --- | --- | --- | --- | --- | --- |
-| BW1 | Completed | TASK-0258 Build Week baseline and control | Pin baseline, scope, evidence, tasks, and authorization before code | Clean synchronized `6998e269...` | Planning commit `a227c045`; runs `29648931050`, `29648931085`, `29648931149` PASS | Normal planning push completed; no dispatch |
+| BW1 | Completed | TASK-0258 Optimize baseline and control | Pin baseline, scope, evidence, tasks, and authorization before code | Clean synchronized `6998e269...` | Planning commit `a227c045`; runs `29648931050`, `29648931085`, `29648931149` PASS | Normal planning push completed; no dispatch |
 | BW2 | Completed | TASK-0259 Optimize Core audit domain | Discovery, nested scope/inheritance, normalization, metrics, stable findings | TASK-0258 planning commit/CI PASS | Commit `d49bd446`; 12/12 focused; 443/443 full; runs `29650061884`, `29650061875`, `29650061881` PASS | Normal validated push completed; no dispatch |
 | BW3 | Completed | TASK-0260 Optimize CLI and outputs | Console/JSON/Markdown/SARIF/offline HTML, schemas, localization, exits | TASK-0259 completed/hosted PASS | Commit `c79932a`; 10/10 focused; 454/454 full; runs `29651733106`, `29651733085`, `29651733087` PASS | Normal validated push completed; no dispatch |
 | BW4 | Completed | TASK-0261 non-destructive proposal and demo | Explicit-path proposal, mappings, unresolved decisions, synthetic demo | TASK-0260 completed/hosted PASS | Commit `7bf37cb8`; 463/463 full; runs `29653163763`, `29653163773`, `29653163760` PASS | Normal validated push completed; no dispatch |
-| BW5 | Final evidence closure | TASK-0262 Build Week docs and final validation | Public attribution/evidence, reproducible judging, full local/hosted closure | TASK-0261 completed/hosted PASS | Public docs `00c9fea3`; local 463/463 + focused 31/31 + build 0/0; runs `29653893305`, `29653893245`, `29653893249` PASS; evidence-only successor CI is the final gate | No release/package/tag/deploy action |
+| BW5 | Final evidence closure | TASK-0262 Optimize docs and final validation | Public attribution/evidence, reproducible judging, full local/hosted closure | TASK-0261 completed/hosted PASS | Public docs `00c9fea3`; local 463/463 + focused 31/31 + build 0/0; runs `29653893305`, `29653893245`, `29653893249` PASS; evidence-only successor CI is the final gate | No release/package/tag/deploy action |
 
-The exact public feature-and-documentation range is `6998e269af4962bbe70a9cb4044727d25dc1a06d..00c9fea3893776f0bc9026f688a15d7a92d2ffb3`. The immediate evidence-only successor is the final overall Build Week HEAD; its self SHA and push-triggered runs are necessarily recorded in immutable Git/GitHub history and the final report.
+The exact public feature-and-documentation range is `6998e269af4962bbe70a9cb4044727d25dc1a06d..00c9fea3893776f0bc9026f688a15d7a92d2ffb3`. The immediate evidence-only successor is the final overall Optimize HEAD; its self SHA and push-triggered runs are necessarily recorded in immutable Git/GitHub history and the final report.
 
 ## V100 `1.0.0-rc.1` Full Release Closure — Completed
 
