@@ -55,11 +55,11 @@ Findings integrate into standard scan pipeline outputs.
 
 ## Acceptance criteria
 
-- [ ] MS§8.5 canonical example (AGENTS.md pnpm vs CLAUDE.md npm) produces instruction-conflict finding deterministically.
-- [ ] Near-duplicate detection tier thresholds unit-tested (exact hash vs normalized similarity).
-- [ ] Broken reference fixture yields stale-reference finding with correct path.
-- [ ] Hidden Unicode/zero-width fixture flagged advisory; clean file not flagged (no FP regression).
-- [ ] No rule emits critical severity without a deterministic-evidence justification comment reviewed in task evidence.
+- [x] MS§8.5 canonical example (AGENTS.md pnpm vs CLAUDE.md npm) produces instruction-conflict finding deterministically.
+- [x] Near-duplicate detection tier thresholds unit-tested (exact hash vs normalized similarity).
+- [x] Broken reference fixture yields stale-reference finding with correct path.
+- [x] Hidden Unicode/zero-width fixture flagged advisory; clean file not flagged (no FP regression).
+- [x] No rule emits critical severity without a deterministic-evidence justification comment reviewed in task evidence.
 
 ## Test steps
 
@@ -75,4 +75,22 @@ Focused commit.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on `rebuild/ackit-vnext`.
+
+Implementation (`src/core/instructions/analysis/`):
+- `analyze.ts` — analyzeInstructions over the instruction graph; rule block ACKIT300..314 mapped to scan categories (instruction-conflict/scope/staleness + hygiene advisories):
+  - ACKIT300 convention conflict (high): explicit key/value extraction only — `package manager [:|=] value` and imperative `use|prefer X as the package manager`, value whitelist {pnpm,npm,yarn,bun}; conflicting values across provider nodes reported with both paths. Conservative-pattern principle documented: misses acceptable, wrong conflicts are not.
+  - ACKIT301 exact duplicate (medium): sha256 over normalized content (frontmatter stripped, lowercased, punctuation collapsed); ACKIT302 near-duplicate (low): trigram Jaccard ≥ NEAR_DUPLICATE_THRESHOLD (0.9), thresholds exported and unit-tested.
+  - ACKIT303 stale/broken reference (medium) from graph status; ACKIT304 unreachable path-specific applyTo glob (low, requires knownFiles input).
+  - Advisory security (REQ-SCAN-006): ACKIT310 hidden Unicode controls (medium), ACKIT311 external URL ref (low), ACKIT313 massive embedded data run ≥8192 chars (medium), ACKIT314 credential-style literal in instructions (high — deterministic regex evidence), ACKIT312 root-escape reference (high — structural).
+  - No-critical policy enforced structurally: AnalysisSeverity type = "high"|"medium"|"low"; tests assert the tier set explicitly (TS rejects "critical" comparisons).
+- CLI integration: findings available via analysis export for TASK-0278 consumption; graph JSON remains the transport.
+
+Tests (27 files / 149 tests total, all green):
+- MS§8.5 canonical pnpm-vs-npm fixture → ACKIT300 with both values named, severity high not critical.
+- Duplicate tiers: normalization unit checks; engineered exact pair (case/punctuation variants) → 301; engineered near pair (trigram overlap ≥0.9 asserted numerically) → 302.
+- Stale reference path assertion; hidden-unicode flagged vs clean-file negative; unreachable glob advisory with knownFiles; credential-literal high finding; suite-wide no-critical assertions.
+
+Validation evidence: lint=0 · format:check=0 · typecheck=0 · build=0 · vitest 27 files / 149 tests=0 · smoke:cli=0 · ackit scan --ci --exclude pnpm-lock.yaml=0.
+
+External actions: none beyond permitted branch pushes recorded earlier under TASK-0290.

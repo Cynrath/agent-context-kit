@@ -82,7 +82,7 @@ export const ackit002PrivateKeyBlock: ScanRule = {
   },
 };
 
-const GENERIC_ASSIGNMENT =
+export const GENERIC_ASSIGNMENT =
   /\b(pass(word|wd)?|secret|api[-_]?key|auth[-_]?token|client[-_]?secret|access[-_]?key)\b\s*[:=]\s*(?:"([^"\s]{6,})"|'([^'\s]{6,})'|([^\s"'#]{6,}))/i;
 
 export const ackit003GenericCredentialAssignment: ScanRule = {

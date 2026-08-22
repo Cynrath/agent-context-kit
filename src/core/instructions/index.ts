@@ -1,3 +1,11 @@
+export type { InstructionAnalysisFinding } from "./analysis/index.js";
+export {
+  analyzeInstructions,
+  EXACT_DUPLICATE_THRESHOLD,
+  NEAR_DUPLICATE_THRESHOLD,
+  normalizeForDuplicateCheck,
+  similarity,
+} from "./analysis/index.js";
 export { extractFrontmatter, normalizeApplyTo } from "./frontmatter.js";
 export {
   buildInstructionGraph,
