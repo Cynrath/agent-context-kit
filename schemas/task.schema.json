@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^TASK-\\d{4}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "default": "pending",
+      "type": "string",
+      "enum": [
+        "pending",
+        "active",
+        "completed",
+        "blocked"
+      ]
+    },
+    "schemaVersion": {
+      "type": "number",
+      "const": 2
+    },
+    "dependencies": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^TASK-\\d{4}$"
+      }
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "completedAt": {
+      "default": null,
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "schemaVersion",
+    "createdAt"
+  ],
+  "$comment": "ACKit task frontmatter schema v2 (REQ-TASKS-002)."
+}

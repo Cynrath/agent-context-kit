@@ -8,7 +8,7 @@ import { isValidKebabName } from "./types.js";
 
 export const SKILLS_LOCK_SCHEMA_VERSION = 1;
 export const LOCK_FILE_RELATIVE = ".ackit/skills.lock.json";
-const BUILTIN_MARKER = "ackit-workflow";
+const _BUILTIN_MARKER = "ackit-workflow";
 
 export interface LockEntry {
   name: string;
