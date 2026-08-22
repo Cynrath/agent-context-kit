@@ -57,21 +57,25 @@ export function normalizeRelativePath(input: string): NormalizeResult {
 }
 
 /**
- * Containment test on already-resolved absolute paths. Comparison is
- * case-insensitive on case-insensitive platforms (win32/darwin default
- * filesystems) and requires either equality with the root or a path that
- * extends the root by a full segment (`root` never matches `root-sibling`).
+ * Containment test on already-resolved absolute paths. Inputs may be native
+ * or POSIX form; both sides are canonicalized to forward slashes first so
+ * behavior is identical on every platform. Comparison is case-insensitive
+ * when requested (win32/darwin default filesystems) and requires either
+ * equality with the root or a full-segment extension (`root` never matches
+ * `root-sibling`).
  */
 export function isInsideRoot(
   canonicalRoot: string,
   candidateRealPath: string,
   platformIsCaseInsensitive = process.platform === "win32",
 ): boolean {
-  const root = platformIsCaseInsensitive ? canonicalRoot.toLowerCase() : canonicalRoot;
-  const candidate = platformIsCaseInsensitive ? candidateRealPath.toLowerCase() : candidateRealPath;
-  if (candidate === root) {
+  const root = toPosix(canonicalRoot);
+  const candidate = toPosix(candidateRealPath);
+  const normRoot = platformIsCaseInsensitive ? root.toLowerCase() : root;
+  const normCandidate = platformIsCaseInsensitive ? candidate.toLowerCase() : candidate;
+  if (normCandidate === normRoot) {
     return true;
   }
-  const rootPrefix = root.endsWith(path.sep) ? root : `${root}${path.sep}`;
-  return candidate.startsWith(rootPrefix);
+  const rootPrefix = normRoot.endsWith("/") ? normRoot : `${normRoot}/`;
+  return normCandidate.startsWith(rootPrefix);
 }
