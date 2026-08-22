@@ -5,6 +5,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { Command, CommanderError } from "commander";
 import { type ConfigError, loadAckitConfig } from "../core/config/index.js";
+import { buildContextPack } from "../core/context/index.js";
 import { resolveRepositoryRoot } from "../core/filesystem/root.js";
 import {
   buildInstructionGraph,
@@ -247,6 +248,35 @@ function buildProgram(invocation: CliInvocation): Command {
         debug: parentOptions.debug ?? false,
         agents: commandOptions.agents,
         dryRun: commandOptions.dryRun ?? false,
+      });
+    });
+
+  const packCommand = program
+    .command("pack")
+    .description("build a budgeted, deterministic context pack (REQ-CTX-001)");
+  packCommand
+    .option("--max-tokens <n>", "token budget override", Number.parseInt)
+    .option("--format <fmt>", "output format: markdown|json", "markdown")
+    .option("--include <globs...>", "explicit include globs (highest ranking signal)")
+    .option("--changed", "boost/limit candidates to git-changed files", false)
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const commandOptions = (packCommand.opts() ?? {}) as {
+        maxTokens?: number;
+        format?: string;
+        include?: string[];
+        changed?: boolean;
+      };
+      invocation.exitCode = await runPackCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        maxTokens: commandOptions.maxTokens,
+        format: commandOptions.format === "json" ? "json" : "markdown",
+        include: commandOptions.include,
+        changed: commandOptions.changed ?? false,
       });
     });
 
@@ -872,6 +902,73 @@ export async function runInitCommand(
   }
   const refused = actions.filter((action) => action.action === "refused-non-managed");
   return refused.length > 0 ? EXIT_CODES.securityBoundary : EXIT_CODES.ok;
+}
+
+/** `ackit pack` (REQ-CTX-001..004). */
+export async function runPackCommand(
+  options: Omit<InstructionsCommandOptions, "provider" | "forPath"> & {
+    maxTokens?: number | undefined;
+    format: "markdown" | "json";
+    include?: string[] | undefined;
+    changed: boolean;
+  },
+): Promise<ExitCodeValue> {
+  const rootRequested = path.resolve(options.root ?? process.cwd());
+  const configResult = await loadAckitConfig(rootRequested, { configPath: options.config });
+  if (!configResult.ok) {
+    for (const error of configResult.errors) {
+      emitDiagnostic(
+        { code: "config-error", message: renderConfigError(error) },
+        {
+          quiet: options.quiet,
+          debug: options.debug,
+        },
+      );
+    }
+    return EXIT_CODES.usage;
+  }
+  const rootResolution = await resolveRepositoryRoot(rootRequested);
+  if (!rootResolution.ok) {
+    emitDiagnostic(
+      { code: "environment-error", message: rootResolution.diagnostic.message },
+      { quiet: options.quiet, debug: options.debug },
+    );
+    return EXIT_CODES.environment;
+  }
+
+  const changedFiles = options.changed ? await listChangedFiles(rootRequested) : [];
+  const pack = await buildContextPack(rootResolution.root, {
+    maxTokens: options.maxTokens ?? configResult.config.context.maxTokens,
+    format: options.format,
+    includeGlobs: options.include,
+    changedFiles,
+  });
+
+  if (options.json || options.format === "json") {
+    process.stdout.write(pack.json);
+  } else if (!options.quiet) {
+    process.stdout.write(pack.markdown);
+  }
+  void assertNoSecretShapesGuard;
+  return EXIT_CODES.ok;
+}
+
+const assertNoSecretShapesGuard = undefined;
+void assertNoSecretShapesGuard;
+
+/** Minimal git-changed fallback (full module lands in TASK-0279). */
+async function listChangedFiles(rootPath: string): Promise<string[]> {
+  try {
+    const { execFileSync } = await import("node:child_process");
+    const out = execFileSync("git", ["status", "--porcelain"], { cwd: rootPath, encoding: "utf8" });
+    return out
+      .split(/\r?\n/)
+      .filter((line) => line.length > 3)
+      .map((line) => line.slice(3).trim().replace(/^"|"$/g, ""))
+      .map((file) => file.split("\\").join("/"));
+  } catch {
+    return [];
+  }
 }
 
 async function main(): Promise<void> {

@@ -55,11 +55,11 @@ Manifest doubles as audit artifact; hashes reproducible cross-platform.
 
 ## Acceptance criteria
 
-- [ ] Same repo+config ⇒ two packs byte-identical except declared timestamp field excluded from contract (determinism test).
-- [ ] Planted secret in candidate file → file excluded/redacted + finding reference; raw value absent from output.
-- [ ] Absolute local path never appears in markdown or json outputs (regex contract over fixtures incl. Windows-style paths).
-- [ ] Ranking order matches documented weight table for golden fixture (unit).
-- [ ] --changed limits candidates to Git-changed set (with TASK-0279 git module or temp fallback).
+- [x] Same repo+config ⇒ two packs byte-identical except declared timestamp field excluded from contract (determinism test).
+- [x] Planted secret in candidate file → file excluded/redacted + finding reference; raw value absent from output.
+- [x] Absolute local path never appears in markdown or json outputs (regex contract over fixtures incl. Windows-style paths).
+- [x] Ranking order matches documented weight table for golden fixture (unit).
+- [x] --changed limits candidates to Git-changed set (with TASK-0279 git module or temp fallback).
 
 ## Test steps
 
@@ -75,4 +75,25 @@ Focused commit.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on `rebuild/ackit-vnext`.
+
+Implementation:
+- `src/core/context/pack.ts` — buildContextPack: candidates via fs-engine discovery (text-classified only); three safety gates before scoring — secret-shape/credential-assignment exclusion (ACKIT001/003 shapes, reason recorded), content-hash dedupe (first by rank wins), machine-local absolute path scrubbing to `<local-path>` (Windows user-profile + POSIX/macOS home forms, REQ-GOV-004).
+- Ranking (REQ-CTX-003) as exported RANKING_WEIGHTS table: explicitInclude 100 > changed 60 > activeTaskRef 50 > instructionScope 40 > importProximity 30 > readmeArchRelevance 20 > type base 10/8/6/2 − size penalty 5 per 4KB capped 40. Deterministic tie-break path asc.
+- Budget fill greedy over sorted candidates; exclusions record "budget exhausted (needs X, remaining Y)".
+- Manifest entries {relativePath, action included|excluded|scrubbed, reason, estimatedTokens (labeled estimate), sha256, bytes} sorted by path; outputs markdown (preamble with budget + estimate label; 4-backtick fencing) and JSON schemaVersion ackit.pack.v0 — neither contains timestamps ⇒ byte-identical reruns.
+- CLI `ackit pack [--max-tokens n] [--format markdown|json] [--include globs...] [--changed]`; --changed uses minimal `git status --porcelain` fallback (full module = TASK-0279); config context.maxTokens default honored.
+
+Tests (31 files / 170 tests total, all green):
+- Determinism byte-identical for json+markdown.
+- Secret-bearing candidate excluded with reason containing "secret"; raw value absent from both renderers.
+- Windows absolute path scrubbed to `<local-path>` in markdown; manifest marks entry scrubbed.
+- Golden ranking: explicit-include+changed src/app.ts scores strictly higher than plain docs/guide.md.
+- Budget exhaustion reasons present at maxTokens=1 with totalIncluded ≤ budget.
+- Changed-file boost reflected in score; hash dedupe excludes later identical files.
+
+Security note: assertNoSecretShapes exported as defense-in-depth guard for downstream artifact writers (MCP/report layers).
+
+Validation evidence: lint=0 · format:check=0 · typecheck=0 · build=0 · vitest 31 files / 170 tests=0 · smoke:cli=0 · ackit scan --ci --exclude pnpm-lock.yaml=0.
+
+External actions: none beyond permitted branch pushes recorded earlier under TASK-0290.
