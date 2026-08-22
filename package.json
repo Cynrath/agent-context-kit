@@ -1,0 +1,37 @@
+{
+  "name": "@cynrath/agent-context-kit",
+  "version": "0.1.0",
+  "description": "ACKit turns any repository into an agent-ready repository: instruction graph, agent skills, security scanning, context budgeting, task-first workflow, policy-as-code, and MCP integration. Offline-first and deterministic.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "ackit": "./dist/cli/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "biome check src tests scripts schemas examples benchmarks",
+    "format:check": "biome format src tests scripts schemas examples benchmarks",
+    "format": "biome format --write src tests scripts schemas examples benchmarks",
+    "test": "vitest run",
+    "smoke:cli": "node tests/e2e/cli-scaffold.smoke.mjs"
+  },
+  "dependencies": {
+    "commander": "^15.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.10",
+    "@types/node": "^24.10.9",
+    "@vitest/coverage-v8": "^4.1.11",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}

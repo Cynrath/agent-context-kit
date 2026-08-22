@@ -1,5 +1,25 @@
 # Changelog
 
+All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in this file.
+
+This project follows Semantic Versioning.
+
+## [0.1.0] — vNext rebuild (unreleased)
+
+Rebuild of AgentContextKit as a TypeScript + Node.js + npm/npx product on branch `rebuild/ackit-vnext`:
+
+- TypeScript strict ESM skeleton with pnpm, Vitest, Biome, tsc build to `dist/` (TASK-0267).
+- `ackit` CLI core: global options (--root/--config/--json/--quiet/--no-color/--verbose/--debug/--strict), stable exit codes 0-5 per ADR-0007, deterministic bare-command summary scaffold, JSON mode with pure stdout.
+- Version/identity single source of truth in package.json (REQ-ARCH-009).
+- Terminal sanitation for diagnostics (ANSI/control-character stripping, REQ-SEC-003).
+- C# v1 runtime removed from this branch's product path (REQ-ARCH-001); published v1 NuGet packages/tags/releases remain immutable historical artifacts.
+- Development status: unpublished; no publish/tag/release is authorized during the rebuild (REQ-GOV-010).
+
+## Legacy — v1 (.NET) line
+
+The sections below are the frozen changelog of the superseded .NET implementation (NuGet `AgentContextKit`, final release `1.0.0-rc.1`). They are preserved verbatim as historical evidence; vNext does not continue this version line (ADR-0013).
+# Changelog
+
 All notable changes to AgentContextKit will be documented in this file.
 
 This project follows Semantic Versioning where practical before `1.0.0`.

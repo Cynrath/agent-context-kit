@@ -1,44 +1,25 @@
-# Build output
-bin/
-obj/
-out/
-publish/
+# Node / pnpm
+node_modules/
+dist/
+coverage/
 
 # Test output
-TestResults/
-coverage/
-*.trx
-*.coverage
-*.coveragexml
-
-# User/IDE state
-.vs/
-.vscode/
-.idea/
-*.user
-*.suo
-
-# Packages and caches
-packages/
-node_modules/
-.nuget/
-
-# Logs and temp files
-logs/
 *.log
-*.binlog
-*.sarif
+logs/
+
+# Temp files
 *.tmp
 *.bak
-.ackit/
-.ackit/cache/
-.ackit/reports/
-.ackit/webui/
-.ackit/prompt-packs/
-.ackit/context-exports/
 
-# Demo/synthetic repos
+# ACKit local state (generated; never committed)
+.ackit/
+artifacts/
 .ackit-demo/
+
+# Local secrets and environment files
+.env
+.env.*
+secrets.json
 
 # Archives and backups
 *.zip
@@ -47,42 +28,22 @@ logs/
 Backups/
 backup/
 
-# Local secrets and environment files
-.env
-.env.*
-secrets.json
-appsettings.Production.json
-appsettings.Staging.json
-appsettings.Local.json
-DataProtection-Keys/
-
-# Databases and dumps
-*.mdf
-*.ldf
-*.db
-*.sqlite
-*.sqlite3
-*.bacpac
-*.dacpac
-*.sql
-
-# Generated package output
-nupkg/
-artifacts/
-*.nupkg
-*.snupkg
-
 # OS files
 Thumbs.db
 .DS_Store
 
-agent-context-kit.rar
-agent-context-kit.zip
+# Editor state
+.vscode/
+.idea/
+*.user
+*.suo
 
-# Playwright MCP browser artifacts
-.playwright-cli/
-.playwright-mcp/
-
-# Local screenshots and ephemeral test artifacts
+# Local screenshots and ephemeral artifacts
 webui-*.png
 report-*.png
+
+# Legacy tooling leftovers (untracked local state)
+.playwright-cli/
+.playwright-mcp/
+.remember/
+graphify-out/

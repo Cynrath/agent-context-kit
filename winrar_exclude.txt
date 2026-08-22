@@ -1,1 +1,0 @@
-.git* .ackit* *\bin* *\obj* *\TestResults* *\coverage* *\logs* *\publish* *\out* *.user *.suo *.log *.binlog *.trx *.coverage *.coveragexml *.tmp *.bak *.zip *.rar *.7z *.nupkg *.snupkg .env .env.* secrets.json appsettings.Production.json appsettings.Staging.json appsettings.Local.json

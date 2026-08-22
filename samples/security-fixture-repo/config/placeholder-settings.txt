@@ -1,6 +1,0 @@
-# Placeholder settings only.
-# Do not add real credentials here.
-
-setting_name = replace-with-local-test-value
-sample_value = not-a-real-credential
-owner = example-maintainer

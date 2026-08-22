@@ -112,3 +112,12 @@ When working on branch `rebuild/ackit-vnext`, the canonical entry point is `docs
 - Task-first rule unchanged: new work requires a task doc under `docs/tasks/` created with the installed `ackit task` command; vNext child tasks are TASK-0264..0289.
 - v1 release immutability rules above remain fully in force on every branch.
 - External actions ban during rebuild: no remote push, tags, releases, or package publishes from agent sessions.
+
+## Continuous Execution Hard Rule (explicit user mandate)
+
+There is no such thing as "next session" for open work. This is a HARD RULE:
+
+- Do not stop, pause, defer, or hand off while any task in the active todo list / task graph is incomplete.
+- Never propose "continue later", "next session", or partial wrap-up while open tasks remain.
+- Work task-by-task through the dependency graph continuously; after each completed+committed task, immediately start the next dependency-ready task.
+- Only a real external blocker may stop execution; report it and stop only on that blocker.

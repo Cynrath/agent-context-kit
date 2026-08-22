@@ -1,9 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/AgentContextKit.Cli/AgentContextKit.Cli.csproj" />
-    <Project Path="src/AgentContextKit.Core/AgentContextKit.Core.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/AgentContextKit.Tests/AgentContextKit.Tests.csproj" />
-  </Folder>
-</Solution>
