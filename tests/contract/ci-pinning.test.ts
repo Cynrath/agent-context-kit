@@ -44,7 +44,7 @@ describe("CI workflow hardening", () => {
     expect(raw).toContain('node: ["22", "24"]');
     expect(raw).toContain("self-scan");
     expect(raw).toContain("package-smoke");
-    expect(raw).toContain("scan --ci --exclude pnpm-lock.yaml");
+    expect(raw).toContain("scan --ci");
     expect(raw).toContain("smoke:package");
   });
 });

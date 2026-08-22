@@ -16,7 +16,8 @@ import {
   resolveEffectiveStack,
 } from "../core/instructions/index.js";
 import { planOrApplyInit } from "../core/onboarding/index.js";
-import { PolicyError, policyDigest, resolvePolicy } from "../core/policy/index.js";
+import { applyPolicyToFindings, PolicyError, policyDigest, resolvePolicy } from "../core/policy/index.js";
+import type { PolicyDocument } from "../core/policy/index.js";
 import {
   assertBindableHost,
   renderHtmlReport,
@@ -697,12 +698,35 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
     return EXIT_CODES.usage;
   }
 
+  // Effective offline policy (REQ-POL-001): suppressions + overrides + digest.
+  let policy: PolicyDocument | null = null;
+  let policyDigestValue = "";
+  try {
+    const resolved = await resolvePolicy(rootResolution.root, {
+      entryFiles: configResult.config.policy.extends,
+    });
+    policy = resolved.policy;
+    policyDigestValue = policyDigest(resolved.policy);
+  } catch (error) {
+    if (error instanceof PolicyError) {
+      emitDiagnostic({ code: error.code.toLowerCase(), message: error.message }, {
+        quiet: options.quiet,
+        debug: options.debug,
+      });
+      return EXIT_CODES.usage;
+    }
+    throw error;
+  }
+
   const result = await runScan(rootResolution.root, {
     rules: defaultRegistry.getAll(),
     limits: configResult.config.limits,
     userExcludeGlobs: configResult.config.scan.exclude,
     filterPaths,
   });
+  if (policy !== null) {
+    result.findings = applyPolicyToFindings(result.findings, policy);
+  }
 
   let newCount: number | null = null;
   let fixedCount: number | null = null;
@@ -807,7 +831,7 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
   }
 
   if (options.ci || newCount !== null) {
-    const threshold = configResult.config.scan.severityThreshold;
+    const threshold = policy?.thresholds.severity ?? configResult.config.scan.severityThreshold;
     const exceededThreshold = result.findings.some((finding) =>
       severityAtLeast(finding.severity, threshold),
     );

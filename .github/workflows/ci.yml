@@ -62,7 +62,7 @@ jobs:
           node dist/cli/index.js config check
           node dist/cli/index.js task doctor
       - name: Self-scan with threshold gate
-        run: node dist/cli/index.js scan --ci --exclude pnpm-lock.yaml
+        run: node dist/cli/index.js scan --ci
 
   package-smoke:
     name: package-smoke ${{ matrix.os }}

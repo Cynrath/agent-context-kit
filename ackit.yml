@@ -1,0 +1,10 @@
+# Root ACKit configuration for this repository.
+schemaVersion: 1
+scan:
+  severityThreshold: medium   # Low advisories are informational here; CI gates at medium+
+  exclude:
+    - pnpm-lock.yaml          # integrity hashes trip legacy entropy heuristics (TASK-0267 note)
+
+policy:
+  extends:
+    - ackit-policy.yml

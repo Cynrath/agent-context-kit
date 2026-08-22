@@ -44,7 +44,10 @@ export async function collectScanTargets(
   const targets: ScanTarget[] = [];
   const diagnostics: FilesystemDiagnostic[] = [];
 
-  for await (const event of walkRepository(root, { limits: options.limits })) {
+  for await (const event of walkRepository(root, {
+    limits: options.limits,
+    shouldDescend: (dir) => !ignoreEngine.isDirectoryIgnored(dir),
+  })) {
     if (event.kind === "diagnostic") {
       diagnostics.push(event.diagnostic);
       continue;

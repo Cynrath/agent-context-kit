@@ -40,7 +40,11 @@ export function startWatch(
     }
   };
 
+  const rootBase = path.basename(rootPath);
   const handleChange = (relativeDir: string, entryName: string): void => {
+    // Some platforms emit the watched root itself (e.g., on directory mtime
+    // changes) — it is not a repository-relative path, so skip it.
+    if (entryName === rootBase && relativeDir.length === 0) return;
     const relativeDirPosix = relativeDir.split("\\").join("/");
     for (const segment of relativeDirPosix.split("/")) {
       if (segment !== "" && ignored.has(segment)) return;

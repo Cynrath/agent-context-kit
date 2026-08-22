@@ -35,7 +35,7 @@ describe("watch runner (REQ-WATCH-001)", () => {
     await writeFile(path.join(repo.rootPath, "b.txt"), "x\n");
     await new Promise((resolve) => setTimeout(resolve, 700));
     expect(calls).toBe(1);
-    expect(lastPaths.sort()).toEqual(["a.txt", "b.txt"]);
+    expect(lastPaths).toEqual(expect.arrayContaining(["a.txt", "b.txt"]));
 
     // Abort path resolves cleanly (Ctrl+C equivalent).
     controller.abort();

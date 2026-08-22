@@ -1,0 +1,27 @@
+# Repository security policy (dogfood).
+schemaVersion: 1
+thresholds:
+  severity: medium
+suppressions:
+  # Scanner test fixtures intentionally embed credential-shaped literals to
+  # prove redaction; they are not real secrets.
+  - ruleId: ACKIT001
+    pathGlobs: ["tests/**", "docs/tasks/**", "docs/rebuild/**"]
+    reason: "fixture credentials used by scanner/security tests and their evidence notes"
+    expiresAt: 2027-08-22
+  - ruleId: ACKIT002
+    pathGlobs: ["tests/security/secrets/**"]
+    reason: "synthetic private key block fixture"
+    expiresAt: 2027-08-22
+  - ruleId: ACKIT003
+    pathGlobs: ["tests/**", "docs/tasks/**", "docs/rebuild/**"]
+    reason: "fixture credential assignments used by tests/docs examples"
+    expiresAt: 2027-08-22
+  - ruleId: ACKIT004
+    pathGlobs: ["tests/security/secrets/**"]
+    reason: "connection-string detection fixture"
+    expiresAt: 2027-08-22
+  - ruleId: ACKIT005
+    pathGlobs: ["docs/**", "tests/**"]
+    reason: "sha/commit and fixture literals in historical evidence and tests trip advisory entropy"
+    expiresAt: 2027-08-22

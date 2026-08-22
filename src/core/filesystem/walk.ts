@@ -14,6 +14,8 @@ export interface WalkOptions {
   signal?: AbortSignal | undefined;
   /** Injectable clock for deterministic deadline tests. Defaults to Date.now. */
   now?: (() => number) | undefined;
+  /** Prune hook: return false to skip descending into a directory. */
+  shouldDescend?: ((relativeDir: string) => boolean) | undefined;
 }
 
 export type WalkEvent =
@@ -155,6 +157,9 @@ export async function* walkRepository(
             return;
           }
         } else if (outcome.kind === "directory") {
+          const allowed =
+            options.shouldDescend === undefined || options.shouldDescend(outcome.relativePath);
+          if (!allowed) continue;
           if (!visitedDirectories.has(outcome.absolutePath)) {
             visitedDirectories.add(outcome.absolutePath);
             queue.push({
