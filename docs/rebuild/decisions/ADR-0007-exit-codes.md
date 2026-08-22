@@ -1,6 +1,6 @@
 # ADR-0007: CLI exit-code taxonomy
 
-Status: Proposed (freeze in TASK-0266) · Date: 2026-08-22
+Status: Accepted (exit codes 0-5 frozen) · Date: 2026-08-22
 
 ## Decision
 Stable taxonomy for all commands:

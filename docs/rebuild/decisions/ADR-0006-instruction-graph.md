@@ -1,6 +1,6 @@
 # ADR-0006: Instruction graph model
 
-Status: Proposed · Date: 2026-08-22
+Status: Accepted · Date: 2026-08-22
 
 ## Decision
 All agent-instruction surfaces become nodes in one resolved graph with the REQ-INSTR-002 field set. Resolution order: root base → nested scope (closer wins) → provider-specific → path-specific `applyTo` globs; `AGENTS.override.md` overrides same-dir `AGENTS.md`; skills link as referenced nodes. Provider adapters implement only officially documented semantics (codex/claude/gemini/copilot at launch; Cursor/Windsurf/Cline/Roo only after doc verification — otherwise omitted, never guessed).

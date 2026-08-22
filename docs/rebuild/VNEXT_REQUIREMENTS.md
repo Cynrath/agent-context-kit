@@ -148,7 +148,7 @@ Legend:
 
 | ID | Source | Requirement | Type | Owner |
 |---|---|---|---|---|
-| REQ-MCP-001 | MS§20 | Official Model Context Protocol TypeScript SDK (2026-07-28 spec line, v2 packages) over stdio; custom protocol layer deleted; remote HTTP not core. | MUST | TASK-0283 |
+| REQ-MCP-001 | MS§20 | Official Model Context Protocol TypeScript SDK over stdio (official `@modelcontextprotocol/sdk` package; stable line 1.30.0 verified against registry 2026-08-22 — see ADR-0008); custom protocol layer deleted; remote HTTP not core. | MUST | TASK-0283 |
 | REQ-MCP-002 | MS§20.1 | Read-only tools exposed (scan, doctor, pack, instruction graph, list/validate skills, list/get tasks, policy check); write tools gated behind explicit capability/config/permission. | MUST | TASK-0283 |
 | REQ-MCP-003 | MS§20.2–20.3 | Resources (repository summary, instructions graph, skills catalog, active tasks, effective policy) and useful deterministic prompts (onboarding, task execution, remediation, optimization). | MUST | TASK-0283 |
 | REQ-MCP-004 | MS§20.4 | Tests: handshake, initialize, list/call tools, resources read, prompts, cancellation, malformed input, shutdown/stdio behavior. | MUST | TASK-0283 |

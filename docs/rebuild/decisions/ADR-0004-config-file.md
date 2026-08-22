@@ -1,6 +1,6 @@
 # ADR-0004: Configuration identity — `ackit.yml`
 
-Status: Proposed (confirm in TASK-0266) · Date: 2026-08-22
+Status: Accepted (config name frozen) · Date: 2026-08-22
 
 ## Decision
 Canonical user config file is `ackit.yml` at repository root (YAML). Internal/cache state lives under `.ackit/` (cache dir, skills lock). Schema carries mandatory `schemaVersion`; unknown major → clear upgrade error. Precedence: defaults < config < policy extends < CLI flags (deterministic merge).
