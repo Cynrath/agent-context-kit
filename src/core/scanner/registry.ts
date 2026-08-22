@@ -1,8 +1,12 @@
-import { RuleRegistry } from "./rules.js";
+import { builtinRegistry } from "./rules/catalog.js";
+import type { RuleRegistry } from "./rules.js";
 
 /**
- * Default ACKit rule registry instance used by the CLI. Populated by the
- * rule catalog task (TASK-0271); the pipeline and tests may register
- * additional scoped instances.
+ * Default ACKit rule registry used by the CLI scan command: the built-in
+ * catalog. Tests may create scoped registries instead of mutating this one.
  */
-export const defaultRegistry = new RuleRegistry();
+function buildDefault(): RuleRegistry {
+  return builtinRegistry();
+}
+
+export const defaultRegistry: RuleRegistry = buildDefault();
