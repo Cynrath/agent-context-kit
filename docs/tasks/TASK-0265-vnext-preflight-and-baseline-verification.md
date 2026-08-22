@@ -53,12 +53,12 @@ Preflight record becomes audit evidence for REQ-FIN-003 final report.
 
 ## Acceptance criteria
 
-- [ ] Local HEAD == origin/master at start; recorded in completion notes.
-- [ ] `ackit doctor` exits 0 on the branch.
-- [ ] `ackit scan --ci` exits 0 with no High/Critical findings.
-- [ ] Baseline JSON files present in `artifacts/rebuild-baseline/` (gitignored).
-- [ ] All `docs/rebuild/VNEXT_*.md` + `GOAL2_BOOTSTRAP.md` present.
-- [ ] No implementation code added by this task.
+- [x] Local HEAD == origin/master at start; recorded in completion notes.
+- [x] `ackit doctor` exits 0 on the branch.
+- [x] `ackit scan --ci` exits 0 with no High/Critical findings.
+- [x] Baseline JSON files present in `artifacts/rebuild-baseline/` (gitignored).
+- [x] All `docs/rebuild/VNEXT_*.md` + `GOAL2_BOOTSTRAP.md` present.
+- [x] No implementation code added by this task.
 
 ## Test steps
 
@@ -77,4 +77,12 @@ No-op task; nothing to roll back except notes.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on branch `rebuild/ackit-vnext`.
+
+- Git reality: local HEAD `b93c1f0f1d7ec5ab03b55db97fdb58b71e54388e` (GOAL 1 planning commit `docs(rebuild): define vNext execution contract and task graph`); `origin/master` = `c49f97f8eb2d520dc759c6fa603079f187b851b7`; merge-base(HEAD, origin/master) = origin/master, so the branch is based exactly on current remote master. Working tree clean at start (`git status --short` empty).
+- Installed ACKit: `1.0.0-rc.1` (v1 .NET tool). `ackit doctor` exit 0 (13 checks PASS incl. CriticalRedactRisk).
+- `ackit scan --ci --json` exit 0; findings: 12 Low (ACKIT004), 4 Medium (ACKIT003); no High/Critical.
+- Baseline artifacts stored under gitignored `artifacts/rebuild-baseline/`: preflight-scan.json, preflight-doctor.txt, ackit-version.txt, git-head.txt, git-origin-master.txt.
+- Planning artifacts verified present: docs/rebuild/VNEXT_REQUIREMENTS.md, VNEXT_EXECUTION_ORDER.md, VNEXT_TRACEABILITY.md, GOAL2_BOOTSTRAP.md, decisions/ contains 14 ADR files, master epic TASK-0264 and all child task docs TASK-0265..0289 exist with unfilled acceptance criteria.
+- No implementation code added by this task (docs-only edit to this file).
+- External actions: none (no push/tag/release/publish).
