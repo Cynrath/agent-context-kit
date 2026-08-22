@@ -3,7 +3,7 @@
 ## Metadata
 
 - Parent epic: TASK-0264
-- Dependencies: TASK-0267
+- Dependencies: TASK-0267, TASK-0290 (bootstrap CI completion gate, added 2026-08-22)
 - Unlocks: TASK-0270, TASK-0272, TASK-0274, TASK-0277
 - Requirement IDs: REQ-FS-001, REQ-FS-002, REQ-FS-003, REQ-FS-004, REQ-FS-005, REQ-FS-006, REQ-GOV-003, REQ-GOV-006, REQ-GOV-007, REQ-SEC-003, REQ-TEST-007 (fs parts)
 - Related ADR/spec: ADR-0005 (root boundary model); MS§11
@@ -59,6 +59,7 @@ Diagnostics carry stable codes aligned with ADR-0007 taxonomy.
 - [x] Unknown-extension file containing secret-like bytes is classified text/scannable (integration assert with TASK-0271 contract later).
 - [x] AbortSignal cancels mid-traversal promptly in integration test.
 - [x] `pnpm typecheck/test/lint/build` green.
+- [ ] TASK-0290 bootstrap CI green on ubuntu/windows/macos × node 22/24 (cross-platform completion gate added 2026-08-22; task is NOT completed until this passes).
 
 ## Test steps
 

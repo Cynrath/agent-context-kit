@@ -12,7 +12,7 @@ Fresh-context entry point: `docs/rebuild/GOAL2_BOOTSTRAP.md`.
 
 ## Scope
 
-- All child tasks TASK-0265 .. TASK-0289 (dependency graph below).
+- All child tasks TASK-0265 .. TASK-0290 (dependency graph below; TASK-0290 added post-planning with a tool-allocated ID as the bootstrap cross-platform CI gate).
 - Final tree: TypeScript single-package implementation replacing the C# v1 runtime on this branch.
 - Full docs rewrite, CI/supply-chain hardening, performance suite, final acceptance gate.
 
@@ -60,11 +60,11 @@ Goal 2 execution of the entire rebuild; final publish authorization remains a se
 
 ## Acceptance criteria
 
-- [ ] All child tasks TASK-0265..TASK-0289 completed with evidence.
+- [ ] All child tasks TASK-0265..TASK-0290 completed with evidence.
 - [ ] `docs/rebuild/VNEXT_TRACEABILITY.md` shows unmapped=0, cycles=0, all REQ verified.
 - [ ] REQ-FIN-001 Final Acceptance Gate checklist fully checked in TASK-0289.
 - [ ] REQ-GOV-012 self-dogfooding passes on this repo (doctor/scan/task doctor/pack/MCP smoke).
-- [ ] Working tree clean; no external actions performed (REQ-GOV-010).
+- [ ] Working tree clean; only permitted fast-forward pushes of `rebuild/ackit-vnext` performed (REQ-GOV-010).
 
 ## Test steps
 

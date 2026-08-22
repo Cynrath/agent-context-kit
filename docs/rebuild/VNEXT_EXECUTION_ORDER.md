@@ -32,8 +32,11 @@ Tie-break never needed beyond this; the rule is total.
 ### Wave 3 — Foundation engines
 | Task | Depends on | Unlocks | Parallel-safe | Reason |
 |---|---|---|---|---|
-| TASK-0268 | 0267 | 0270, 0272, 0274, 0277 | yes | fs engine is security bedrock |
+| TASK-0290 | 0267 | 0268-completion | yes | Bootstrap CI gate: engine/security work needs Windows+POSIX evidence before completion |
+| TASK-0268 | 0267, 0290 (completion gate) | 0270, 0272, 0274, 0277 | yes | fs engine is security bedrock |
 | TASK-0269 | 0267 | 0270, 0281, 0282 | yes | config feeds every command |
+
+Note: TASK-0290 was added post-planning (tool-allocated ID) to close a sequencing gap — TASK-0268's security fixtures require cross-platform CI before its completion is accepted. Implementation may proceed locally in parallel; completion gates on TASK-0290 being green.
 
 ### Wave 4 — Core capabilities
 | Task | Depends on | Unlocks | Parallel-safe | Reason |
@@ -85,4 +88,4 @@ Tie-break never needed beyond this; the rule is total.
 
 ## Cycle proof
 
-Edges point strictly from lower/equal wave to higher wave (dependency ⇒ strictly greater wave except equal-wave independent pairs which have no edges between them). A cycle would require an edge back to a lower wave; none exists by construction. Verified by the selection rule terminating: wave numbers strictly increase along dependency chains, max chain length 10 < task count.
+Edges point strictly from lower/equal wave to higher wave (dependency ⇒ strictly greater wave except equal-wave independent pairs which have no edges between them). A cycle would require an edge back to a lower wave; none exists by construction. Verified by the selection rule terminating: wave numbers strictly increase along dependency chains, max chain length 10 < task count. TASK-0290's completion-gate edge into TASK-0268 is same-wave and adds no back edge.

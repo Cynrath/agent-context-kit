@@ -5,7 +5,7 @@ You are a fresh agent. Everything needed to execute the rebuild is in this repos
 ## Reality anchors
 
 - Repository: `O:\projeler\agent-context-kit` (GitHub: `Cynrath/agent-context-kit`)
-- Working branch: `rebuild/ackit-vnext` (local only — never push it)
+- Working branch: `rebuild/ackit-vnext` — exists locally AND on origin (remote branch observed 2026-08-22). Normal fast-forward pushes to this branch are allowed; everything else remote stays banned.
 - Planning base: branch created from `master` @ `c49f97f8eb2d520dc759c6fa603079f187b851b7`
 - Goal 1 planning commit: see `git log --oneline -n 5` on this branch (docs(rebuild) commit)
 - Runtime reality > any SHA written here. Verify with git first.
@@ -38,7 +38,7 @@ Task IDs are allocated by the tool. Never invent IDs.
 
 ## Next-task selection (deterministic, no judgment calls)
 
-First task where: status ≠ completed AND dependencies completed AND lowest wave AND lowest ID. Expected sequence starts: **TASK-0265** → TASK-0266 → TASK-0267 → {0268 ∥ 0269} → …
+First task where: status ≠ completed AND dependencies completed AND lowest wave AND lowest ID. Expected sequence starts: **TASK-0265** → TASK-0266 → TASK-0267 → {0268 ∥ 0269 ∥ 0290} → … (TASK-0290 is the cross-platform CI gate; TASK-0268's completion depends on it).
 
 ## Task execution loop (per task, mandatory order)
 
@@ -55,7 +55,7 @@ Read task doc → implement minimum correct scope → unit/integration/security 
 
 ## Prohibited external actions
 
-Remote push · force-push · tags · GitHub Releases · npm publish · NuGet publish · workflow dispatch · deployments · paid services · history rewrite. Local commits on the rebuild branch are allowed and expected.
+master push · force-push · history rewrite · tags · GitHub Releases · npm publish · NuGet publish · workflow dispatch · deployments · paid services. Normal fast-forward pushes to `rebuild/ackit-vnext` are allowed and expected (REQ-GOV-010 as updated 2026-08-22). Local commits on the rebuild branch are always allowed.
 
 ## Git discipline
 
@@ -63,12 +63,12 @@ Conventional Commits scoped to real diff (`feat(core):`, `fix(scan):`, `docs:` �
 
 ## Definition of final completion (all must hold)
 
-1. Every task TASK-0265..0289 completed with evidence.
+1. Every task TASK-0265..0290 completed with evidence.
 2. Traceability invariants hold (unmapped=0, cycles=0 — see VNEXT_TRACEABILITY.md).
 3. MS§46 Final Acceptance Gate fully checked (TASK-0289).
 4. Self-dogfood green: vNext `doctor`/`scan`/task-doctor on this repo; pack producible; MCP starts.
 5. Clean-environment matrix green: frozen install, lint, format:check, typecheck, test, build, tarball smoke (MS§47).
-6. Final report per MS§48 including "no external actions performed".
-7. Working tree clean; remote untouched.
+6. Final report per MS§48 including external-actions statement limited to permitted fast-forward pushes of `rebuild/ackit-vnext` only.
+7. Working tree clean; master untouched; no prohibited remote action performed.
 
 If context runs low mid-task: write honest state into the task's Completion notes (never mark complete), checkpoint-commit, and let the next session resume via this bootstrap.

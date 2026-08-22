@@ -22,7 +22,7 @@ Legend:
 | REQ-GOV-007 | MS§3.4 | No silent error swallowing; errors surface as diagnostics with stable codes. | MUST |
 | REQ-GOV-008 | MS§3.4 | User files are never overwritten by default; writes require explicit intent (`--fix`, `--write`, managed-block scope). | MUST |
 | REQ-GOV-009 | MS§36 | Out-of-scope list enforced: no built-in OpenAI/Anthropic/Gemini API, vector DB, embeddings/RAG, multi-agent orchestrator, LLM router, container vuln scanner, SBOM platform, SAST clone, ML PII detector, Jira/Slack/Teams clients, IDE suite, untrusted JS plugin execution, cloud account or central server requirement. | OUT |
-| REQ-GOV-010 | MS§3.5, §12(G1) | During Goal 2: no remote push, force push, tag, GitHub Release, npm publish, workflow dispatch, history rewrite; local commits only on rebuild branch. | MUST |
+| REQ-GOV-010 | MS§3.5, §12(G1) | Remote governance (updated 2026-08-22 after `rebuild/ackit-vnext` became a real remote branch): normal fast-forward pushes to `rebuild/ackit-vnext` are allowed; master push, force push, history rewrite, tags, GitHub Releases, npm publish, NuGet publish, workflow dispatch, and deployments remain prohibited. | MUST |
 | REQ-GOV-011 | MS§41 | Task-task loop without pausing to ask permission; unfinished tasks never marked completed; checkpoint commits allowed. | MUST |
 | REQ-GOV-012 | MS§44 | Self-dogfooding at completion: vNext ACKit passes doctor/scan/task-doctor on its own repo, valid instructions + skills + config, pack producible, MCP starts. | MUST |
 

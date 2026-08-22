@@ -46,6 +46,7 @@ Check: `docs/rebuild/scripts/check-traceability.ps1` (or manual table audit reco
 | TASK-0287 | README/docs | REQ-DOC-001..004, REQ-SEC-001/002 |
 | TASK-0288 | performance | REQ-PERF-001 |
 | TASK-0289 | final gate | REQ-FIN-001..003, REQ-GOV-012 |
+| TASK-0290 | bootstrap CI | REQ-CI-001 (minimal matrix subset), REQ-GOV-010, REQ-GOV-011 |
 
 ## Global invariants ownership
 
@@ -87,11 +88,11 @@ Global invariants are not single-task features; they are asserted continuously:
 |---|---|
 | unit | 0268, 0269, 0271, 0272, 0273, 0274, 0277, 0279, 0281, 0282, 0284 |
 | integration | 0268, 0270, 0272, 0275, 0276, 0278, 0279, 0280, 0281, 0282, 0284 |
-| security fixtures | 0268, 0271, 0273, 0274, 0277, 0284, final sweep 0289 |
+| security fixtures | 0268 (cross-platform via TASK-0290 CI), 0271, 0273, 0274, 0277, 0284, final sweep 0289 |
 | contract/snapshot | 0270, 0272, 0279, 0281, 0283, 0285 |
 | e2e/tarball | 0285, 0289 |
 | cli-smoke | 0267, 0270, 0277, 0284, 0285, 0289 |
-| ci-config | 0286 |
+| ci-config | 0290 (bootstrap), 0286 (final hardening) |
 | docs-review | 0266, 0287, 0289 |
 
 ## Completion evidence
@@ -104,7 +105,7 @@ Each task records evidence in its own Completion notes (commands + exit codes + 
 
 ## Old v1 task classification (`docs/tasks/TASK-0001..0263`, `PROJECT-CONTROL-*`)
 
-302 historical files reviewed by name/domain; none block vNext. vNext child IDs are exclusively the new ackit-generated TASK-0264..0289 — no v1 ID is reused for different work.
+302 historical files reviewed by name/domain; none block vNext. vNext child IDs are exclusively the new ackit-generated TASK-0264..0290 (TASK-0290 added post-planning with a tool-allocated ID to close the CI sequencing gap) — no v1 ID is reused for different work.
 
 | Class | Items | Disposition |
 |---|---|---|
