@@ -8,9 +8,12 @@ on:
     branches:
       - "rebuild/**"
 
+permissions:
+  contents: read
+
 jobs:
   verify:
-    name: ${{ matrix.os }} / node-${{ matrix.node }}
+    name: verify ${{ matrix.os }} / node-${{ matrix.node }}
     strategy:
       fail-fast: false
       matrix:
@@ -18,11 +21,14 @@ jobs:
         node: ["22", "24"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # actions/checkout@v4 (f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a)
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+      # actions/setup-node@v4 (ae0d4ed08881f17d1511386f5be3e62356acd4a6)
+      - uses: actions/setup-node@ae0d4ed08881f17d1511386f5be3e62356acd4a6
         with:
           node-version: ${{ matrix.node }}
-      - uses: pnpm/action-setup@v4
+      # pnpm/action-setup@v4 (b906affcce14559ad1aafd4ab0e942779e9f58b1)
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
         with:
           package_json_file: package.json
       - name: Frozen install
@@ -35,5 +41,45 @@ jobs:
         run: pnpm typecheck
       - name: Build
         run: pnpm build
-      - name: Tests
+      - name: Tests (unit/integration/contract/security)
         run: pnpm test
+
+  self-scan:
+    name: self-scan (dogfood)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+      - uses: actions/setup-node@ae0d4ed08881f17d1511386f5be3e62356acd4a6
+        with:
+          node-version: "22"
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          package_json_file: package.json
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Doctor equivalent (config + tasks integrity)
+        run: |
+          node dist/cli/index.js config check
+          node dist/cli/index.js task doctor
+      - name: Self-scan with threshold gate
+        run: node dist/cli/index.js scan --ci --exclude pnpm-lock.yaml
+
+  package-smoke:
+    name: package-smoke ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+      - uses: actions/setup-node@ae0d4ed08881f17d1511386f5be3e62356acd4a6
+        with:
+          node-version: "22"
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          package_json_file: package.json
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Tarball install + installed-CLI smoke
+        run: pnpm run smoke:package
