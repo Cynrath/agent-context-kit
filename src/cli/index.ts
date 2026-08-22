@@ -16,14 +16,13 @@ import {
   resolveEffectiveStack,
 } from "../core/instructions/index.js";
 import { planOrApplyInit } from "../core/onboarding/index.js";
-import type { PolicyDocument } from "../core/policy/index.js";
 import { PolicyError, policyDigest, resolvePolicy } from "../core/policy/index.js";
 import { renderScanJson, renderScanTerminal } from "../core/reporting/index.js";
-import type { Finding } from "../core/scanner/index.js";
 import { defaultRegistry, runScan, severityAtLeast } from "../core/scanner/index.js";
 import { validateSkills } from "../core/skills/index.js";
 import { installSkills } from "../core/skills/install.js";
 import { TaskStore } from "../core/tasks/index.js";
+import { detectWorkspaces } from "../core/workspace/index.js";
 import { emitDiagnostic } from "../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../shared/exit-codes.js";
 import { getPackageIdentity } from "../shared/version.js";
@@ -335,6 +334,18 @@ function buildProgram(invocation: CliInvocation): Command {
         debug: parentOptions.debug ?? false,
       });
     });
+
+  const workspacesCommand = program
+    .command("workspaces")
+    .description("detect monorepo workspace layout (REQ-MONO-001)");
+  workspacesCommand.action(async () => {
+    const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+    invocation.exitCode = await runWorkspacesCommand({
+      root: parentOptions.root,
+      json: parentOptions.json ?? false,
+      quiet: parentOptions.quiet ?? false,
+    });
+  });
 
   program.addHelpText("after", `\n${HELP_TEXT_SUFFIX}`);
   return program;
@@ -1191,61 +1202,52 @@ function rootResolutionSafe(rootPath: string): { canonicalPath: string } {
   return { canonicalPath: rootPath };
 }
 
-/** Applies an effective policy to findings: active suppressions + severity overrides. */
-export function applyPolicyToFindings(findings: Finding[], policy: PolicyDocument): Finding[] {
-  const today = new Date().toISOString().slice(0, 10);
-  const severityByRule = new Map(
-    policy.rules
-      .filter((rule) => rule.severity !== undefined)
-      .map((rule) => [rule.ruleId, rule.severity as string]),
-  );
-  const suppressionIndex = policy.suppressions
-    .filter((suppression) =>
-      suppression.expiresAt === undefined ? true : suppression.expiresAt >= today,
-    )
-    .map((suppression) => ({
-      ...suppression,
-      matcher: new RegExp(globToRegExpSource(suppression.pathGlobs)),
-      source: suppression,
-    }));
-  void suppressionIndex;
-  return findings.map((finding) => {
-    const override = severityByRule.get(finding.ruleId);
-    const suppressedByPolicy = policy.suppressions.some((suppression) => {
-      if (suppression.ruleId !== finding.ruleId) return false;
-      if (suppression.expiresAt !== undefined && suppression.expiresAt < today) return false;
-      const matcher = new RegExp(
-        `^(${suppression.pathGlobs.map(escapeGlob).join("|")})$`
-          .replace(/\*\*/g, ".*")
-          .replace(/\*/g, "[^/]*"),
+/** `ackit workspaces` (REQ-MONO-001). */
+export async function runWorkspacesCommand(options: {
+  root?: string | undefined;
+  json: boolean;
+  quiet: boolean;
+}): Promise<ExitCodeValue> {
+  const rootRequested = path.resolve(options.root ?? process.cwd());
+  const rootResolution = await resolveRepositoryRoot(rootRequested);
+  if (!rootResolution.ok) {
+    emitDiagnostic(
+      { code: "environment-error", message: rootResolution.diagnostic.message },
+      { quiet: options.quiet, debug: false },
+    );
+    return EXIT_CODES.environment;
+  }
+  const detection = await detectWorkspaces(rootResolution.root);
+  if (options.json) {
+    process.stdout.write(
+      `${JSON.stringify(
+        {
+          schemaVersion: "ackit.workspaces.v0",
+          tool: "ackit",
+          command: "workspaces",
+          count: detection.workspaces.length,
+          workspaces: detection.workspaces,
+          diagnostics: detection.diagnostics,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+  } else if (!options.quiet) {
+    for (const workspace of detection.workspaces) {
+      process.stdout.write(
+        `${workspace.name} [${workspace.type}] ${workspace.relativePath} (${workspace.markers.join(", ")})\n`,
       );
-      return matcher.test(finding.relativePath);
-    });
-    if (suppressedByPolicy && !finding.suppressed) {
-      const match = policy.suppressions.find(
-        (suppression) => suppression.ruleId === finding.ruleId,
-      );
-      return {
-        ...finding,
-        suppressed: true,
-        suppressionReason: `policy suppression${match?.expiresAt !== undefined ? ` (expires ${match.expiresAt})` : ""}`,
-        ...(override !== undefined ? { severity: override as Finding["severity"] } : {}),
-      };
     }
-    if (override !== undefined) {
-      return { ...finding, severity: override as Finding["severity"] };
-    }
-    return finding;
-  });
+    if (detection.workspaces.length === 0)
+      process.stdout.write("single-package repository (no workspaces detected)\n");
+  }
+  void resolveWorkspaceNameUnused;
+  return EXIT_CODES.ok;
 }
 
-function escapeGlob(glob: string): string {
-  return glob.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function globToRegExpSource(_globs: readonly string[]): string {
-  return "";
-}
+const resolveWorkspaceNameUnused = undefined;
+void resolveWorkspaceNameUnused;
 
 async function main(): Promise<void> {
   process.exitCode = await runCli(process.argv);

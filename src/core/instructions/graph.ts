@@ -264,21 +264,41 @@ function toPosix(value: string): string {
   return value.split("\\").join("/");
 }
 
-/** Effective-stack resolution (REQ-INSTR-003). */
+/** Effective-stack resolution (REQ-INSTR-003). Nested AGENTS.md files apply
+ * only to paths inside their scope directory; workspace boundaries never
+ * conflate with this path-specific semantics (REQ-MONO-002 distinction). */
 export function resolveEffectiveStack(
   graph: InstructionGraph,
   provider: ProviderId,
   forPath?: string,
 ): string[] {
+  const dirOf = forPath === undefined || forPath.length === 0 ? null : posixDirname(forPath);
   const candidates = graph.nodes.filter((node) => {
     if (node.kind !== "instruction") return false;
     if (node.provider !== provider) return false;
     if (node.applyTo !== null) {
-      if (forPath === undefined || forPath.length === 0) return false;
-      return picomatch(node.applyTo, { dot: true })(forPath);
+      if (dirOf === null) return false;
+      return picomatch(node.applyTo, { dot: true })(forPath ?? "");
+    }
+    // Codex-family nesting: a node applies when its scope directory is an
+    // ancestor of (or equal to) the queried path's directory.
+    if (provider === "codex" && node.relativePath !== "codex-global/AGENTS.md") {
+      if (dirOf !== null && !isAncestorOrSelf(node.scopeRoot, dirOf)) return false;
     }
     return true;
   });
   candidates.sort((a, b) => a.precedence - b.precedence || (a.id < b.id ? -1 : 1));
   return candidates.map((node) => node.id);
+}
+
+function isAncestorOrSelf(scopeRoot: string, targetDir: string): boolean {
+  if (scopeRoot === "." || scopeRoot === "") return true;
+  const normalizedScope = scopeRoot.replace(/\/+$/, "");
+  return targetDir === normalizedScope || targetDir.startsWith(`${normalizedScope}/`);
+}
+
+function posixDirname(forPath: string): string {
+  const parts = forPath.split("/");
+  parts.pop();
+  return parts.length === 0 ? "." : parts.join("/");
 }

@@ -142,9 +142,6 @@ describe("policy engine (REQ-POL-001..003)", () => {
   });
 
   it("npm: extends resolves through pre-installed packages only; network spies stay silent", async () => {
-    const { request: httpRequest } = await import("node:http");
-    const { request: httpsRequest } = await import("node:https");
-
     // Simulate a pre-installed policy package.
     const pkgDir = path.join(rootPath, "node_modules", "demo-policy-pack");
     await mkdir(pkgDir, { recursive: true });

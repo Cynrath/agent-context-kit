@@ -1,3 +1,4 @@
+export { applyPolicyToFindings, globMatches } from "./apply.js";
 export { forbiddenPatternToRule, PolicyError, policyDigest, resolvePolicy } from "./resolve.js";
 export type { EffectivePolicy, PolicyDocument, PolicyRule, PolicySuppression } from "./types.js";
 export {

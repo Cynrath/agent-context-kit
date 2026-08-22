@@ -17,7 +17,8 @@ describe("declarative forbidden patterns (REQ-POL-001)", () => {
       content: "const x = eval(input); // dynamic\n",
     });
     expect(drafts).toHaveLength(1);
-    const draft = drafts[0]!;
+    const draft = drafts[0];
+    if (draft === undefined) throw new Error("expected one draft");
     expect(draft?.ruleId).toBe("ACKIT950");
     expect(draft?.rawEvidence).toBe("eval(");
     const finding = FindingSchema.parse({
