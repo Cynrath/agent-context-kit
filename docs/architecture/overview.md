@@ -1,0 +1,52 @@
+# Architecture Overview
+
+ACKit is a single npm package (`@cynrath/agent-context-kit`) exposing:
+
+- a CLI (`ackit`) and
+- a read-only MCP server (official TypeScript SDK over stdio)
+
+built from one modular TypeScript (strict, ESM) source tree.
+
+```
+src/
+  cli/            commander wiring; global options; exit codes per ADR-0007
+  api/            public-API alias layer (scanRepository)
+  index.ts        THE public programmatic entry (contract-tested allowlist)
+  core/
+    filesystem/   canonical-root engine: normalize → realpath → containment,
+                  safe walker with limits/cancellation, text/binary classifier,
+                  ignore stack (builtin → .gitignore chain → user globs)
+    config/       ackit.yml zod schema, YAML loader w/ line-accurate errors,
+                  deterministic merge + sha256 digest, JSON-schema emission
+    scanner/      pipeline: discovery → ignore/filter → classify → bounded
+                  rule evaluation → redact-at-construction → fingerprint →
+                  deterministic sort; built-in ACKITnnn rule catalog;
+                  inline suppression with visible bypass advisory
+    instructions/ instruction-graph discovery/resolution (codex/claude/
+                  gemini/copilot/shared), reference+security scanning,
+                  conflict/duplicate/staleness/advisory analysis
+    skills/       open-standard skill parser/validator, ownership lock,
+                  idempotent builtin install/sync
+    context/      budgeted deterministic context pack; optimize advisor with
+                  fenced fix mode
+    policy/       offline declarative policies: extends DFS, locked rules,
+                  suppressions w/ expiry, digest, forbidden patterns
+    tasks/        docs-first task system (active|archive) with completion gate
+    git/          porcelain-based changed/staged/range sets
+    cache/        content-addressed scan cache; baseline compare/write
+    reporting/    terminal/json/sarif/markdown/html renderers; loopback serve
+    watch/        debounced watcher + git hooks installer
+    workspace/    monorepo detection + path partitioning
+  mcp/            official SDK server (tools/resources/prompts)
+shared/           exit codes, diagnostics sanitizer, version source, tokens
+```
+
+## Invariants
+
+1. **Single door to the filesystem** — feature code never calls `fs` directly.
+2. **Redaction before reporters** — findings are constructed already-safe.
+3. **Determinism** — same repo+config ⇒ byte-identical JSON/packs/fingerprints.
+4. **Offline by construction** — resolution paths cannot reach the network.
+5. **Single identity source** — package.json feeds CLI/MCP/reports alike.
+
+Details: `docs/concepts/*.md`, ADRs under `docs/rebuild/decisions/`.

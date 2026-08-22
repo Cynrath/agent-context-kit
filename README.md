@@ -1,418 +1,201 @@
-<div align="center">
+# ACKit — AgentContextKit
 
-# AgentContextKit
+**Turn any repository into an agent-ready repository** — instruction graph,
+agent skills, security scanning, context budgeting, docs-first tasks,
+policy-as-code, and MCP. Offline-first and deterministic.
 
-**Offline-first repository context and safety tooling for AI-assisted development.**
+> Status: **unpublished** — active rebuild on branch `rebuild/ackit-vnext`
+> (`0.1.0-dev`). No npm install yet; publishing is a separate authorization.
+> See [Docs](#docs) · [Security](docs/security/THREAT_MODEL.md) ·
+> [Contributing](CONTRIBUTING.md) · License: MIT.
 
-Analyze a repository, generate clean agent context files, create task-first workflow docs, and catch secret/PII/brand leakage risks before a project is shared with AI agents or released publicly.
+## What it does
 
-<p>
-  <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-smoke.yml"><img alt="Cross-platform smoke" src="https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-smoke.yml/badge.svg"></a>
-  <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-source-smoke.yml"><img alt="Current-source smoke" src="https://github.com/Cynrath/agent-context-kit/actions/workflows/cross-platform-source-smoke.yml/badge.svg"></a>
-</p>
+ACKit reads your repository the way a coding agent would — instructions,
+skills, tasks, docs, code — and makes it **safe and efficient** for that
+agent: it resolves who-listens-to-what across provider instruction files,
+validates open-standard skills without ever executing them, scans for secrets
+and hygiene problems with redacted evidence, builds token-budgeted context
+packs with explained exclusions, enforces a docs-first task workflow with
+machine-checkable gates, applies team policy as code (locked rules, offline),
+and exposes all of it read-only over MCP.
 
-<p>
-  <a href="https://www.nuget.org/packages/AgentContextKit"><img alt="NuGet" src="https://img.shields.io/nuget/v/AgentContextKit?label=NuGet&logo=nuget"></a>
-  <a href="https://www.nuget.org/packages/AgentContextKit"><img alt="NuGet downloads" src="https://img.shields.io/nuget/dt/AgentContextKit?label=downloads&logo=nuget"></a>
-  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/Cynrath/agent-context-kit"></a>
-  <a href="https://dotnet.microsoft.com/"><img alt=".NET 10" src="https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white"></a>
-</p>
+## Why
 
-<p>
-  <a href="README.tr.md"><strong>Türkçe</strong></a> ·
-  <a href="#-quick-start"><strong>Quick Start</strong></a> ·
-  <a href="#-preview"><strong>Preview</strong></a> ·
-  <a href="#-what-it-does"><strong>Features</strong></a> ·
-  <a href="#-cli-command-map"><strong>CLI</strong></a> ·
-  <a href="#-safety-model"><strong>Safety</strong></a> ·
-  <a href="#-documentation-map"><strong>Docs</strong></a>
-</p>
+Agent tooling today is either convention-based (nothing is verified) or
+cloud-coupled (your code leaves the machine). ACKit takes a third path:
+**deterministic local analysis** with stable machine-readable contracts, an
+offline-by-construction dependency policy, and ownership-respecting writes.
+It dogfoods its own workflow: this repository was built by following the same
+task system the product ships.
 
-</div>
+## Features
 
-Default commands process repository content locally: no repository upload, AI API call, telemetry, or external-tool invocation. See [No-Network Default Policy](docs/NO_NETWORK_DEFAULT_POLICY.md).
+- Instruction graph: codex/claude/gemini/copilot surfaces, nesting, overrides,
+  `applyTo` globs, conflict/duplicate/staleness/advisory analysis
+- Agent Skills (open standard): parse/validate/install/sync with ownership
+  lock; four built-ins included; scripts detected, never executed
+- Scanning: secret shapes, credential assignments, private keys, connection
+  strings, entropy advisories, absolute-path leaks, CI pinning hygiene,
+  dependency drift — evidence always redacted
+- Context packs: weighted deterministic ranking inside a token budget with a
+  full manifest (hash/reason/tokens)
+- Tasks: `docs/tasks` workflow with single-active rule and completion gate
+- Policy-as-code: extends chains, locked rules, suppressions with expiry,
+  digests — strictly offline
+- Incremental & baselines: git changed/staged/range sets, content-addressed
+  cache, fingerprint compare (new vs fixed)
+- Reports: terminal, JSON, SARIF 2.1.0, Markdown, self-contained HTML;
+  loopback report viewer
+- Monorepo aware: pnpm/npm/yarn/generic detection with path-scoped semantics
+- MCP server (official SDK, stdio): 9 read-only tools, 5 resources, 4 prompts
 
-> [!IMPORTANT]
-> `v1.0.0-rc.1` is the latest complete prerelease on GitHub and NuGet. Its exact package assets, attestations, and installed-package smoke on Windows, Ubuntu, and macOS are verified. This is a release candidate, not a `1.0.0` GA claim.
+## Install
 
----
-
-## ACKit Optimize
-
-`ackit optimize` is post-`1.0.0-rc.1` current-source functionality. It discovers supported AI-agent instruction surfaces, resolves nested `AGENTS.md` scope, reports stable duplication/conflict/safety/quality findings and deterministic context estimates, exports console/JSON/Markdown/SARIF/offline HTML, and can create an explicit-path review proposal without rewriting source files.
-
-The published RC1 predates this feature and remains unchanged. Optimize is deterministic local C#: it makes no model/API call, requires no API key, and never lets a model silently rewrite instructions.
-
-```powershell
-dotnet restore AgentContextKit.sln
-dotnet build AgentContextKit.sln -c Release --no-restore
-Push-Location samples/ackit-optimize-demo
-dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json --proposal .ackit/reports/optimized-instructions.md
-Pop-Location
+```bash
+# not published yet — from a checkout:
+pnpm install --frozen-lockfile && pnpm build
+alias ackit="node $(pwd)/dist/cli/index.js"
 ```
 
----
+Requires Node **>= 22**.
 
-## Project Status
+## Quickstart
 
-| Area | Status |
-| --- | --- |
-| Current complete prerelease | `v1.0.0-rc.1` published on GitHub and NuGet; exact assets, two attestations, and three-platform installed-package smoke verified |
-| Release evidence | NuGet repository commit and exact tag target `258918b33c3d1359aac967604ee524e8b66ddf02`; GitHub prerelease [v1.0.0-rc.1](https://github.com/Cynrath/agent-context-kit/releases/tag/v1.0.0-rc.1) |
-| Package | `AgentContextKit` global tool install verified |
-| Previous complete prerelease | `v0.2.0-alpha.4` |
-| Runtime | .NET 10 |
-| Platforms | Windows, Ubuntu, macOS via GitHub Actions smoke flows |
-| Privacy model | Offline-first; no repository upload and no remote AI API calls in the MVP |
-| SARIF | `ackit sarif` is included in the published `1.0.0-rc.1` package |
-| Optimize | `ackit optimize` is verified in current source only; published RC1 predates it |
-
----
-
-## Preview
-
-The Web UI dashboard shows readiness score, stack signals, health checks, findings, generated context files, and task previews.
-
-![AgentContextKit Web UI dashboard preview](docs/assets/screenshots/ackit-webui-preview-alpha4.webp)
-*Sanitized preview from a synthetic demo repository. No local paths, secrets, or private data are visible.*
-
-![AgentContextKit flow](docs/assets/diagrams/ackit-flow.svg)
-
-See [Web UI Preview](docs/WEB_UI_PREVIEW.md), [Visual Assets](docs/VISUAL_ASSETS.md), [Sample Gallery](docs/SAMPLE_GALLERY.md), and [Demo Scenarios](docs/DEMO_SCENARIOS.md).
-
----
-
-## Related ecosystem
-
-AgentContextKit prepares a repository before it reaches an AI coding agent or release decision. Specialized local tools can complement that workflow, but AgentContextKit does not install or invoke external tools by default.
-
-- Repo-to-context packers can create model-ready bundles after local hygiene review.
-- Graph and search tools can add optional architecture/navigation context.
-- Security scanners and SBOM tools can provide deeper, separately reviewed evidence.
-- External outputs remain local-only until a human privacy review approves sharing.
-
-See [Related Projects](docs/RELATED_PROJECTS.md), [Comparison Matrix](docs/RELATED_TOOLS_COMPARISON_MATRIX.md), [External Workflows](docs/EXTERNAL_TOOL_WORKFLOWS.md), and [Agent Context Pipeline](docs/AGENT_CONTEXT_PIPELINE.md).
-
----
-
-## Why AgentContextKit
-
-AI coding agents are powerful, but they often receive incomplete, stale, or unsafe project context. That can lead to wrong edits, weak task planning, inconsistent agent instructions, missed test expectations, and accidental exposure when a private repository becomes public.
-
-AgentContextKit gives teams a repeatable local workflow before they hand a repository to Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI, or similar coding agents.
-
-| Problem | AgentContextKit helps by |
-| --- | --- |
-| Agent context is scattered | Generating consistent agent instruction and workflow files |
-| Repository structure is unclear | Producing a concise project map and stack signal summary |
-| Work starts without task discipline | Creating structured task files under `docs/tasks` |
-| Public release has leakage risk | Reporting secret-like, PII-like, brand, and local-path findings |
-| CI needs machine-readable checks | Supporting JSON output and `scan --ci` severity gates |
-| Review artifacts need to stay local | Creating offline HTML, Web UI, prompt pack, and context export artifacts |
-
-### Choose a workflow
-
-| Goal | Start here |
-| --- | --- |
-| Check whether a repository is ready for AI-assisted work | `ackit doctor` then `ackit scan --ci` |
-| Audit agent instruction quality and context cost | Current source: `ackit optimize` |
-| Create agent instructions for the current project | `ackit generate --target all` |
-| Start a traceable implementation task | `ackit task "Describe the focused change"` |
-| Review findings visually without a server | `ackit report` or `ackit webui` |
-| Prepare context without uploading it | `ackit prompt-pack`, review it, then `ackit context-export --approve` |
-
----
-
-## What It Does
-
-| Capability | Command | Output |
-| --- | --- | --- |
-| Initialize config | `ackit init` | `.ackit/config.yml` |
-| Validate config | `ackit config-check` | Read-only sanitized diagnostics and migration guidance |
-| Scan repository | `ackit scan` | Stack, docs, tests, CI, Docker, agent files, risky paths |
-| Filter scan scope | `ackit scan --include <glob> --exclude <glob>` | Current-source ad-hoc include/exclude filters |
-| Fail CI on risk | `ackit scan --ci` | Non-zero exit on high or critical findings |
-| Audit agent instructions | `ackit optimize` | Post-RC1 current-source scope, conflict, quality, and context-cost findings plus optional explicit-path review proposal; no source rewrite/apply mode |
-| Record reviewed findings | `ackit baseline` | Sanitized local baseline for opt-in new-finding CI policy |
-| Generate SARIF | `ackit sarif` | Privacy-first SARIF 2.1.0 report from the published package or current source |
-| Build HTML report | `ackit report` | Offline static scan report |
-| Build Web UI prototype | `ackit webui` | Offline static review UI |
-| Prepare prompt pack | `ackit prompt-pack` | Local dry-run prompt pack; no remote call |
-| Export approved context manifest | `ackit context-export` | Local approval manifest |
-| Generate agent files | `ackit generate` | Codex, Claude, Cursor, Copilot context files |
-| Create task docs | `ackit task` | Structured task Markdown files |
-| Check sensitive content | `ackit redact-check` | Secret/PII/brand/local-path risk report |
-| Check repository health | `ackit doctor` | OSS and repo hygiene diagnostics |
-| Run local MCP transport | `ackit mcp --stdio-server` | Current-source local JSON-RPC stdio loop |
-| Compare baselines | `ackit diff` | Current-source sanitized baseline diff |
-| Trim context artifacts | `ackit trim` | Current-source size-bounded Markdown/JSON trimming |
-| Watch local changes | `ackit watch` | Current-source debounced local scan watcher |
-
----
-
-## Quick Start
-
-### Install from NuGet
-
-```powershell
-dotnet tool install --global AgentContextKit --version 1.0.0-rc.1
-ackit version
-ackit --help
+```bash
+ackit init --dry-run        # plan shims + builtin skills (writes nothing)
+ackit skills install        # install 4 built-in skills idempotently
+ackit scan --ci             # scan; exit 1 at/over threshold
+ackit instructions          # resolved instruction graph
+ackit pack --max-tokens 50000
 ```
 
-Run scans from the root of the repository you want to inspect:
+Every command supports `--json` for machine-readable stdout and `--help`.
+Full tour: `docs/guides/getting-started.md`.
 
-```powershell
-ackit scan
-ackit scan --ci
-ackit doctor
+## CLI overview
+
+| Command | Purpose |
+|---|---|
+| `init` | plan/write instruction shims + builtin skills |
+| `scan` | security/hygiene scan (+`--ci --changed --staged --since --range --baseline --write-baseline --watch --format`) |
+| `optimize` | hygiene advisor (`--fix` fenced to managed surfaces) |
+| `pack` | budgeted context pack |
+| `instructions` | graph tree/JSON + effective chain |
+| `skills` | list / validate / install |
+| `task` | create / list / start / complete / archive / doctor |
+| `policy` / `config` | check offline policy / validate config |
+| `cache` / `workspaces` / `hooks` / `report serve` / `mcp serve` | utilities |
+
+Details: `docs/reference/cli.md` · Exit codes: `docs/reference/exit-codes.md`
+
+## Configuration
+
+Optional root `ackit.yml` (schema-versioned, strict):
+
+```yaml
+schemaVersion: 1
+scan:
+  severityThreshold: medium
+limits:
+  maxFiles: 50000
+context:
+  maxTokens: 80000
+policy:
+  extends: []
 ```
 
-`scan --ci` returns a non-zero exit code for High or Critical findings. Start with `ackit scan` when you want report-only behavior.
+Validate: `ackit config check`. Schema: `schemas/ackit.schema.json`.
+Reference: `docs/reference/config.md`.
 
-The published `1.0.0-rc.1` package supports read-only config diagnostics and an explicit baseline workflow:
+## Instruction graph
 
-```powershell
-ackit config-check --json
-ackit baseline
-ackit scan --baseline .ackit-baseline.json --ci
-ackit sarif --output .ackit/reports/baseline.sarif --baseline .ackit-baseline.json
-ackit report --output .ackit/reports/baseline.html --baseline .ackit-baseline.json
-ackit webui --output .ackit/webui/baseline.html --baseline .ackit-baseline.json
+AGENTS/CLAUDE/GEMINI/Copilot surfaces resolve into one graph with explicit
+precedence tiers, nested-scope wins, `AGENTS.override.md`, copilot `applyTo`
+globs, checksums, token estimates and security flags:
+
+```bash
+ackit instructions --provider claude --for src/app.ts
 ```
 
-Baseline mode keeps existing findings visible but fails CI only for new High or Critical findings. Baseline replacement requires `ackit baseline --update`.
+Concepts: `docs/concepts/instruction-graph.md`.
 
-### Common installed-tool workflows
+## Scanning & severity
 
-Create local review artifacts:
+Findings carry `ruleId/severity/category/message/path:line:col/fingerprint/
+redacted evidence/remediation/documentationKey/suppression`. Deterministic
+order; inline `ackit-ignore:ACKITnnn` bypasses stay visible via an advisory.
+Rules table: `docs/reference/rules.md`.
 
-```powershell
-ackit sarif --output .ackit/reports/ackit.sarif
-ackit report --output .ackit/reports/scan-report.html
-ackit webui --output .ackit/webui/index.html
-```
+## Context budget
 
-Initialize and generate agent context:
+Ranked by transparent weights (include > changed > task refs > scope >
+proximity > relevance > type − size), filled greedily into `--max-tokens`,
+manifest explains every exclusion. Concepts:
+`docs/concepts/context-budget.md`.
 
-```powershell
-ackit init --lang en
-ackit generate --target all --lang en
-ackit task "Add permission checks" --lang en
-```
+## Policy as code
 
-Generated `.ackit/` reports and Web UI files are local-only artifacts and should be reviewed before sharing.
+Versioned YAML layers with `extends` (local files or pre-installed npm
+packages only), locked rules, scoped suppressions with expiry, thresholds and
+a digest wired into reports/cache. `ackit policy check`.
 
-### Run from source
+## Workspaces
 
-Run these commands from the AgentContextKit repository root:
+pnpm/npm/yarn/generic monorepo detection with per-workspace partitioning of
+instructions/policy/packs. Guide: `docs/guides/monorepo.md`.
 
-```powershell
-dotnet restore AgentContextKit.sln
-dotnet build AgentContextKit.sln -c Release --no-restore
-dotnet test AgentContextKit.sln -c Release --no-build
-dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- --help
-dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci
-dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --json
-dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --include 'src/**' --exclude '**/*.bak' --ci
-dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- sarif --output .ackit/reports/ackit.sarif
-dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json
-dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --proposal .ackit/reports/optimized-instructions.md
-```
+## Exit codes
 
-The published `1.0.0-rc.1` package adds sanitized suppression audit fields to human/JSON scan output and includes scan glob filters plus local-only `mcp`, `diff`, `trim`, and `watch` commands. It predates ACKit Optimize; the command is currently demonstrated from source and does not retroactively change the RC1 package, tag, release, assets, or attestations. `--proposal` requires an explicit repository-relative Markdown path, skips existing output, never targets instruction sources, and has no apply mode.
-
-### Try it on a sample
-
-```powershell
-Push-Location samples/dotnet-console
-dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci
-Pop-Location
-
-Push-Location samples/ackit-optimize-demo
-dotnet run --project ../../src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- optimize --json --proposal .ackit/reports/optimized-instructions.md
-Pop-Location
-```
-
-See [Sample Gallery](docs/SAMPLE_GALLERY.md) and [Demo Scenarios](docs/DEMO_SCENARIOS.md) for guided examples.
-
-New to the tool? Follow [First Five Minutes With Ackit](docs/FIRST_FIVE_MINUTES.md) for a disposable, copy-paste-ready walkthrough using the published package.
-
-Adopting it in a real project? Use [Prepare A Repository For AI Coding Agents](docs/PREPARE_REPOSITORY_FOR_AI_AGENTS.md) for the security, config, generation, task-first, and CI-readiness workflow.
-
-<details>
-<summary><strong>Installed-tool smoke test</strong></summary>
-
-```powershell
-$smoke = Join-Path $env:TEMP "ackit-smoke-test"
-New-Item -ItemType Directory -Force -Path $smoke | Out-Null
-Push-Location $smoke
-dotnet new console -n DemoApp
-Push-Location DemoApp
-git init
-ackit init --lang tr
-ackit scan --ci
-ackit generate --target all --lang tr
-ackit task "Demo smoke test task" --lang en
-ackit report --output .ackit/reports/smoke.html
-ackit webui --output .ackit/webui/index.html
-ackit prompt-pack --output .ackit/prompt-packs/smoke.md --json
-ackit context-export --prompt-pack .ackit/prompt-packs/smoke.md --approve --output .ackit/context-exports/smoke.json --json
-Pop-Location
-Pop-Location
-```
-
-`ackit doctor` can report missing README, LICENSE, SECURITY, tests, CI, `.gitignore`, or package metadata in a minimal demo app. That is expected repository-health output, not a tool failure.
-
-</details>
-
----
-
-## CLI Command Map
-This map combines the immutable published `1.0.0-rc.1` foundation with documented current-source additions in `docs/CLI_CONTRACT.md` and `docs/CLI_REFERENCE.md`. `ackit optimize` is post-RC1 and is not in the published package.
-
-```text
-ackit init [--lang en|tr] [--json]
-ackit config-check [--lang en|tr] [--json]
-ackit scan [--baseline <repo-relative.json>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
-ackit optimize [--format console|json|markdown|sarif|html] [--output <repo-relative-file>] [--include <glob>] [--exclude <glob>] [--lang en|tr] [--json] [--ci]
-ackit baseline [--output <repo-relative.json>] [--update] [--lang en|tr] [--json]
-ackit sarif --output <repo-relative.sarif> [--baseline <repo-relative.json>] [--lang en|tr] [--json]
-ackit report [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]
-ackit webui [--output <repo-relative.html>] [--baseline <repo-relative.json>] [--lang en|tr] [--json]
-ackit prompt-pack [--output <repo-relative.md>] [--lang en|tr] [--json]
-ackit context-export --prompt-pack <repo-relative.md> --approve [--output <repo-relative.json>] [--lang en|tr] [--json]
-ackit generate [--target codex|claude|anthropic|cursor|copilot|continue|all] [--lang en|tr] [--json]
-ackit task "<title>" [--lang en|tr] [--json]
-ackit redact-check [--profile public-release] [--lang en|tr] [--json]
-ackit doctor [--lang en|tr] [--json]
-ackit hooks [--target codex|claude|anthropic|continue] [--shell pwsh|sh] [--install|--dry-run] [--output <repo-relative-dir>] [--lang en|tr] [--json]
-ackit mcp --stdio-server [--repo <path>] [--lang en|tr]
-ackit mcp --stdio <json-request> [--output <repo-relative.jsonl>] [--lang en|tr]
-ackit diff --from <from.json> --to <to.json> [--lang en|tr] [--json]
-ackit trim --input <repo-relative.md|json> --output <repo-relative.md|json> --max-chars <N> [--lang en|tr] [--json]
-ackit watch [--debounce-ms <N>] [--once] [--max-runtime-ms <N>] [--json] [--lang en|tr]
-ackit version
-ackit --help
-```
-
-## Generated Files
-
-Depending on the command and selected target, AgentContextKit can generate:
-
-| Area | Files |
-| --- | --- |
-| Agent instructions | `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/project.mdc`, `.github/copilot-instructions.md` |
-| Project workflow | `docs/PROJECT_MAP.md`, `docs/AI_WORKFLOW.md`, `docs/SECURITY_NOTES.md`, `docs/DEVELOPMENT_STANDARD.md` |
-| Task tracking | `docs/tasks/TASK-0001.md` |
-| Codex handoff | `.codex/HANDOFF.md`, `.codex/CONTEXT_PACK.md` |
-| Reports | `.ackit/reports/scan-report.html`, `.ackit/reports/ackit.sarif` |
-| Review UI | `.ackit/webui/index.html` |
-| Prompt review | `.ackit/prompt-packs/prompt-pack.md` |
-| Context approval | `.ackit/context-exports/context-export-manifest.json` |
-
----
-
-## Safety Model
-
-AgentContextKit is designed to make repository review safer before public release or AI-context export.
-
-| Behavior | Default |
-| --- | --- |
-| Remote AI/API calls | No remote AI calls in the MVP |
-| Repository upload | No upload of repository contents |
-| Existing generated files | Skipped by default |
-| Secret redaction | No automatic redaction in the MVP |
-| Risk severity | Critical, High, Medium, Low, Info |
-| SARIF content | Repository-relative locations; raw secret matches are not written |
-| Prompt packs | Local dry-run artifacts only |
-| Context exports | Local approval manifest only |
-| Publishing | No GitHub push or NuGet publish is performed by the tool |
-
-The scanner uses stable rule IDs and a narrow safe technical allowlist for common platform/package domains, known non-Critical paths, and clearly non-real fixture placeholders. Configured scanner allowlists can suppress non-Critical noise, but Critical findings remain reportable.
-
-> [!CAUTION]
-> Static reports, Web UI files, prompt packs, and context export manifests are local artifacts. Review them before sharing because they can include repository metadata or local paths.
-
----
-
-## Localization
-
-Default language is English. Turkish is supported with `--lang tr`. Unknown language values fall back to English.
-
-```powershell
-ackit init --lang tr
-ackit scan --lang tr
-ackit generate --target all --lang tr
-ackit task "Yetki kontrollerini ekle" --lang tr
-```
-
----
-
-## Configuration And Automation
-
-| Topic | Documentation |
-| --- | --- |
-| `.ackit/config.yml` | [Configuration](docs/CONFIGURATION.md) |
-| Machine-readable output | [JSON Output](docs/JSON_OUTPUT.md) |
-| CI usage | [GitHub Actions Usage](docs/GITHUB_ACTIONS_USAGE.md) |
-| Scanner behavior | [Scanner Rules](docs/SCANNER_RULES.md) |
-| Suppression audit | [Suppression Audit](docs/SUPPRESSION_AUDIT.md) |
-| Exit behavior | [Exit Codes](docs/EXIT_CODES.md) |
-| SARIF report | [SARIF Output](docs/SARIF_OUTPUT.md) |
-
----
-
-## Documentation Map
-
-Start with [Documentation Index](docs/DOCUMENTATION_INDEX.md).
-
-| Category | Links |
-| --- | --- |
-| Usage | [CLI Reference](docs/CLI_REFERENCE.md), [Examples](docs/EXAMPLES.md), [Example Workflows](docs/EXAMPLE_WORKFLOWS.md) |
-| Demo | [Sample Gallery](docs/SAMPLE_GALLERY.md), [Demo Scenarios](docs/DEMO_SCENARIOS.md), [Web UI Preview](docs/WEB_UI_PREVIEW.md) |
-| Reports | [HTML Reports](docs/HTML_REPORTS.md), [SARIF Output](docs/SARIF_OUTPUT.md), [Web UI Prototype](docs/WEB_UI_PROTOTYPE.md), [Visual Assets](docs/VISUAL_ASSETS.md) |
-| Operations | [Configuration](docs/CONFIGURATION.md), [JSON Output](docs/JSON_OUTPUT.md), [Suppression Audit](docs/SUPPRESSION_AUDIT.md), [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| Engineering | [Architecture](docs/ARCHITECTURE.md), [Source Hygiene](docs/SOURCE_HYGIENE.md), [Security Model](docs/SECURITY_MODEL.md) |
-| Packaging | [Packaging](docs/PACKAGING.md), [Release Validation](docs/RELEASE_VALIDATION.md), [Maintainer Release Handoff](docs/MAINTAINER_RELEASE_HANDOFF.md) |
-| Maintainers | [Contributor Onboarding](docs/CONTRIBUTOR_ONBOARDING.md), [Support Matrix](docs/SUPPORT_MATRIX.md), [Maintainer Guide](docs/MAINTAINER_GUIDE.md) |
-| GitHub setup | [GitHub Labels](docs/GITHUB_LABELS.md), [GitHub Settings Checklist](docs/GITHUB_SETTINGS_CHECKLIST.md), [GitHub Repo Hygiene](docs/GITHUB_REPO_HYGIENE.md), [Issue Triage](docs/ISSUE_TRIAGE.md) |
-| Release readiness | [Public Release Audit](docs/PUBLIC_RELEASE_AUDIT.md), [Release Blockers](docs/RELEASE_BLOCKERS.md) |
-
----
-
-## Roadmap
-
-See [Roadmap](docs/ROADMAP.md).
-
-Public release blockers are tracked in [Release Blockers](docs/RELEASE_BLOCKERS.md).
-
----
-
-## Packaging
-
-Local package validation is documented in [Packaging](docs/PACKAGING.md) and [Release Validation](docs/RELEASE_VALIDATION.md). The `1.0.0-rc.1` prerelease is published as a NuGet global tool.
-
-```powershell
-dotnet tool install --global AgentContextKit --version 1.0.0-rc.1
-ackit version
-```
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [Contributor Onboarding](docs/CONTRIBUTOR_ONBOARDING.md). Please use the GitHub issue and pull request templates, and do not include secrets or private repository data in public reports.
-
----
+0 ok · 1 threshold/new-findings · 2 usage/config · 3 environment ·
+4 security boundary · 5 internal. Reference: `docs/reference/exit-codes.md`.
 
 ## Security
 
-See [SECURITY.md](SECURITY.md). Please do not include secrets, private repository contents, production configuration, or private customer data in public issues.
+Threat model: `docs/security/THREAT_MODEL.md` · Trust model:
+`docs/security/SECURITY_MODEL.md`. Highlights: repository content is
+untrusted input; zero network in product code; secrets redacted at
+construction; filesystem access funneled through one containment engine;
+MCP server is read-only. Vulnerabilities: see `SECURITY.md`.
 
----
+## Docs
+
+Architecture: `docs/architecture/overview.md` · Concepts:
+instruction-graph / context-budget / agent-skills · Guides: getting-started /
+ci / monorepo / agent-integration · Reference: cli / config / rules /
+exit-codes / mcp / schemas · Decisions: `docs/decisions/README.md` ·
+History: `docs/history/v1.md`
+
+## MCP setup
+
+```json
+{ "mcpServers": { "ackit": { "command": "ackit", "args": ["mcp", "serve"] } } }
+```
+
+Reference: `docs/reference/mcp.md`.
+
+## Requirements
+
+Node >= 22 · pnpm 11 (development) · git optional (incremental features).
+
+## Development
+
+```bash
+pnpm install --frozen-lockfile
+pnpm lint && pnpm format:check && pnpm typecheck
+pnpm build && pnpm test && pnpm smoke:cli
+pnpm run smoke:package   # pack → temp install → CLI smoke
+```
+
+See `CONTRIBUTING.md` for the docs-first workflow.
+
+## Versioning & status
+
+vNext restarts at `0.1.0`; v1 (.NET/NuGet `1.0.0-rc.1`) is frozen legacy.
+This branch is unpublished; any publish/tag/release requires separate
+explicit authorization. Changelog: `CHANGELOG.md` (rebuild entry atop a
+verbatim legacy section).
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT — `LICENSE`.
