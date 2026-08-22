@@ -26,6 +26,7 @@
     "smoke:cli": "node tests/e2e/cli-scaffold.smoke.mjs"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "commander": "^15.0.0",
     "ignore": "^7.0.6",
     "picomatch": "^4.0.5",

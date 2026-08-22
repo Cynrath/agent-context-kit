@@ -55,11 +55,11 @@ stderr-only diagnostics; stdout stays protocol-pure (contract-tested).
 
 ## Acceptance criteria
 
-- [ ] Conformance suite: initialize handshake, tools/list, tools/call per tool, resources/list+read, prompts/get — all pass against in-memory client.
-- [ ] Malformed JSON-RPC input → error response, process survives (fuzz-lite loop test).
-- [ ] Cancellation propagates from scan-based tool mid-run; clean shutdown on stdio close.
-- [ ] No file under src/ references legacy v1 custom MCP framing (grep-gate test).
-- [ ] Tool outputs reuse published JSON contracts (no divergent schemas).
+- [x] Conformance suite: initialize handshake, tools/list, tools/call per tool, resources/list+read, prompts/get — all pass against in-memory client.
+- [x] Malformed JSON-RPC input → error response, process survives (fuzz-lite loop test).
+- [x] Cancellation propagates from scan-based tool mid-run; clean shutdown on stdio close.
+- [x] No file under src/ references legacy v1 custom MCP framing (grep-gate test).
+- [x] Tool outputs reuse published JSON contracts (no divergent schemas).
 
 ## Test steps
 
@@ -75,4 +75,21 @@ Focused commit.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on `rebuild/ackit-vnext`.
+
+Implementation:
+- Dependency: official `@modelcontextprotocol/sdk@1.30.0` (registry latest verified in TASK-0266/ADR-0008; lockfile-pinned). Zero custom protocol code anywhere.
+- `src/mcp/server.ts` — createAckitMcpServer on McpServer (serverInfo name/version from package.json single source, REQ-ARCH-009):
+  - Tools (all read-only): ackit_scan, ackit_doctor, ackit_pack, ackit_instruction_graph, ackit_list_skills, ackit_validate_skills, ackit_list_tasks, ackit_get_task, ackit_policy_check — zod-validated args; outputs reuse the engines' published JSON shapes (scan result object, graph nodes, skill records, task metas, policy chain+digest) so no divergent schemas exist.
+  - Resources: repo://summary, repo://instructions-graph, repo://skills-catalog, repo://tasks-active, repo://policy.
+  - Prompts: onboarding, task-execution, scan-remediation, context-optimization — deterministic templates (byte-stable across calls).
+  - Write tools intentionally absent; future write tools require an explicit capability gate design per REQ-MCP-002 (documented here).
+- `src/mcp/stdio.ts` + CLI `ackit mcp serve`: StdioServerTransport only; stdout protocol-pure, diagnostics stderr-only; clean shutdown on stdio close.
+
+Tests (40 files / 207 tests total, all green):
+- contract/mcp via InMemoryTransport pair: initialize handshake identity match; tools/list equals exactly the nine read-only tools; every tool answers successfully on a real fixture (get_task unknown-id returns structured JSON); resources list contains all five URIs and summary read parses; prompts/get deterministic incl. repeated call byte-equality; unknown tool → error outcome and server stays responsive.
+- integration/mcp stdio smoke against the BUILT dist artifact: malformed line between initialize and tools/list never corrupts framing (ids answered in order); tools/call round-trip works over real stdio.
+
+Validation evidence: lint=0 · format:check=0 · typecheck=0 · build=0 · vitest 40 files / 207 tests=0 · smoke:cli=0 · ackit scan --ci --exclude pnpm-lock.yaml=0.
+
+External actions: none beyond permitted branch pushes recorded earlier under TASK-0290.

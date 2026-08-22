@@ -367,6 +367,21 @@ function buildProgram(invocation: CliInvocation): Command {
       });
     });
 
+  const mcpCommand = program
+    .command("mcp")
+    .description("Model Context Protocol integration (official SDK, stdio only)");
+  mcpCommand
+    .command("serve")
+    .description("serve the ACKit MCP server over stdio (protocol-pure stdout)")
+    .action(async () => {
+      // Delegate to the dedicated entry so stdout carries only JSON-RPC.
+      await import("../mcp/stdio.js");
+      // stdio entry keeps the process alive until the transport closes.
+      return new Promise<void>((resolve) => {
+        process.on("exit", () => resolve());
+      });
+    });
+
   program.addHelpText("after", `\n${HELP_TEXT_SUFFIX}`);
   return program;
 }
