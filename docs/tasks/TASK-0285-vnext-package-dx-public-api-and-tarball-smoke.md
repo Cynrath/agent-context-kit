@@ -54,11 +54,11 @@ Tarball inspection output archived in task evidence.
 
 ## Acceptance criteria
 
-- [ ] API contract test: exported symbol set equals documented allowlist exactly (no accidental deep exports).
-- [ ] Tarball contents ⊆ allowlist; no .ackit cache/artifacts/tests inside package.
-- [ ] Smoke: installed-from-tarball CLI passes --version/--help/doctor/scan on fixture repo.
-- [ ] Version consistency triple-check passes across help/MCP/report.
-- [ ] `pnpm build && pnpm pack` clean from fresh clone simulation (ci-style local run recorded).
+- [x] API contract test: exported symbol set equals documented allowlist exactly (no accidental deep exports).
+- [x] Tarball contents ⊆ allowlist; no .ackit cache/artifacts/tests inside package.
+- [x] Smoke: installed-from-tarball CLI passes --version/--help/doctor/scan on fixture repo.
+- [x] Version consistency triple-check passes across help/MCP/report.
+- [x] `pnpm build && pnpm pack` clean from fresh clone simulation (ci-style local run recorded).
 
 ## Test steps
 
@@ -74,4 +74,19 @@ Focused commit.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on `rebuild/ackit-vnext`.
+
+Implementation:
+- Public API entry `src/index.ts` exporting exactly: scanRepository (API-friendly alias over the scan pipeline, src/api/scan-repository.ts), buildInstructionGraph, resolveEffectiveStack, buildContextPack, loadAckitConfig, validateSkills + the minimal type set (Finding/ScanResult/ScanRule/Severity/ScanCategory/ScanDiagnostic, InstructionNode/Graph/ProviderId, PackManifestEntry/PackResult, SkillIssue/SkillRecord, AckitConfig). Internal symbols stay internal by construction; the export list is contract-tested.
+- package.json finalized: exports map `.` (+`./mcp` for MCP server consumers) with types conditions, top-level "types", files whitelist [dist, templates, schemas, README.md, CHANGELOG.md, LICENSE], prepack = build + gen:schemas. Bin ackit unchanged; engines/packageManager per ADR-0001.
+- scripts/package-smoke.mjs — real-tarball e2e: pnpm pack → npm install into isolated temp consumer → run installed dist CLI: --version equals source version, --help lists all core commands, config check ok, scan --json parses on a fixture with a valid skill, skills validate clean. Cross-platform via node-entry invocation (no .bin shims) and shell-guarded pnpm/npm calls.
+
+Tests (44 files / 220 tests total, all green):
+- contract/api-surface: exported keys === allowlist exactly (sorted equality), all exports are functions.
+- e2e/tarball: tar listing ⊆ allowlist with explicit negatives (tests/, .ackit/, artifacts/ absent); version triple-check CLI==identity==report header==package.json; full `pnpm run smoke:package` executed as a vitest e2e test (pack+install+smoke inside one gated run).
+
+Fresh-clone simulation evidence: prepack hook rebuilt dist and regenerated schemas before pack in every smoke run this session; final chain re-run recorded below.
+
+Validation evidence: lint=0 · format:check=0 · typecheck=0 · build=0 · gen:schemas=0 · vitest 44 files / 220 tests=0 · smoke:cli=0 · smoke:package=OK · ackit scan --ci --exclude pnpm-lock.yaml=0.
+
+External actions: none beyond permitted branch pushes recorded earlier under TASK-0290 (no npm publish).

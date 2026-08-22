@@ -12,18 +12,36 @@
   "bin": {
     "ackit": "./dist/cli/index.js"
   },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp/server.d.ts",
+      "import": "./dist/mcp/server.js"
+    }
+  },
   "files": [
-    "dist"
+    "dist",
+    "templates",
+    "schemas",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "prepack": "pnpm build && pnpm gen:schemas",
     "gen:schemas": "node scripts/generate-schemas.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "biome check src tests scripts schemas examples",
     "format:check": "biome format src tests scripts schemas examples",
     "format": "biome format --write src tests scripts schemas examples",
     "test": "vitest run",
-    "smoke:cli": "node tests/e2e/cli-scaffold.smoke.mjs"
+    "smoke:cli": "node tests/e2e/cli-scaffold.smoke.mjs",
+    "smoke:package": "node scripts/package-smoke.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
