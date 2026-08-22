@@ -54,11 +54,11 @@ CI artifacts limited to reports; retention minimized.
 
 ## Acceptance criteria
 
-- [ ] Workflow YAML lint-valid; every action pinned by SHA + comment (grep-gate script).
-- [ ] Matrix covers ubuntu-latest, windows-latest, macos-latest × two Node LTS lines from TASK-0266 decision.
-- [ ] Self-scan job runs new ACKit against this repository and enforces threshold (exit-fail demo recorded once intentionally? no — proof via local run evidence).
-- [ ] Package smoke job executes tarball install+smoke on all OS.
-- [ ] No job performs push/publish/tag; `permissions:` block reviewed in evidence.
+- [x] Workflow YAML lint-valid; every action pinned by SHA + comment (grep-gate script).
+- [x] Matrix covers ubuntu-latest, windows-latest, macos-latest × two Node LTS lines from TASK-0266 decision.
+- [x] Self-scan job runs new ACKit against this repository and enforces threshold (exit-fail demo recorded once intentionally? no — proof via local run evidence).
+- [x] Package smoke job executes tarball install+smoke on all OS.
+- [x] No job performs push/publish/tag; `permissions:` block reviewed in evidence.
 
 ## Test steps
 
@@ -74,4 +74,36 @@ Focused commit; v1 workflows restorable via git history.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on `rebuild/ackit-vnext`.
+
+Workflow (`.github/workflows/ci.yml`) — three jobs, all triggers limited to
+`rebuild/**` pushes/PRs, top-level `permissions: contents: read`, no secrets:
+
+1. verify — ubuntu/windows/macos × node 22/24 (six legs): frozen pnpm
+   install → lint → format:check → typecheck → build → full test suites.
+2. self-scan (dogfood) — builds dist then runs the NEW ACKit against this
+   repository: `config check` + `task doctor` + `scan --ci --exclude
+   pnpm-lock.yaml` as an enforced threshold gate.
+3. package-smoke — same three OS: build + `pnpm run smoke:package`
+   (tarball → temp npm install → installed-CLI version/help/config/scan/skills
+   assertions).
+
+Action pinning (REQ-SEC-004): every `uses:` pinned to a full 40-char commit
+SHA with a version comment; SHAs resolved live from the GitHub API on
+2026-08-22 — checkout `f548e57e…`, setup-node `ae0d4ed0…`,
+pnpm/action-setup v4 tag→commit `b906affc…`. Contract test
+tests/contract/ci-pinning.test.ts enforces SHA format, version comments,
+permissions scope, absence of master/release/publish triggers, matrix legs,
+and presence of self-scan + package-smoke jobs.
+
+v1 workflow removals: cross-platform-smoke.yml, cross-platform-source-smoke.yml,
+release-candidate-evidence.yml, release.yml (git history retains them). No
+publish/tag/release execution exists anywhere in the final tree (REQ-SEC-005).
+
+Local validation before push: full chain green (lint/format/typecheck/build/
+vitest 46 files / 228 tests), plus the exact self-scan and smoke commands the
+CI will run. Hosted run for this commit recorded in TASK-0289 evidence.
+
+External actions: fast-forward pushes of rebuild/ackit-vnext only; read-only
+GitHub API lookups for pinning SHAs; no publish/tag/release/workflow dispatch
+beyond push-triggered CI.
