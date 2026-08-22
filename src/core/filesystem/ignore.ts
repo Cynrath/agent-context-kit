@@ -78,14 +78,14 @@ export class IgnoreEngine {
     const dirs = ancestorDirectories(segments);
     for (const dir of dirs) {
       const matcher = this.gitignoreCache.get(gitignoreKey(dir));
-      if (matcher !== undefined && matcher.ignores(relativePath)) {
+      if (matcher?.ignores(relativePath)) {
         return {
           ignored: true,
           source: { layer: "gitignore", file: gitignoreDisplayPath(dir) },
         };
       }
     }
-    if (this.userMatcher !== undefined && this.userMatcher(relativePath)) {
+    if (this.userMatcher?.(relativePath)) {
       const pattern =
         findMatchingGlob(this.options.userExcludeGlobs ?? [], relativePath) ?? "(user glob)";
       return { ignored: true, source: { layer: "user-exclude", pattern } };

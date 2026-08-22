@@ -12,6 +12,8 @@ import {
 export interface WalkOptions {
   limits?: TraversalLimits | undefined;
   signal?: AbortSignal | undefined;
+  /** Injectable clock for deterministic deadline tests. Defaults to Date.now. */
+  now?: (() => number) | undefined;
 }
 
 export type WalkEvent =
@@ -45,7 +47,8 @@ export async function* walkRepository(
 ): AsyncGenerator<WalkEvent> {
   const limits = options.limits ?? {};
   const concurrency = Math.max(1, limits.concurrency ?? DEFAULT_CONCURRENCY);
-  const deadline = limits.deadlineMs === undefined ? undefined : Date.now() + limits.deadlineMs;
+  const clockNow = options.now ?? ((): number => Date.now());
+  const deadline = limits.deadlineMs === undefined ? undefined : clockNow() + limits.deadlineMs;
   const visitedDirectories = new Set<string>();
   let filesYielded = 0;
   let bytesSeen = 0;
@@ -67,7 +70,7 @@ export async function* walkRepository(
       };
       return;
     }
-    if (deadline !== undefined && Date.now() > deadline) {
+    if (deadline !== undefined && clockNow() > deadline) {
       yield {
         kind: "diagnostic",
         diagnostic: {
@@ -173,7 +176,7 @@ export async function* walkRepository(
         } else {
           yield { kind: "diagnostic", diagnostic: outcome.diagnostic };
         }
-        if (options.signal?.aborted || (deadline !== undefined && Date.now() > deadline)) {
+        if (options.signal?.aborted || (deadline !== undefined && clockNow() > deadline)) {
           yield {
             kind: "diagnostic",
             diagnostic: options.signal?.aborted

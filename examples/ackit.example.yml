@@ -1,0 +1,38 @@
+# Example ACKit configuration (schemaVersion 1).
+# Copy to your repository root as `ackit.yml`. All sections are optional;
+# omitted sections use the documented defaults.
+schemaVersion: 1
+
+scan:
+  include:
+    - "**/*"
+  exclude:
+    - "**/*.min.js"
+  severityThreshold: medium
+
+limits:
+  maxFiles: 50000
+  maxFileBytes: 1048576
+  deadlineMs: 60000
+
+instructions:
+  enabled: true
+  maxTokenEstimatePerFile: 20000
+
+skills:
+  enabled: true
+
+context:
+  maxTokens: 80000
+
+policy:
+  extends: []
+
+output:
+  format: terminal
+
+cache:
+  enabled: true
+
+workspaces:
+  enabled: false

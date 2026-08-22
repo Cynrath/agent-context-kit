@@ -17,6 +17,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "gen:schemas": "node scripts/generate-schemas.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "biome check src tests scripts schemas examples benchmarks",
     "format:check": "biome format src tests scripts schemas examples benchmarks",
@@ -27,7 +28,9 @@
   "dependencies": {
     "commander": "^15.0.0",
     "ignore": "^7.0.6",
-    "picomatch": "^4.0.5"
+    "picomatch": "^4.0.5",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.10",

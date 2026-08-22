@@ -72,17 +72,24 @@ describe("walk limits and budgets", () => {
     }
   });
 
-  it("respects a wall-clock deadline with FS-DEADLINE-EXCEEDED", async () => {
+  it("respects a wall-clock deadline with FS-DEADLINE-EXCEEDED (injected clock)", async () => {
     const repo = await makeTempRepo();
     try {
       for (let index = 0; index < 20; index += 1) {
         await fsp.writeFile(path.join(repo.root.canonicalPath, `f${index}.txt`), "x");
       }
-      const codes: string[] = [];
       const { walkRepository } = await import("../../../src/core/filesystem/walk.js");
+      const codes: string[] = [];
+      let calls = 0;
+      const start = 1_000_000;
+      // Deterministic fake clock: first call sets the baseline, later calls jump far past the deadline.
+      const fakeNow = (): number => {
+        calls += 1;
+        return calls === 1 ? start : start + 60_000;
+      };
       for await (const event of walkRepository(
         { canonicalPath: repo.root.canonicalPath },
-        { limits: { deadlineMs: 1 } },
+        { limits: { deadlineMs: 1000 }, now: fakeNow },
       )) {
         if (event.kind === "diagnostic") {
           codes.push(event.diagnostic.code);

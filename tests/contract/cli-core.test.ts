@@ -32,11 +32,11 @@ describe("ackit CLI core behavior (scaffold)", () => {
     captured.restore();
     expect(code).toBe(EXIT_CODES.ok);
     expect(captured.lines()).toBe(
-      [
+      `${[
         `ackit ${getPackageIdentity().version}`,
         "Repository health summary: scaffold — checks are not wired in this build yet.",
         "Available today: --version, --help, global option parsing, JSON mode.",
-      ].join("\n") + "\n",
+      ].join("\n")}\n`,
     );
   });
 

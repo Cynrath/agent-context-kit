@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "scan": {
+      "default": {
+        "include": [],
+        "exclude": [],
+        "severityThreshold": "low"
+      },
+      "type": "object",
+      "properties": {
+        "include": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "severityThreshold": {
+          "default": "low",
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        }
+      }
+    },
+    "limits": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "maxFiles": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxFileBytes": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxTotalBytes": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxDepth": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "deadlineMs": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "instructions": {
+      "default": {
+        "enabled": true,
+        "maxTokenEstimatePerFile": 20000
+      },
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        },
+        "maxTokenEstimatePerFile": {
+          "default": 20000,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "skills": {
+      "default": {
+        "enabled": true
+      },
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        }
+      }
+    },
+    "context": {
+      "default": {
+        "maxTokens": 100000
+      },
+      "type": "object",
+      "properties": {
+        "maxTokens": {
+          "default": 100000,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "policy": {
+      "default": {
+        "extends": []
+      },
+      "type": "object",
+      "properties": {
+        "extends": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "baseline": {
+      "type": "string"
+    },
+    "output": {
+      "default": {
+        "format": "terminal"
+      },
+      "type": "object",
+      "properties": {
+        "format": {
+          "default": "terminal",
+          "type": "string",
+          "enum": [
+            "terminal",
+            "json",
+            "markdown",
+            "html",
+            "sarif"
+          ]
+        }
+      }
+    },
+    "cache": {
+      "default": {
+        "enabled": true
+      },
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        }
+      }
+    },
+    "workspaces": {
+      "default": {
+        "enabled": false
+      },
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "required": [
+    "schemaVersion"
+  ]
+}
