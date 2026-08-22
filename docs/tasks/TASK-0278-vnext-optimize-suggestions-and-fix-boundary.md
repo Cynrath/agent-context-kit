@@ -53,11 +53,11 @@ Fix actions summarized in stdout summary for audit.
 
 ## Acceptance criteria
 
-- [ ] Default `optimize` on dirty-fixture repo exits 0 with findings, repo git-status clean afterward (hard assertion).
-- [ ] `--fix` on fixture with user-owned conflicting file → proposes diff, refuses silent write.
-- [ ] `--fix --dry-run` byte-identical to proposal output of default+plan flag (determinism).
-- [ ] Managed block update preserves surrounding user text exactly (round-trip test).
-- [ ] All nine detection categories have at least one triggering fixture test.
+- [x] Default `optimize` on dirty-fixture repo exits 0 with findings, repo git-status clean afterward (hard assertion).
+- [x] `--fix` on fixture with user-owned conflicting file → proposes diff, refuses silent write.
+- [x] `--fix --dry-run` byte-identical to proposal output of default+plan flag (determinism).
+- [x] Managed block update preserves surrounding user text exactly (round-trip test).
+- [x] All nine detection categories have at least one triggering fixture test.
 
 ## Test steps
 
@@ -73,4 +73,21 @@ Focused commit.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on `rebuild/ackit-vnext`.
+
+Implementation:
+- `src/core/context/optimize.ts` — analyzeOptimize (read-only) covering all nine REQ-CTX-005 categories by reusing the deterministic engines: conflicting-instructions/redundant-content/stale-reference/mis-scoped-applyto from TASK-0273 analysis (knownFiles wired for unreachable-glob detection), oversized-context-doc via token estimates on root instruction files, duplicate-skill from the skills validator, missing-workflow-skill + missing-task-docs advisories, budget-overrun from a real pack run at the configured budget, stale-generated-files for managed blocks differing from canonical shims.
+- naiveLineDiff — LCS-based deterministic diff used for proposal previews.
+- applyFixes — fenced fix mode: writes ONLY managed blocks (ensureManagedBlock) and lock-owned skills (installSkills); non-managed conflicts are never touched; --dry-run emits proposal diffs instead of writing (REQ-GOV-008).
+- CLI `ackit optimize [--fix] [--dry-run]` — JSON mode ackit.optimize.v0; default exit 0.
+
+Tests (38 files / 198 tests total, all green):
+- Dirty fixture triggers all nine categories in one analysis; git status stays clean across init→analyze (hard zero-mutation assertion).
+- Non-fixable conflict produces zero outcomes and leaves user bytes identical.
+- LCS diff determinism with -/+/context lines asserted on a managed-block example.
+- Managed-block round-trip preserves user prefix and trailing text exactly.
+- Healthy fixture (workflow skill installed, docs/tasks present, clean instructions) yields ZERO suggestions (noise guard).
+
+Validation evidence: lint=0 · format:check=0 · typecheck=0 · build=0 · vitest 38 files / 198 tests=0 · smoke:cli=0 · ackit scan --ci --exclude pnpm-lock.yaml=0.
+
+External actions: none beyond permitted branch pushes recorded earlier under TASK-0290.

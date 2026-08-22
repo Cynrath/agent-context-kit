@@ -1,3 +1,5 @@
+export type { FixOutcome, OptimizeSuggestion } from "./optimize.js";
+export { analyzeOptimize, applyFixes, naiveLineDiff } from "./optimize.js";
 export type { BuildPackOptions, PackManifestEntry, PackResult } from "./pack.js";
 export {
   assertNoSecretShapes,
