@@ -19,9 +19,9 @@
     "build": "tsc -p tsconfig.build.json",
     "gen:schemas": "node scripts/generate-schemas.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "biome check src tests scripts schemas examples benchmarks",
-    "format:check": "biome format src tests scripts schemas examples benchmarks",
-    "format": "biome format --write src tests scripts schemas examples benchmarks",
+    "lint": "biome check src tests scripts schemas examples",
+    "format:check": "biome format src tests scripts schemas examples",
+    "format": "biome format --write src tests scripts schemas examples",
     "test": "vitest run",
     "smoke:cli": "node tests/e2e/cli-scaffold.smoke.mjs"
   },

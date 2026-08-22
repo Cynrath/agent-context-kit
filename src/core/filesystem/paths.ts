@@ -2,10 +2,14 @@ import path from "node:path";
 import process from "node:process";
 
 /**
- * Converts a native path to canonical POSIX (forward-slash) form (REQ-TEST-007).
+ * Converts any path to canonical POSIX (forward-slash) form (REQ-TEST-007).
+ * Both separators are converted regardless of host platform: repository
+ * inputs may carry Windows-style backslashes on any OS, and canonical
+ * machine-independent output always uses "/". (Trade-off documented: a
+ * literal backslash inside a POSIX filename cannot be represented.)
  */
 export function toPosix(value: string): string {
-  return value.split(path.sep).join("/");
+  return value.split("\\").join("/");
 }
 
 export type NormalizeFailureReason = "absolute" | "escapes-root" | "empty-segment-invalid";
