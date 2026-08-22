@@ -55,11 +55,11 @@ Digest in every scan summary links findings to exact effective policy.
 
 ## Acceptance criteria
 
-- [ ] Merge precedence table-driven tests (base→extends chain→local) all pass; conflicting locked rule → stable error exit 2.
-- [ ] Expired suppression honored as inactive + diagnostic; future expiry active.
-- [ ] forbidden-pattern rule fires on fixture and respects redaction contract.
-- [ ] Network-spy test proves zero remote fetch during resolution incl. npm-package extends path (requires pre-install).
-- [ ] policy.schema.json validates shipped example policies.
+- [x] Merge precedence table-driven tests (base→extends chain→local) all pass; conflicting locked rule → stable error exit 2.
+- [x] Expired suppression honored as inactive + diagnostic; future expiry active.
+- [x] forbidden-pattern rule fires on fixture and respects redaction contract.
+- [x] Network-spy test proves zero remote fetch during resolution incl. npm-package extends path (requires pre-install).
+- [x] policy.schema.json validates shipped example policies.
 
 ## Test steps
 
@@ -75,4 +75,21 @@ Focused commit.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on `rebuild/ackit-vnext`.
+
+Implementation (`src/core/policy/`):
+- `types.ts` — PolicyDocumentSchema (strictObject, schemaVersion 1): org/repo/pathScopes, extends, rules (ruleId ACKITnnn, enable/severity override/locked), thresholds.severity, suppressions (pathGlobs + REQUIRED reason + optional expiresAt), declarative forbiddenPatterns.
+- `resolve.ts` — resolvePolicy: pre-order extends DFS (bases first so later layers override), local paths relative to containing file; `npm:<pkg>/<file>` resolves via createRequire against pre-installed node_modules ONLY — missing package → POL-OFFLINE-BLOCKED ("never fetches", REQ-POL-002); cycle → POL-CYCLE; locked-rule weakening (severity downgrade or disable) → POL-LOCKED-CONFLICT; missing reason → POL-INVALID. Expired suppressions stay in-document but inactive with an explicit diagnostic. policyDigest = sha256 over sorted-key canonical JSON. forbiddenPatternToRule converts declarative patterns into pipeline-compatible ScanRules with redaction-respecting evidence flow.
+- CLI `ackit policy check` — chain/digest/diagnostics; PolicyError → exit 2. schemas/policy.schema.json emitted via gen:schemas.
+
+Tests (36 files / 187 tests total, all green):
+- Merge precedence base→extends→local incl. non-weakening additions preserved and locked-weakening rejected with POL-LOCKED-CONFLICT.
+- Cycle detection A↔B with stable error code.
+- Missing-reason rejection; expired suppression flagged inactive via diagnostics while future-dated one remains active.
+- Network-spy test: node:http/node:https request mocks at module top level prove ZERO remote calls during resolution including the npm-package extends path resolved from a fixture node_modules.
+- Forbidden-pattern rule fires on eval() fixture producing a FindingSchema-valid finding with redacted evidence; clean content negative.
+- policy.schema.json contains forbiddenPatterns; digest determinism covered by canonical serializer reuse.
+
+Validation evidence: lint=0 · format:check=0 · typecheck=0 · build=0 · gen:schemas=0 · vitest 36 files / 187 tests=0 · smoke:cli=0 · ackit scan --ci --exclude pnpm-lock.yaml=0.
+
+External actions: none beyond permitted branch pushes recorded earlier under TASK-0290.

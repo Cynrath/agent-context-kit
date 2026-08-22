@@ -16,7 +16,10 @@ import {
   resolveEffectiveStack,
 } from "../core/instructions/index.js";
 import { planOrApplyInit } from "../core/onboarding/index.js";
+import type { PolicyDocument } from "../core/policy/index.js";
+import { PolicyError, policyDigest, resolvePolicy } from "../core/policy/index.js";
 import { renderScanJson, renderScanTerminal } from "../core/reporting/index.js";
+import type { Finding } from "../core/scanner/index.js";
 import { defaultRegistry, runScan, severityAtLeast } from "../core/scanner/index.js";
 import { validateSkills } from "../core/skills/index.js";
 import { installSkills } from "../core/skills/install.js";
@@ -313,6 +316,23 @@ function buildProgram(invocation: CliInvocation): Command {
         root: parentOptions.root,
         json: parentOptions.json ?? false,
         quiet: parentOptions.quiet ?? false,
+      });
+    });
+
+  const policyCommand = program
+    .command("policy")
+    .description("policy-as-code utilities (REQ-POL-001, offline by construction)");
+  policyCommand
+    .command("check")
+    .description("resolve the effective policy and print chain + digest + problems")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runPolicyCheckCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
       });
     });
 
@@ -1106,6 +1126,125 @@ export async function runCacheCleanCommand(options: {
     process.stdout.write(`cache clean: removed ${removedBytes} bytes from .ackit/cache\n`);
   }
   return EXIT_CODES.ok;
+}
+
+/** `ackit policy check` (REQ-POL-001/002). */
+export async function runPolicyCheckCommand(
+  options: Omit<InstructionsCommandOptions, "provider" | "forPath">,
+): Promise<ExitCodeValue> {
+  const rootRequested = path.resolve(options.root ?? process.cwd());
+  const configResult = await loadAckitConfig(rootRequested, { configPath: options.config });
+  if (!configResult.ok) {
+    for (const error of configResult.errors) {
+      emitDiagnostic(
+        { code: "config-error", message: renderConfigError(error) },
+        {
+          quiet: options.quiet,
+          debug: options.debug,
+        },
+      );
+    }
+    return EXIT_CODES.usage;
+  }
+  try {
+    const resolved = await resolvePolicy(rootResolutionSafe(rootRequested), {
+      entryFiles: configResult.config.policy.extends,
+    });
+    if (options.json) {
+      process.stdout.write(
+        `${JSON.stringify(
+          {
+            schemaVersion: "ackit.policy.v0",
+            tool: "ackit",
+            command: "policy check",
+            ok: true,
+            chain: resolved.chain,
+            digest: policyDigest(resolved.policy),
+            diagnostics: resolved.diagnostics,
+          },
+          null,
+          2,
+        )}\n`,
+      );
+    } else if (!options.quiet) {
+      process.stdout.write(
+        `policy OK — chain (${resolved.chain.length}), digest ${policyDigest(resolved.policy).slice(0, 12)}\n`,
+      );
+    }
+    return EXIT_CODES.ok;
+  } catch (error) {
+    if (error instanceof PolicyError) {
+      emitDiagnostic(
+        { code: error.code.toLowerCase(), message: error.message },
+        {
+          quiet: options.quiet,
+          debug: options.debug,
+        },
+      );
+      return EXIT_CODES.usage;
+    }
+    throw error;
+  }
+}
+
+function rootResolutionSafe(rootPath: string): { canonicalPath: string } {
+  return { canonicalPath: rootPath };
+}
+
+/** Applies an effective policy to findings: active suppressions + severity overrides. */
+export function applyPolicyToFindings(findings: Finding[], policy: PolicyDocument): Finding[] {
+  const today = new Date().toISOString().slice(0, 10);
+  const severityByRule = new Map(
+    policy.rules
+      .filter((rule) => rule.severity !== undefined)
+      .map((rule) => [rule.ruleId, rule.severity as string]),
+  );
+  const suppressionIndex = policy.suppressions
+    .filter((suppression) =>
+      suppression.expiresAt === undefined ? true : suppression.expiresAt >= today,
+    )
+    .map((suppression) => ({
+      ...suppression,
+      matcher: new RegExp(globToRegExpSource(suppression.pathGlobs)),
+      source: suppression,
+    }));
+  void suppressionIndex;
+  return findings.map((finding) => {
+    const override = severityByRule.get(finding.ruleId);
+    const suppressedByPolicy = policy.suppressions.some((suppression) => {
+      if (suppression.ruleId !== finding.ruleId) return false;
+      if (suppression.expiresAt !== undefined && suppression.expiresAt < today) return false;
+      const matcher = new RegExp(
+        `^(${suppression.pathGlobs.map(escapeGlob).join("|")})$`
+          .replace(/\*\*/g, ".*")
+          .replace(/\*/g, "[^/]*"),
+      );
+      return matcher.test(finding.relativePath);
+    });
+    if (suppressedByPolicy && !finding.suppressed) {
+      const match = policy.suppressions.find(
+        (suppression) => suppression.ruleId === finding.ruleId,
+      );
+      return {
+        ...finding,
+        suppressed: true,
+        suppressionReason: `policy suppression${match?.expiresAt !== undefined ? ` (expires ${match.expiresAt})` : ""}`,
+        ...(override !== undefined ? { severity: override as Finding["severity"] } : {}),
+      };
+    }
+    if (override !== undefined) {
+      return { ...finding, severity: override as Finding["severity"] };
+    }
+    return finding;
+  });
+}
+
+function escapeGlob(glob: string): string {
+  return glob.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function globToRegExpSource(_globs: readonly string[]): string {
+  return "";
 }
 
 async function main(): Promise<void> {

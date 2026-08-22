@@ -1,9 +1,8 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildContextPack, RANKING_WEIGHTS } from "../../../src/core/context/pack.js";
-import type { RepositoryRoot } from "../../../src/core/filesystem/root.js";
 
 let repo: { rootPath: string; cleanup(): Promise<void> };
 

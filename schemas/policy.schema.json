@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "org": {
+      "type": "string"
+    },
+    "repo": {
+      "type": "string"
+    },
+    "pathScopes": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "extends": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rules": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "pattern": "^ACKIT\\d{3}$"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "locked": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ruleId"
+        ]
+      }
+    },
+    "thresholds": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "severity": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        }
+      }
+    },
+    "suppressions": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "pattern": "^ACKIT\\d{3}$"
+          },
+          "pathGlobs": {
+            "default": [
+              "**"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expiresAt": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}"
+          }
+        },
+        "required": [
+          "ruleId",
+          "reason"
+        ]
+      }
+    },
+    "forbiddenPatterns": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^ACKIT\\d{3}$"
+          },
+          "pattern": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity": {
+            "default": "medium",
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "pattern",
+          "message"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion"
+  ],
+  "additionalProperties": false,
+  "$comment": "ACKit policy document schema v1 (REQ-POL-001)."
+}
