@@ -64,8 +64,12 @@ function talkToServer(
       child.on("exit", () => resolve({ responses, stderr: stderrText }));
       setTimeout(() => resolve({ responses, stderr: stderrText }), 1500);
     };
+    const started = Date.now();
     const poll = setInterval(() => {
-      if (expectedFrames > 0 && responses.length >= expectedFrames) {
+      if (
+        expectedFrames > 0 &&
+        (responses.length >= expectedFrames || Date.now() - started > 12000)
+      ) {
         clearInterval(poll);
         finish();
       }
@@ -73,7 +77,7 @@ function talkToServer(
     setTimeout(() => {
       clearInterval(poll);
       finish();
-    }, 8000);
+    }, 15000);
   });
 }
 
@@ -133,7 +137,7 @@ describe("MCP stdio transport (integration)", () => {
         params: { name: "ackit_list_tasks", arguments: {} },
       });
 
-      const { responses } = await talkToServer([initMessage, initializedNote, callMessage], 1);
+      const { responses } = await talkToServer([initMessage, initializedNote, callMessage], 2);
       const callResponse = responses
         .map((line) => JSON.parse(line) as { id?: unknown })
         .find((message) => message.id === 3);

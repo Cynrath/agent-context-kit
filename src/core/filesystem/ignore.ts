@@ -12,6 +12,19 @@ import picomatch from "picomatch";
  * 2. per-directory .gitignore stack (root → current directory; deeper wins)
  * 3. user exclude globs from configuration
  */
+export const IGNORED_DIR_NAMES: readonly string[] = [
+  ".git",
+  "node_modules",
+  "vendor",
+  "packages",
+  "dist",
+  "build",
+  "out",
+  "coverage",
+  ".ackit",
+  "artifacts",
+];
+
 export const BUILTIN_IGNORED_DIRECTORIES = new Set([
   ".git",
   "node_modules",

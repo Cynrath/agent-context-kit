@@ -17,11 +17,21 @@ import {
 } from "../core/instructions/index.js";
 import { planOrApplyInit } from "../core/onboarding/index.js";
 import { PolicyError, policyDigest, resolvePolicy } from "../core/policy/index.js";
-import { renderScanJson, renderScanTerminal } from "../core/reporting/index.js";
+import {
+  assertBindableHost,
+  renderHtmlReport,
+  renderMarkdownReport,
+  renderSarif,
+  renderScanJson,
+  renderScanTerminal,
+  serveReportFile,
+} from "../core/reporting/index.js";
 import { defaultRegistry, runScan, severityAtLeast } from "../core/scanner/index.js";
 import { validateSkills } from "../core/skills/index.js";
 import { installSkills } from "../core/skills/install.js";
 import { TaskStore } from "../core/tasks/index.js";
+import { hookStatus, installHook, uninstallHook } from "../core/watch/hooks.js";
+import { startWatch } from "../core/watch/watch.js";
 import { detectWorkspaces } from "../core/workspace/index.js";
 import { emitDiagnostic } from "../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../shared/exit-codes.js";
@@ -95,6 +105,9 @@ function buildProgram(invocation: CliInvocation): Command {
     .option("--range <a..b>", "incremental: files changed in commit range")
     .option("--baseline <file>", "compare findings against a baseline JSON")
     .option("--write-baseline <file>", "write current findings as baseline JSON")
+    .option("--format <fmt>", "output format: terminal|json|sarif|markdown|html", "terminal")
+    .option("--output <file>", "write report to this file instead of stdout")
+    .option("--watch", "re-run scan on file changes until Ctrl+C", false)
     .action(async () => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
       const commandOptions = (scanCommand.opts() ?? {}) as {
@@ -105,6 +118,9 @@ function buildProgram(invocation: CliInvocation): Command {
         range?: string;
         baseline?: string;
         writeBaseline?: string;
+        format?: string;
+        output?: string;
+        watch?: boolean;
       };
       invocation.exitCode = await runScanCommand({
         root: parentOptions.root,
@@ -119,6 +135,9 @@ function buildProgram(invocation: CliInvocation): Command {
         range: commandOptions.range,
         baseline: commandOptions.baseline,
         writeBaseline: commandOptions.writeBaseline,
+        format: commandOptions.format ?? "terminal",
+        output: commandOptions.output,
+        watch: commandOptions.watch ?? false,
       });
     });
 
@@ -382,6 +401,75 @@ function buildProgram(invocation: CliInvocation): Command {
       });
     });
 
+  const reportCommand = program.command("report").description("report utilities");
+  reportCommand
+    .command("serve")
+    .description("serve an HTML report on loopback (read-only)")
+    .argument("<file>")
+    .option("--host <host>", "bind host (default 127.0.0.1)", "127.0.0.1")
+    .option("--port <n>", "port (default: random free)", Number.parseInt)
+    .option("--allow-nonlocal", "explicitly allow binding a non-loopback host", false)
+    .action(
+      async (file: string, opts: { host?: string; port?: number; allowNonlocal?: boolean }) => {
+        const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+        invocation.exitCode = await runReportServeCommand({
+          root: parentOptions.root,
+          json: parentOptions.json ?? false,
+          quiet: parentOptions.quiet ?? false,
+          file,
+          host: opts.host ?? "127.0.0.1",
+          port: Number.isFinite(opts.port) ? (opts.port as number) : undefined,
+          allowNonLocal: opts.allowNonlocal ?? false,
+        });
+      },
+    );
+
+  const hooksCommand = program
+    .command("hooks")
+    .description("git pre-commit hook management (REQ-WATCH-002)");
+  hooksCommand
+    .command("install")
+    .description("append the ACKit managed pre-commit block, preserving user content")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runHooksCommand(
+        {
+          root: parentOptions.root,
+          json: parentOptions.json ?? false,
+          quiet: parentOptions.quiet ?? false,
+        },
+        "install",
+      );
+    });
+  hooksCommand
+    .command("uninstall")
+    .description("remove only the ACKit managed lines")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runHooksCommand(
+        {
+          root: parentOptions.root,
+          json: parentOptions.json ?? false,
+          quiet: parentOptions.quiet ?? false,
+        },
+        "uninstall",
+      );
+    });
+  hooksCommand
+    .command("status")
+    .description("report hook installation status")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runHooksCommand(
+        {
+          root: parentOptions.root,
+          json: parentOptions.json ?? false,
+          quiet: parentOptions.quiet ?? false,
+        },
+        "status",
+      );
+    });
+
   program.addHelpText("after", `\n${HELP_TEXT_SUFFIX}`);
   return program;
 }
@@ -532,6 +620,9 @@ export async function runConfigCheck(options: Partial<GlobalOptions>): Promise<E
 }
 
 interface ScanCommandOptions {
+  format?: string | undefined;
+  output?: string | undefined;
+  watch?: boolean | undefined;
   root?: string | undefined;
   config?: string | undefined;
   json: boolean;
@@ -641,13 +732,78 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
     }
   }
 
-  if (options.json) {
-    process.stdout.write(renderScanJson(result, { newCount, fixedCount }));
-  } else if (!options.quiet) {
-    process.stdout.write(renderScanTerminal(result));
-    if (newCount !== null && fixedCount !== null) {
-      process.stdout.write(`Baseline delta: ${newCount} new, ${fixedCount} fixed.\n`);
+  const effectiveFormat = options.json === true ? "json" : (options.format ?? "terminal");
+  const reportMeta = {
+    filesScanned: result.filesScanned,
+    policyDigest: configResult.ok ? configResult.digest : "",
+  };
+  const renderFor = (format: string): string => {
+    switch (format) {
+      case "json":
+        return renderScanJson(result, { newCount, fixedCount });
+      case "sarif":
+        return renderSarif(result.findings, {
+          policyDigest: configResult.ok ? configResult.digest : "",
+        });
+      case "markdown":
+        return renderMarkdownReport(result.findings, reportMeta);
+      case "html":
+        return renderHtmlReport(result.findings, reportMeta);
+      default:
+        return (
+          renderScanTerminal(result) +
+          (newCount !== null && fixedCount !== null
+            ? `Baseline delta: ${newCount} new, ${fixedCount} fixed.\n`
+            : "")
+        );
     }
+  };
+
+  if (options.watch === true) {
+    // Watch loop (REQ-WATCH-001): initial scan, then debounced re-scans.
+    if (!options.quiet && !options.json) {
+      process.stdout.write(renderFor(effectiveFormat));
+      process.stdout.write("watching for changes... (Ctrl+C to stop)\n");
+    }
+    let rerunning = false;
+    const controller = new AbortController();
+    process.on("SIGINT", () => controller.abort());
+    const handle = startWatch(rootResolution.root.canonicalPath, {
+      signal: controller.signal,
+      onChange: () => {
+        if (rerunning) return;
+        rerunning = true;
+        void runScan(rootResolution.root, {
+          rules: defaultRegistry.getAll(),
+          limits: configResult.config.limits,
+          userExcludeGlobs: configResult.config.scan.exclude,
+          filterPaths,
+        })
+          .then((rerun) => {
+            result.findings = rerun.findings;
+            result.filesScanned = rerun.filesScanned;
+            result.diagnostics = rerun.diagnostics;
+            if (!options.quiet && !options.json) process.stdout.write("re-scan complete.\n");
+          })
+          .finally(() => {
+            rerunning = false;
+          });
+      },
+    });
+    await handle.done;
+    if (!options.quiet && !options.json) process.stdout.write("watch stopped cleanly (exit 0).\n");
+    return EXIT_CODES.ok;
+  }
+
+  const rendered = renderFor(effectiveFormat);
+  if (options.output !== undefined) {
+    await import("node:fs/promises").then((fsp) =>
+      fsp.writeFile(path.resolve(options.output as string), rendered, "utf8"),
+    );
+    if (!options.quiet && !options.json)
+      process.stdout.write(`report written to ${options.output}\n`);
+  } else {
+    process.stdout.write(rendered);
   }
 
   if (options.ci || newCount !== null) {
@@ -1350,6 +1506,76 @@ export async function runOptimizeCommand(
         `fix ${outcome.action} ${outcome.target}${outcome.detail.startsWith("+") || outcome.detail.startsWith("-") ? `\n${outcome.detail}` : ` — ${outcome.detail}`}\n`,
       );
     }
+  }
+  return EXIT_CODES.ok;
+}
+
+/** `ackit report serve` (REQ-RPT-002): loopback-only by default. */
+export async function runReportServeCommand(
+  options: Omit<InstructionsCommandOptions, "provider" | "forPath" | "debug"> & {
+    file: string;
+    host: string;
+    port?: number | undefined;
+    allowNonLocal: boolean;
+  },
+): Promise<ExitCodeValue> {
+  try {
+    assertBindableHost(options.host, options.allowNonLocal);
+  } catch (error) {
+    emitDiagnostic(
+      {
+        code: (error as PolicyError).code?.toLowerCase() ?? "nonlocal-refused",
+        message: (error as Error).message,
+      },
+      { quiet: options.quiet, debug: false },
+    );
+    return EXIT_CODES.usage;
+  }
+  const handle = await serveReportFile({
+    file: options.file,
+    host: options.host,
+    port: options.port,
+  });
+  if (!options.quiet) {
+    process.stdout.write(
+      `report serving at http://${options.host}:${handle.port} (Ctrl+C to stop)\n`,
+    );
+  }
+  await new Promise<void>((resolve) => process.on("SIGINT", resolve));
+  await handle.close();
+  return EXIT_CODES.ok;
+}
+
+/** `ackit hooks install|uninstall|status`. */
+export async function runHooksCommand(
+  base: { root?: string | undefined; json: boolean; quiet: boolean },
+  action: "install" | "uninstall" | "status",
+): Promise<ExitCodeValue> {
+  const repoRoot = path.resolve(base.root ?? process.cwd());
+  let payload: Record<string, unknown>;
+  switch (action) {
+    case "install": {
+      const result = await installHook(repoRoot);
+      payload = { action, ...result };
+      break;
+    }
+    case "uninstall": {
+      const result = await uninstallHook(repoRoot);
+      payload = { action, ...result };
+      break;
+    }
+    default: {
+      const result = await hookStatus(repoRoot);
+      payload = { action: "status", ...result };
+    }
+  }
+  if (base.json) {
+    process.stdout.write(
+      `${JSON.stringify({ schemaVersion: "ackit.hooks.v0", tool: "ackit", command: `hooks ${action}`, ...payload }, null, 2)}\n`,
+    );
+  } else if (!base.quiet) {
+    const status = (payload as { status?: string }).status ?? "";
+    process.stdout.write(`hooks ${action}: ${status}\n`);
   }
   return EXIT_CODES.ok;
 }
