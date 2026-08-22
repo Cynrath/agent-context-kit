@@ -6,6 +6,11 @@ import { fileURLToPath } from "node:url";
 import { Command, CommanderError } from "commander";
 import { type ConfigError, loadAckitConfig } from "../core/config/index.js";
 import { resolveRepositoryRoot } from "../core/filesystem/root.js";
+import {
+  buildInstructionGraph,
+  type ProviderId,
+  resolveEffectiveStack,
+} from "../core/instructions/index.js";
 import { renderScanJson, renderScanTerminal } from "../core/reporting/index.js";
 import { defaultRegistry, runScan, severityAtLeast } from "../core/scanner/index.js";
 import { emitDiagnostic } from "../shared/diagnostics.js";
@@ -84,6 +89,32 @@ function buildProgram(invocation: CliInvocation): Command {
         quiet: parentOptions.quiet ?? false,
         debug: parentOptions.debug ?? false,
         ci: commandOptions.ci ?? false,
+      });
+    });
+
+  const instructionsCommand = program
+    .command("instructions")
+    .description("discover and resolve the agent instruction graph");
+  instructionsCommand
+    .option(
+      "--provider <id>",
+      "restrict effective resolution to one provider (codex|claude|gemini|copilot)",
+    )
+    .option("--for <path>", "repository-relative path for applyTo matching")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const commandOptions = (instructionsCommand.opts() ?? {}) as {
+        provider?: string;
+        for?: string;
+      };
+      invocation.exitCode = await runInstructionsCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        provider: commandOptions.provider,
+        forPath: commandOptions.for,
       });
     });
 
@@ -305,6 +336,100 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
 function toRepoRelative(root: string, absolutePath: string): string {
   const relative = path.relative(root, absolutePath);
   return relative.split(path.sep).join("/");
+}
+
+const INSTRUCTIONS_REPORT_SCHEMA_VERSION = "ackit.instructions.v0";
+
+interface InstructionsCommandOptions {
+  root?: string | undefined;
+  config?: string | undefined;
+  json: boolean;
+  quiet: boolean;
+  debug: boolean;
+  provider?: string | undefined;
+  forPath?: string | undefined;
+}
+
+/**
+ * `ackit instructions` (REQ-INSTR-001..003): prints the discovered graph as
+ * a stable tree, or pure JSON; --provider/--for resolve an effective stack.
+ */
+export async function runInstructionsCommand(
+  options: InstructionsCommandOptions,
+): Promise<ExitCodeValue> {
+  const rootRequested = path.resolve(options.root ?? process.cwd());
+  const configResult = await loadAckitConfig(rootRequested, { configPath: options.config });
+  if (!configResult.ok) {
+    for (const error of configResult.errors) {
+      emitDiagnostic(
+        { code: "config-error", message: renderConfigError(error) },
+        {
+          quiet: options.quiet,
+          debug: options.debug,
+        },
+      );
+    }
+    return EXIT_CODES.usage;
+  }
+  const rootResolution = await resolveRepositoryRoot(rootRequested);
+  if (!rootResolution.ok) {
+    emitDiagnostic(
+      { code: "environment-error", message: rootResolution.diagnostic.message },
+      { quiet: options.quiet, debug: options.debug },
+    );
+    return EXIT_CODES.environment;
+  }
+
+  const graph = await buildInstructionGraph(rootResolution.root, {
+    maxTokenEstimatePerFile: configResult.config.instructions.maxTokenEstimatePerFile,
+  });
+
+  if (options.json) {
+    let chain: string[] | null = null;
+    if (options.provider !== undefined) {
+      const provider = options.provider as ProviderId;
+      chain = resolveEffectiveStack(graph, provider, options.forPath ?? "");
+    }
+    process.stdout.write(
+      `${JSON.stringify(
+        {
+          schemaVersion: INSTRUCTIONS_REPORT_SCHEMA_VERSION,
+          tool: "ackit",
+          command: "instructions",
+          nodeCount: graph.nodes.length,
+          effectiveChain: chain,
+          nodes: graph.nodes,
+          diagnostics: graph.diagnostics,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+    return EXIT_CODES.ok;
+  }
+
+  if (!options.quiet) {
+    for (const node of graph.nodes) {
+      const indent = "  ".repeat(Math.min(node.depth, 6));
+      const applyLabel = node.applyTo !== null ? ` [applyTo: ${node.applyTo.join(", ")}]` : "";
+      process.stdout.write(
+        `${indent}${node.provider}/${node.kind} ${node.relativePath}${applyLabel} (${node.tokenEstimate} tokens)\n`,
+      );
+    }
+    if (graph.diagnostics.length > 0) {
+      process.stdout.write(`Diagnostics (${graph.diagnostics.length})\n`);
+      for (const diagnostic of graph.diagnostics) {
+        emitDiagnostic(
+          {
+            code: diagnostic.code.toLowerCase(),
+            message: `${diagnostic.relativePath ?? ""}: ${diagnostic.message}`,
+          },
+          { quiet: false, debug: options.debug },
+        );
+      }
+    }
+  }
+  return EXIT_CODES.ok;
 }
 
 async function main(): Promise<void> {
