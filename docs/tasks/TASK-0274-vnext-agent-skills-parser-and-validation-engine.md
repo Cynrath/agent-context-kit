@@ -54,11 +54,11 @@ Findings reuse scan finding contract shape where sensible (documented mapping).
 
 ## Acceptance criteria
 
-- [ ] Unit matrix covers every REQ-SKILL-005 check with positive+negative fixture.
-- [ ] Duplicate skill names across nested dirs flagged.
-- [ ] Reference pointing outside repo root → strict error; relative deep chain > threshold → warning tier.
-- [ ] SKILL.md containing `scripts/run.sh` → reported as present, zero execution attempts (assert via fs spy).
-- [ ] Valid ACKit repo skills validate clean end-to-end.
+- [x] Unit matrix covers every REQ-SKILL-005 check with positive+negative fixture.
+- [x] Duplicate skill names across nested dirs flagged.
+- [x] Reference pointing outside repo root → strict error; relative deep chain > threshold → warning tier.
+- [x] SKILL.md containing `scripts/run.sh` → reported as present, zero execution attempts (assert via fs spy).
+- [x] Valid ACKit repo skills validate clean end-to-end.
 
 ## Test steps
 
@@ -74,4 +74,20 @@ Focused commit.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on `rebuild/ackit-vnext`.
+
+Implementation:
+- `src/core/skills/types.ts` — SkillRecord (name/description/relativePath/checksum/tokenEstimate/scripts/references/assets), SkillIssue with strict|warning tiers, SKILL_PATH_PATTERN for `.agents/skills/<name>/SKILL.md` at any depth, kebab-name validator, MAX_DESCRIPTION_LENGTH=1024, MAX_REFERENCE_CHAIN_DEPTH=3.
+- `src/core/skills/validate.ts` — validateSkills: discovery over realpath'd root; frontmatter via shared extractFrontmatter (BOM-tolerant); strict checks SKILL-FRONTMATTER-MISSING (also covers invalid YAML), SKILL-NAME-MISSING/INVALID (kebab), SKILL-DIR-MISMATCH, SKILL-DESCRIPTION-MISSING, SKILL-DUPLICATE (cross-directory), SKILL-BROKEN-REF, SKILL-ROOT-ESCAPE (strict); warnings SKILL-DESCRIPTION-LONG, SKILL-OVERSIZE (shared estimator), SKILL-EXTERNAL-REF, SKILL-DEEP-CHAIN (BFS depth>3). Scripts/references/assets dirs are enumerated and reported only — the module performs no dynamic imports or process spawning (REQ-SKILL-006).
+- CLI: `ackit skills validate` (0 clean / 1 findings / 2 usage per taxonomy; JSON mode schemaVersion ackit.skills.v0 with skills+issues) and `ackit skills list`.
+
+Tests (24 files / 133 tests total, all green):
+- REQ-SKILL-005 matrix positive+negative per check incl. duplicate names across nested workspace-style roots, out-of-root strict error (4× ../ from skill depth), broken local ref strict, deep-chain warning tier assertion, CRLF+BOM fixture without false positives.
+- Zero-execution proof: `node:child_process` module mocked at top level with spies; full validation run asserts spawn/exec/execFile never called while scripts/run.sh presence is reported.
+- Real-repository end-to-end validation runs clean.
+
+Notes: two genuine cross-platform fixes surfaced by tests and folded in: skill discovery now POSIX-normalizes candidate paths before pattern matching (Windows backslashes previously hid every skill), and frontmatter extraction strips a leading BOM so CRLF/BOM fixtures parse. Root-escape semantics documented: escaping requires more `..` than the skill's depth; shallower overshoot resolves to an existing-root path handled as broken-ref/valid.
+
+Validation evidence: lint=0 · format:check=0 · typecheck=0 · build=0 · vitest 24 files / 133 tests=0 · smoke:cli=0 · ackit scan --ci --exclude pnpm-lock.yaml=0.
+
+External actions: none beyond permitted branch pushes recorded earlier under TASK-0290.

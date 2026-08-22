@@ -13,21 +13,22 @@ const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
  * the file does not start with a `---` block.
  */
 export function extractFrontmatter(content: string): FrontmatterResult {
-  const match = FRONTMATTER_PATTERN.exec(content);
+  const normalized = content.replace(/^\uFEFF/, "");
+  const match = FRONTMATTER_PATTERN.exec(normalized);
   if (match === null) {
-    return { frontmatter: null, body: content };
+    return { frontmatter: null, body: normalized };
   }
   try {
     const parsed = parse(match[1] ?? "");
     if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
       return {
         frontmatter: parsed as Record<string, unknown>,
-        body: content.slice(match[0].length),
+        body: normalized.slice(match[0].length),
       };
     }
-    return { frontmatter: null, body: content.slice(match[0].length) };
+    return { frontmatter: null, body: normalized.slice(match[0].length) };
   } catch {
-    return { frontmatter: null, body: content.slice(match[0].length) };
+    return { frontmatter: null, body: normalized.slice(match[0].length) };
   }
 }
 

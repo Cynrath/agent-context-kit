@@ -13,6 +13,7 @@ import {
 } from "../core/instructions/index.js";
 import { renderScanJson, renderScanTerminal } from "../core/reporting/index.js";
 import { defaultRegistry, runScan, severityAtLeast } from "../core/scanner/index.js";
+import { validateSkills } from "../core/skills/index.js";
 import { emitDiagnostic } from "../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../shared/exit-codes.js";
 import { getPackageIdentity } from "../shared/version.js";
@@ -115,6 +116,34 @@ function buildProgram(invocation: CliInvocation): Command {
         debug: parentOptions.debug ?? false,
         provider: commandOptions.provider,
         forPath: commandOptions.for,
+      });
+    });
+
+  const skillsCommand = program.command("skills").description("agent skills utilities");
+  skillsCommand
+    .command("validate")
+    .description("validate .agents/skills against the open standard (strict + warning tiers)")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runSkillsValidateCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+      });
+    });
+  skillsCommand
+    .command("list")
+    .description("list discovered agent skills")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runSkillsListCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
       });
     });
 
@@ -427,6 +456,109 @@ export async function runInstructionsCommand(
           { quiet: false, debug: options.debug },
         );
       }
+    }
+  }
+  return EXIT_CODES.ok;
+}
+
+const SKILLS_REPORT_SCHEMA_VERSION = "ackit.skills.v0";
+
+async function loadValidatedSkills(
+  options: Omit<InstructionsCommandOptions, "provider" | "forPath">,
+): Promise<
+  | { ok: true; result: Awaited<ReturnType<typeof validateSkills>> }
+  | { ok: false; exitCode: ExitCodeValue }
+> {
+  const rootRequested = path.resolve(options.root ?? process.cwd());
+  const configResult = await loadAckitConfig(rootRequested, { configPath: options.config });
+  if (!configResult.ok) {
+    for (const error of configResult.errors) {
+      emitDiagnostic(
+        { code: "config-error", message: renderConfigError(error) },
+        {
+          quiet: options.quiet,
+          debug: options.debug,
+        },
+      );
+    }
+    return { ok: false, exitCode: EXIT_CODES.usage };
+  }
+  const rootResolution = await resolveRepositoryRoot(rootRequested);
+  if (!rootResolution.ok) {
+    emitDiagnostic(
+      { code: "environment-error", message: rootResolution.diagnostic.message },
+      { quiet: options.quiet, debug: options.debug },
+    );
+    return { ok: false, exitCode: EXIT_CODES.environment };
+  }
+  const result = await validateSkills(rootResolution.root);
+  return { ok: true, result };
+}
+
+/** `ackit skills validate`: 0 clean, 1 findings (strict or warning), 2 usage. */
+export async function runSkillsValidateCommand(
+  options: Omit<InstructionsCommandOptions, "provider" | "forPath">,
+): Promise<ExitCodeValue> {
+  const loaded = await loadValidatedSkills(options);
+  if (!loaded.ok) return loaded.exitCode;
+  const { skills, issues } = loaded.result;
+  if (options.json) {
+    process.stdout.write(
+      `${JSON.stringify(
+        {
+          schemaVersion: SKILLS_REPORT_SCHEMA_VERSION,
+          tool: "ackit",
+          command: "skills validate",
+          skillCount: skills.length,
+          issueCount: issues.length,
+          skills,
+          issues,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+  } else if (!options.quiet) {
+    process.stdout.write(`${skills.length} skill(s), ${issues.length} issue(s)\n`);
+    for (const issue of issues) {
+      emitDiagnostic(
+        {
+          code: `skill-${issue.id.toLowerCase()}`,
+          message: `${issue.relativePath}: ${issue.message} [${issue.tier}]`,
+        },
+        { quiet: false, debug: options.debug },
+      );
+    }
+  }
+  return issues.length > 0 ? EXIT_CODES.thresholdExceeded : EXIT_CODES.ok;
+}
+
+/** `ackit skills list`. */
+export async function runSkillsListCommand(
+  options: Omit<InstructionsCommandOptions, "provider" | "forPath">,
+): Promise<ExitCodeValue> {
+  const loaded = await loadValidatedSkills(options);
+  if (!loaded.ok) return loaded.exitCode;
+  const { skills } = loaded.result;
+  if (options.json) {
+    process.stdout.write(
+      `${JSON.stringify(
+        {
+          schemaVersion: SKILLS_REPORT_SCHEMA_VERSION,
+          tool: "ackit",
+          command: "skills list",
+          skills,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+  } else if (!options.quiet) {
+    for (const skill of skills) {
+      process.stdout.write(`${skill.name} — ${skill.description} (${skill.relativePath})\n`);
+    }
+    if (skills.length === 0) {
+      process.stdout.write("No agent skills discovered.\n");
     }
   }
   return EXIT_CODES.ok;
