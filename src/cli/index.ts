@@ -14,6 +14,7 @@ import {
 import { renderScanJson, renderScanTerminal } from "../core/reporting/index.js";
 import { defaultRegistry, runScan, severityAtLeast } from "../core/scanner/index.js";
 import { validateSkills } from "../core/skills/index.js";
+import { installSkills, lockHasAbsolutePaths, readSkillsLock } from "../core/skills/install.js";
 import { emitDiagnostic } from "../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../shared/exit-codes.js";
 import { getPackageIdentity } from "../shared/version.js";
@@ -144,6 +145,23 @@ function buildProgram(invocation: CliInvocation): Command {
         json: parentOptions.json ?? false,
         quiet: parentOptions.quiet ?? false,
         debug: parentOptions.debug ?? false,
+      });
+    });
+
+  skillsCommand
+    .command("install")
+    .description("install the four built-in ACKit skills idempotently")
+    .option("--force", "discard local edits on OWNED skills (third-party names still refused)")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const commandOptions = (skillsCommand.opts() ?? {}) as { force?: boolean };
+      invocation.exitCode = await runSkillsInstallCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        force: commandOptions.force ?? false,
       });
     });
 
@@ -560,6 +578,57 @@ export async function runSkillsListCommand(
     if (skills.length === 0) {
       process.stdout.write("No agent skills discovered.\n");
     }
+  }
+  return EXIT_CODES.ok;
+}
+
+/** `ackit skills install`: ownership-safe idempotent builtin installation. */
+export async function runSkillsInstallCommand(
+  options: Omit<InstructionsCommandOptions, "provider" | "forPath"> & { force: boolean },
+): Promise<ExitCodeValue> {
+  const rootRequested = path.resolve(options.root ?? process.cwd());
+  const rootResolution = await resolveRepositoryRoot(rootRequested);
+  if (!rootResolution.ok) {
+    emitDiagnostic(
+      { code: "environment-error", message: rootResolution.diagnostic.message },
+      { quiet: options.quiet, debug: options.debug },
+    );
+    return EXIT_CODES.environment;
+  }
+  const outcomes = await installSkills(rootResolution.root, { force: options.force });
+  if (options.json) {
+    process.stdout.write(
+      `${JSON.stringify(
+        {
+          schemaVersion: SKILLS_REPORT_SCHEMA_VERSION,
+          tool: "ackit",
+          command: "skills install",
+          outcomes,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+  } else if (!options.quiet) {
+    for (const outcome of outcomes) {
+      process.stdout.write(`${outcome.skill}: ${outcome.status} — ${outcome.message}\n`);
+    }
+  }
+  const refused = outcomes.filter(
+    (outcome) =>
+      outcome.status === "refused-third-party" || outcome.status === "conflict-user-modified",
+  );
+  if (refused.length > 0) {
+    for (const outcome of refused) {
+      emitDiagnostic(
+        {
+          code: "ownership-conflict",
+          message: `${outcome.skill}: ${outcome.message}`,
+        },
+        { quiet: options.quiet, debug: options.debug },
+      );
+    }
+    return EXIT_CODES.securityBoundary;
   }
   return EXIT_CODES.ok;
 }
