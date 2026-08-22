@@ -102,3 +102,13 @@ If context is low or work pauses, update:
 - `.codex/SESSION_HANDOFF.md`
 - `.codex/NEXT_STEPS.md`
 - The active task file completion notes
+
+## vNext Rebuild Transition (GOAL 2 active)
+
+When working on branch `rebuild/ackit-vnext`, the canonical entry point is `docs/rebuild/GOAL2_BOOTSTRAP.md`:
+
+- Requirements: `docs/rebuild/VNEXT_REQUIREMENTS.md`; execution waves + binding next-task rule: `docs/rebuild/VNEXT_EXECUTION_ORDER.md`; traceability: `docs/rebuild/VNEXT_TRACEABILITY.md`; ADRs: `docs/rebuild/decisions/`.
+- The vNext rebuild targets TypeScript/Node/npm. On this branch, each task's own validation plan (in its task doc) is authoritative; the .NET checks below apply only to v1/master maintenance work, not to vNext implementation tasks.
+- Task-first rule unchanged: new work requires a task doc under `docs/tasks/` created with the installed `ackit task` command; vNext child tasks are TASK-0264..0289.
+- v1 release immutability rules above remain fully in force on every branch.
+- External actions ban during rebuild: no remote push, tags, releases, or package publishes from agent sessions.
