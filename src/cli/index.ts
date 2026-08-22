@@ -4,9 +4,12 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { Command, CommanderError } from "commander";
+import { compareBaseline, readBaseline, writeBaseline } from "../core/cache/baseline.js";
+import { cleanCache } from "../core/cache/cache.js";
 import { type ConfigError, loadAckitConfig } from "../core/config/index.js";
 import { buildContextPack } from "../core/context/index.js";
 import { resolveRepositoryRoot } from "../core/filesystem/root.js";
+import { changedFiles, rangeFiles, sinceFiles, stagedFiles } from "../core/git/git.js";
 import {
   buildInstructionGraph,
   type ProviderId,
@@ -84,9 +87,23 @@ function buildProgram(invocation: CliInvocation): Command {
   const scanCommand = program.command("scan").description("scan the repository for problems");
   scanCommand
     .option("--ci", "enforce the configured severity threshold as a CI gate (exit 1 when exceeded)")
+    .option("--changed", "incremental: only git-changed/untracked files", false)
+    .option("--staged", "incremental: only git-staged files", false)
+    .option("--since <ref>", "incremental: files changed since <ref>")
+    .option("--range <a..b>", "incremental: files changed in commit range")
+    .option("--baseline <file>", "compare findings against a baseline JSON")
+    .option("--write-baseline <file>", "write current findings as baseline JSON")
     .action(async () => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
-      const commandOptions = (scanCommand.opts() ?? {}) as { ci?: boolean };
+      const commandOptions = (scanCommand.opts() ?? {}) as {
+        ci?: boolean;
+        changed?: boolean;
+        staged?: boolean;
+        since?: string;
+        range?: string;
+        baseline?: string;
+        writeBaseline?: string;
+      };
       invocation.exitCode = await runScanCommand({
         root: parentOptions.root,
         config: parentOptions.config,
@@ -94,6 +111,12 @@ function buildProgram(invocation: CliInvocation): Command {
         quiet: parentOptions.quiet ?? false,
         debug: parentOptions.debug ?? false,
         ci: commandOptions.ci ?? false,
+        changed: commandOptions.changed ?? false,
+        staged: commandOptions.staged ?? false,
+        since: commandOptions.since,
+        range: commandOptions.range,
+        baseline: commandOptions.baseline,
+        writeBaseline: commandOptions.writeBaseline,
       });
     });
 
@@ -280,6 +303,19 @@ function buildProgram(invocation: CliInvocation): Command {
       });
     });
 
+  const cacheCommand = program.command("cache").description("ACKit cache utilities");
+  cacheCommand
+    .command("clean")
+    .description("remove the ACKit scan cache tree only (.ackit/cache)")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runCacheCleanCommand({
+        root: parentOptions.root,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+      });
+    });
+
   program.addHelpText("after", `\n${HELP_TEXT_SUFFIX}`);
   return program;
 }
@@ -436,12 +472,19 @@ interface ScanCommandOptions {
   quiet: boolean;
   debug: boolean;
   ci: boolean;
+  changed?: boolean | undefined;
+  staged?: boolean | undefined;
+  since?: string | undefined;
+  range?: string | undefined;
+  baseline?: string | undefined;
+  writeBaseline?: string | undefined;
 }
 
 /**
- * `ackit scan` (REQ-SCAN-001/007): pipeline over the fs engine; exit 1 when
- * --ci and findings meet/exceed the configured severity threshold, 2 on
- * invalid config, 0 otherwise (ADR-0007).
+ * `ackit scan` (REQ-SCAN-001/007, REQ-BASE-001): pipeline over the fs engine
+ * with git-aware incremental sets and baseline compare/write; exit codes per
+ * ADR-0007 (1 threshold/--ci exceeded or new-vs-baseline, 2 invalid config,
+ * 3 environment).
  */
 export async function runScanCommand(options: ScanCommandOptions): Promise<ExitCodeValue> {
   const rootRequested = path.resolve(options.root ?? process.cwd());
@@ -468,26 +511,90 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
     return EXIT_CODES.environment;
   }
 
+  // Incremental candidate set (REQ-BASE-003). Non-git + any incremental flag
+  // is invalid usage of the flag in that context → exit 2 with clear reason.
+  let filterPaths: Set<string> | undefined;
+  try {
+    if (
+      options.changed ||
+      options.staged ||
+      options.since !== undefined ||
+      options.range !== undefined
+    ) {
+      const paths = new Set<string>();
+      if (options.changed) for (const file of changedFiles(rootRequested)) paths.add(file);
+      if (options.staged) for (const file of stagedFiles(rootRequested)) paths.add(file);
+      if (options.since !== undefined)
+        for (const file of sinceFiles(rootRequested, options.since)) paths.add(file);
+      if (options.range !== undefined) {
+        const [from, to] = options.range.split("..");
+        for (const file of rangeFiles(rootRequested, from ?? "HEAD", to ?? "HEAD")) paths.add(file);
+      }
+      filterPaths = paths;
+    }
+  } catch (error) {
+    emitDiagnostic(
+      { code: "git-unavailable", message: (error as Error).message },
+      { quiet: options.quiet, debug: options.debug },
+    );
+    return EXIT_CODES.usage;
+  }
+
   const result = await runScan(rootResolution.root, {
     rules: defaultRegistry.getAll(),
     limits: configResult.config.limits,
     userExcludeGlobs: configResult.config.scan.exclude,
+    filterPaths,
   });
 
-  if (options.json) {
-    process.stdout.write(renderScanJson(result));
-  } else if (!options.quiet) {
-    process.stdout.write(renderScanTerminal(result));
+  let newCount: number | null = null;
+  let fixedCount: number | null = null;
+  if (options.baseline !== undefined) {
+    const baseline = await readBaseline(rootResolution.root, options.baseline);
+    if (baseline === null) {
+      emitDiagnostic(
+        {
+          code: "baseline-error",
+          message: `cannot read/validate baseline '${options.baseline}'`,
+        },
+        { quiet: options.quiet, debug: options.debug },
+      );
+      return EXIT_CODES.usage;
+    }
+    const diff = compareBaseline(result.findings, baseline);
+    newCount = diff.newFindings.length;
+    fixedCount = diff.fixedCount;
   }
 
-  if (options.ci) {
+  if (options.writeBaseline !== undefined) {
+    await writeBaseline(rootResolution.root, result.findings, options.writeBaseline);
+    if (!options.json && !options.quiet) {
+      process.stdout.write(
+        `baseline written to ${options.writeBaseline} (${result.findings.length} findings)\n`,
+      );
+    }
+  }
+
+  if (options.json) {
+    process.stdout.write(renderScanJson(result, { newCount, fixedCount }));
+  } else if (!options.quiet) {
+    process.stdout.write(renderScanTerminal(result));
+    if (newCount !== null && fixedCount !== null) {
+      process.stdout.write(`Baseline delta: ${newCount} new, ${fixedCount} fixed.\n`);
+    }
+  }
+
+  if (options.ci || newCount !== null) {
     const threshold = configResult.config.scan.severityThreshold;
-    const exceeded = result.findings.some((finding) =>
+    const exceededThreshold = result.findings.some((finding) =>
       severityAtLeast(finding.severity, threshold),
     );
-    if (exceeded) {
+    const hasNew = newCount !== null && newCount > 0;
+    if (exceededThreshold || hasNew) {
       if (!options.json && !options.quiet) {
-        process.stdout.write(`CI gate failed: threshold '${threshold}' met or exceeded.\n`);
+        process.stdout.write(
+          `CI gate failed: ${hasNew ? `${newCount} new finding(s) vs baseline` : `threshold '${threshold}' met or exceeded`}.\n`,
+        );
       }
       return EXIT_CODES.thresholdExceeded;
     }
@@ -969,6 +1076,36 @@ async function listChangedFiles(rootPath: string): Promise<string[]> {
   } catch {
     return [];
   }
+}
+
+/** `ackit cache clean` — scope-limited to .ackit/cache (REQ-BASE-004). */
+export async function runCacheCleanCommand(options: {
+  root?: string | undefined;
+  json: boolean;
+  quiet: boolean;
+}): Promise<ExitCodeValue> {
+  const rootRequested = path.resolve(options.root ?? process.cwd());
+  const rootResolution = await resolveRepositoryRoot(rootRequested);
+  if (!rootResolution.ok) {
+    emitDiagnostic(
+      { code: "environment-error", message: rootResolution.diagnostic.message },
+      { quiet: options.quiet, debug: false },
+    );
+    return EXIT_CODES.environment;
+  }
+  const { removedBytes } = await cleanCache(rootResolution.root);
+  if (options.json) {
+    process.stdout.write(
+      `${JSON.stringify(
+        { schemaVersion: "ackit.cache.v0", tool: "ackit", command: "cache clean", removedBytes },
+        null,
+        2,
+      )}\n`,
+    );
+  } else if (!options.quiet) {
+    process.stdout.write(`cache clean: removed ${removedBytes} bytes from .ackit/cache\n`);
+  }
+  return EXIT_CODES.ok;
 }
 
 async function main(): Promise<void> {

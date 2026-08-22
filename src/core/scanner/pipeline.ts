@@ -14,6 +14,8 @@ export interface ScanPipelineOptions {
   signal?: AbortSignal | undefined;
   /** Batch size for file evaluation (deterministic order preserved). */
   concurrency?: number | undefined;
+  /** Incremental mode: restrict evaluation to these repo-relative paths. */
+  filterPaths?: ReadonlySet<string> | undefined;
 }
 
 interface LineColumn {
@@ -42,10 +44,14 @@ export async function runScan(
     userExcludeGlobs: options.userExcludeGlobs,
   });
   diagnostics.push(...collection.diagnostics);
+  const filterPaths = options.filterPaths;
+  const inFilter = (relativePath: string): boolean =>
+    filterPaths === undefined || filterPaths.size === 0 || filterPaths.has(relativePath);
+
   // Binary-classified files are skipped by design; the decision is surfaced
   // as a diagnostic instead of silence (classifier owns the call, REQ-FS-004).
   for (const target of collection.targets) {
-    if (target.kind !== "text") {
+    if (target.kind !== "text" && inFilter(target.relativePath)) {
       diagnostics.push({
         code: "SCAN-BINARY-SKIPPED",
         message:
@@ -58,7 +64,9 @@ export async function runScan(
     return { findings, diagnostics, filesScanned, aborted: true };
   }
 
-  const textTargets = collection.targets.filter((target) => target.kind === "text");
+  const textTargets = collection.targets.filter(
+    (target) => target.kind === "text" && inFilter(target.relativePath),
+  );
 
   for (let offset = 0; offset < textTargets.length; offset += concurrency) {
     if (options.signal?.aborted) {

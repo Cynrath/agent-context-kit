@@ -12,6 +12,8 @@ export interface ScanReportJson {
     filesScanned: number;
     totalFindings: number;
     bySeverity: Record<string, number>;
+    newVsBaseline?: number | null;
+    fixedVsBaseline?: number | null;
   };
   diagnostics: ScanResult["diagnostics"];
   findings: unknown[];
@@ -22,7 +24,10 @@ export interface ScanReportJson {
  * deterministic byte-for-byte for identical repo+config (REQ-TEST-006) —
  * no timestamps or machine-dependent fields.
  */
-export function renderScanJson(result: ScanResult): string {
+export function renderScanJson(
+  result: ScanResult,
+  baselineDelta?: { newCount: number | null; fixedCount: number | null },
+): string {
   const bySeverity: Record<string, number> = {};
   for (const finding of result.findings) {
     bySeverity[finding.severity] = (bySeverity[finding.severity] ?? 0) + 1;
@@ -36,6 +41,8 @@ export function renderScanJson(result: ScanResult): string {
       filesScanned: result.filesScanned,
       totalFindings: result.findings.length,
       bySeverity,
+      newVsBaseline: baselineDelta?.newCount ?? null,
+      fixedVsBaseline: baselineDelta?.fixedCount ?? null,
     },
     diagnostics: result.diagnostics,
     findings: result.findings,
