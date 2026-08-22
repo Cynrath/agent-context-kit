@@ -5,6 +5,9 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { Command, CommanderError } from "commander";
 import { type ConfigError, loadAckitConfig } from "../core/config/index.js";
+import { resolveRepositoryRoot } from "../core/filesystem/root.js";
+import { renderScanJson, renderScanTerminal } from "../core/reporting/index.js";
+import { defaultRegistry, runScan, severityAtLeast } from "../core/scanner/index.js";
 import { emitDiagnostic } from "../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../shared/exit-codes.js";
 import { getPackageIdentity } from "../shared/version.js";
@@ -66,6 +69,22 @@ function buildProgram(invocation: CliInvocation): Command {
       const parentOptions = (configCommand.opts() ?? {}) as Partial<GlobalOptions>;
       const rootOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
       invocation.exitCode = await runConfigCheck({ ...rootOptions, ...parentOptions });
+    });
+
+  const scanCommand = program.command("scan").description("scan the repository for problems");
+  scanCommand
+    .option("--ci", "enforce the configured severity threshold as a CI gate (exit 1 when exceeded)")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const commandOptions = (scanCommand.opts() ?? {}) as { ci?: boolean };
+      invocation.exitCode = await runScanCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        ci: commandOptions.ci ?? false,
+      });
     });
 
   program.addHelpText("after", `\n${HELP_TEXT_SUFFIX}`);
@@ -215,6 +234,72 @@ export async function runConfigCheck(options: Partial<GlobalOptions>): Promise<E
     }
   }
   return EXIT_CODES.usage;
+}
+
+interface ScanCommandOptions {
+  root?: string | undefined;
+  config?: string | undefined;
+  json: boolean;
+  quiet: boolean;
+  debug: boolean;
+  ci: boolean;
+}
+
+/**
+ * `ackit scan` (REQ-SCAN-001/007): pipeline over the fs engine; exit 1 when
+ * --ci and findings meet/exceed the configured severity threshold, 2 on
+ * invalid config, 0 otherwise (ADR-0007).
+ */
+export async function runScanCommand(options: ScanCommandOptions): Promise<ExitCodeValue> {
+  const rootRequested = path.resolve(options.root ?? process.cwd());
+  const configResult = await loadAckitConfig(rootRequested, { configPath: options.config });
+  if (!configResult.ok) {
+    for (const error of configResult.errors) {
+      emitDiagnostic(
+        { code: "config-error", message: renderConfigError(error) },
+        {
+          quiet: options.quiet,
+          debug: options.debug,
+        },
+      );
+    }
+    return EXIT_CODES.usage;
+  }
+
+  const rootResolution = await resolveRepositoryRoot(rootRequested);
+  if (!rootResolution.ok) {
+    emitDiagnostic(
+      { code: "environment-error", message: rootResolution.diagnostic.message },
+      { quiet: options.quiet, debug: options.debug },
+    );
+    return EXIT_CODES.environment;
+  }
+
+  const result = await runScan(rootResolution.root, {
+    rules: defaultRegistry.getAll(),
+    limits: configResult.config.limits,
+    userExcludeGlobs: configResult.config.scan.exclude,
+  });
+
+  if (options.json) {
+    process.stdout.write(renderScanJson(result));
+  } else if (!options.quiet) {
+    process.stdout.write(renderScanTerminal(result));
+  }
+
+  if (options.ci) {
+    const threshold = configResult.config.scan.severityThreshold;
+    const exceeded = result.findings.some((finding) =>
+      severityAtLeast(finding.severity, threshold),
+    );
+    if (exceeded) {
+      if (!options.json && !options.quiet) {
+        process.stdout.write(`CI gate failed: threshold '${threshold}' met or exceeded.\n`);
+      }
+      return EXIT_CODES.thresholdExceeded;
+    }
+  }
+  return EXIT_CODES.ok;
 }
 
 function toRepoRelative(root: string, absolutePath: string): string {

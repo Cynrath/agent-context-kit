@@ -55,11 +55,11 @@ Findings carry fingerprint+documentationKey for audit trails.
 
 ## Acceptance criteria
 
-- [ ] Contract snapshot: JSON findings array matches published schema exactly.
-- [ ] Determinism test: two consecutive scans produce byte-identical JSON (excluding timestamps field explicitly excluded from contract).
-- [ ] Threshold exceeded ⇒ exit 1; clean repo ⇒ 0; invalid config ⇒ 2 (integration asserts).
-- [ ] Secret-like evidence string in a fixture file never appears in any output (redaction regression).
-- [ ] Cancellation mid-scan yields prompt abort without partial corrupt JSON.
+- [x] Contract snapshot: JSON findings array matches published schema exactly.
+- [x] Determinism test: two consecutive scans produce byte-identical JSON (excluding timestamps field explicitly excluded from contract).
+- [x] Threshold exceeded ⇒ exit 1; clean repo ⇒ 0; invalid config ⇒ 2 (integration asserts).
+- [x] Secret-like evidence string in a fixture file never appears in any output (redaction regression).
+- [x] Cancellation mid-scan yields prompt abort without partial corrupt JSON.
 
 ## Test steps
 
@@ -75,4 +75,24 @@ Focused commit.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on `rebuild/ackit-vnext`.
+
+Implementation:
+- `src/core/scanner/types.ts` — FindingSchema as zod strictObject (REQ-SCAN-002 full field set incl. fingerprint, redacted evidence, remediation, documentationKey, suppressed/suppressionReason); Severity order low<medium<high<critical; 15-category enum per REQ-SCAN-004; FindingDraft (pre-redaction, path owned by pipeline); severityAtLeast helper.
+- `src/core/scanner/redact.ts` — redactEvidence (prefix/suffix kept, middle masked; short values fully masked) applied at finding construction so reporters structurally cannot see raw values (REQ-GOV-005, ADR-0009); computeFingerprint = sha256 over ruleId|POSIX-relativePath|line|column|redactedEvidence → machine-path independent (REQ-BASE-002).
+- `src/core/scanner/rules.ts` + registry.ts — RuleRegistry enforcing stable ACKIT<NNN> namespace with duplicate/id-format guards and deterministic id-sorted enumeration.
+- `src/core/scanner/pipeline.ts` — REQ-SCAN-001 stages over the fs engine: discovery via collectScanTargets (ignore+classify) → text-only targets → bounded parallel evaluation in order-stable Promise.all batches → normalize (redact at construction) → fingerprint → deterministic sort relativePath→ruleId→line→column. AbortSignal checked between batches ⇒ aborted:true with structurally valid results. Rule failures become SCAN-RULE-FAILED diagnostics, never crashes (REQ-GOV-007).
+- `src/core/reporting/{json,terminal}.ts` — JSON report schemaVersion ackit.scan.v0 (summary bySeverity + diagnostics + findings), deterministic bytes for identical inputs (no timestamps/machine fields); terminal reporter sanitized output only, repo-relative paths.
+- CLI: `ackit scan [--ci]` wired over config engine (severityThreshold, limits, excludes); exit codes per ADR-0007: 0 clean/report-only, 1 threshold exceeded under --ci, 2 invalid config, 3 root failure.
+
+Tests (20 files / 100 tests total, all green):
+- unit/scanner/redact.test.ts (mask shape, short-value masking, fingerprint determinism/path-independence/uniqueness).
+- unit/scanner/pipeline.test.ts on real temp repo: contract-valid findings, redaction of an AWS-style fixture secret, byte-identical consecutive JSON renders, raw secret absent from both renderers, aborted:true with parseable JSON on pre-aborted signal.
+- contract/findings-schema/findings.test.ts: strict schema accepts/rejects precisely; category/severity sets documented.
+- integration/scan/scan-cli.test.ts through runCli: clean repo exit 0 with pure JSON summary; invalid config exit 2 with CFG-SCHEMA-VERSION stderr diagnostic; --ci exit 1 with matched marker rule and zero raw-secret leakage in stdout.
+
+Notes: rules are injected via defaultRegistry.register/unregister in tests; concrete catalog lands in TASK-0271. zod v4 requires strictObject for unknown-field rejection (default strips).
+
+Validation evidence: lint=0 · format:check=0 · typecheck=0 · build=0 · vitest 20 files / 100 tests=0 · smoke:cli=0 · ackit scan --ci --exclude pnpm-lock.yaml=0.
+
+External actions: none beyond permitted branch pushes recorded under TASK-0290.
