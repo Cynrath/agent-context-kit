@@ -16,8 +16,13 @@ import {
   resolveEffectiveStack,
 } from "../core/instructions/index.js";
 import { planOrApplyInit } from "../core/onboarding/index.js";
-import { applyPolicyToFindings, PolicyError, policyDigest, resolvePolicy } from "../core/policy/index.js";
 import type { PolicyDocument } from "../core/policy/index.js";
+import {
+  applyPolicyToFindings,
+  PolicyError,
+  policyDigest,
+  resolvePolicy,
+} from "../core/policy/index.js";
 import {
   assertBindableHost,
   renderHtmlReport,
@@ -709,10 +714,13 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
     policyDigestValue = policyDigest(resolved.policy);
   } catch (error) {
     if (error instanceof PolicyError) {
-      emitDiagnostic({ code: error.code.toLowerCase(), message: error.message }, {
-        quiet: options.quiet,
-        debug: options.debug,
-      });
+      emitDiagnostic(
+        { code: error.code.toLowerCase(), message: error.message },
+        {
+          quiet: options.quiet,
+          debug: options.debug,
+        },
+      );
       return EXIT_CODES.usage;
     }
     throw error;
@@ -832,8 +840,8 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
 
   if (options.ci || newCount !== null) {
     const threshold = policy?.thresholds.severity ?? configResult.config.scan.severityThreshold;
-    const exceededThreshold = result.findings.some((finding) =>
-      severityAtLeast(finding.severity, threshold),
+    const exceededThreshold = result.findings.some(
+      (finding) => !finding.suppressed && severityAtLeast(finding.severity, threshold),
     );
     const hasNew = newCount !== null && newCount > 0;
     if (exceededThreshold || hasNew) {

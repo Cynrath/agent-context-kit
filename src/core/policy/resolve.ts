@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { promises as fsp, existsSync as existsSyncDefault } from "node:fs";
+import { existsSync as existsSyncDefault, promises as fsp } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { parse } from "yaml";
@@ -45,10 +45,10 @@ export async function resolvePolicy(
   const visiting = new Set<string>();
   const visited = new Set<string>();
 
-  const hasExplicitEntries =
-    options.entryFiles !== undefined && options.entryFiles.length > 0;
+  const entryFilesOption = options.entryFiles;
+  const hasExplicitEntries = entryFilesOption !== undefined && entryFilesOption.length > 0;
   const entryFiles = hasExplicitEntries
-    ? options.entryFiles.map((entryFile) => path.resolve(root.canonicalPath, entryFile))
+    ? entryFilesOption.map((entryFile) => path.resolve(root.canonicalPath, entryFile))
     : [entry];
   // Default policy file is OPTIONAL: repositories without one simply get an
   // empty effective policy instead of an error.
