@@ -11,6 +11,7 @@ import {
   type ProviderId,
   resolveEffectiveStack,
 } from "../core/instructions/index.js";
+import { planOrApplyInit } from "../core/onboarding/index.js";
 import { renderScanJson, renderScanTerminal } from "../core/reporting/index.js";
 import { defaultRegistry, runScan, severityAtLeast } from "../core/scanner/index.js";
 import { validateSkills } from "../core/skills/index.js";
@@ -225,6 +226,29 @@ function buildProgram(invocation: CliInvocation): Command {
         );
       });
   }
+
+  const initCommand = program
+    .command("init")
+    .description("onboard a repository: instruction shims + built-in skills (REQ-INSTR-009)");
+  initCommand
+    .option(
+      "--agents <list>",
+      "comma-separated providers or 'all' (codex,claude,gemini,copilot)",
+      "all",
+    )
+    .option("--dry-run", "print the plan without writing", false)
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const commandOptions = (initCommand.opts() ?? {}) as { agents?: string; dryRun?: boolean };
+      invocation.exitCode = await runInitCommand({
+        root: parentOptions.root,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        agents: commandOptions.agents,
+        dryRun: commandOptions.dryRun ?? false,
+      });
+    });
 
   program.addHelpText("after", `\n${HELP_TEXT_SUFFIX}`);
   return program;
@@ -806,6 +830,48 @@ function emitTaskJson(
   process.stdout.write(
     `${JSON.stringify({ schemaVersion: TASK_REPORT_SCHEMA_VERSION, tool: "ackit", command: `task ${command}`, ...payload }, null, 2)}\n`,
   );
+}
+
+/** `ackit init` (REQ-ONB-001/002): plan → write lifecycle; refusals exit 4. */
+export async function runInitCommand(
+  options: Omit<InstructionsCommandOptions, "provider" | "forPath"> & {
+    agents?: string | undefined;
+    dryRun: boolean;
+  },
+): Promise<ExitCodeValue> {
+  const rootRequested = path.resolve(options.root ?? process.cwd());
+  const rootResolution = await resolveRepositoryRoot(rootRequested);
+  if (!rootResolution.ok) {
+    emitDiagnostic(
+      { code: "environment-error", message: rootResolution.diagnostic.message },
+      { quiet: options.quiet, debug: options.debug },
+    );
+    return EXIT_CODES.environment;
+  }
+  const agents = (options.agents ?? "all").split(",").map((entry) => entry.trim());
+  const actions = await planOrApplyInit(rootResolution.root, { agents, dryRun: options.dryRun });
+  if (options.json) {
+    process.stdout.write(
+      `${JSON.stringify(
+        {
+          schemaVersion: SKILLS_REPORT_SCHEMA_VERSION,
+          tool: "ackit",
+          command: "init",
+          dryRun: options.dryRun,
+          actions,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+  } else if (!options.quiet) {
+    process.stdout.write(options.dryRun ? "Init plan (dry-run):\n" : "Init results:\n");
+    for (const action of actions) {
+      process.stdout.write(`  [${action.action}] ${action.file} — ${action.detail}\n`);
+    }
+  }
+  const refused = actions.filter((action) => action.action === "refused-non-managed");
+  return refused.length > 0 ? EXIT_CODES.securityBoundary : EXIT_CODES.ok;
 }
 
 async function main(): Promise<void> {
