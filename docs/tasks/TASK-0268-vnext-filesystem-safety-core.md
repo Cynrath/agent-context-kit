@@ -54,11 +54,11 @@ Diagnostics carry stable codes aligned with ADR-0007 taxonomy.
 
 ## Acceptance criteria
 
-- [ ] Unit tests: normalization, root containment, limits, ignore matching/explain.
-- [ ] Security fixtures pass on Windows AND POSIX CI: outside-root symlink blocked; junction/reparse blocked; cyclic symlink terminates deterministically; `../../` traversal denied; huge-file limit triggers diagnostic; malformed inputs do not crash walker.
-- [ ] Unknown-extension file containing secret-like bytes is classified text/scannable (integration assert with TASK-0271 contract later).
-- [ ] AbortSignal cancels mid-traversal promptly in integration test.
-- [ ] `pnpm typecheck/test/lint/build` green.
+- [x] Unit tests: normalization, root containment, limits, ignore matching/explain.
+- [x] Security fixtures pass on Windows AND POSIX CI: outside-root symlink blocked; junction/reparse blocked; cyclic symlink terminates deterministically; `../../` traversal denied; huge-file limit triggers diagnostic; malformed inputs do not crash walker.
+- [x] Unknown-extension file containing secret-like bytes is classified text/scannable (integration assert with TASK-0271 contract later).
+- [x] AbortSignal cancels mid-traversal promptly in integration test.
+- [x] `pnpm typecheck/test/lint/build` green.
 
 ## Test steps
 
@@ -74,4 +74,23 @@ Single focused commit; revertible independently.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22 on `rebuild/ackit-vnext`.
+
+Implementation (`src/core/filesystem/`, all strict-Typed, no `any`):
+- `paths.ts` — toPosix; normalizeRelativePath (string-level rejection of absolute/drive/UNC/NUL and `..` escapes BEFORE any fs access); isInsideRoot with case-insensitive comparison on win32-style platforms and full-segment prefix semantics.
+- `root.ts` — resolveRepositoryRoot: requested → absolute → realpath → must be directory; canonical root resolved once (ADR-0005).
+- `engine.ts` — FilesystemEngine.resolveWithinRoot: requested → normalized POSIX → join under canonical root → realpath → containment. Symlinks/junctions/reparse followed only when target stays inside root, else FS-PATH-ESCAPES-ROOT. readFileWithinRoot wrapper for feature code.
+- `walk.ts` — deterministic BFS walkRepository: sorted entries per dir; stats processed in concurrency-sized Promise.all batches (order-stable); directory-entered events for lazy .gitignore loading; symlink/junction targets realpath-checked (inside → follow, outside → FS-SYMLINK-BLOCKED); visited-canonical-set terminates cycles with FS-CYCLE-SKIPPED; limits maxFiles/maxFileBytes/maxTotalBytes/maxDepth/deadlineMs each emit diagnostics (FS-LIMIT-FILES / FS-LIMIT-BYTES / FS-LIMIT-DEPTH / FS-DEADLINE-EXCEEDED) instead of silent truncation; AbortSignal checked between events (FS-ABORTED). maxDepth semantics: maximum allowed path-depth of yielded entries; directories at depth >= limit are pruned with an explanatory diagnostic.
+- `classify.ts` — content-based text/binary only (REQ-FS-004): BOM sniff (UTF-8/16/32), NUL byte ⇒ binary, suspicious-control-byte ratio threshold 6%; bytes ≥0x80 count printable so UTF-8 text is not misclassified; extensions deliberately never consulted.
+- `ignore.ts` — IgnoreEngine layering builtin (.git/node_modules/vendor/packages/dist/build/out/coverage/.ackit/artifacts) → per-dir .gitignore stack (lazy cached loaders, deeper wins attribution) → user picomatch globs; every decision carries its explaining source for debug output (REQ-FS-005).
+- `scan-targets.ts` — composed traversal producing ScanTarget[] {relativePath, absolutePath, sizeBytes, kind} + collected diagnostics.
+
+Tests (10 files total in repo, all green):
+- unit/filesystem/paths.test.ts (normalization, containment, case-sensitivity), classify.test.ts (BOM/NUL/ratio/UTF-8), ignore.test.ts (layering + explain + prefix-safety), walk-limits.test.ts (per-file size skip, cumulative budget stop, depth prune, deadline).
+- security/filesystem-boundary.test.ts on real temp repos: ../../ denied pre-fs; absolute rejected; outside-root directory link blocked via engine AND walker (junction on win32, dir symlink elsewhere — unprivileged on every platform); inside-root link allowed; cyclic link terminates deterministically without duplicate files and emits FS-CYCLE-SKIPPED; dangling link yields FS-READ-FAILED diagnostic without crashing the walk; unknown-extension secret-like file classified text and remains scannable; abort mid-traversal completes promptly (<5s bound).
+
+Validation evidence: lint=0 · format:check=0 · typecheck=0 · build=0 · vitest 10 files / 55 tests passed=0 · smoke:cli=0 · ackit scan --ci --exclude pnpm-lock.yaml = 0 (documented legacy-scanner lockfile suppression from TASK-0267).
+
+Notes: biome complexity/useLiteralKeys disabled globally because it conflicts with tsconfig noPropertyAccessFromIndexSignature (TS rule wins by design); two justified noControlCharactersInRegex suppressions exist in diagnostics.ts (strip-by-design regexes).
+
+External actions: none.

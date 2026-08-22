@@ -25,11 +25,14 @@
     "smoke:cli": "node tests/e2e/cli-scaffold.smoke.mjs"
   },
   "dependencies": {
-    "commander": "^15.0.0"
+    "commander": "^15.0.0",
+    "ignore": "^7.0.6",
+    "picomatch": "^4.0.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.10",
     "@types/node": "^24.10.9",
+    "@types/picomatch": "^4.0.3",
     "@vitest/coverage-v8": "^4.1.11",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11"
