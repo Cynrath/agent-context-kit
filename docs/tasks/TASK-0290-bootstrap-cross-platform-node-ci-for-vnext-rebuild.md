@@ -52,10 +52,10 @@ CI run URLs recorded in completion notes as evidence.
 
 ## Acceptance criteria
 
-- [ ] `.github/workflows/ci.yml` runs ubuntu/windows/macos × node 22/24 with frozen pnpm install, lint, format:check, typecheck, test, build.
-- [ ] Workflow triggers on pushes to `rebuild/**` branches only; no master/release triggers.
-- [ ] A real run of this workflow is green on all six matrix legs.
-- [ ] VNEXT_EXECUTION_ORDER and VNEXT_TRACEABILITY updated; TASK-0268 lists this task as a completion dependency.
+- [x] `.github/workflows/ci.yml` runs ubuntu/windows/macos × node 22/24 with frozen pnpm install, lint, format:check, typecheck, test, build.
+- [x] Workflow triggers on pushes to `rebuild/**` branches only; no master/release triggers.
+- [x] A real run of this workflow is green on all six matrix legs.
+- [x] VNEXT_EXECUTION_ORDER and VNEXT_TRACEABILITY updated; TASK-0268 lists this task as a completion dependency.
 
 ## Test steps
 
@@ -72,4 +72,13 @@ Revert workflow file; branch-local.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-08-22.
+
+- Workflow: `.github/workflows/ci.yml` — matrix ubuntu-latest/windows-latest/macos-latest × node "22"/"24" (six jobs); steps: checkout → setup-node → pnpm/action-setup (reads packageManager pin) → `pnpm install --frozen-lockfile` → lint → format:check → typecheck → build → tests. Triggers limited to `push`/`pull_request` on `rebuild/**`; no master/release paths. Action pinning to immutable SHAs is deliberately deferred to TASK-0286 per this task's out-of-scope list.
+- Governance updates shipped in the same change set: canonical vNext AGENTS.md (stale .NET/NuGet/.codex references removed), VNEXT_EXECUTION_ORDER Wave-3 insertion with completion-gate note, VNEXT_TRACEABILITY row + ci-config class split (0290 bootstrap / 0286 final), REQ-GOV-010 reworded for the real remote branch, GOAL2_BOOTSTRAP reality anchors and prohibited-actions updated.
+- Evidence (real runs):
+  - Run 32590812858 — FAILED: exposed genuine cross-platform bug (`toPosix` depended on host path.sep; POSIX runners left backslashes unconverted). Fixed in commit `11b509d`.
+  - Run 32591258510 — FAILED: second real bug (`isInsideRoot` used host separator for the boundary segment; mixed-separator containment failed off-Windows). Fixed in commit `d9f4904`.
+  - Run 32591587589 — **SUCCESS**, all six legs green (ubuntu/node-22+24, windows/node-22+24, macos/node-22+24) at commit `d9f4904`. This run also executed the TASK-0268 security fixture suite on Windows and POSIX.
+- Local chain re-verified before each push: lint/format/typecheck/build/test all exit 0 (83 tests).
+- External actions: two fast-forward pushes of `rebuild/ackit-vnext` performed under REQ-GOV-010 as updated 2026-08-22; no other remote action.

@@ -59,7 +59,7 @@ Diagnostics carry stable codes aligned with ADR-0007 taxonomy.
 - [x] Unknown-extension file containing secret-like bytes is classified text/scannable (integration assert with TASK-0271 contract later).
 - [x] AbortSignal cancels mid-traversal promptly in integration test.
 - [x] `pnpm typecheck/test/lint/build` green.
-- [ ] TASK-0290 bootstrap CI green on ubuntu/windows/macos × node 22/24 (cross-platform completion gate added 2026-08-22; task is NOT completed until this passes).
+- [x] TASK-0290 bootstrap CI green on ubuntu/windows/macos × node 22/24 (cross-platform completion gate added 2026-08-22; task is NOT completed until this passes).
 
 ## Test steps
 
@@ -94,4 +94,6 @@ Validation evidence: lint=0 · format:check=0 · typecheck=0 · build=0 · vites
 
 Notes: biome complexity/useLiteralKeys disabled globally because it conflicts with tsconfig noPropertyAccessFromIndexSignature (TS rule wins by design); two justified noControlCharactersInRegex suppressions exist in diagnostics.ts (strip-by-design regexes).
 
-External actions: none.
+Cross-platform completion (2026-08-22, TASK-0290 gate): the security fixture suite now runs on ubuntu/windows/macos × node 22/24. CI exposed two real portability bugs, both fixed and regression-covered: `toPosix` used host path.sep (commit `11b509d`) and `isInsideRoot` compared with the host separator instead of canonical POSIX form (commit `d9f4904`). Final green run: GitHub Actions run 32591587589, all six matrix legs, commit `d9f4904`.
+
+External actions: fast-forward pushes of `rebuild/ackit-vnext` only (permitted by REQ-GOV-010 as updated 2026-08-22).
