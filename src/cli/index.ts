@@ -767,7 +767,7 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
   const effectiveFormat = options.json === true ? "json" : (options.format ?? "terminal");
   const reportMeta = {
     filesScanned: result.filesScanned,
-    policyDigest: configResult.ok ? configResult.digest : "",
+    policyDigest: policyDigestValue,
   };
   const renderFor = (format: string): string => {
     switch (format) {
@@ -775,7 +775,7 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
         return renderScanJson(result, { newCount, fixedCount });
       case "sarif":
         return renderSarif(result.findings, {
-          policyDigest: configResult.ok ? configResult.digest : "",
+          policyDigest: policyDigestValue,
         });
       case "markdown":
         return renderMarkdownReport(result.findings, reportMeta);

@@ -98,10 +98,12 @@ describe("markdown + html reports (REQ-SCAN-007 / REQ-RPT-002)", () => {
   });
 
   it("escapes html-sensitive characters in messages", () => {
+    const baseFinding = FIXTURE[0];
+    if (baseFinding === undefined) throw new Error("fixture missing");
     const escaped = renderHtmlReport(
       [
         {
-          ...FIXTURE[0]!,
+          ...baseFinding,
           message: '"><script>alert(1)</script>',
         },
       ],

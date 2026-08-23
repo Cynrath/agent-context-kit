@@ -1,4 +1,4 @@
-import { watch, promises as fsp, type Dirent, type FSWatcher } from "node:fs";
+import { type Dirent, type FSWatcher, promises as fsp, watch } from "node:fs";
 import path from "node:path";
 import { IGNORED_DIR_NAMES } from "../filesystem/ignore.js";
 
