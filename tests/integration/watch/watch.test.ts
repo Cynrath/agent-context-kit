@@ -2,13 +2,18 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import type { RepositoryRoot } from "../../../src/core/filesystem/root.js";
 import { startWatch } from "../../../src/core/watch/watch.js";
 
-let repo: { rootPath: string; cleanup(): Promise<void> };
+let repo: { root: RepositoryRoot; rootPath: string; cleanup(): Promise<void> };
 
 beforeAll(async () => {
   const rootPath = await mkdtemp(path.join(tmpdir(), "ackit-watch-"));
-  repo = { rootPath, cleanup: () => rm(rootPath, { recursive: true, force: true }) };
+  repo = {
+    root: { canonicalPath: rootPath },
+    rootPath,
+    cleanup: () => rm(rootPath, { recursive: true, force: true }),
+  };
 });
 
 afterAll(async () => {
@@ -20,7 +25,7 @@ describe("watch runner (REQ-WATCH-001)", () => {
     let calls = 0;
     let lastPaths: string[] = [];
     const controller = new AbortController();
-    const handle = startWatch(repo.rootPath, {
+    const handle = startWatch(repo.root, {
       debounceMs: 150,
       signal: controller.signal,
       onChange: (paths) => {
@@ -46,7 +51,7 @@ describe("watch runner (REQ-WATCH-001)", () => {
     await mkdir(path.join(repo.rootPath, ".git"), { recursive: true });
     let calls = 0;
     const controller = new AbortController();
-    const handle = startWatch(repo.rootPath, {
+    const handle = startWatch(repo.root, {
       debounceMs: 100,
       signal: controller.signal,
       onChange: () => {

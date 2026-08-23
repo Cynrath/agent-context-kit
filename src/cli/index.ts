@@ -800,7 +800,7 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
     let rerunning = false;
     const controller = new AbortController();
     process.on("SIGINT", () => controller.abort());
-    const handle = startWatch(rootResolution.root.canonicalPath, {
+    const handle = startWatch(rootResolution.root, {
       signal: controller.signal,
       onChange: () => {
         if (rerunning) return;
