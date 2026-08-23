@@ -104,6 +104,15 @@ Local validation before push: full chain green (lint/format/typecheck/build/
 vitest 46 files / 228 tests), plus the exact self-scan and smoke commands the
 CI will run. Hosted run for this commit recorded in TASK-0289 evidence.
 
+Hosted evidence timeline:
+- Run `32605306270` (first hardened pipeline) failed: exposed `--exclude` as a
+  legacy-scanner flag absent from the new CLI, plus the Windows libuv watch
+  crash. Fixed via root `ackit.yml` + `ackit-policy.yml` dogfood config,
+  policy wiring into the scan gate, ignored-dir pruning in the walker, and a
+  portable polling watcher replacing recursive fs.watch.
+- Final run for this task: **`32607804222` — all 10 jobs green** (verify ×6,
+  self-scan, package-smoke ×3).
+
 External actions: fast-forward pushes of rebuild/ackit-vnext only; read-only
 GitHub API lookups for pinning SHAs; no publish/tag/release/workflow dispatch
 beyond push-triggered CI.
