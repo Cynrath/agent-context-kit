@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "ackit.bench.v0",
+  "date": "2026-08-23",
+  "machine": {
+    "platform": "win32",
+    "cpus": 12,
+    "model": "AMD Ryzen 5 6600H with Radeon Graphics         ",
+    "node": "v24.13.0"
+  },
+  "results": {
+    "small": {
+      "files": 10,
+      "coldScanMs": 9.24,
+      "warmScanMs": 6.46,
+      "incrementalMs": 4.44,
+      "filesPerSec": 1549,
+      "peakRssMb": 58.13,
+      "graphMs": 1.26,
+      "packMs": 7.57,
+      "cacheHitRatio": 0.9
+    },
+    "medium": {
+      "files": 200,
+      "coldScanMs": 82.54,
+      "warmScanMs": 82.43,
+      "incrementalMs": 100.84,
+      "filesPerSec": 2426,
+      "peakRssMb": 60.48,
+      "graphMs": 3.71,
+      "packMs": 73.5,
+      "cacheHitRatio": 1
+    },
+    "large": {
+      "files": 2000,
+      "coldScanMs": 952.6,
+      "warmScanMs": 1018.15,
+      "incrementalMs": 726.48,
+      "filesPerSec": 1964,
+      "peakRssMb": 88.6,
+      "graphMs": 28.28,
+      "packMs": 915.77,
+      "cacheHitRatio": 1
+    },
+    "monorepo": {
+      "files": 105,
+      "coldScanMs": 59.67,
+      "warmScanMs": 58.28,
+      "incrementalMs": 48.55,
+      "filesPerSec": 1802,
+      "peakRssMb": 89.72,
+      "graphMs": 3.57,
+      "packMs": 51.83,
+      "cacheHitRatio": 0.99
+    },
+    "instruction-heavy": {
+      "files": 42,
+      "coldScanMs": 49.29,
+      "warmScanMs": 52.33,
+      "incrementalMs": 48.77,
+      "filesPerSec": 803,
+      "peakRssMb": 89.55,
+      "graphMs": 52.41,
+      "packMs": 56.27,
+      "cacheHitRatio": 0.98
+    },
+    "skill-heavy": {
+      "files": 60,
+      "coldScanMs": 66.54,
+      "warmScanMs": 62.27,
+      "incrementalMs": 61.52,
+      "filesPerSec": 964,
+      "peakRssMb": 89.95,
+      "graphMs": 29.61,
+      "packMs": 56.99,
+      "cacheHitRatio": 0.98
+    },
+    "binary-heavy": {
+      "files": 300,
+      "coldScanMs": 112.44,
+      "warmScanMs": 109.71,
+      "incrementalMs": 108.35,
+      "filesPerSec": 2734,
+      "peakRssMb": 92.87,
+      "graphMs": 4.06,
+      "packMs": 183.16,
+      "cacheHitRatio": 1
+    }
+  }
+}

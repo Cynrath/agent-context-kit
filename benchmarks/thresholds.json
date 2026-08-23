@@ -1,0 +1,8 @@
+{
+  "$comment": "Advisory regression thresholds: max allowed multiple of the committed baseline per metric/class. CI treats breaches as warnings; local runs may enforce.",
+  "defaultMultiplier": 3.0,
+  "perClass": {
+    "small": { "coldScanMs": 6, "warmScanMs": 4 },
+    "medium": { "coldScanMs": 8, "warmScanMs": 5 }
+  }
+}

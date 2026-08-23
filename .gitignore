@@ -47,3 +47,6 @@ report-*.png
 .playwright-mcp/
 .remember/
 graphify-out/
+
+# Benchmark transient fixtures
+benchmarks/.fixtures/
