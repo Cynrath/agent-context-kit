@@ -5,7 +5,13 @@ import { estimateTokens } from "../../shared/tokens.js";
 import { getPackageIdentity } from "../../shared/version.js";
 import type { RepositoryRoot } from "../filesystem/root.js";
 import { collectScanTargets } from "../filesystem/scan-targets.js";
-import { GENERIC_ASSIGNMENT } from "../scanner/rules/secret-rules.js";
+import {
+  ackit001TokenFormats,
+  ackit002PrivateKeyBlock,
+  ackit003GenericCredentialAssignment,
+  ackit004ConnectionString,
+} from "../scanner/rules/secret-rules.js";
+import type { FindingDraft, ScanRule } from "../scanner/types.js";
 
 export const PACK_SCHEMA_VERSION = "ackit.pack.v0";
 export const PACK_PREAMBLE_LABEL = "token counts are estimates";
@@ -23,41 +29,73 @@ export const RANKING_WEIGHTS = {
   sizePenaltyCap: 40,
 } as const;
 
-const SECRET_TOKEN_SHAPES: readonly RegExp[] = [
-  /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/,
-  /\bghp_[A-Za-z0-9]{36}\b/,
-  /\bgithub_pat_[A-Za-z0-9_]{22,}\b/,
-  /\bsk-[A-Za-z0-9_-]{20,}\b/,
-  /\bxox[baprs]-[A-Za-z0-9-]{10,}\b/,
-];
-
 const ABSOLUTE_PATH_PATTERNS: readonly RegExp[] = [
   /\b[A-Z]:\\(?:Users|Documents and Settings)\\[^\s"'`)\]]*/g,
   /\/home\/[^\s/"'`)\]]+/g,
   /\/Users\/[^\s/"'`)\]]+/g,
 ];
 
-export interface PackCandidateInput {
-  relativePath: string;
-  content: string;
+/**
+ * Canonical secret safety gate for emitted artifacts.
+ *
+ * Single source of truth: the SAME catalog rules that power `ackit scan`
+ * (ACKIT001 token shapes, ACKIT002 private keys, ACKIT003 credential
+ * assignments, ACKIT004 connection strings) evaluate candidate content AND
+ * every emitted surface. No parallel/divergent detection list exists.
+ */
+export const PACK_SECRET_GATE_RULES: readonly ScanRule[] = [
+  ackit001TokenFormats,
+  ackit002PrivateKeyBlock,
+  ackit003GenericCredentialAssignment,
+  ackit004ConnectionString,
+];
+
+function runSecretGate(content: string): string[] {
+  const hits: string[] = [];
+  for (const rule of PACK_SECRET_GATE_RULES) {
+    try {
+      if (rule.evaluate({ relativePath: "(gate)", content }).some((_draft: FindingDraft) => true)) {
+        hits.push(rule.id);
+      }
+    } catch {
+      // A rule failing must never open the gate; treat as hit defensively.
+      hits.push(rule.id);
+    }
+  }
+  return hits;
 }
 
 export interface PackManifestEntry {
   relativePath: string;
-  action: "included" | "excluded" | "scrubbed";
+  action: "included" | "excluded" | "scrubbed" | "context-section";
   reason: string;
   estimatedTokens: number;
   sha256: string;
   bytes: number;
 }
 
+/** Canonical context sections required by REQ-CTX-001 (deterministic order). */
+export interface PackContextSection {
+  id:
+    | "instruction-graph"
+    | "active-tasks"
+    | "skills-catalog"
+    | "policy-summary"
+    | "repository-metadata";
+  title: string;
+  body: string;
+}
+
 export interface BuildPackOptions {
   maxTokens?: number | undefined;
   includeGlobs?: readonly string[] | undefined;
-  changedFiles?: readonly string[] | undefined;
+  /** Restrict file candidates to exactly this set (git-changed mode). */
+  restrictToFiles?: readonly string[] | undefined;
   activeTaskContent?: string | undefined;
   instructionReferenceTargets?: readonly string[] | undefined;
   limits?: import("../filesystem/types.js").TraversalLimits | undefined;
+  /** REQ-CTX-001 canonical context sections, pre-rendered by the caller. */
+  contextSections?: readonly PackContextSection[] | undefined;
 }
 
 export interface PackResult {
@@ -71,6 +109,15 @@ export interface PackResult {
 
 /**
  * Deterministic, budgeted context pack (REQ-CTX-001..004).
+ *
+ * Safety gates, in order:
+ *   G1 binary content excluded via the CANONICAL filesystem classifier
+ *      (extension-agnostic; unknown-extension binaries included in that);
+ *   G2 secret detection delegated to the canonical catalog rules — a file
+ *      matching any secret rule is excluded with the rule ids in the reason;
+ *   G3 content-hash dedupe;
+ *   G4 machine-local absolute paths scrubbed to `<local-path>`.
+ * The same secret rules re-verify every EMITTED surface as a final guard.
  * Same repo+config ⇒ byte-identical output (no timestamps in contract).
  */
 export async function buildContextPack(
@@ -78,32 +125,66 @@ export async function buildContextPack(
   options: BuildPackOptions & { format?: "markdown" | "json" | undefined } = {},
 ): Promise<PackResult> {
   const maxTokens = options.maxTokens ?? 100_000;
-  const collection = await collectScanTargets(root, {
-    skipClassification: true,
-  });
+  const collection = await collectScanTargets(root);
 
   const includeMatch =
     options.includeGlobs && options.includeGlobs.length > 0
       ? picomatch([...options.includeGlobs], { dot: true })
       : null;
-  const changedSet = new Set((options.changedFiles ?? []).map(toPosix));
+  const restrictSet =
+    options.restrictToFiles === undefined
+      ? null
+      : new Set(options.restrictToFiles.map((file) => file.split("\\").join("/")));
   const instructionRefs = new Set((options.instructionReferenceTargets ?? []).map(toPosix));
   const activeTaskText = options.activeTaskContent ?? "";
-
-  interface Scored {
-    relativePath: string;
-    content: string;
-    score: number;
-    tokens: number;
-    hash: string;
-    bytes: number;
-  }
 
   const scored: Scored[] = [];
   const manifestDraft: PackManifestEntry[] = [];
   const seenHashes = new Map<string, string>();
 
+  // ---- Canonical context sections first (REQ-CTX-001), budget-prioritized.
+  let usedTokens = 0;
+  const sectionBodies = new Map<string, string>();
+  for (const section of options.contextSections ?? []) {
+    const tokens = estimateTokens(section.body);
+    const rel = `(context)/${section.id}`;
+    if (usedTokens + tokens <= maxTokens) {
+      usedTokens += tokens;
+      sectionBodies.set(rel, section.body);
+      manifestDraft.push({
+        relativePath: rel,
+        action: "context-section",
+        reason: `REQ-CTX-001 canonical context section (${section.title})`,
+        estimatedTokens: tokens,
+        sha256: createHash("sha256").update(section.body).digest("hex"),
+        bytes: Buffer.byteLength(section.body),
+      });
+    } else {
+      manifestDraft.push({
+        relativePath: rel,
+        action: "excluded",
+        reason: `budget exhausted (needs ${tokens}, remaining ${maxTokens - usedTokens})`,
+        estimatedTokens: tokens,
+        sha256: createHash("sha256").update(section.body).digest("hex"),
+        bytes: Buffer.byteLength(section.body),
+      });
+    }
+  }
+
   for (const target of collection.targets) {
+    // G1: binary exclusion via the CANONICAL classifier (extension-agnostic).
+    if (target.kind !== "text") {
+      manifestDraft.push({
+        relativePath: target.relativePath,
+        action: "excluded",
+        reason: "binary content excluded by canonical classifier",
+        estimatedTokens: 0,
+        sha256: createHash("sha256").update(`${target.relativePath}:binary`).digest("hex"),
+        bytes: target.sizeBytes,
+      });
+      continue;
+    }
+
     let content: string;
     try {
       content = await fsp.readFile(target.absolutePath, "utf8");
@@ -111,33 +192,50 @@ export async function buildContextPack(
       continue;
     }
 
-    // Safety gate 1: secrets → hard exclusion (REQ-GOV-005).
-    const secretShape = SECRET_TOKEN_SHAPES.find((pattern) => pattern.test(content));
-    const credentialAssignment = GENERIC_ASSIGNMENT.exec(content);
-    if (secretShape !== undefined || credentialAssignment !== null) {
-      manifestDraft.push(
-        entry(
-          target.relativePath,
-          "excluded",
-          `potential secret detected (${secretShape !== undefined ? "ACKIT001-shape" : "ACKIT003-shape"})`,
-          content,
-        ),
-      );
+    // G2: canonical catalog secret gate (single source of truth with scan).
+    const secretRuleIds = runSecretGate(content);
+    if (secretRuleIds.length > 0) {
+      manifestDraft.push({
+        relativePath: target.relativePath,
+        action: "excluded",
+        reason: `potential secret detected (${secretRuleIds.join(", ")})`,
+        estimatedTokens: 0,
+        sha256: createHash("sha256").update(content).digest("hex"),
+        bytes: Buffer.byteLength(content),
+      });
       continue;
     }
 
-    // Safety gate 2: dedupe by content hash.
+    // G3: dedupe by content hash.
     const hash = createHash("sha256").update(content).digest("hex");
     const originalOwner = seenHashes.get(hash);
     if (originalOwner !== undefined) {
-      manifestDraft.push(
-        entry(target.relativePath, "excluded", `duplicate of ${originalOwner}`, content),
-      );
+      manifestDraft.push({
+        relativePath: target.relativePath,
+        action: "excluded",
+        reason: `duplicate of ${originalOwner}`,
+        estimatedTokens: 0,
+        sha256: hash,
+        bytes: Buffer.byteLength(content),
+      });
       continue;
     }
     seenHashes.set(hash, target.relativePath);
 
-    // Safety gate 3: scrub machine-local absolute paths (REQ-GOV-004).
+    // Restrictive git-changed mode: candidates limited to the changed set.
+    if (restrictSet !== null && !restrictSet.has(target.relativePath)) {
+      manifestDraft.push({
+        relativePath: target.relativePath,
+        action: "excluded",
+        reason: "outside requested changed-file set",
+        estimatedTokens: 0,
+        sha256: hash,
+        bytes: Buffer.byteLength(content),
+      });
+      continue;
+    }
+
+    // G4: scrub machine-local absolute paths (REQ-GOV-004).
     let scrubbed = 0;
     for (const pattern of ABSOLUTE_PATH_PATTERNS) {
       content = content.replace(pattern, () => {
@@ -148,7 +246,8 @@ export async function buildContextPack(
 
     const score =
       (includeMatch?.(target.relativePath) ? RANKING_WEIGHTS.explicitInclude : 0) +
-      (changedSet.has(target.relativePath) ? RANKING_WEIGHTS.changed : 0) +
+      (restrictSet !== null ? RANKING_WEIGHTS.changed : 0) +
+      (changedSetHas(options.restrictToFiles, target.relativePath) ? RANKING_WEIGHTS.changed : 0) +
       (activeTaskText.length > 0 && activeTaskText.includes(target.relativePath)
         ? RANKING_WEIGHTS.activeTaskRef
         : 0) +
@@ -158,7 +257,7 @@ export async function buildContextPack(
       typeWeight(target.relativePath);
 
     const penalty = Math.min(
-      Math.floor(target.sizeBytes / 4096) * RANKING_WEIGHTS.sizePenaltyPer4k,
+      Math.floor(Buffer.byteLength(content) / 4096) * RANKING_WEIGHTS.sizePenaltyPer4k,
       RANKING_WEIGHTS.sizePenaltyCap,
     );
 
@@ -172,110 +271,60 @@ export async function buildContextPack(
     });
     if (scrubbed > 0) {
       manifestDraft.push({
-        ...entry(
-          target.relativePath,
-          "scrubbed",
-          `${scrubbed} machine-local absolute path(s) scrubbed`,
-          content,
-        ),
+        relativePath: target.relativePath,
+        action: "scrubbed",
+        reason: `${scrubbed} machine-local absolute path(s) scrubbed`,
+        estimatedTokens: estimateTokens(content),
         sha256: hash,
+        bytes: Buffer.byteLength(content),
       });
     }
   }
 
-  // Deterministic order: score desc, then path asc.
   scored.sort((a, b) => b.score - a.score || (a.relativePath < b.relativePath ? -1 : 1));
 
   const included: Scored[] = [];
-  let used = 0;
   for (const candidate of scored) {
-    if (used + candidate.tokens <= maxTokens) {
+    if (usedTokens + candidate.tokens <= maxTokens) {
       included.push(candidate);
-      used += candidate.tokens;
-      manifestDraft.push(includedEntry(candidate));
+      usedTokens += candidate.tokens;
+      manifestDraft.push({
+        relativePath: candidate.relativePath,
+        action: "included",
+        reason: `score ${candidate.score}`,
+        estimatedTokens: candidate.tokens,
+        sha256: candidate.hash,
+        bytes: candidate.bytes,
+      });
     } else {
-      manifestDraft.push(
-        entry(
-          candidate.relativePath,
-          "excluded",
-          `budget exhausted (needs ${candidate.tokens}, remaining ${maxTokens - used})`,
-          candidate.content,
-        ),
-      );
+      manifestDraft.push({
+        relativePath: candidate.relativePath,
+        action: "excluded",
+        reason: `budget exhausted (needs ${candidate.tokens}, remaining ${maxTokens - usedTokens})`,
+        estimatedTokens: candidate.tokens,
+        sha256: candidate.hash,
+        bytes: candidate.bytes,
+      });
     }
   }
 
   const manifest = finalizeManifest(manifestDraft);
   const identity = getPackageIdentity();
-  const markdown = renderMarkdown(identity.version, maxTokens, used, included, manifest);
-  const json = renderJson(identity.version, maxTokens, used, manifest);
+  const markdown = renderMarkdown(identity.version, maxTokens, usedTokens, sectionBodies, included);
+  const json = renderJson(identity.version, maxTokens, usedTokens, manifest);
+
+  // Final defense-in-depth: the same catalog rules verify EMITTED surfaces.
+  assertNoSecretShapes(markdown);
+  assertNoSecretShapes(json);
+
   return {
     format: options.format ?? "markdown",
     markdown,
     json,
     manifest,
-    totalIncludedTokens: used,
+    totalIncludedTokens: usedTokens,
     maxTokens,
   };
-}
-
-function entry(
-  relativePath: string,
-  action: PackManifestEntry["action"],
-  reason: string,
-  content: string,
-): PackManifestEntry {
-  return {
-    relativePath,
-    action,
-    reason,
-    estimatedTokens: estimateTokens(content),
-    sha256: createHash("sha256").update(content).digest("hex"),
-    bytes: Buffer.byteLength(content),
-  };
-}
-
-function includedEntry(candidate: Scored): PackManifestEntry {
-  return {
-    relativePath: candidate.relativePath,
-    action: "included",
-    reason: `score ${candidate.score}`,
-    estimatedTokens: candidate.tokens,
-    sha256: candidate.hash,
-    bytes: candidate.bytes,
-  };
-}
-
-function finalizeManifest(draft: readonly PackManifestEntry[]): PackManifestEntry[] {
-  return [...draft].sort((a, b) =>
-    a.relativePath < b.relativePath ? -1 : a.relativePath > b.relativePath ? 1 : 0,
-  );
-}
-
-function renderMarkdown(
-  version: string,
-  maxTokens: number,
-  used: number,
-  included: readonly Scored[],
-  _manifest: readonly PackManifestEntry[],
-): string {
-  const lines: string[] = [
-    `# ACKit Context Pack`,
-    "",
-    `ackit ${version}; budget ${used}/${maxTokens} tokens (${PACK_PREAMBLE_LABEL}).`,
-    "",
-  ];
-  for (const item of included) {
-    lines.push(
-      `## ${item.relativePath}`,
-      "",
-      "````",
-      item.content.replace(/````/g, "`'`'`'"),
-      "````",
-      "",
-    );
-  }
-  return lines.join("\n");
 }
 
 interface Scored {
@@ -287,23 +336,11 @@ interface Scored {
   bytes: number;
 }
 
-function renderJson(
-  version: string,
-  maxTokens: number,
-  used: number,
-  manifest: readonly PackManifestEntry[],
-): string {
-  return `${JSON.stringify(
-    {
-      schemaVersion: PACK_SCHEMA_VERSION,
-      tool: "ackit",
-      version,
-      budget: { maxTokens, totalIncludedTokens: used, estimator: PACK_PREAMBLE_LABEL },
-      manifest,
-    },
-    null,
-    2,
-  )}\n`;
+function changedSetHas(
+  restrictToFiles: readonly string[] | undefined,
+  relativePath: string,
+): boolean {
+  return restrictToFiles !== undefined && restrictToFiles.includes(relativePath);
 }
 
 function isInstructionScope(relativePath: string): boolean {
@@ -330,12 +367,68 @@ function typeWeight(relativePath: string): number {
   return 2;
 }
 
-/** Final defense-in-depth guard for emitted artifacts. */
+function finalizeManifest(draft: readonly PackManifestEntry[]): PackManifestEntry[] {
+  return [...draft].sort((a, b) =>
+    a.relativePath < b.relativePath ? -1 : a.relativePath > b.relativePath ? 1 : 0,
+  );
+}
+
+function renderMarkdown(
+  version: string,
+  maxTokens: number,
+  used: number,
+  sections: Map<string, string>,
+  files: readonly Scored[],
+): string {
+  const lines: string[] = [
+    "# ACKit Context Pack",
+    "",
+    `ackit ${version}; budget ${used}/${maxTokens} tokens (${PACK_PREAMBLE_LABEL}).`,
+    "",
+  ];
+  for (const [rel, body] of sections) {
+    lines.push(`## ${rel}`, "", body.trim(), "");
+  }
+  for (const item of files) {
+    lines.push(
+      `## ${item.relativePath}`,
+      "",
+      "````",
+      item.content.replace(/````/g, "`'`'`'"),
+      "````",
+      "",
+    );
+  }
+  return lines.join("\n");
+}
+
+function renderJson(
+  version: string,
+  maxTokens: number,
+  used: number,
+  manifest: readonly PackManifestEntry[],
+): string {
+  return `${JSON.stringify(
+    {
+      schemaVersion: PACK_SCHEMA_VERSION,
+      tool: "ackit",
+      version,
+      budget: { maxTokens, totalIncludedTokens: used, estimator: PACK_PREAMBLE_LABEL },
+      manifest,
+    },
+    null,
+    2,
+  )}\n`;
+}
+
+/**
+ * Real guard: runs the CANONICAL secret catalog over emitted output. Throws
+ * if any secret-shaped value leaked past the exclusion gates.
+ */
 export function assertNoSecretShapes(emitted: string): void {
-  for (const pattern of SECRET_TOKEN_SHAPES) {
-    if (pattern.test(emitted)) {
-      throw new Error("internal error: secret-shaped value reached pack output");
-    }
+  const hits = runSecretGate(emitted);
+  if (hits.length > 0) {
+    throw new Error(`internal error: secret-shaped value reached pack output (${hits.join(", ")})`);
   }
 }
 

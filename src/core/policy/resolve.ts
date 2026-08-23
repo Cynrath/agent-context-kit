@@ -4,13 +4,17 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { parse } from "yaml";
 import { stableStringify } from "../config/load.js";
+import { isInsideRoot } from "../filesystem/paths.js";
 import type { PolicyDocument } from "./types.js";
 import { PolicyDocumentSchema } from "./types.js";
 
 export interface ResolveOptions {
   /** Explicit entry file; otherwise config.policy.extends entries are used. */
   entryFiles?: readonly string[] | undefined;
+  /** Repository name for `repo:` scoped layers (defaults: none). */
   repoName?: string | undefined;
+  /** Organization name for `org:` scoped layers (defaults: none). */
+  orgName?: string | undefined;
 }
 
 export class PolicyError extends Error {
@@ -21,7 +25,8 @@ export class PolicyError extends Error {
       | "POL-LOCKED-CONFLICT"
       | "POL-NOT-FOUND"
       | "POL-INVALID"
-      | "POL-OFFLINE-BLOCKED",
+      | "POL-OFFLINE-BLOCKED"
+      | "POL-ROOT-ESCAPE",
   ) {
     super(message);
     this.name = "PolicyError";
@@ -37,7 +42,12 @@ export class PolicyError extends Error {
 export async function resolvePolicy(
   root: RepositoryRootLike,
   options: ResolveOptions = {},
-): Promise<{ policy: PolicyDocument; chain: string[]; diagnostics: string[] }> {
+): Promise<{
+  policy: PolicyDocument;
+  chain: string[];
+  diagnostics: string[];
+  documents: PolicyDocument[];
+}> {
   const entry = path.join(root.canonicalPath, "ackit-policy.yml");
   const chain: string[] = [];
   const documents: PolicyDocument[] = [];
@@ -53,7 +63,7 @@ export async function resolvePolicy(
   // Default policy file is OPTIONAL: repositories without one simply get an
   // empty effective policy instead of an error.
   if (!hasExplicitEntries && !existsSyncDefault(entry)) {
-    return { policy: emptyPolicy(), chain: [], diagnostics: [] };
+    return { policy: emptyPolicy(), chain: [], diagnostics: [], documents: [] };
   }
 
   for (const entryFile of entryFiles) {
@@ -61,13 +71,20 @@ export async function resolvePolicy(
   }
 
   let effective = emptyPolicy();
+  const appliedDocuments: PolicyDocument[] = [];
   for (const document of documents) {
-    if (!scopeMatches(document, options.repoName)) continue;
+    if (!scopeMatches(document, options)) {
+      diagnostics.push(
+        `policy layer scope mismatch (org=${document.org ?? "-"}, repo=${document.repo ?? "-"}) — layer skipped`,
+      );
+      continue;
+    }
+    appliedDocuments.push(document);
     effective = mergeDocuments(effective, document, diagnostics);
   }
   effective.rules = dedupeLockedConflicts(effective.rules, diagnostics);
 
-  return { policy: effective, chain, diagnostics };
+  return { policy: effective, chain, diagnostics, documents: appliedDocuments };
 
   async function loadChain(file: string, stack: string[] = []): Promise<void> {
     if (visited.has(file)) return;
@@ -110,7 +127,9 @@ export async function resolvePolicy(
 
     // Pre-order: extends chain resolves first so later layers override bases.
     for (const extendEntry of document.extends) {
-      const childFile = resolveExtendEntry(root.canonicalPath, path.dirname(file), extendEntry);
+      const childFile = extendEntry.startsWith("npm:")
+        ? resolveExtendEntrySync(root.canonicalPath, path.dirname(file), extendEntry)
+        : await resolveLocalExtendEntry(root.canonicalPath, path.dirname(file), extendEntry);
       await loadChain(childFile, [...stack, file]);
     }
     documents.push(document);
@@ -131,14 +150,15 @@ export async function resolvePolicy(
     visited.add(file);
   }
 
-  function scopeMatches(document: PolicyDocument, repoName?: string): boolean {
-    if (document.org !== undefined) {
-      // Org scoping applies when the repository declares membership; unknown orgs still apply base rules.
-      if (options.repoName === undefined && document.repo !== undefined) return false;
-    }
-    if (document.repo !== undefined && repoName !== undefined && document.repo !== repoName) {
-      return false;
-    }
+  function scopeMatches(
+    document: PolicyDocument,
+    ctx: { repoName?: string | undefined; orgName?: string | undefined },
+  ): boolean {
+    // Deterministic layer-applicability semantics (audit 2.6):
+    // - doc.org defined requires matching context org (missing org context ⇒ skip);
+    // - doc.repo defined requires matching repository name.
+    if (document.org !== undefined && document.org !== ctx.orgName) return false;
+    if (document.repo !== undefined && document.repo !== ctx.repoName) return false;
     return true;
   }
 }
@@ -148,17 +168,22 @@ function mergeDocuments(
   layer: PolicyDocument,
   diagnostics: string[],
 ): PolicyDocument {
+  // Audit 2.6: a layer with pathScopes keeps its suppressions and forbidden
+  // patterns OUT of the flattened view — they are enforced per-path through
+  // the per-document (scoped) evaluation instead.
+  const scoped = layer.pathScopes.length > 0;
   return {
     ...base,
     thresholds: { ...base.thresholds, ...layer.thresholds },
-    suppressions: dedupeBy(
-      [...base.suppressions, ...layer.suppressions],
-      (s) => `${s.ruleId}|${s.pathGlobs.join(",")}`,
-    ),
-    forbiddenPatterns: dedupeBy(
-      [...base.forbiddenPatterns, ...layer.forbiddenPatterns],
-      (p) => p.id,
-    ),
+    suppressions: scoped
+      ? base.suppressions
+      : dedupeBy(
+          [...base.suppressions, ...layer.suppressions],
+          (s) => `${s.ruleId}|${s.pathGlobs.join(",")}`,
+        ),
+    forbiddenPatterns: scoped
+      ? base.forbiddenPatterns
+      : dedupeBy([...base.forbiddenPatterns, ...layer.forbiddenPatterns], (p) => p.id),
     rules: mergeRules(base.rules, layer.rules, diagnostics),
   };
 }
@@ -211,8 +236,46 @@ function dedupeBy<T>(items: readonly T[], keyOf: (item: T) => string): T[] {
   return [...seen.values()];
 }
 
+/**
+ * Resolves a LOCAL extends entry strictly inside the canonical repository
+ * root (audit 2.5): `../` chains, absolute paths, and symlink/junction/
+ * reparse targets that resolve outside the root are all rejected with a
+ * stable POL-ROOT-ESCAPE code before any content is read. npm-prefixed
+ * entries intentionally bypass this check and follow their own controlled
+ * pre-installed-package trust boundary.
+ */
+async function resolveLocalExtendEntry(
+  repoRoot: string,
+  containingDir: string,
+  entry: string,
+): Promise<string> {
+  const resolved = path.resolve(containingDir, entry);
+  // String-level containment FIRST so traversal attempts are flagged as
+  // escape even when the target does not exist.
+  if (!isInsideRoot(repoRoot, resolved)) {
+    throw new PolicyError(
+      `policy extends target '${entry}' resolves outside the repository root`,
+      "POL-ROOT-ESCAPE",
+    );
+  }
+  let real: string;
+  try {
+    real = await fsp.realpath(resolved);
+  } catch {
+    throw new PolicyError(`policy file not found: ${entry}`, "POL-NOT-FOUND");
+  }
+  // Symlink/junction/reparse second pass on the canonical target.
+  if (!isInsideRoot(repoRoot, real)) {
+    throw new PolicyError(
+      `policy extends target '${entry}' resolves outside the repository root via link`,
+      "POL-ROOT-ESCAPE",
+    );
+  }
+  return real;
+}
+
 /** `npm:` prefix resolves through pre-installed node_modules — never the network. */
-function resolveExtendEntry(repoRoot: string, containingDir: string, entry: string): string {
+function resolveExtendEntrySync(repoRoot: string, containingDir: string, entry: string): string {
   if (entry.startsWith("npm:")) {
     const spec = entry.slice(4);
     const slashIndex = spec.indexOf("/");

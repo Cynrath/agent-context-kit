@@ -7,6 +7,7 @@ import {
   buildInstructionGraph,
   resolveEffectiveStack,
 } from "../../../src/core/instructions/index.js";
+import type { Finding } from "../../../src/core/scanner/types.js";
 import {
   detectWorkspaces,
   partitionByWorkspace,
@@ -105,6 +106,7 @@ describe("workspace vs path-specific instruction distinction (REQ-MONO-002)", ()
       repo: undefined,
       pathScopes: [],
       extends: [],
+      rules: [],
       thresholds: {},
       suppressions: [
         {
@@ -116,11 +118,11 @@ describe("workspace vs path-specific instruction distinction (REQ-MONO-002)", ()
       ],
       forbiddenPatterns: [],
     };
-    const findings = [
+    const findings: Finding[] = [
       baseFinding("packages/web/src/a.ts"),
       baseFinding("packages/mobile/src/b.ts"),
     ];
-    const applied = applyPolicyToFindings(findings as never, policy as never);
+    const applied = applyPolicyToFindings(findings, { policy, documents: [policy] });
     expect(applied[0]?.suppressed).toBe(true);
     expect(applied[1]?.suppressed).toBe(false);
   });
@@ -151,8 +153,8 @@ describe("workspace vs path-specific instruction distinction (REQ-MONO-002)", ()
   function baseFinding(relativePath: string) {
     return {
       ruleId: "ACKIT020",
-      severity: "low",
-      category: "hygiene",
+      severity: "low" as const,
+      category: "hygiene" as const,
       message: "TODO marker",
       relativePath,
       line: 1,

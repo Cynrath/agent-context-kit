@@ -705,12 +705,14 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
 
   // Effective offline policy (REQ-POL-001): suppressions + overrides + digest.
   let policy: PolicyDocument | null = null;
+  let documents: PolicyDocument[] = [];
   let policyDigestValue = "";
   try {
     const resolved = await resolvePolicy(rootResolution.root, {
       entryFiles: configResult.config.policy.extends,
     });
     policy = resolved.policy;
+    documents = resolved.documents;
     policyDigestValue = policyDigest(resolved.policy);
   } catch (error) {
     if (error instanceof PolicyError) {
@@ -733,7 +735,7 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
     filterPaths,
   });
   if (policy !== null) {
-    result.findings = applyPolicyToFindings(result.findings, policy);
+    result.findings = applyPolicyToFindings(result.findings, { policy, documents });
   }
 
   let newCount: number | null = null;
@@ -1297,12 +1299,26 @@ export async function runPackCommand(
     return EXIT_CODES.environment;
   }
 
-  const changedFiles = options.changed ? await listChangedFiles(rootRequested) : [];
+  let restrictToFiles: string[] | undefined;
+  if (options.changed) {
+    try {
+      restrictToFiles = await listChangedFiles(rootRequested);
+    } catch (error) {
+      emitDiagnostic(
+        {
+          code: (error as Error).name === "GitUnavailableError" ? "git-unavailable" : "pack-error",
+          message: (error as Error).message,
+        },
+        { quiet: options.quiet, debug: options.debug },
+      );
+      return EXIT_CODES.environment;
+    }
+  }
   const pack = await buildContextPack(rootResolution.root, {
     maxTokens: options.maxTokens ?? configResult.config.context.maxTokens,
     format: options.format,
     includeGlobs: options.include,
-    changedFiles,
+    restrictToFiles,
   });
 
   if (options.json || options.format === "json") {
@@ -1317,19 +1333,10 @@ export async function runPackCommand(
 const assertNoSecretShapesGuard = undefined;
 void assertNoSecretShapesGuard;
 
-/** Minimal git-changed fallback (full module lands in TASK-0279). */
+/** Git-changed/untracked candidate set for pack (REQ-CTX-001). Errors propagate. */
 async function listChangedFiles(rootPath: string): Promise<string[]> {
-  try {
-    const { execFileSync } = await import("node:child_process");
-    const out = execFileSync("git", ["status", "--porcelain"], { cwd: rootPath, encoding: "utf8" });
-    return out
-      .split(/\r?\n/)
-      .filter((line) => line.length > 3)
-      .map((line) => line.slice(3).trim().replace(/^"|"$/g, ""))
-      .map((file) => file.split("\\").join("/"));
-  } catch {
-    return [];
-  }
+  const { changedFiles } = await import("../core/git/git.js");
+  return changedFiles(rootPath);
 }
 
 /** `ackit cache clean` — scope-limited to .ackit/cache (REQ-BASE-004). */

@@ -63,12 +63,7 @@ describe("context pack engine (REQ-CTX-001..004)", () => {
 
   it("ranking order matches the documented weight table for a golden fixture", async () => {
     // Explicit include + changed + instruction scope beats plain docs file.
-    const result = await pack({
-      format: "json",
-      includeGlobs: ["src/**"],
-      changedFiles: ["src/app.ts"],
-      maxTokens: 100_000,
-    });
+    const result = await pack({ format: "json", includeGlobs: ["src/**"], maxTokens: 100000 });
     const includedOrder = result.manifest
       .filter((entry) => entry.action === "included")
       .map((entry) => entry.relativePath);
@@ -91,15 +86,17 @@ describe("context pack engine (REQ-CTX-001..004)", () => {
     expect(result.totalIncludedTokens).toBeLessThanOrEqual(30);
   });
 
-  it("changed-files input boosts matching candidates (integration seam)", async () => {
-    const boosted = await pack({
-      format: "json",
-      changedFiles: ["README.md"],
-      includeGlobs: [],
-    });
-    const readme = boosted.manifest.find((entry) => entry.relativePath === "README.md");
-    expect(readme?.action).toBe("included");
-    expect(readme?.reason).toContain(String(RANKING_WEIGHTS.explicitInclude * 0));
+  it("--changed mode restricts candidates to the changed set (REQ-CTX-001)", async () => {
+    const result = await pack({ format: "json", restrictToFiles: ["README.md"] });
+    const included = result.manifest
+      .filter((entry) => entry.action === "included")
+      .map((entry) => entry.relativePath);
+    expect(included).toEqual(["README.md"]);
+    const others = result.manifest.filter(
+      (entry) =>
+        entry.action === "excluded" && entry.reason.includes("outside requested changed-file set"),
+    );
+    expect(others.length).toBeGreaterThan(0);
   });
 
   it("deduplicates identical content by hash", async () => {
