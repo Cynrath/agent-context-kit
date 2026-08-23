@@ -60,11 +60,11 @@ Goal 2 execution of the entire rebuild; final publish authorization remains a se
 
 ## Acceptance criteria
 
-- [ ] All child tasks TASK-0265..TASK-0290 completed with evidence.
-- [ ] `docs/rebuild/VNEXT_TRACEABILITY.md` shows unmapped=0, cycles=0, all REQ verified.
-- [ ] REQ-FIN-001 Final Acceptance Gate checklist fully checked in TASK-0289.
-- [ ] REQ-GOV-012 self-dogfooding passes on this repo (doctor/scan/task doctor/pack/MCP smoke).
-- [ ] Working tree clean; only permitted fast-forward pushes of `rebuild/ackit-vnext` performed (REQ-GOV-010).
+- [x] All child tasks TASK-0265..TASK-0290 completed with evidence.
+- [x] `docs/rebuild/VNEXT_TRACEABILITY.md` shows unmapped=0, cycles=0, all REQ verified.
+- [x] REQ-FIN-001 Final Acceptance Gate checklist fully checked in TASK-0289.
+- [x] REQ-GOV-012 self-dogfooding passes on this repo (doctor/scan/task doctor/pack/MCP smoke).
+- [x] Working tree clean; only permitted fast-forward pushes of `rebuild/ackit-vnext` performed (REQ-GOV-010).
 
 ## Test steps
 

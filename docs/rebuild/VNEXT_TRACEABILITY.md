@@ -97,11 +97,41 @@ Global invariants are not single-task features; they are asserted continuously:
 
 ## Completion evidence
 
-Each task records evidence in its own Completion notes (commands + exit codes + artifact paths under gitignored `artifacts/`). This table fills at Goal 2 closeout:
+Each task records detailed evidence in its own Completion notes (commands +
+exit codes + artifact paths under gitignored `artifacts/`). Closeout summary
+(Goal 2, branch `rebuild/ackit-vnext`):
 
-| Task | Evidence summary | Date |
+| Task | Evidence summary | Commit / Run |
 |---|---|---|
-| TASK-0265..0289 | (pending Goal 2) | — |
+| TASK-0265 | preflight baseline artifacts + doctor/scan exit 0 | b6d02b7 |
+| TASK-0266 | ADRs accepted; Node/MCP/npm registry verification | 84272d8 |
+| TASK-0267 | TS skeleton; 20 tests; removal list | b58cd66 |
+| TASK-0290 | bootstrap CI 6/6 green (run 32591587589) | f6e6f19 |
+| TASK-0268 | fs engine; security fixtures; cross-platform fixes | 7adf832 + d9f4904 |
+| TASK-0269 | config engine + schemas + config check CLI | cefc010 |
+| TASK-0272 | instruction graph + provider adapters | 3b27f43 |
+| TASK-0274 | skills parser/validator | 29fe9d2 |
+| TASK-0270 | scan pipeline + finding contract + reporters | 8837041 |
+| TASK-0271 | rule catalog ACKIT001..099 + suppression advisory | ed34678 |
+| TASK-0273 | instruction analysis ACKIT300..314 | cea05ff |
+| TASK-0275 | builtin skills + ownership lock | ba9929f |
+| TASK-0281 | task system commands + completion gate | 44ae0d5 |
+| TASK-0276 | init lifecycle + managed blocks | 75a2186 |
+| TASK-0277 | context pack engine | ba6daf1 |
+| TASK-0279 | git incremental/cache/baseline | 22a08a1 |
+| TASK-0282 | offline policy engine + digest | bdd85a9 |
+| TASK-0280 | monorepo detection + path scoping | 3e9fda2 |
+| TASK-0278 | optimize advisor + fenced fix | 83bbb49 |
+| TASK-0283 | MCP official SDK stdio server | ec18093 |
+| TASK-0284 | SARIF/MD/HTML reports + watch + hooks | 547cb24 |
+| TASK-0285 | public API + files whitelist + tarball smoke | 9125319 |
+| TASK-0287 | README/canonical docs/threat model | fa4147c |
+| TASK-0286 | CI hardening; hosted run 32607804222 all green | 2063daf/34ae00c |
+| TASK-0288 | benchmark suite + baseline JSON | 586ab23 |
+| TASK-0289 | final gate + MS§48 report | see task doc |
+
+Invariants at closeout: unmapped requirements = 0 · dependency cycles = 0 ·
+tasks without acceptance criteria = 0 · implementation tasks without test plan = 0.
 
 ## Old v1 task classification (`docs/tasks/TASK-0001..0263`, `PROJECT-CONTROL-*`)
 
