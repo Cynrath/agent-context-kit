@@ -7,6 +7,8 @@ import { renderMarkdownReport } from "../../../src/core/reporting/index.js";
 import { getPackageIdentity } from "../../../src/shared/version.js";
 
 const REPO_ROOT = process.cwd();
+const PNPM = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+const PNPM_SHELL = process.platform === "win32";
 
 /** Packaging allowlist (REQ-PKG-001): everything in the tarball must fit these prefixes. */
 const ALLOWED_PREFIXES = [
@@ -31,10 +33,10 @@ describe("tarball contents inspection (REQ-PKG-001)", () => {
   it("packed tarball fits the files allowlist with no tests/cache/artifacts", () => {
     const work = mkdtempSync(path.join(tmpdir(), "ackit-inspect-"));
     try {
-      execFileSync("pnpm.cmd", ["pack", "--pack-destination", work], {
+      execFileSync(PNPM, ["pack", "--pack-destination", work], {
         cwd: REPO_ROOT,
         encoding: "utf8",
-        shell: process.platform === "win32",
+        shell: PNPM_SHELL,
       });
       const tarballName = readdirSync(work).find((entry) => entry.endsWith(".tgz"));
       expect(tarballName).toBeDefined();
@@ -79,10 +81,10 @@ describe("version identity triple-check (REQ-ARCH-009)", () => {
   it("real tarball installs into a temp consumer and the installed CLI passes smoke", () => {
     const work = mkdtempSync(path.join(tmpdir(), "ackit-tar-e2e-"));
     try {
-      execFileSync("pnpm.cmd", ["run", "smoke:package"], {
+      execFileSync(PNPM, ["run", "smoke:package"], {
         cwd: REPO_ROOT,
         encoding: "utf8",
-        shell: process.platform === "win32",
+        shell: PNPM_SHELL,
         timeout: 300000,
       });
     } finally {
