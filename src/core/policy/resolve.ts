@@ -57,9 +57,17 @@ export async function resolvePolicy(
 
   const entryFilesOption = options.entryFiles;
   const hasExplicitEntries = entryFilesOption !== undefined && entryFilesOption.length > 0;
-  const entryFiles = hasExplicitEntries
-    ? entryFilesOption.map((entryFile) => path.resolve(root.canonicalPath, entryFile))
-    : [entry];
+  // Audit item 1: top-level entryFiles must ALSO pass canonical containment.
+  const entryFiles: string[] = [];
+  if (hasExplicitEntries) {
+    for (const entryFile of entryFilesOption) {
+      entryFiles.push(
+        await resolveLocalExtendEntry(root.canonicalPath, root.canonicalPath, entryFile),
+      );
+    }
+  } else {
+    entryFiles.push(entry);
+  }
   // Default policy file is OPTIONAL: repositories without one simply get an
   // empty effective policy instead of an error.
   if (!hasExplicitEntries && !existsSyncDefault(entry)) {

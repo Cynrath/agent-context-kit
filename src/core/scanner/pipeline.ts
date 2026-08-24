@@ -45,8 +45,9 @@ export async function runScan(
   });
   diagnostics.push(...collection.diagnostics);
   const filterPaths = options.filterPaths;
+  // Audit item 6: undefined = full scan; defined (even empty) = restrict to set.
   const inFilter = (relativePath: string): boolean =>
-    filterPaths === undefined || filterPaths.size === 0 || filterPaths.has(relativePath);
+    filterPaths === undefined || filterPaths.has(relativePath);
 
   // Binary-classified files are skipped by design; the decision is surfaced
   // as a diagnostic instead of silence (classifier owns the call, REQ-FS-004).

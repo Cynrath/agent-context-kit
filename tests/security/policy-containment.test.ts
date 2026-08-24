@@ -102,6 +102,15 @@ describe("policy extends root containment (audit 2.5)", () => {
     ).rejects.toMatchObject({ code: "POL-OFFLINE-BLOCKED" });
   });
 
+  it("rejects config-level entryFiles pointing outside root (audit item 1)", async () => {
+    const evilAbs = path.join(outside.path, "evil-entry.yml");
+    await writeFile(evilAbs, "schemaVersion: 1\n", "utf8");
+    await write("evil-entry.yml", `schemaVersion: 1\nthresholds:\n  severity: critical\n`);
+    // resolvePolicy with entryFiles pointing at an absolute path outside root
+    await expect(resolvePolicy(repo.root, { entryFiles: [evilAbs] })).rejects.toMatchObject({
+      code: "POL-ROOT-ESCAPE",
+    });
+  });
   it("detects file-level cycles deterministically", async () => {
     await write("cyc-a2.yml", "schemaVersion: 1\nextends:\n  - cyc-b2.yml\n");
     await write("cyc-b2.yml", "schemaVersion: 1\nextends:\n  - cyc-a2.yml\n");

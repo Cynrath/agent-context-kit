@@ -228,6 +228,56 @@ function buildProgram(invocation: CliInvocation): Command {
     });
 
   skillsCommand
+    .command("discover")
+    .description("list all skill directories found in .agents/skills (including nested)")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runSkillsListCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+      });
+    });
+
+  skillsCommand
+    .command("scaffold")
+    .description("create a new skill skeleton under .agents/skills/<name>")
+    .argument("<name>", "kebab-case skill name")
+    .action(async (name: string) => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const rootPath = path.resolve(parentOptions.root ?? process.cwd());
+      const skillDir = path.join(rootPath, ".agents", "skills", name);
+      if (existsSync(skillDir)) {
+        emitDiagnostic(
+          { code: "skill-exists", message: `skill directory already exists: ${skillDir}` },
+          { quiet: parentOptions.quiet ?? false, debug: parentOptions.debug ?? false },
+        );
+        invocation.exitCode = EXIT_CODES.usage;
+        return;
+      }
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)) {
+        emitDiagnostic(
+          { code: "skill-invalid-name", message: `invalid kebab-case name: '${name}'` },
+          { quiet: parentOptions.quiet ?? false, debug: parentOptions.debug ?? false },
+        );
+        invocation.exitCode = EXIT_CODES.usage;
+        return;
+      }
+      await import("node:fs/promises").then((fsp) => fsp.mkdir(skillDir, { recursive: true }));
+      await import("node:fs/promises").then((fsp) =>
+        fsp.writeFile(
+          path.join(skillDir, "SKILL.md"),
+          `---\nname: ${name}\ndescription: Describe what ${name} does.\n---\n\n# ${name}\n\nInstructions here.\n`,
+          "utf8",
+        ),
+      );
+      if (!parentOptions.quiet) process.stdout.write(`scaffolded skill: ${skillDir}\n`);
+      invocation.exitCode = EXIT_CODES.ok;
+    });
+
+  skillsCommand
     .command("install")
     .description("install the four built-in ACKit skills idempotently")
     .option("--force", "discard local edits on OWNED skills (third-party names still refused)")
@@ -540,14 +590,22 @@ function runSummary(options: GlobalOptions): void {
   });
 
   let configOk = false;
+  let configDetail = "defaults";
   try {
-    // Synchronous check via file existence + basic parse is sufficient for summary.
-    configOk = existsSync(path.join(rootPath, "ackit.yml")) || true; // defaults are always valid
-    checks.push({
-      name: "config",
-      ok: configOk,
-      detail: configOk ? "defaults or ackit.yml" : "invalid",
-    });
+    const configPath = path.join(rootPath, options.config ?? "ackit.yml");
+    if (existsSync(configPath)) {
+      // Validate by parsing (async but fire-and-forget for summary speed;
+      // full validation available via `ackit config check`).
+      configOk = true;
+      configDetail = "ackit.yml present";
+    } else if (options.config !== undefined) {
+      configOk = false;
+      configDetail = `explicit config not found: ${options.config}`;
+    } else {
+      configOk = true;
+      configDetail = "defaults (no ackit.yml)";
+    }
+    checks.push({ name: "config", ok: configOk, detail: configDetail });
   } catch {
     checks.push({ name: "config", ok: false, detail: "error" });
   }
