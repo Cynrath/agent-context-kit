@@ -9,20 +9,13 @@ import { cleanCache } from "../core/cache/cache.js";
 import { type ConfigError, loadAckitConfig } from "../core/config/index.js";
 import { analyzeOptimize, applyFixes, buildContextPack } from "../core/context/index.js";
 import { resolveRepositoryRoot } from "../core/filesystem/root.js";
-import { changedFiles, rangeFiles, sinceFiles, stagedFiles } from "../core/git/git.js";
 import {
   buildInstructionGraph,
   type ProviderId,
   resolveEffectiveStack,
 } from "../core/instructions/index.js";
 import { planOrApplyInit } from "../core/onboarding/index.js";
-import type { PolicyDocument } from "../core/policy/index.js";
-import {
-  applyPolicyToFindings,
-  PolicyError,
-  policyDigest,
-  resolvePolicy,
-} from "../core/policy/index.js";
+import { PolicyError, policyDigest, resolvePolicy } from "../core/policy/index.js";
 import {
   assertBindableHost,
   renderHtmlReport,
@@ -32,7 +25,12 @@ import {
   renderScanTerminal,
   serveReportFile,
 } from "../core/reporting/index.js";
-import { defaultRegistry, runScan, severityAtLeast } from "../core/scanner/index.js";
+import {
+  type ExecutedScan,
+  executeConfiguredScan,
+  GitUnavailableError,
+  ScanContractError,
+} from "../core/scanner/index.js";
 import { validateSkills } from "../core/skills/index.js";
 import { installSkills } from "../core/skills/install.js";
 import { TaskStore } from "../core/tasks/index.js";
@@ -651,97 +649,42 @@ interface ScanCommandOptions {
  */
 export async function runScanCommand(options: ScanCommandOptions): Promise<ExitCodeValue> {
   const rootRequested = path.resolve(options.root ?? process.cwd());
-  const configResult = await loadAckitConfig(rootRequested, { configPath: options.config });
-  if (!configResult.ok) {
-    for (const error of configResult.errors) {
-      emitDiagnostic(
-        { code: "config-error", message: renderConfigError(error) },
-        {
-          quiet: options.quiet,
-          debug: options.debug,
-        },
-      );
-    }
-    return EXIT_CODES.usage;
-  }
 
-  const rootResolution = await resolveRepositoryRoot(rootRequested);
-  if (!rootResolution.ok) {
+  let executed: ExecutedScan;
+  try {
+    executed = await executeConfiguredScan(rootRequested, {
+      configPath: options.config,
+      changed: options.changed,
+      staged: options.staged,
+      since: options.since,
+      range: options.range,
+    });
+  } catch (error) {
+    if (
+      error instanceof GitUnavailableError ||
+      error instanceof ScanContractError ||
+      error instanceof PolicyError
+    ) {
+      const code = (error as { code?: string }).code ?? "scan-error";
+      emitDiagnostic(
+        { code: String(code).toLowerCase(), message: error.message },
+        { quiet: options.quiet, debug: options.debug },
+      );
+      return EXIT_CODES.usage;
+    }
     emitDiagnostic(
-      { code: "environment-error", message: rootResolution.diagnostic.message },
+      { code: "environment-error", message: (error as Error).message },
       { quiet: options.quiet, debug: options.debug },
     );
     return EXIT_CODES.environment;
   }
 
-  // Incremental candidate set (REQ-BASE-003). Non-git + any incremental flag
-  // is invalid usage of the flag in that context → exit 2 with clear reason.
-  let filterPaths: Set<string> | undefined;
-  try {
-    if (
-      options.changed ||
-      options.staged ||
-      options.since !== undefined ||
-      options.range !== undefined
-    ) {
-      const paths = new Set<string>();
-      if (options.changed) for (const file of changedFiles(rootRequested)) paths.add(file);
-      if (options.staged) for (const file of stagedFiles(rootRequested)) paths.add(file);
-      if (options.since !== undefined)
-        for (const file of sinceFiles(rootRequested, options.since)) paths.add(file);
-      if (options.range !== undefined) {
-        const [from, to] = options.range.split("..");
-        for (const file of rangeFiles(rootRequested, from ?? "HEAD", to ?? "HEAD")) paths.add(file);
-      }
-      filterPaths = paths;
-    }
-  } catch (error) {
-    emitDiagnostic(
-      { code: "git-unavailable", message: (error as Error).message },
-      { quiet: options.quiet, debug: options.debug },
-    );
-    return EXIT_CODES.usage;
-  }
-
-  // Effective offline policy (REQ-POL-001): suppressions + overrides + digest.
-  let policy: PolicyDocument | null = null;
-  let documents: PolicyDocument[] = [];
-  let policyDigestValue = "";
-  try {
-    const resolved = await resolvePolicy(rootResolution.root, {
-      entryFiles: configResult.config.policy.extends,
-    });
-    policy = resolved.policy;
-    documents = resolved.documents;
-    policyDigestValue = policyDigest(resolved.policy);
-  } catch (error) {
-    if (error instanceof PolicyError) {
-      emitDiagnostic(
-        { code: error.code.toLowerCase(), message: error.message },
-        {
-          quiet: options.quiet,
-          debug: options.debug,
-        },
-      );
-      return EXIT_CODES.usage;
-    }
-    throw error;
-  }
-
-  const result = await runScan(rootResolution.root, {
-    rules: defaultRegistry.getAll(),
-    limits: configResult.config.limits,
-    userExcludeGlobs: configResult.config.scan.exclude,
-    filterPaths,
-  });
-  if (policy !== null) {
-    result.findings = applyPolicyToFindings(result.findings, { policy, documents });
-  }
+  const result = executed.result;
 
   let newCount: number | null = null;
   let fixedCount: number | null = null;
   if (options.baseline !== undefined) {
-    const baseline = await readBaseline(rootResolution.root, options.baseline);
+    const baseline = await readBaseline(executed.root, options.baseline);
     if (baseline === null) {
       emitDiagnostic(
         {
@@ -758,7 +701,7 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
   }
 
   if (options.writeBaseline !== undefined) {
-    await writeBaseline(rootResolution.root, result.findings, options.writeBaseline);
+    await writeBaseline(executed.root, result.findings, options.writeBaseline);
     if (!options.json && !options.quiet) {
       process.stdout.write(
         `baseline written to ${options.writeBaseline} (${result.findings.length} findings)\n`,
@@ -767,18 +710,13 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
   }
 
   const effectiveFormat = options.json === true ? "json" : (options.format ?? "terminal");
-  const reportMeta = {
-    filesScanned: result.filesScanned,
-    policyDigest: policyDigestValue,
-  };
+  const reportMeta = { filesScanned: result.filesScanned, policyDigest: executed.policyDigest };
   const renderFor = (format: string): string => {
     switch (format) {
       case "json":
         return renderScanJson(result, { newCount, fixedCount });
       case "sarif":
-        return renderSarif(result.findings, {
-          policyDigest: policyDigestValue,
-        });
+        return renderSarif(result.findings, { policyDigest: executed.policyDigest });
       case "markdown":
         return renderMarkdownReport(result.findings, reportMeta);
       case "html":
@@ -794,7 +732,6 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
   };
 
   if (options.watch === true) {
-    // Watch loop (REQ-WATCH-001): initial scan, then debounced re-scans.
     if (!options.quiet && !options.json) {
       process.stdout.write(renderFor(effectiveFormat));
       process.stdout.write("watching for changes... (Ctrl+C to stop)\n");
@@ -802,27 +739,31 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
     let rerunning = false;
     const controller = new AbortController();
     process.on("SIGINT", () => controller.abort());
-    const handle = startWatch(rootResolution.root, {
-      signal: controller.signal,
-      onChange: () => {
-        if (rerunning) return;
-        rerunning = true;
-        void runScan(rootResolution.root, {
-          rules: defaultRegistry.getAll(),
-          limits: configResult.config.limits,
-          userExcludeGlobs: configResult.config.scan.exclude,
-          filterPaths,
+    const rerun = (): void => {
+      if (rerunning) return;
+      rerunning = true;
+      executeConfiguredScan(rootRequested, {
+        configPath: options.config,
+        changed: options.changed,
+        staged: options.staged,
+        since: options.since,
+        range: options.range,
+        signal: controller.signal,
+      })
+        .then((rerunResult) => {
+          result.findings = rerunResult.findings;
+          result.filesScanned = rerunResult.result.filesScanned;
+          result.diagnostics = rerunResult.result.diagnostics;
+          if (!options.quiet && !options.json) process.stdout.write("re-scan complete.\n");
         })
-          .then((rerun) => {
-            result.findings = rerun.findings;
-            result.filesScanned = rerun.filesScanned;
-            result.diagnostics = rerun.diagnostics;
-            if (!options.quiet && !options.json) process.stdout.write("re-scan complete.\n");
-          })
-          .finally(() => {
-            rerunning = false;
-          });
-      },
+        .catch(() => undefined)
+        .finally(() => {
+          rerunning = false;
+        });
+    };
+    const handle = startWatch(executed.root, {
+      signal: controller.signal,
+      onChange: rerun,
     });
     await handle.done;
     if (!options.quiet && !options.json) process.stdout.write("watch stopped cleanly (exit 0).\n");
@@ -840,20 +781,18 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
     process.stdout.write(rendered);
   }
 
-  if (options.ci || newCount !== null) {
-    const threshold = policy?.thresholds.severity ?? configResult.config.scan.severityThreshold;
-    const exceededThreshold = result.findings.some(
-      (finding) => !finding.suppressed && severityAtLeast(finding.severity, threshold),
-    );
-    const hasNew = newCount !== null && newCount > 0;
-    if (exceededThreshold || hasNew) {
-      if (!options.json && !options.quiet) {
-        process.stdout.write(
-          `CI gate failed: ${hasNew ? `${newCount} new finding(s) vs baseline` : `threshold '${threshold}' met or exceeded`}.\n`,
-        );
-      }
-      return EXIT_CODES.thresholdExceeded;
+  const gateRequired = options.ci || newCount !== null;
+  if (gateRequired && (executed.exceededThreshold || (newCount !== null && newCount > 0))) {
+    if (!options.json && !options.quiet) {
+      process.stdout.write(
+        `CI gate failed: ${
+          newCount !== null && newCount > 0
+            ? `${newCount} new finding(s) vs baseline`
+            : `threshold '${executed.threshold}' met or exceeded`
+        }.\n`,
+      );
     }
+    return EXIT_CODES.thresholdExceeded;
   }
   return EXIT_CODES.ok;
 }

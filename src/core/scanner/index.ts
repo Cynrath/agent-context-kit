@@ -1,3 +1,5 @@
+export type { ExecutedScan, ExecuteScanOptions } from "./orchestrate.js";
+export { executeConfiguredScan, GitUnavailableError, ScanContractError } from "./orchestrate.js";
 export { runScan, type ScanPipelineOptions } from "./pipeline.js";
 export { computeFingerprint, redactEvidence } from "./redact.js";
 export { defaultRegistry } from "./registry.js";

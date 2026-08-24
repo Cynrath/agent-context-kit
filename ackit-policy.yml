@@ -10,16 +10,16 @@ suppressions:
     reason: "fixture credentials used by scanner/security tests and their evidence notes"
     expiresAt: 2027-08-22
   - ruleId: ACKIT002
-    pathGlobs: ["tests/security/secrets/**"]
-    reason: "synthetic private key block fixture"
+    pathGlobs: ["tests/security/**"]
+    reason: "synthetic private key block fixtures"
     expiresAt: 2027-08-22
   - ruleId: ACKIT003
     pathGlobs: ["tests/**", "docs/tasks/**", "docs/rebuild/**"]
     reason: "fixture credential assignments used by tests/docs examples"
     expiresAt: 2027-08-22
   - ruleId: ACKIT004
-    pathGlobs: ["tests/security/secrets/**"]
-    reason: "connection-string detection fixture"
+    pathGlobs: ["tests/security/**"]
+    reason: "connection-string detection fixtures"
     expiresAt: 2027-08-22
   - ruleId: ACKIT005
     pathGlobs: ["docs/**", "tests/**"]

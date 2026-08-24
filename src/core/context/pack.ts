@@ -340,7 +340,7 @@ function changedSetHas(
   restrictToFiles: readonly string[] | undefined,
   relativePath: string,
 ): boolean {
-  return restrictToFiles !== undefined && restrictToFiles.includes(relativePath);
+  return restrictToFiles?.includes(relativePath);
 }
 
 function isInstructionScope(relativePath: string): boolean {
