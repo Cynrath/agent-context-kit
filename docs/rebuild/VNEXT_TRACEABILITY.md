@@ -133,6 +133,21 @@ exit codes + artifact paths under gitignored `artifacts/`). Closeout summary
 Invariants at closeout: unmapped requirements = 0 · dependency cycles = 0 ·
 tasks without acceptance criteria = 0 · implementation tasks without test plan = 0.
 
+## Post-goal closure addendum (2026-08-25)
+
+Post-goal-2 audit work is tracked outside the historical wave table:
+
+| Task | Scope | Location |
+|---|---|---|
+| TASK-0291 | independent contract audit + hardening; superseding report | `docs/tasks/TASK-0291-*.md` |
+| TASK-0001 | round-2 P0/P1 repairs; records an invalid forced close (historical evidence, remains `blocked` truthfully) | `docs/tasks/active/TASK-0001-*.md` |
+| TASK-0002 | final closure: CLI monolith split, pack JSON semantic parity, MCP behavioral cancellation, tarball MCP E2E | `docs/tasks/active/TASK-0002-*.md` |
+
+Historical vNext wave tasks (`docs/tasks/TASK-0264..0291`) are flat-format
+documents from the Goal-2 era; the vNext TaskStore lifecycle (active/archive,
+start/complete gate) governs only the `docs/tasks/active` set. Both eras coexist
+as documented history; neither pretends to be validated by the other's tooling.
+
 ## Old v1 task classification (`docs/tasks/TASK-0001..0263`, `PROJECT-CONTROL-*`)
 
 302 historical files reviewed by name/domain; none block vNext. vNext child IDs are exclusively the new ackit-generated TASK-0264..0290 (TASK-0290 added post-planning with a tool-allocated ID to close the CI sequencing gap) — no v1 ID is reused for different work.

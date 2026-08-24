@@ -70,7 +70,7 @@ To be filled progressively as findings are confirmed/fixed; each carries its own
 - [x] package-smoke executes real commands with exit-code assertions
 - [x] True tarball E2E covers init/scan/task/pack/policy/MCP on installed artifact
 - [x] MCP parameter parity + cancellation + root confinement
-- [ ] CLI monolith split into modules without public behavior change — **P2 ADVISORY DEBT**: ~1800-line index.ts should be split into command modules; does not affect correctness/security
+- [x] CLI monolith split into modules without public behavior change — completed 2026-08-25 (see Closure update below; the earlier "P2 ADVISORY DEBT" characterization was wrong and is preserved here only as chronology of the premature closeout)
 - [x] Full verification sequence green locally AND hosted CI green on final HEAD
 - [x] Superseding audit report written (findings/severity/fix/test mapping)
 
@@ -107,15 +107,39 @@ Focused commits revertible individually.
 
 ## Features considered but rejected
 
-- CLI module split into commands/*.ts files: valid improvement but purely mechanical refactor with regression risk; deferred to dedicated task.
+- CLI module split: initially rejected during the first audit round as "purely mechanical refactor" — that rejection was a judgment error; the ~1800-line monolith violated REQ-ARCH-008 and blocked closure. It has since been completed (see Closure update below).
 - Docs site (VitePress): adds build machinery; deferred until after first publish.
 - Property-based fuzz testing (fast-check): justified but requires dependency evaluation; advisory debt.
 
 ## Advisory debt (P2)
 
-- CLI monolith (~1700 lines in src/cli/index.ts): should be split into command modules. Does not affect correctness/security.
+- ~~CLI monolith (~1700 lines in src/cli/index.ts)~~ — RESOLVED: split completed (see Closure update).
 - Coverage thresholds not yet enforced in vitest.config.ts.
 - SchemaStore submission pending npm publish.
+
+## Closure update (2026-08-25): CLI monolith split + pack JSON parity + MCP behavioral cancellation
+
+The three items left open by this audit were completed under `docs/tasks/active/TASK-0002`:
+
+1. CLI split: `src/cli/index.ts` reduced from 1,821 lines / 63,151 bytes to a 23-line bootstrap;
+   `src/cli/program.ts` (367 lines) owns Commander registration; 15 cohesive command/shared modules
+   under `src/cli/commands/` + `src/cli/{context,errors,output,root}.ts`; largest command module
+   183 lines; dependency direction program → commands → shared → core; no cycles; guarded by
+   `tests/contract/cli-architecture.test.ts`. Public behavior pinned by existing contract tests.
+2. Pack JSON semantic parity: canonical orchestration extracted to
+   `src/core/context/orchestrate.ts` (`buildCanonicalContextSections`) used by BOTH the CLI pack
+   command and the MCP `ackit_pack` tool; JSON now carries all five context sections plus included
+   file content/hash/tokens/bytes; markdown↔JSON semantic selection proven equal by
+   `tests/integration/context/pack-parity.test.ts`.
+3. Behavioral cancellation: abort checkpoints added through the pack hot path (before/after
+   discovery, per section, per candidate before/after reads, before ranking/rendering);
+   `tests/integration/mcp/cancellation.test.ts` proves pre-abort refusal, transport-level request
+   cancellation with no result returned, and post-cancel server health.
+
+Installed-tarball E2E (`scripts/package-smoke.mjs`) now launches the MCP server from the installed
+package over stdio: initialize → tools/list → ackit_scan/ackit_pack/ackit_doctor calls →
+resources/list+read → prompts/list+get → clean stdin shutdown, with stdout JSON-RPC purity asserted.
+Runs in CI on ubuntu/windows/macos.
 
 ## Verification evidence
 

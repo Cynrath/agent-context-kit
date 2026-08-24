@@ -1,7 +1,7 @@
 ---
 id: "TASK-0002"
 title: "Final closure: complete mandatory work from invalid TASK-0001 closeout"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   []
@@ -41,16 +41,16 @@ REQ-DX-002, REQ-CTX-001, REQ-MCP-001..004, REQ-API-001, REQ-PKG-001
 
 ## Acceptance criteria
 
-- [ ] src/cli/index.ts reduced to minimal bootstrap (<200 lines)
-- [ ] Command implementations in src/cli/commands/*.ts modules
-- [ ] No giant orchestration file remains (>500 lines)
-- [ ] Public CLI behavior preserved (all existing tests pass)
-- [ ] Pack JSON includes context sections AND included file content
-- [ ] Pack Markdown and JSON represent same semantic selection
-- [ ] No secrets or absolute paths in pack JSON/markdown output
-- [ ] Installed tarball E2E covers init/doctor/scan/task/pack/policy/MCP
-- [ ] Full suite passes with no flaky release-critical failures
-- [ ] Hosted CI green on exact final HEAD
+- [x] src/cli/index.ts reduced to minimal bootstrap (<200 lines) — 23 lines / ~0.6 KB
+- [x] Command implementations in src/cli/commands/*.ts modules — 15 modules, largest 183 lines
+- [x] No giant orchestration file remains (>500 lines) — program.ts 367 lines max
+- [x] Public CLI behavior preserved (all existing tests pass) — contract suites green; runCli surface unchanged
+- [x] Pack JSON includes context sections AND included file content
+- [x] Pack Markdown and JSON represent same semantic selection
+- [x] No secrets or absolute paths in pack JSON/markdown output
+- [x] Installed tarball E2E covers init/doctor/scan/task/pack/policy/MCP
+- [x] Full suite passes with no flaky release-critical failures
+- [ ] Hosted CI green on exact final HEAD (verified after the docs commit push)
 
 ## Test steps
 
@@ -64,8 +64,8 @@ REQ-DX-002, REQ-CTX-001, REQ-MCP-001..004, REQ-API-001, REQ-PKG-001
 ## Risks
 
 - Import path errors during module extraction → caught by typecheck
-- Behavioral regressions → caught by existing 267-test suite
-- Circular dependencies → prevented by one-way imports from commands to core
+- Behavioral regressions → caught by existing test suite
+- Circular dependencies → prevented by one-way imports from commands to core; guarded by cli-architecture test
 
 ## Rollback plan
 
@@ -73,25 +73,47 @@ Focused commit revert per extraction step.
 
 ## Completion notes
 
-'ROUND-2 CLOSURE STATUS:
+COMPLETED 2026-08-25 (normal lifecycle, no --force).
 
-COMPLETED in this session:
-- Pack binary bypass fixed (P0): canonical classifier + catalog secret gate (commit 194d84b)
-- Pack divergent secret detection replaced with canonical rules (P0) (commit 194d84b)
-- Policy extends root escape contained (P0): realpath + isInsideRoot + POL-ROOT-ESCAPE (commit 194d84b)
-- Policy scope semantics implemented: org/repo/pathScopes with table-driven tests (commit 194d84b)
-- MCP root confinement: no root parameter, server constructed with single canonical root (commit a5f9510)
-- MCP scan parity: executeConfiguredScan shared between CLI and MCP (commit a5f9510)
-- Incremental empty-set bug: defined-but-empty filterPaths = zero-target scan (commit fb60184)
-- Bare ackit real health summary: fake || true removed (commit fb60184)
-- Skills discover/scaffold/sync/doctor commands added (commit fb60184)
-- Package smoke behavioral rewrite with full command battery (commit f664115)
-- Cache hot path integrated into scanner pipeline with await cacheSet (commit 2aa15ba)
-- Policy forbiddenPatterns + enabled:false wired into active rule plan (commit 0d35c27)
+1. CLI MONOLITH SPLIT (dependency-first, no buildProgram-first mistake):
+   - efe9020 process-budget test stability fix; de9d23f shared leaf helpers; c07c19b leaf command modules;
+     cfa6d48 skills/task/instructions/init/summary modules; ae4d434 remaining commands + program.ts +
+     23-line bootstrap index.ts.
+   - index.ts: 1,821 lines / 63,151 bytes → 23 lines. program.ts: 367 lines. Largest command module: scan.ts 193 lines.
+   - Direction enforced: program → commands → shared(cli context/errors/output/root) → core. Core/MCP never import CLI.
+   - Regression guard: tests/contract/cli-architecture.test.ts (line budgets + forbidden imports).
+2. PACK JSON SEMANTIC PARITY:
+   - Canonical orchestration: src/core/context/orchestrate.ts buildCanonicalContextSections() used by BOTH
+     CLI `pack` and MCP `ackit_pack` (single source of truth, mirrors executeConfiguredScan pattern).
+   - JSON carries schemaVersion/tool/version/budget + 5 canonical contextSections with content/tokens/sha256
+     + files with relativePath/content/estimatedTokens/sha256/bytes + manifest.
+   - Parity proven: tests/integration/context/pack-parity.test.ts (same sections/files/manifest selection across formats,
+     deterministic byte-identical reruns, no machine-local absolute paths).
+   - Live evidence on this repo: pack --format json → sections=5, files=135, manifest=553, budget 99998/100000.
+3. MCP BEHAVIORAL CANCELLATION:
+   - Abort checkpoints through pack hot path: before discovery / after discovery / per section / per candidate
+     before+after read / before ranking+rendering (src/core/context/pack.ts), plus section-collection checks in
+     orchestrate.ts.
+   - tests/integration/mcp/cancellation.test.ts: pre-aborted signal refuses work; aborted tool call returns NO result
+     over InMemory transport and server stays healthy (subsequent listTools/calls succeed); large-fixture mid-flight
+     cancellation with warm-measured timing and post-cancel recovery.
+4. INSTALLED-TARBALL MCP E2E:
+   - scripts/package-smoke.mjs now launches MCP from the installed .tgz consumer copy: initialize handshake (serverInfo
+     identity == package.json version), notifications/initialized, tools/list, ackit_scan/ackit_pack/ackit_doctor calls,
+     resources/list + repo://summary read, prompts/list + prompts/get, clean stdin shutdown exit 0; stdout purity asserted
+     by strict JSON.parse of every line. Runs in hosted CI on ubuntu/windows/macos.
+5. TEST STABILITY ROOT CAUSE (not "flaky"):
+   - Reproduction: intermittent failures in optimize/git/cli-dist-contract suites; captured timeout at exactly 5000ms
+     default while synchronous git fixture seeding (init+config+add+commit spawns) took 10.7s under load.
+   - Root cause: process-spawn-heavy tests without explicit time budgets on a threads-pool runner.
+   - Fix: explicit generous budgets (60s) for spawn-bound tests/hooks only; assertion semantics untouched. 6 consecutive
+     full-suite runs green after fix (270→282 tests as new suites landed). A silent watch re-scan error swallow was also
+     found in debt sweep and fixed (297f7c9).
+6. REVERIFICATIONS: policy (enabled:false, forbiddenPatterns wiring, scopes, containment incl. junction/symlink),
+   cache (content-hash keys, policy/config digest invalidation, hot path), skills family (validate/list/discover/
+   doctor/scaffold/install live exits 0) — focused suites 64/64 green.
 
-NOT COMPLETED (requires dedicated focused session):
-- CLI monolith split: ~1822-line index.ts has deep cross-dependencies between buildProgram and all run*Command functions. Multiple extraction attempts revealed that each function references core modules AND shared helpers defined in the same file. A safe split requires planning the dependency graph first and extracting in dependency order.
-- Pack JSON semantic content: renderJson now accepts sections+files params but contextSections are only populated by MCP pack tool, not CLI pack command.
-- MCP behavioral cancellation test: signal is propagated but no test starts a long operation, cancels it mid-flight, and verifies abort + server health.
+Local gate at completion: install(frozen)=0 lint=0 format:check=0 typecheck=0 gen:schemas=0 build=0
+vitest 57 files / 282 tests =0 smoke:cli=0 smoke:package=0 task doctor=0 git diff --check clean.
 
-Evidence: 54 files / 270 tests PASS · typecheck=0 · build=0 · self-scan --ci exit 0 · CI run 32733300227 10/10 green at fd95335'
+Hosted CI evidence is recorded after the final docs commit push (final acceptance criterion above).
