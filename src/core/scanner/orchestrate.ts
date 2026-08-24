@@ -6,6 +6,7 @@ import { resolveRepositoryRoot } from "../filesystem/root.js";
 import { changedFiles, rangeFiles, sinceFiles, stagedFiles } from "../git/git.js";
 import {
   applyPolicyToFindings,
+  forbiddenPatternToRule,
   PolicyError,
   policyDigest,
   resolvePolicy,
@@ -114,8 +115,22 @@ export async function executeConfiguredScan(
     const { createHash } = await import("node:crypto");
     const configDigest = createHash("sha256").update(stableStringify(config)).digest("hex");
 
+    // Build the ACTIVE rule plan (audit item 2):
+    // 1. Start with built-in catalog.
+    // 2. Filter out policy-disabled rules (enabled:false) BEFORE evaluation.
+    // 3. Append declarative forbiddenPatterns as first-class ScanRules.
+    const builtin = defaultRegistry.getAll();
+    const disabledIds = new Set(
+      resolvedPolicy.policy.rules.filter((r) => r.enabled === false).map((r) => r.ruleId),
+    );
+    const activeBuiltin = builtin.filter((rule) => !disabledIds.has(rule.id));
+    const forbiddenRules = resolvedPolicy.policy.forbiddenPatterns.map((fp) =>
+      forbiddenPatternToRule(fp),
+    );
+    const activeRulePlan: import("./types.js").ScanRule[] = [...activeBuiltin, ...forbiddenRules];
+
     const result = await runScan(root, {
-      rules: defaultRegistry.getAll(),
+      rules: activeRulePlan,
       limits: config.limits,
       userExcludeGlobs: config.scan.exclude,
       filterPaths,

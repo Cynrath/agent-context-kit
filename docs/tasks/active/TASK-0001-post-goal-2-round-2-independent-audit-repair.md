@@ -1,7 +1,7 @@
 ---
 id: "TASK-0001"
 title: "Post-Goal-2 round 2 independent audit repair"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   []
