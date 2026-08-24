@@ -3,7 +3,7 @@ import process from "node:process";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { loadAckitConfig } from "../core/config/index.js";
-import { buildContextPack, type PackContextSection } from "../core/context/index.js";
+import { buildCanonicalContextSections, buildContextPack } from "../core/context/index.js";
 import { resolveRepositoryRoot } from "../core/filesystem/root.js";
 import { buildInstructionGraph } from "../core/instructions/index.js";
 import { policyDigest, resolvePolicy } from "../core/policy/index.js";
@@ -123,62 +123,11 @@ export async function createAckitMcpServer(requestedRoot?: string | undefined): 
       const maxTokens =
         args.maxTokens ?? (configResult.ok ? configResult.config.context.maxTokens : 100_000);
 
-      const graph = await buildInstructionGraph({ canonicalPath: repositoryRoot });
-      const skills = await validateSkills({ canonicalPath: repositoryRoot });
-      const store = new TaskStore(repositoryRoot);
-      const activeTasks = (await store.list(false)).filter((doc) => doc.meta.status === "active");
-
-      let policyLine = "policy digest: n/a";
-      try {
-        const configForPolicy = await loadAckitConfig(repositoryRoot);
-        if (configForPolicy.ok) {
-          const resolvedPolicy = await resolvePolicy(
-            { canonicalPath: repositoryRoot },
-            {
-              entryFiles: configForPolicy.config.policy.extends,
-            },
-          );
-          policyLine = `policy digest: ${policyDigest(resolvedPolicy.policy)}`;
-        }
-      } catch {
-        // Policy summary is advisory in pack context sections.
-      }
-
-      let pkgMeta = "";
-      try {
-        const fsMod = await import("node:fs/promises");
-        const rawPkg = await fsMod.readFile(path.join(repositoryRoot, "package.json"), "utf8");
-        const parsed = JSON.parse(rawPkg) as { name?: string; description?: string };
-        pkgMeta = `${parsed.name ?? "?"}${parsed.description ? ` — ${parsed.description}` : ""}`;
-      } catch {
-        pkgMeta = "(no package.json)";
-      }
-
-      const sections: PackContextSection[] = [
-        {
-          id: "instruction-graph",
-          title: "Instruction Graph Summary",
-          body: `Nodes: ${graph.nodes.length}\nProviders: ${[...new Set(graph.nodes.map((n) => n.provider))].join(", ")}`,
-        },
-        {
-          id: "active-tasks",
-          title: "Active Tasks",
-          body:
-            activeTasks.length > 0
-              ? activeTasks.map((doc) => `${doc.meta.id}: ${doc.meta.title}`).join("\n")
-              : "(no active task)",
-        },
-        {
-          id: "skills-catalog",
-          title: "Skills Catalog",
-          body:
-            skills.skills.length > 0
-              ? skills.skills.map((s) => `${s.name} — ${s.description}`).join("\n")
-              : "(no skills discovered)",
-        },
-        { id: "policy-summary", title: "Policy Summary", body: policyLine },
-        { id: "repository-metadata", title: "Repository Metadata", body: pkgMeta },
-      ];
+      // Canonical orchestration shared with the CLI `ackit pack` command.
+      const sections = await buildCanonicalContextSections(
+        { canonicalPath: repositoryRoot },
+        { signal: extra.signal },
+      );
 
       const pack = await buildContextPack(
         { canonicalPath: repositoryRoot },

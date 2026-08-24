@@ -1,7 +1,7 @@
 import path from "node:path";
 import process from "node:process";
 import { loadAckitConfig } from "../../core/config/index.js";
-import { buildContextPack } from "../../core/context/index.js";
+import { buildCanonicalContextSections, buildContextPack } from "../../core/context/index.js";
 import { resolveRepositoryRoot } from "../../core/filesystem/root.js";
 import { changedFiles } from "../../core/git/git.js";
 import { emitDiagnostic } from "../../shared/diagnostics.js";
@@ -53,11 +53,14 @@ export async function runPackCommand(
       return EXIT_CODES.environment;
     }
   }
+  // Canonical orchestration shared with the MCP `ackit_pack` tool.
+  const sections = await buildCanonicalContextSections(rootResolution.root);
   const pack = await buildContextPack(rootResolution.root, {
     maxTokens: options.maxTokens ?? configResult.config.context.maxTokens,
     format: options.format,
     includeGlobs: options.include,
     restrictToFiles,
+    contextSections: sections,
   });
 
   if (options.json || options.format === "json") {

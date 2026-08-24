@@ -131,13 +131,123 @@ try {
 ackit(["--root", fixture, "--json", "task", "complete", taskId, "--force"]);
 ackit(["--root", fixture, "--json", "task", "archive", taskId]);
 
-// pack produces valid JSON with manifest
+// pack produces valid JSON with manifest AND canonical context sections/files
 const packJson = ackit(["--root", fixture, "--json", "pack", "--max-tokens", "50000"]);
 const packParsed = JSON.parse(packJson);
 if (!Array.isArray(packParsed.manifest)) throw new Error("pack manifest not an array");
+if (!Array.isArray(packParsed.contextSections) || packParsed.contextSections.length === 0)
+  throw new Error("pack JSON missing canonical context sections");
+if (!Array.isArray(packParsed.files) || packParsed.files.length === 0)
+  throw new Error("pack JSON missing included file content");
+if (packJson.includes(work)) throw new Error("machine-local absolute path leaked into pack JSON");
+const packMarkdown = ackit(["--root", fixture, "pack", "--max-tokens", "50000"]);
+if (!packMarkdown.startsWith("# ACKit Context Pack"))
+  throw new Error("pack markdown preamble missing");
 
 // policy check passes
 ackit(["--root", fixture, "--json", "policy", "check"]);
+
+// ---- Full MCP battery from the INSTALLED package (REQ-MCP-004 / REQ-PKG-001).
+const mcpEntry = path.join(pkgDir, "dist", "mcp", "stdio.js");
+if (!existsSync(mcpEntry)) throw new Error("installed package lacks dist/mcp/stdio.js");
+await import("node:child_process").then(async ({ spawn }) => {
+  const child = spawn(process.execPath, [mcpEntry], {
+    cwd: fixture,
+    env: { ...process.env, ACKIT_ROOT: fixture },
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  let buffer = "";
+  const pending = new Map();
+  const stderrChunks = [];
+  child.stdout.on("data", (chunk) => {
+    buffer += chunk.toString("utf8");
+    for (;;) {
+      const idx = buffer.indexOf("\n");
+      if (idx < 0) break;
+      const line = buffer.slice(0, idx).trim();
+      buffer = buffer.slice(idx + 1);
+      if (!line) continue;
+      const msg = JSON.parse(line); // throws on protocol-purity violation
+      if (msg.id !== undefined && pending.has(msg.id)) {
+        pending.get(msg.id)(msg);
+        pending.delete(msg.id);
+      }
+    }
+  });
+  child.stderr.on("data", (chunk) => stderrChunks.push(chunk.toString("utf8")));
+  const nextId = (() => {
+    let id = 0;
+    return () => ++id;
+  })();
+  function request(method, params, timeoutMs = 60_000) {
+    return new Promise((resolve, reject) => {
+      const id = nextId();
+      const timer = setTimeout(() => reject(new Error(`MCP ${method} timed out`)), timeoutMs);
+      pending.set(id, (msg) => {
+        clearTimeout(timer);
+        if (msg.error) reject(new Error(`${method} error: ${JSON.stringify(msg.error)}`));
+        else resolve(msg.result);
+      });
+      child.stdin.write(`${JSON.stringify({ jsonrpc: "2.0", id, method, params })}\n`);
+    });
+  }
+  function notify(method, params) {
+    child.stdin.write(`${JSON.stringify({ jsonrpc: "2.0", method, params })}\n`);
+  }
+
+  try {
+    const initialized = await request("initialize", {
+      protocolVersion: "2025-06-18",
+      capabilities: {},
+      clientInfo: { name: "package-smoke", version: "0.0.1" },
+    });
+    if (initialized.serverInfo?.name !== "ackit") throw new Error("MCP serverInfo.name mismatch");
+    if (initialized.serverInfo?.version !== pkg.version)
+      throw new Error(`MCP server version mismatch: ${initialized.serverInfo?.version}`);
+    notify("notifications/initialized", {});
+
+    const tools = await request("tools/list", {});
+    const toolNames = tools.tools.map((t) => t.name).sort();
+    for (const expected of [
+      "ackit_scan",
+      "ackit_pack",
+      "ackit_doctor",
+      "ackit_policy_check",
+      "ackit_list_tasks",
+    ]) {
+      if (!toolNames.includes(expected)) throw new Error(`tools/list missing ${expected}`);
+    }
+
+    for (const name of ["ackit_scan", "ackit_pack", "ackit_doctor"]) {
+      const result = await request("tools/call", { name, arguments: {} });
+      if (!Array.isArray(result.content) || result.content.length === 0)
+        throw new Error(`tool ${name} returned empty content`);
+    }
+
+    const resources = await request("resources/list", {});
+    const uris = resources.resources.map((r) => r.uri);
+    for (const expected of ["repo://summary", "repo://skills-catalog", "repo://tasks-active"]) {
+      if (!uris.includes(expected)) throw new Error(`resources/list missing ${expected}`);
+    }
+    const summary = await request("resources/read", { uri: "repo://summary" });
+    if (!summary.contents?.[0]?.text.includes("instructionNodeCount"))
+      throw new Error("repo://summary payload unexpected");
+
+    const prompts = await request("prompts/list", {});
+    if (!prompts.prompts.some((p) => p.name === "onboarding"))
+      throw new Error("prompts/list missing onboarding");
+    const prompt = await request("prompts/get", { name: "onboarding", arguments: {} });
+    if (!prompt.messages?.length) throw new Error("onboarding prompt empty");
+
+    // Clean shutdown: closing stdin ends the server with exit code 0.
+    const exited = new Promise((resolve) => child.once("exit", (code) => resolve(code)));
+    child.stdin.end();
+    const exitCode = await exited;
+    if (exitCode !== 0) throw new Error(`MCP server exited ${exitCode}`);
+  } finally {
+    child.kill();
+  }
+});
 
 console.log(`package smoke OK — ${tarballName} (v${pkg.version})`);
 rmSync(work, { recursive: true, force: true });

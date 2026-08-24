@@ -15,6 +15,8 @@ import type { FindingDraft, ScanRule } from "../scanner/types.js";
 
 export const PACK_SCHEMA_VERSION = "ackit.pack.v0";
 export const PACK_PREAMBLE_LABEL = "token counts are estimates";
+/** Stable abort message surfaced when a pack is cancelled mid-flight. */
+export const PACK_ABORTED_MESSAGE = "context pack aborted";
 
 /** Ranking weight table (REQ-CTX-003 / ADR-0012) — transparent and documented. */
 export const RANKING_WEIGHTS = {
@@ -126,8 +128,13 @@ export async function buildContextPack(
   root: RepositoryRoot,
   options: BuildPackOptions & { format?: "markdown" | "json" | undefined } = {},
 ): Promise<PackResult> {
+  const signal = options.signal;
+  // Checkpoint 1: before discovery.
+  if (signal?.aborted) throw new Error(PACK_ABORTED_MESSAGE);
   const maxTokens = options.maxTokens ?? 100_000;
   const collection = await collectScanTargets(root, { skipClassification: false });
+  // Checkpoint 2: after discovery, before any content work.
+  if (signal?.aborted) throw new Error(PACK_ABORTED_MESSAGE);
 
   const includeMatch =
     options.includeGlobs && options.includeGlobs.length > 0
@@ -148,6 +155,8 @@ export async function buildContextPack(
   let usedTokens = 0;
   const sectionBodies = new Map<string, string>();
   for (const section of options.contextSections ?? []) {
+    // Checkpoint 3: per context section.
+    if (signal?.aborted) throw new Error(PACK_ABORTED_MESSAGE);
     const tokens = estimateTokens(section.body);
     const rel = `(context)/${section.id}`;
     if (usedTokens + tokens <= maxTokens) {
@@ -174,6 +183,8 @@ export async function buildContextPack(
   }
 
   for (const target of collection.targets) {
+    // Checkpoint 4: per candidate, before read.
+    if (signal?.aborted) throw new Error(PACK_ABORTED_MESSAGE);
     // G1: binary exclusion via the CANONICAL classifier (extension-agnostic).
     if (target.kind !== "text") {
       manifestDraft.push({
@@ -193,6 +204,8 @@ export async function buildContextPack(
     } catch {
       continue;
     }
+    // Checkpoint 5: after each expensive read.
+    if (signal?.aborted) throw new Error(PACK_ABORTED_MESSAGE);
 
     // G2: canonical catalog secret gate (single source of truth with scan).
     const secretRuleIds = runSecretGate(content);
@@ -284,6 +297,8 @@ export async function buildContextPack(
   }
 
   scored.sort((a, b) => b.score - a.score || (a.relativePath < b.relativePath ? -1 : 1));
+  // Checkpoint 6: after ranking, before budget selection and rendering.
+  if (signal?.aborted) throw new Error(PACK_ABORTED_MESSAGE);
 
   const included: Scored[] = [];
   for (const candidate of scored) {
