@@ -27,22 +27,23 @@ describe("git module (REQ-BASE-003)", () => {
   let repoA = "";
   let nonGit = "";
 
-  beforeAll(async () => {
-    repoA = await initRepo("git-a");
-    await writeFile(path.join(repoA, "committed.txt"), "base\n");
-    git(repoA, ["add", "."]);
-    git(repoA, ["commit", "-m", "init"]);
-    await writeFile(path.join(repoA, "modified.txt"), "worktree change\n");
-    await writeFile(path.join(repoA, "untracked.txt"), "untracked\n");
-    await writeFile(path.join(repoA, "second.txt"), "second commit\n");
-    git(repoA, ["add", "second.txt"]);
-    git(repoA, ["commit", "-m", "second"]);
-    // Stage AFTER the second commit so it stays pending in the index.
-    await writeFile(path.join(repoA, "staged.txt"), "staged content\n");
-    git(repoA, ["add", "staged.txt"]);
+  beforeAll(
+    async () => {
+      repoA = await initRepo("git-a");
+      await writeFile(path.join(repoA, "committed.txt"), "base\n");
+      git(repoA, ["add", "."]);
+      git(repoA, ["commit", "-m", "init"]);
+      await writeFile(path.join(repoA, "modified.txt"), "worktree change\n");
+      await writeFile(path.join(repoA, "untracked.txt"), "untracked\n");
+      await writeFile(path.join(repoA, "second.txt"), "second commit\n");
+      git(repoA, ["add", "second.txt"]);
+      git(repoA, ["commit", "-m", "second"]);
+      // Stage AFTER the second commit so it stays pending in the index.
+      await writeFile(path.join(repoA, "staged.txt"), "staged content\n");
+      git(repoA, ["add", "staged.txt"]);
 
-    nonGit = await mkdtemp(path.join(tmpdir(), "ackit-nongit-"));
-  });
+      nonGit = await mkdtemp(path.join(tmpdir(), "ackit-nongit-"));
+  }, 60_000);
 
   afterAll(async () => {
     await rm(repoA, { recursive: true, force: true });

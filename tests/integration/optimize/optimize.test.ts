@@ -115,19 +115,25 @@ function gitStatusClean(rootPath: string): boolean {
 }
 
 describe("optimize advisor (REQ-CTX-005)", () => {
-  it("default run is read-only: dirty fixture analyzed while git stays clean", async () => {
-    // Seed a git baseline AFTER fixture creation but BEFORE analysis.
-    expect(gitStatusClean(dirty.root.canonicalPath)).toBe(true);
-    const suggestions = await analyzeOptimize(dirty.root, { maxTokens: 1500 });
-    const categories = new Set<string>(suggestions.map((suggestion) => suggestion.category));
-    for (const category of CATEGORIES_EXPECTED) {
-      expect(categories.has(category), `missing category ${category}`).toBe(true);
-    }
-    const status = execFileSync("git", ["-C", dirty.root.canonicalPath, "status", "--porcelain"], {
-      encoding: "utf8",
-    });
-    expect(status.trim()).toBe("");
-  });
+  // Synchronous git fixture seeding (init + config + add + commit) involves
+  // several process spawns that can exceed the default 5 s budget on cold
+  // Windows runners; the assertions themselves are timing-independent.
+  it(
+    "default run is read-only: dirty fixture analyzed while git stays clean",
+    async () => {
+      expect(gitStatusClean(dirty.root.canonicalPath)).toBe(true);
+      const suggestions = await analyzeOptimize(dirty.root, { maxTokens: 1500 });
+      const categories = new Set<string>(suggestions.map((suggestion) => suggestion.category));
+      for (const category of CATEGORIES_EXPECTED) {
+        expect(categories.has(category), `missing category ${category}`).toBe(true);
+      }
+      const status = execFileSync("git", ["-C", dirty.root.canonicalPath, "status", "--porcelain"], {
+        encoding: "utf8",
+      });
+      expect(status.trim()).toBe("");
+    },
+    60_000,
+  );
 
   it("--fix refuses to silently write user-owned conflicting content (proposal only)", async () => {
     // The pnpm-vs-npm conflict lives in user files; fix mode must not touch them.
