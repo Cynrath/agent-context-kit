@@ -152,7 +152,13 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
           result.diagnostics = rerunResult.result.diagnostics;
           if (!options.quiet && !options.json) process.stdout.write("re-scan complete.\n");
         })
-        .catch(() => undefined)
+        .catch((error: unknown) => {
+          if (options.json) return;
+          emitDiagnostic(
+            { code: "watch-rescan-error", message: (error as Error).message },
+            { quiet: options.quiet, debug: options.debug },
+          );
+        })
         .finally(() => {
           rerunning = false;
         });
