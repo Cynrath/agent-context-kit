@@ -264,9 +264,16 @@ async function resolveLocalExtendEntry(
   } catch {
     throw new PolicyError(`policy file not found: ${entry}`, "POL-NOT-FOUND");
   }
-  // Symlink/junction/reparse second pass: use path.relative which handles
-  // Windows drive-casing and 8.3 short-name resolution correctly.
-  const rel = path.relative(repoRoot, real);
+  // Symlink/junction/reparse second pass: realpath BOTH the root and the
+  // target so Windows 8.3 short-name / casing differences don't produce
+  // false positives.
+  let realRoot: string;
+  try {
+    realRoot = await fsp.realpath(repoRoot);
+  } catch {
+    realRoot = repoRoot;
+  }
+  const rel = path.relative(realRoot, real);
   if (rel.startsWith("..") || path.isAbsolute(rel)) {
     throw new PolicyError(
       `policy extends target '${entry}' resolves outside the repository root via link`,
