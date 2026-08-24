@@ -73,4 +73,25 @@ Focused commit revert per extraction step.
 
 ## Completion notes
 
-(placeholder)
+'ROUND-2 CLOSURE STATUS:
+
+COMPLETED in this session:
+- Pack binary bypass fixed (P0): canonical classifier + catalog secret gate (commit 194d84b)
+- Pack divergent secret detection replaced with canonical rules (P0) (commit 194d84b)
+- Policy extends root escape contained (P0): realpath + isInsideRoot + POL-ROOT-ESCAPE (commit 194d84b)
+- Policy scope semantics implemented: org/repo/pathScopes with table-driven tests (commit 194d84b)
+- MCP root confinement: no root parameter, server constructed with single canonical root (commit a5f9510)
+- MCP scan parity: executeConfiguredScan shared between CLI and MCP (commit a5f9510)
+- Incremental empty-set bug: defined-but-empty filterPaths = zero-target scan (commit fb60184)
+- Bare ackit real health summary: fake || true removed (commit fb60184)
+- Skills discover/scaffold/sync/doctor commands added (commit fb60184)
+- Package smoke behavioral rewrite with full command battery (commit f664115)
+- Cache hot path integrated into scanner pipeline with await cacheSet (commit 2aa15ba)
+- Policy forbiddenPatterns + enabled:false wired into active rule plan (commit 0d35c27)
+
+NOT COMPLETED (requires dedicated focused session):
+- CLI monolith split: ~1822-line index.ts has deep cross-dependencies between buildProgram and all run*Command functions. Multiple extraction attempts revealed that each function references core modules AND shared helpers defined in the same file. A safe split requires planning the dependency graph first and extracting in dependency order.
+- Pack JSON semantic content: renderJson now accepts sections+files params but contextSections are only populated by MCP pack tool, not CLI pack command.
+- MCP behavioral cancellation test: signal is propagated but no test starts a long operation, cancels it mid-flight, and verifies abort + server health.
+
+Evidence: 54 files / 270 tests PASS · typecheck=0 · build=0 · self-scan --ci exit 0 · CI run 32733300227 10/10 green at fd95335'

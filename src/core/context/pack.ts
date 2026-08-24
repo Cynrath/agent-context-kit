@@ -313,7 +313,7 @@ export async function buildContextPack(
   const manifest = finalizeManifest(manifestDraft);
   const identity = getPackageIdentity();
   const markdown = renderMarkdown(identity.version, maxTokens, usedTokens, sectionBodies, included);
-  const json = renderJson(identity.version, maxTokens, usedTokens, manifest);
+  const json = renderJson(identity.version, maxTokens, usedTokens, manifest, sectionBodies, included);
 
   // Final defense-in-depth: the same catalog rules verify EMITTED surfaces.
   assertNoSecretShapes(markdown);
@@ -410,13 +410,30 @@ function renderJson(
   maxTokens: number,
   used: number,
   manifest: readonly PackManifestEntry[],
+  sections: Map<string, string>,
+  files: readonly Scored[],
 ): string {
+  const contextSectionEntries = [...sections.entries()].map(([rel, body]) => ({
+    id: rel.replace("(context)/", ""),
+    content: body,
+    estimatedTokens: estimateTokens(body),
+    sha256: createHash("sha256").update(body).digest("hex"),
+  }));
+  const fileEntries = files.map((f) => ({
+    relativePath: f.relativePath,
+    content: f.content,
+    estimatedTokens: f.tokens,
+    sha256: f.hash,
+    bytes: f.bytes,
+  }));
   return `${JSON.stringify(
     {
       schemaVersion: PACK_SCHEMA_VERSION,
       tool: "ackit",
       version,
       budget: { maxTokens, totalIncludedTokens: used, estimator: PACK_PREAMBLE_LABEL },
+      contextSections: contextSectionEntries,
+      files: fileEntries,
       manifest,
     },
     null,
