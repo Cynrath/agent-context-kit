@@ -4,7 +4,7 @@ title: "Post-Goal-2 round 2 independent audit repair"
 status: pending
 schemaVersion: 2
 dependencies:
-  - "TASK-0291"
+  []
 createdAt: "2026-08-24"
 completedAt: null
 ---
