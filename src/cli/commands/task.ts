@@ -1,8 +1,10 @@
 import path from "node:path";
 import process from "node:process";
+import type { Command } from "commander";
 import { TaskStore } from "../../core/tasks/index.js";
 import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
+import type { CliInvocation, GlobalOptions } from "../context.js";
 import { TASK_REPORT_SCHEMA_VERSION } from "../context.js";
 
 interface TaskCommandBase {
@@ -137,4 +139,71 @@ function emitTaskJson(command: string, payload: Record<string, unknown>): void {
   process.stdout.write(
     `${JSON.stringify({ schemaVersion: TASK_REPORT_SCHEMA_VERSION, tool: "ackit", command: `task ${command}`, ...payload }, null, 2)}\n`,
   );
+}
+
+/**
+ * Registers the `ackit task` command family on the program.
+ */
+export function registerTaskCommands(program: Command, invocation: CliInvocation): void {
+  const taskCommand = program.command("task").description("docs-first task system (REQ-TASKS-001)");
+  taskCommand
+    .command("create")
+    .description("create a pending task with a tool-allocated id")
+    .argument("<title>")
+    .option("--depends-on <ids...>", "dependency TASK-#### ids")
+    .action(async (title: string, opts: { dependsOn?: string[] }) => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runTaskCommand(
+        {
+          root: parentOptions.root,
+          json: parentOptions.json ?? false,
+          quiet: parentOptions.quiet ?? false,
+        },
+        "create",
+        { title, dependencies: opts.dependsOn ?? [] },
+      );
+    });
+  for (const [sub, description] of [
+    ["list", "list tasks (active dir by default; --all includes archive)"],
+    ["doctor", "validate the active task set integrity"],
+    ["show", "show one task by id"],
+  ] as const) {
+    taskCommand
+      .command(sub)
+      .description(description)
+      .option("--all", "include archived tasks", false)
+      .argument("[id]", "task id (required for show)")
+      .action(async (id: string | undefined, opts: { all?: boolean }) => {
+        const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+        invocation.exitCode = await runTaskCommand(
+          {
+            root: parentOptions.root,
+            json: parentOptions.json ?? false,
+            quiet: parentOptions.quiet ?? false,
+          },
+          sub,
+          id ? { id } : { all: opts.all ?? false },
+        );
+      });
+  }
+  for (const sub of ["start", "complete", "archive"] as const) {
+    taskCommand
+      .command(sub)
+      .argument("<id>")
+      .description(`${sub} the given task`)
+      .option("--force", "override completion gate with explicit intent (complete only)", false)
+      .action(async (id: string, opts: { force?: boolean }) => {
+        const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+        invocation.exitCode = await runTaskCommand(
+          {
+            root: parentOptions.root,
+            json: parentOptions.json ?? false,
+            quiet: parentOptions.quiet ?? false,
+            force: opts.force ?? false,
+          },
+          sub,
+          { id },
+        );
+      });
+  }
 }

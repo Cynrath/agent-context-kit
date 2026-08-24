@@ -2,13 +2,14 @@ import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import type { Command } from "commander";
 import { loadAckitConfig } from "../../core/config/index.js";
 import { resolveRepositoryRoot } from "../../core/filesystem/root.js";
 import { validateSkills } from "../../core/skills/index.js";
 import { installSkills } from "../../core/skills/install.js";
 import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
-import type { InstructionsCommandOptions } from "../context.js";
+import type { CliInvocation, GlobalOptions, InstructionsCommandOptions } from "../context.js";
 import { SKILLS_REPORT_SCHEMA_VERSION } from "../context.js";
 import { resolveCliRoot } from "../root.js";
 import { reportConfigErrors } from "./config.js";
@@ -185,4 +186,114 @@ export async function runSkillsScaffoldCommand(
   );
   if (!options.quiet) process.stdout.write(`scaffolded skill: ${skillDir}\n`);
   return EXIT_CODES.ok;
+}
+
+/**
+ * Registers the full `ackit skills` command family on the program.
+ */
+export function registerSkillsCommands(program: Command, invocation: CliInvocation): void {
+  const skillsCommand = program.command("skills").description("agent skills utilities");
+  skillsCommand
+    .command("validate")
+    .description("validate .agents/skills against the open standard (strict + warning tiers)")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runSkillsValidateCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+      });
+    });
+  skillsCommand
+    .command("list")
+    .description("list discovered agent skills")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runSkillsListCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+      });
+    });
+
+  skillsCommand
+    .command("sync")
+    .description("alias for install: sync builtin skills to the current version")
+    .option("--force", "discard local edits on OWNED skills", false)
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const cmdOpts = (skillsCommand.opts() ?? {}) as { force?: boolean };
+      invocation.exitCode = await runSkillsInstallCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        force: cmdOpts.force ?? false,
+      });
+    });
+
+  skillsCommand
+    .command("doctor")
+    .description("validate skills + verify lock integrity")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runSkillsValidateCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+      });
+    });
+
+  skillsCommand
+    .command("discover")
+    .description("list all skill directories found in .agents/skills (including nested)")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runSkillsListCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+      });
+    });
+
+  skillsCommand
+    .command("scaffold")
+    .description("create a new skill skeleton under .agents/skills/<name>")
+    .argument("<name>", "kebab-case skill name")
+    .action(async (name: string) => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runSkillsScaffoldCommand(name, {
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+      });
+    });
+
+  skillsCommand
+    .command("install")
+    .description("install the four built-in ACKit skills idempotently")
+    .option("--force", "discard local edits on OWNED skills (third-party names still refused)")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const commandOptions = (skillsCommand.opts() ?? {}) as { force?: boolean };
+      invocation.exitCode = await runSkillsInstallCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        force: commandOptions.force ?? false,
+      });
+    });
 }
