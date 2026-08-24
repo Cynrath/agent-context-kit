@@ -108,5 +108,36 @@ JSON.parse(scanJson);
 const skillsJson = ackit(["--root", fixture, "--json", "skills", "validate"]);
 JSON.parse(skillsJson);
 
+// doctor reports health
+const doctorJson = ackit(["--root", fixture, "--json", "doctor"]);
+const doctorParsed = JSON.parse(doctorJson);
+if (!doctorParsed.ok && !doctorParsed.checks) throw new Error("doctor output invalid");
+
+// task lifecycle: create → list → show → start → complete
+const taskCreate = ackit(["--root", fixture, "--json", "task", "create", "smoke-test-task"]);
+const taskId = JSON.parse(taskCreate).created;
+ackit(["--root", fixture, "task", "start", taskId]);
+ackit(["--root", fixture, "--json", "task", "show", taskId]);
+const taskList = ackit(["--root", fixture, "--json", "task", "list"]);
+JSON.parse(taskList);
+// complete should fail (gate blocks unchecked criteria)
+try {
+  ackit(["--root", fixture, "--json", "task", "complete", taskId]);
+  throw new Error("completion gate should have blocked");
+} catch {
+  // expected — gate blocked
+}
+// force complete
+ackit(["--root", fixture, "--json", "task", "complete", taskId, "--force"]);
+ackit(["--root", fixture, "--json", "task", "archive", taskId]);
+
+// pack produces valid JSON with manifest
+const packJson = ackit(["--root", fixture, "--json", "pack", "--max-tokens", "50000"]);
+const packParsed = JSON.parse(packJson);
+if (!Array.isArray(packParsed.manifest)) throw new Error("pack manifest not an array");
+
+// policy check passes
+ackit(["--root", fixture, "--json", "policy", "check"]);
+
 console.log(`package smoke OK — ${tarballName} (v${pkg.version})`);
 rmSync(work, { recursive: true, force: true });
