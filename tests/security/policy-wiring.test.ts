@@ -25,12 +25,8 @@ describe("policy rule plan wiring (audit item 2)", () => {
   it("enabled: false prevents rule from producing findings", async () => {
     await writeFile(
       path.join(repo.rootPath, "ackit-policy.yml"),
-      [
-        "schemaVersion: 1",
-        "rules:",
-        "  - ruleId: ACKIT020",
-        "    enabled: false",
-      ].join("\n") + "\n",
+      ["schemaVersion: 1", "rules:", "  - ruleId: ACKIT020", "    enabled: false"].join("\n") +
+        "\n",
       "utf8",
     );
     await writeFile(
@@ -53,7 +49,7 @@ describe("policy rule plan wiring (audit item 2)", () => {
         "schemaVersion: 1",
         "forbiddenPatterns:",
         "  - id: ACKIT950",
-        "    pattern: \"eval\\\\(\"",
+        '    pattern: "eval\\\\("',
         "    severity: high",
         "    message: eval() is forbidden",
       ].join("\n") + "\n",
@@ -62,14 +58,18 @@ describe("policy rule plan wiring (audit item 2)", () => {
     await writeFile(path.join(repo.rootPath, "code.js"), "eval(input);\n");
 
     // Remove the disable so we can see all rules.
-    await writeFile(path.join(repo.rootPath, "ackit-policy.yml"), [
-      "schemaVersion: 1",
-      "forbiddenPatterns:",
-      "  - id: ACKIT950",
-      '    pattern: "eval\\\\("',
-      "    severity: high",
-      "    message: eval() is forbidden",
-    ].join("\n") + "\n", "utf8");
+    await writeFile(
+      path.join(repo.rootPath, "ackit-policy.yml"),
+      [
+        "schemaVersion: 1",
+        "forbiddenPatterns:",
+        "  - id: ACKIT950",
+        '    pattern: "eval\\\\("',
+        "    severity: high",
+        "    message: eval() is forbidden",
+      ].join("\n") + "\n",
+      "utf8",
+    );
     await writeFile(path.join(repo.rootPath, "code.js"), "eval(input);\n");
 
     const result = await executeConfiguredScan(repo.rootPath);
@@ -87,12 +87,8 @@ describe("policy rule plan wiring (audit item 2)", () => {
     );
     await writeFile(
       path.join(repo.rootPath, "ackit-policy.yml"),
-      [
-        "schemaVersion: 1",
-        "rules:",
-        "  - ruleId: ACKIT020",
-        "    severity: high",
-      ].join("\n") + "\n",
+      ["schemaVersion: 1", "rules:", "  - ruleId: ACKIT020", "    severity: high"].join("\n") +
+        "\n",
       "utf8",
     );
     await writeFile(path.join(repo.rootPath, "todo.txt"), "// TODO upgrade\n");
