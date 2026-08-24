@@ -50,3 +50,6 @@ graphify-out/
 
 # Benchmark transient fixtures
 benchmarks/.fixtures/
+
+run-*.txt
+full-run.txt
