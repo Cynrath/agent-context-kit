@@ -23,6 +23,8 @@ export interface InstructionsCommandOptions {
   json: boolean;
   quiet: boolean;
   debug: boolean;
+  provider?: string | undefined;
+  forPath?: string | undefined;
 }
 
 export interface ScanCommandOptions {

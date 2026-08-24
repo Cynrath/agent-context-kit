@@ -1,0 +1,41 @@
+$ vitest run
+
+ RUN  v4.1.11 O:/projeler/agent-context-kit
+
+error: unknown option '--definitely-not-an-option'
+(run 'ackit --help' for usage)
+ackit:usage-error: error: unknown option '--definitely-not-an-option'
+(defaults) OK ÔÇö schemaVersion 1, digest 11b17c8839ab
+ackit 0.1.0 ÔÇö repository health
+
+  Ô£ô git: repository detected
+  Ô£ô config: ackit.yml present
+  Ô£ô tasks: docs/tasks present
+  Ô£ô skills: no skills directory
+
+All checks passed.
+error: unknown option '--definitely-not-an-option'
+(run 'ackit --help' for usage)
+ackit:usage-error: error: unknown option '--definitely-not-an-option'
+error: too many arguments. Expected 0 arguments but got 1: not-a-command.
+(run 'ackit --help' for usage)
+ackit:usage-error: error: too many arguments. Expected 0 arguments but got 1: not-a-command.
+$ pnpm build && pnpm gen:schemas
+$ tsc -p tsconfig.build.json
+$ node scripts/generate-schemas.mjs
+(node:29160) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+$ node scripts/package-smoke.mjs
+$ pnpm build && pnpm gen:schemas
+$ tsc -p tsconfig.build.json
+$ node scripts/generate-schemas.mjs
+ackit:task-error: completion gate blocked: 2 unchecked acceptance criteria item(s); completion notes missing/placeholder
+ackit:force-override: WARNING BANNER: completion forced past the gate (--force overrode: 2 unchecked acceptance criteria item(s); completion notes missing/placeholder)
+(node:6440) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ Test Files  54 passed (54)
+      Tests  270 passed (270)
+   Start at  01:15:19
+   Duration  47.60s (transform 9.23s, setup 0ms, import 46.26s, tests 127.43s, environment 10ms)
+

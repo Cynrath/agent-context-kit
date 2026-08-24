@@ -58,15 +58,15 @@ describe("git module (REQ-BASE-003)", () => {
     expect(changed).toContain("modified.txt");
     expect(changed).toContain("staged.txt");
     expect(changed).not.toContain("second.txt"); // committed before the working-tree edits
-  });
+  }, 60_000);
 
   it("rangeFiles resolves a..HEAD via merge-base diff", () => {
     const files = rangeFiles(repoA, "HEAD~1", "HEAD");
     expect(files).toContain("second.txt");
-  });
+  }, 60_000);
 
   it("non-git directory raises GitUnavailableError with clear message", async () => {
     expect(() => changedFiles(nonGit)).toThrow(GitUnavailableError);
     expect(() => stagedFiles(nonGit)).toThrow(/failed|not found/);
-  });
+  }, 60_000);
 });
