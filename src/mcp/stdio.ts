@@ -5,7 +5,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { createAckitMcpServer } from "./server.js";
 
 async function main(): Promise<void> {
-  const server = createAckitMcpServer();
+  const { server } = await createAckitMcpServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
   // Clean shutdown when stdio closes (REQ-MCP-004).

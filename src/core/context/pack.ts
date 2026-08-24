@@ -96,6 +96,8 @@ export interface BuildPackOptions {
   limits?: import("../filesystem/types.js").TraversalLimits | undefined;
   /** REQ-CTX-001 canonical context sections, pre-rendered by the caller. */
   contextSections?: readonly PackContextSection[] | undefined;
+  /** Cancellation signal (REQ-MCP-004 / audit 6C). */
+  signal?: AbortSignal | undefined;
 }
 
 export interface PackResult {
@@ -125,7 +127,7 @@ export async function buildContextPack(
   options: BuildPackOptions & { format?: "markdown" | "json" | undefined } = {},
 ): Promise<PackResult> {
   const maxTokens = options.maxTokens ?? 100_000;
-  const collection = await collectScanTargets(root);
+  const collection = await collectScanTargets(root, { skipClassification: false });
 
   const includeMatch =
     options.includeGlobs && options.includeGlobs.length > 0

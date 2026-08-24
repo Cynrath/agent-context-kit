@@ -20,7 +20,7 @@ afterAll(async () => {
 });
 
 async function connect(): Promise<{ client: Client; close(): Promise<void> }> {
-  const server = createAckitMcpServer();
+  const { server } = await createAckitMcpServer(rootPath);
   const client = new Client({ name: "test-client", version: "0.0.1" });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   await server.connect(serverTransport);
