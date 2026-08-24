@@ -52,5 +52,4 @@ export const INSTRUCTIONS_REPORT_SCHEMA_VERSION = "ackit.instructions.v0";
 export const TASK_REPORT_SCHEMA_VERSION = "ackit.tasks.v0";
 export const CONFIG_CHECK_SCHEMA_VERSION = "ackit.config-check.v0";
 
-export { emitDiagnostic, EXIT_CODES, getPackageIdentity };
-export { type ExitCodeValue };
+export { EXIT_CODES, type ExitCodeValue, emitDiagnostic, getPackageIdentity };

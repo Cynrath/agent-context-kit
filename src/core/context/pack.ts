@@ -313,7 +313,14 @@ export async function buildContextPack(
   const manifest = finalizeManifest(manifestDraft);
   const identity = getPackageIdentity();
   const markdown = renderMarkdown(identity.version, maxTokens, usedTokens, sectionBodies, included);
-  const json = renderJson(identity.version, maxTokens, usedTokens, manifest, sectionBodies, included);
+  const json = renderJson(
+    identity.version,
+    maxTokens,
+    usedTokens,
+    manifest,
+    sectionBodies,
+    included,
+  );
 
   // Final defense-in-depth: the same catalog rules verify EMITTED surfaces.
   assertNoSecretShapes(markdown);
