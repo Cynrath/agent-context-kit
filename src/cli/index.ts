@@ -40,6 +40,11 @@ import { detectWorkspaces } from "../core/workspace/index.js";
 import { emitDiagnostic } from "../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../shared/exit-codes.js";
 import { getPackageIdentity } from "../shared/version.js";
+import { runCacheCleanCommand } from "./commands/cache.js";
+import { runConfigCheck } from "./commands/config.js";
+import { runDoctorCommand } from "./commands/doctor.js";
+import { runHooksCommand } from "./commands/hooks.js";
+import { runWorkspacesCommand } from "./commands/workspaces.js";
 import {
   type CliInvocation,
   CONFIG_CHECK_SCHEMA_VERSION,
@@ -678,76 +683,6 @@ export async function runCli(argv: readonly string[]): Promise<ExitCodeValue> {
     }
     return EXIT_CODES.internal;
   }
-}
-
-/**
- * `ackit config check`: validate ackit.yml and report structured results
- * (REQ-CFG-005). Exit 2 on invalid config per ADR-0007.
- */
-export async function runConfigCheck(options: Partial<GlobalOptions>): Promise<ExitCodeValue> {
-  const root = path.resolve(options.root ?? process.cwd());
-  const result = await loadAckitConfig(root, { configPath: options.config });
-  if (result.ok) {
-    if (options.json === true) {
-      process.stdout.write(
-        `${JSON.stringify(
-          {
-            schemaVersion: CONFIG_CHECK_SCHEMA_VERSION,
-            tool: "ackit",
-            command: "config check",
-            ok: true,
-            configSourceFile:
-              result.sourceFile === null ? null : toRepoRelative(root, result.sourceFile),
-            digest: result.digest,
-          },
-          null,
-          2,
-        )}\n`,
-      );
-    } else {
-      const sourceLabel =
-        result.sourceFile === null ? "(defaults)" : toRepoRelative(root, result.sourceFile);
-      process.stdout.write(
-        `${sourceLabel} OK — schemaVersion 1, digest ${result.digest.slice(0, 12)}\n`,
-      );
-    }
-    return EXIT_CODES.ok;
-  }
-  if (options.json === true) {
-    process.stdout.write(
-      `${JSON.stringify(
-        {
-          schemaVersion: CONFIG_CHECK_SCHEMA_VERSION,
-          tool: "ackit",
-          command: "config check",
-          ok: false,
-          errors: result.errors.map((error) => ({
-            code: error.code,
-            message: error.message,
-            file: error.file ?? undefined,
-            line: error.location?.line,
-            column: error.location?.column,
-            path: error.path,
-            received: error.received,
-            suggestion: error.suggestion,
-          })),
-        },
-        null,
-        2,
-      )}\n`,
-    );
-  } else {
-    for (const error of result.errors) {
-      emitDiagnostic(
-        { code: "config-error", message: renderConfigError(error) },
-        {
-          quiet: options.quiet ?? false,
-          debug: options.debug ?? false,
-        },
-      );
-    }
-  }
-  return EXIT_CODES.usage;
 }
 
 interface ScanCommandOptions {
@@ -1407,47 +1342,13 @@ export async function runPackCommand(
   } else if (!options.quiet) {
     process.stdout.write(pack.markdown);
   }
-  void assertNoSecretShapesGuard;
   return EXIT_CODES.ok;
 }
-
-const assertNoSecretShapesGuard = undefined;
-void assertNoSecretShapesGuard;
 
 /** Git-changed/untracked candidate set for pack (REQ-CTX-001). Errors propagate. */
 async function listChangedFiles(rootPath: string): Promise<string[]> {
   const { changedFiles } = await import("../core/git/git.js");
   return changedFiles(rootPath);
-}
-
-/** `ackit cache clean` — scope-limited to .ackit/cache (REQ-BASE-004). */
-export async function runCacheCleanCommand(options: {
-  root?: string | undefined;
-  json: boolean;
-  quiet: boolean;
-}): Promise<ExitCodeValue> {
-  const rootRequested = path.resolve(options.root ?? process.cwd());
-  const rootResolution = await resolveRepositoryRoot(rootRequested);
-  if (!rootResolution.ok) {
-    emitDiagnostic(
-      { code: "environment-error", message: rootResolution.diagnostic.message },
-      { quiet: options.quiet, debug: false },
-    );
-    return EXIT_CODES.environment;
-  }
-  const { removedBytes } = await cleanCache(rootResolution.root);
-  if (options.json) {
-    process.stdout.write(
-      `${JSON.stringify(
-        { schemaVersion: "ackit.cache.v0", tool: "ackit", command: "cache clean", removedBytes },
-        null,
-        2,
-      )}\n`,
-    );
-  } else if (!options.quiet) {
-    process.stdout.write(`cache clean: removed ${removedBytes} bytes from .ackit/cache\n`);
-  }
-  return EXIT_CODES.ok;
 }
 
 /** `ackit policy check` (REQ-POL-001/002). */
@@ -1512,53 +1413,6 @@ export async function runPolicyCheckCommand(
 function rootResolutionSafe(rootPath: string): { canonicalPath: string } {
   return { canonicalPath: rootPath };
 }
-
-/** `ackit workspaces` (REQ-MONO-001). */
-export async function runWorkspacesCommand(options: {
-  root?: string | undefined;
-  json: boolean;
-  quiet: boolean;
-}): Promise<ExitCodeValue> {
-  const rootRequested = path.resolve(options.root ?? process.cwd());
-  const rootResolution = await resolveRepositoryRoot(rootRequested);
-  if (!rootResolution.ok) {
-    emitDiagnostic(
-      { code: "environment-error", message: rootResolution.diagnostic.message },
-      { quiet: options.quiet, debug: false },
-    );
-    return EXIT_CODES.environment;
-  }
-  const detection = await detectWorkspaces(rootResolution.root);
-  if (options.json) {
-    process.stdout.write(
-      `${JSON.stringify(
-        {
-          schemaVersion: "ackit.workspaces.v0",
-          tool: "ackit",
-          command: "workspaces",
-          count: detection.workspaces.length,
-          workspaces: detection.workspaces,
-          diagnostics: detection.diagnostics,
-        },
-        null,
-        2,
-      )}\n`,
-    );
-  } else if (!options.quiet) {
-    for (const workspace of detection.workspaces) {
-      process.stdout.write(
-        `${workspace.name} [${workspace.type}] ${workspace.relativePath} (${workspace.markers.join(", ")})\n`,
-      );
-    }
-    if (detection.workspaces.length === 0)
-      process.stdout.write("single-package repository (no workspaces detected)\n");
-  }
-  void resolveWorkspaceNameUnused;
-  return EXIT_CODES.ok;
-}
-
-const resolveWorkspaceNameUnused = undefined;
-void resolveWorkspaceNameUnused;
 
 /** `ackit optimize` (REQ-CTX-005): default run never mutates the repository. */
 export async function runOptimizeCommand(
@@ -1664,108 +1518,6 @@ export async function runReportServeCommand(
   await new Promise<void>((resolve) => process.on("SIGINT", resolve));
   await handle.close();
   return EXIT_CODES.ok;
-}
-
-/** `ackit hooks install|uninstall|status`. */
-export async function runHooksCommand(
-  base: { root?: string | undefined; json: boolean; quiet: boolean },
-  action: "install" | "uninstall" | "status",
-): Promise<ExitCodeValue> {
-  const repoRoot = path.resolve(base.root ?? process.cwd());
-  let payload: Record<string, unknown>;
-  switch (action) {
-    case "install": {
-      const result = await installHook(repoRoot);
-      payload = { action, ...result };
-      break;
-    }
-    case "uninstall": {
-      const result = await uninstallHook(repoRoot);
-      payload = { action, ...result };
-      break;
-    }
-    default: {
-      const result = await hookStatus(repoRoot);
-      payload = { action: "status", ...result };
-    }
-  }
-  if (base.json) {
-    process.stdout.write(
-      `${JSON.stringify({ schemaVersion: "ackit.hooks.v0", tool: "ackit", command: `hooks ${action}`, ...payload }, null, 2)}\n`,
-    );
-  } else if (!base.quiet) {
-    const status = (payload as { status?: string }).status ?? "";
-    process.stdout.write(`hooks ${action}: ${status}\n`);
-  }
-  return EXIT_CODES.ok;
-}
-
-/** `ackit doctor` (REQ-DX-002): comprehensive health check across subsystems. */
-export async function runDoctorCommand(
-  options: Omit<InstructionsCommandOptions, "provider" | "forPath"> & { ci: boolean },
-): Promise<ExitCodeValue> {
-  const rootPath = path.resolve(options.root ?? process.cwd());
-  const checks: Array<{ name: string; ok: boolean; detail: string }> = [];
-
-  // Config check
-  const configResult = await loadAckitConfig(rootPath, { configPath: options.config });
-  checks.push({
-    name: "config",
-    ok: configResult.ok,
-    detail: configResult.ok ? "valid" : configResult.errors.map((e) => e.code).join(", "),
-  });
-
-  // Task integrity
-  try {
-    const store = new TaskStore(rootPath);
-    const report = await store.doctor();
-    checks.push({
-      name: "tasks",
-      ok: report.ok,
-      detail: report.ok ? "integrity OK" : `${report.problems.length} problem(s)`,
-    });
-  } catch (error) {
-    checks.push({ name: "tasks", ok: false, detail: (error as Error).message });
-  }
-
-  // Skills validation
-  const rootResolution = await resolveRepositoryRoot(rootPath);
-  if (rootResolution.ok) {
-    const skills = await validateSkills(rootResolution.root);
-    const strictIssues = skills.issues.filter((issue) => issue.tier === "strict");
-    checks.push({
-      name: "skills",
-      ok: strictIssues.length === 0,
-      detail:
-        strictIssues.length === 0
-          ? `${skills.skills.length} skill(s) OK`
-          : `${strictIssues.length} strict issue(s)`,
-    });
-  } else {
-    checks.push({ name: "skills", ok: false, detail: rootResolution.diagnostic.message });
-  }
-
-  const allOk = checks.every((check) => check.ok);
-
-  if (options.json) {
-    process.stdout.write(
-      `${JSON.stringify(
-        { schemaVersion: "ackit.doctor.v1", tool: "ackit", command: "doctor", ok: allOk, checks },
-        null,
-        2,
-      )}\n`,
-    );
-  } else if (!options.quiet) {
-    for (const check of checks) {
-      process.stdout.write(`  ${check.ok ? "✓" : "✗"} ${check.name}: ${check.detail}\n`);
-    }
-    process.stdout.write(
-      allOk
-        ? "\nAll doctor checks passed.\n"
-        : `\n${checks.filter((c) => !c.ok).length} check(s) failed.\n`,
-    );
-  }
-  return allOk || !options.ci ? EXIT_CODES.ok : EXIT_CODES.thresholdExceeded;
 }
 
 async function main(): Promise<void> {

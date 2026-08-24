@@ -1,0 +1,74 @@
+import path from "node:path";
+import process from "node:process";
+import { loadAckitConfig } from "../../core/config/index.js";
+import { resolveRepositoryRoot } from "../../core/filesystem/root.js";
+import { validateSkills } from "../../core/skills/index.js";
+import { TaskStore } from "../../core/tasks/index.js";
+import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
+import type { InstructionsCommandOptions } from "../context.js";
+import { writeJson } from "../output.js";
+
+/** `ackit doctor` (REQ-DX-002): comprehensive health check across subsystems. */
+export async function runDoctorCommand(
+  options: Omit<InstructionsCommandOptions, "provider" | "forPath"> & { ci: boolean },
+): Promise<ExitCodeValue> {
+  const rootPath = path.resolve(options.root ?? process.cwd());
+  const checks: Array<{ name: string; ok: boolean; detail: string }> = [];
+
+  const configResult = await loadAckitConfig(rootPath, { configPath: options.config });
+  checks.push({
+    name: "config",
+    ok: configResult.ok,
+    detail: configResult.ok ? "valid" : configResult.errors.map((e) => e.code).join(", "),
+  });
+
+  try {
+    const store = new TaskStore(rootPath);
+    const report = await store.doctor();
+    checks.push({
+      name: "tasks",
+      ok: report.ok,
+      detail: report.ok ? "integrity OK" : `${report.problems.length} problem(s)`,
+    });
+  } catch (error) {
+    checks.push({ name: "tasks", ok: false, detail: (error as Error).message });
+  }
+
+  const rootResolution = await resolveRepositoryRoot(rootPath);
+  if (rootResolution.ok) {
+    const skills = await validateSkills(rootResolution.root);
+    const strictIssues = skills.issues.filter((issue) => issue.tier === "strict");
+    checks.push({
+      name: "skills",
+      ok: strictIssues.length === 0,
+      detail:
+        strictIssues.length === 0
+          ? `${skills.skills.length} skill(s) OK`
+          : `${strictIssues.length} strict issue(s)`,
+    });
+  } else {
+    checks.push({ name: "skills", ok: false, detail: rootResolution.diagnostic.message });
+  }
+
+  const allOk = checks.every((check) => check.ok);
+
+  if (options.json) {
+    writeJson({
+      schemaVersion: "ackit.doctor.v1",
+      tool: "ackit",
+      command: "doctor",
+      ok: allOk,
+      checks,
+    });
+  } else if (!options.quiet) {
+    for (const check of checks) {
+      process.stdout.write(`  ${check.ok ? "✓" : "✗"} ${check.name}: ${check.detail}\n`);
+    }
+    process.stdout.write(
+      allOk
+        ? "\nAll doctor checks passed.\n"
+        : `\n${checks.filter((c) => !c.ok).length} check(s) failed.\n`,
+    );
+  }
+  return allOk || !options.ci ? EXIT_CODES.ok : EXIT_CODES.thresholdExceeded;
+}
