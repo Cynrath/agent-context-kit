@@ -117,9 +117,13 @@ export async function runTaskCommand(
         if (base.json) {
           emitTaskJson(subcommand, { id, ok: true, warnings });
         } else if (!base.quiet) {
-          process.stdout.write(
-            `${id}: ${subcommand === "archive" ? "archived" : `${subcommand}ed`}\n`,
-          );
+          const pastTense =
+            subcommand === "archive"
+              ? "archived"
+              : subcommand === "complete"
+                ? "completed"
+                : "started";
+          process.stdout.write(`${id}: ${pastTense}\n`);
         }
         return EXIT_CODES.ok;
       }

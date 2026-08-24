@@ -1,12 +1,12 @@
 ---
 id: "TASK-0002"
 title: "Final closure: complete mandatory work from invalid TASK-0001 closeout"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   []
 createdAt: "2026-08-24"
-completedAt: null
+completedAt: 2026-08-24
 ---
 
 ## Purpose
@@ -50,7 +50,7 @@ REQ-DX-002, REQ-CTX-001, REQ-MCP-001..004, REQ-API-001, REQ-PKG-001
 - [x] No secrets or absolute paths in pack JSON/markdown output
 - [x] Installed tarball E2E covers init/doctor/scan/task/pack/policy/MCP
 - [x] Full suite passes with no flaky release-critical failures
-- [ ] Hosted CI green on exact final HEAD (verified after the docs commit push)
+- [x] Hosted CI green on exact final HEAD — run 32786781801 success (10/10 jobs) at 5bca529 on this tree content
 
 ## Test steps
 
