@@ -280,7 +280,7 @@ async function resolveLocalExtendEntry(
       "POL-ROOT-ESCAPE",
     );
   }
-    return resolved;
+  return resolved;
 }
 
 /** `npm:` prefix resolves through pre-installed node_modules — never the network. */
