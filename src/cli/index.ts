@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { Command, CommanderError } from "commander";
 import { compareBaseline, readBaseline, writeBaseline } from "../core/cache/baseline.js";
 import { cleanCache } from "../core/cache/cache.js";
-import { type ConfigError, loadAckitConfig } from "../core/config/index.js";
+import { loadAckitConfig } from "../core/config/index.js";
 import { analyzeOptimize, applyFixes, buildContextPack } from "../core/context/index.js";
 import { resolveRepositoryRoot } from "../core/filesystem/root.js";
 import {
@@ -40,29 +40,21 @@ import { detectWorkspaces } from "../core/workspace/index.js";
 import { emitDiagnostic } from "../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../shared/exit-codes.js";
 import { getPackageIdentity } from "../shared/version.js";
+import {
+  type CliInvocation,
+  CONFIG_CHECK_SCHEMA_VERSION,
+  type GlobalOptions,
+  INSTRUCTIONS_REPORT_SCHEMA_VERSION,
+  SKILLS_REPORT_SCHEMA_VERSION,
+  SUMMARY_SCHEMA_VERSION,
+  TASK_REPORT_SCHEMA_VERSION,
+} from "./context.js";
+import { isUsageError, renderConfigError } from "./errors.js";
+import { toRepoRelative } from "./root.js";
 
-/**
- * Global options shared by every ackit command (REQ-DX-003).
- */
-export interface GlobalOptions {
-  root?: string | undefined;
-  config?: string | undefined;
-  json: boolean;
-  quiet: boolean;
-  color: boolean;
-  verbose: boolean;
-  debug: boolean;
-  strict: boolean;
-}
-
-const SUMMARY_SCHEMA_VERSION = "ackit.summary.v0";
+export type { GlobalOptions } from "./context.js";
 
 const HELP_TEXT_SUFFIX = "";
-
-/** Per-invocation state shared between command actions and runCli. */
-interface CliInvocation {
-  exitCode?: ExitCodeValue | undefined;
-}
 
 function buildProgram(invocation: CliInvocation): Command {
   const program = new Command();
@@ -651,10 +643,6 @@ function runSummary(options: GlobalOptions): void {
   process.stdout.write(`${lines.join("\n")}\n`);
 }
 
-function isUsageError(error: CommanderError): boolean {
-  return error.code !== "commander.helpDisplayed" && error.code !== "commander.version";
-}
-
 /**
  * Runs one CLI invocation and returns the process exit code (ADR-0007).
  * Exported for contract tests.
@@ -690,15 +678,6 @@ export async function runCli(argv: readonly string[]): Promise<ExitCodeValue> {
     }
     return EXIT_CODES.internal;
   }
-}
-
-const CONFIG_CHECK_SCHEMA_VERSION = "ackit.config-check.v0";
-
-function renderConfigError(error: ConfigError): string {
-  const location =
-    error.location !== undefined ? `:${error.location.line}:${error.location.column}` : "";
-  const suggestion = error.suggestion !== undefined ? ` (did you mean '${error.suggestion}'?)` : "";
-  return `${error.code} ${error.file ?? "ackit.yml"}${location}: ${error.message}${suggestion}`;
 }
 
 /**
@@ -945,13 +924,6 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
   return EXIT_CODES.ok;
 }
 
-function toRepoRelative(root: string, absolutePath: string): string {
-  const relative = path.relative(root, absolutePath);
-  return relative.split(path.sep).join("/");
-}
-
-const INSTRUCTIONS_REPORT_SCHEMA_VERSION = "ackit.instructions.v0";
-
 interface InstructionsCommandOptions {
   root?: string | undefined;
   config?: string | undefined;
@@ -1043,8 +1015,6 @@ export async function runInstructionsCommand(
   }
   return EXIT_CODES.ok;
 }
-
-const SKILLS_REPORT_SCHEMA_VERSION = "ackit.skills.v0";
 
 async function loadValidatedSkills(
   options: Omit<InstructionsCommandOptions, "provider" | "forPath">,
@@ -1197,8 +1167,6 @@ export async function runSkillsInstallCommand(
   }
   return EXIT_CODES.ok;
 }
-
-const TASK_REPORT_SCHEMA_VERSION = "ackit.tasks.v0";
 
 interface TaskCommandBase {
   root?: string | undefined;

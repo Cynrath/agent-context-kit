@@ -1,6 +1,3 @@
-import path from "node:path";
-import process from "node:process";
-import type { Command } from "commander";
 import { emitDiagnostic } from "../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../shared/exit-codes.js";
 import { getPackageIdentity } from "../shared/version.js";
