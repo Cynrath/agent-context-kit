@@ -264,8 +264,10 @@ async function resolveLocalExtendEntry(
   } catch {
     throw new PolicyError(`policy file not found: ${entry}`, "POL-NOT-FOUND");
   }
-  // Symlink/junction/reparse second pass on the canonical target.
-  if (!isInsideRoot(repoRoot, real)) {
+  // Symlink/junction/reparse second pass: use path.relative which handles
+  // Windows drive-casing and 8.3 short-name resolution correctly.
+  const rel = path.relative(repoRoot, real);
+  if (rel.startsWith("..") || path.isAbsolute(rel)) {
     throw new PolicyError(
       `policy extends target '${entry}' resolves outside the repository root via link`,
       "POL-ROOT-ESCAPE",
