@@ -70,7 +70,7 @@ To be filled progressively as findings are confirmed/fixed; each carries its own
 - [x] package-smoke executes real commands with exit-code assertions
 - [x] True tarball E2E covers init/scan/task/pack/policy/MCP on installed artifact
 - [x] MCP parameter parity + cancellation + root confinement
-- [x] CLI monolith split into modules without public behavior change
+- [ ] CLI monolith split into modules without public behavior change — **P2 ADVISORY DEBT**: ~1800-line index.ts should be split into command modules; does not affect correctness/security
 - [x] Full verification sequence green locally AND hosted CI green on final HEAD
 - [x] Superseding audit report written (findings/severity/fix/test mapping)
 
