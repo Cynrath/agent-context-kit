@@ -107,6 +107,12 @@ export async function executeConfiguredScan(
     const resolvedPolicy = await resolvePolicy(root, {
       entryFiles: config.policy.extends,
     });
+    const pd = policyDigest(resolvedPolicy.policy);
+
+    // Compute config digest for cache key binding.
+    const { stableStringify } = await import("../config/load.js");
+    const { createHash } = await import("node:crypto");
+    const configDigest = createHash("sha256").update(stableStringify(config)).digest("hex");
 
     const result = await runScan(root, {
       rules: defaultRegistry.getAll(),
@@ -114,6 +120,11 @@ export async function executeConfiguredScan(
       userExcludeGlobs: config.scan.exclude,
       filterPaths,
       signal: options.signal,
+      cache: {
+        root,
+        configDigest,
+        policyDigest: pd,
+      },
     });
     result.findings = applyPolicyToFindings(result.findings, {
       policy: resolvedPolicy.policy,

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { RepositoryRoot } from "../filesystem/root.js";
 import { collectScanTargets } from "../filesystem/scan-targets.js";
 import { DEFAULT_CONCURRENCY } from "../filesystem/types.js";
@@ -16,6 +17,18 @@ export interface ScanPipelineOptions {
   concurrency?: number | undefined;
   /** Incremental mode: restrict evaluation to these repo-relative paths. */
   filterPaths?: ReadonlySet<string> | undefined;
+  /**
+   * Cache hot path (audit item 10): when set, unchanged files with valid
+   * cache entries skip rule evaluation entirely. Key = content hash +
+   * config digest + policy digest + rule schema + engine version.
+   */
+  cache?:
+    | {
+        root: RepositoryRoot;
+        configDigest: string;
+        policyDigest: string;
+      }
+    | undefined;
 }
 
 interface LineColumn {
@@ -76,7 +89,7 @@ export async function runScan(
     }
     const batch = textTargets.slice(offset, offset + concurrency);
     const batchResults = await Promise.all(
-      batch.map((target) => evaluateTarget(target, options.rules)),
+      batch.map((target) => evaluateTarget(target, options.rules, options.cache)),
     );
     for (const result of batchResults) {
       filesScanned += 1;
@@ -105,6 +118,7 @@ function sortFindings(findings: Finding[]): void {
 async function evaluateTarget(
   target: { relativePath: string; absolutePath: string; kind: string },
   rules: readonly ScanRule[],
+  cache?: { root: RepositoryRoot; configDigest: string; policyDigest: string } | undefined,
 ): Promise<{ findings: Finding[]; diagnostics: ScanDiagnostic[] }> {
   const findings: Finding[] = [];
   const diagnostics: ScanDiagnostic[] = [];
@@ -120,6 +134,23 @@ async function evaluateTarget(
       relativePath: target.relativePath,
     });
     return { findings, diagnostics };
+  }
+
+  // Cache hot path (audit item 10): check for valid cached results before
+  // evaluating rules. Key binds content hash + config/policy digests +
+  // rule schema version + engine version. mtime is never trusted.
+  if (cache) {
+    const contentHash = createHash("sha256").update(content).digest("hex");
+    const { computeCacheKey, cacheGet } = await import("../cache/cache.js");
+    const key = computeCacheKey({
+      contentHash,
+      configDigest: cache.configDigest,
+      policyDigest: cache.policyDigest,
+    });
+    const cached = await cacheGet(cache.root, key);
+    if (cached !== null && Array.isArray(cached.findings)) {
+      return { findings: cached.findings as Finding[], diagnostics };
+    }
   }
   for (const rule of rules) {
     if (!rule.appliesTo(target.relativePath)) continue;
@@ -190,6 +221,28 @@ async function evaluateTarget(
         );
       }
     }
+  }
+
+  // Cache write: store findings for this file keyed by content hash + digests.
+  if (cache) {
+    const contentHash = createHash("sha256").update(content).digest("hex");
+    const { computeCacheKey, cacheSet } = await import("../cache/cache.js");
+    const { getPackageIdentity } = await import("../../shared/version.js");
+    const identity = getPackageIdentity();
+    const key = computeCacheKey({
+      contentHash,
+      configDigest: cache.configDigest,
+      policyDigest: cache.policyDigest,
+    });
+    const { RULE_SCHEMA_VERSION } = await import("../cache/cache.js");
+    await cacheSet(cache.root, {
+      key,
+      ruleSchemaVersion: RULE_SCHEMA_VERSION,
+      engineVersion: identity.version,
+      configDigest: cache.configDigest,
+      policyDigest: cache.policyDigest,
+      findings,
+    }).catch(() => undefined); // cache write failures never block scanning
   }
   return { findings, diagnostics };
 }
