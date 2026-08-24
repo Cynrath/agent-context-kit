@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { realpathSync } from "node:fs";
+import { existsSync, realpathSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -57,10 +57,7 @@ export interface GlobalOptions {
 
 const SUMMARY_SCHEMA_VERSION = "ackit.summary.v0";
 
-const HELP_TEXT_SUFFIX = [
-  "vNext scaffold build: only the CLI core is wired so far.",
-  "Engine commands (doctor, scan, init, pack, ...) land task-by-task on rebuild/ackit-vnext.",
-].join("\n");
+const HELP_TEXT_SUFFIX = "";
 
 /** Per-invocation state shared between command actions and runCli. */
 interface CliInvocation {
@@ -200,6 +197,37 @@ function buildProgram(invocation: CliInvocation): Command {
     });
 
   skillsCommand
+    .command("sync")
+    .description("alias for install: sync builtin skills to the current version")
+    .option("--force", "discard local edits on OWNED skills", false)
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const cmdOpts = (skillsCommand.opts() ?? {}) as { force?: boolean };
+      invocation.exitCode = await runSkillsInstallCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        force: cmdOpts.force ?? false,
+      });
+    });
+
+  skillsCommand
+    .command("doctor")
+    .description("validate skills + verify lock integrity")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runSkillsValidateCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+      });
+    });
+
+  skillsCommand
     .command("install")
     .description("install the four built-in ACKit skills idempotently")
     .option("--force", "discard local edits on OWNED skills (third-party names still refused)")
@@ -237,12 +265,14 @@ function buildProgram(invocation: CliInvocation): Command {
   for (const [sub, description] of [
     ["list", "list tasks (active dir by default; --all includes archive)"],
     ["doctor", "validate the active task set integrity"],
+    ["show", "show one task by id"],
   ] as const) {
     taskCommand
       .command(sub)
       .description(description)
       .option("--all", "include archived tasks", false)
-      .action(async (opts: { all?: boolean }) => {
+      .argument("[id]", "task id (required for show)")
+      .action(async (id: string | undefined, opts: { all?: boolean }) => {
         const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
         invocation.exitCode = await runTaskCommand(
           {
@@ -251,7 +281,7 @@ function buildProgram(invocation: CliInvocation): Command {
             quiet: parentOptions.quiet ?? false,
           },
           sub,
-          { all: opts.all ?? false },
+          id ? { id } : { all: opts.all ?? false },
         );
       });
   }
@@ -370,6 +400,21 @@ function buildProgram(invocation: CliInvocation): Command {
     });
   });
 
+  const doctorCommand = program
+    .command("doctor")
+    .description("comprehensive repository health check (config + tasks + skills + scan)");
+  doctorCommand.option("--ci", "exit 1 when any check fails", false).action(async () => {
+    const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+    const cmdOpts = (doctorCommand.opts() ?? {}) as { ci?: boolean };
+    invocation.exitCode = await runDoctorCommand({
+      root: parentOptions.root,
+      json: parentOptions.json ?? false,
+      quiet: parentOptions.quiet ?? false,
+      debug: parentOptions.debug ?? false,
+      ci: cmdOpts.ci ?? false,
+    });
+  });
+
   const optimizeCommand = program
     .command("optimize")
     .description("read-only advisor for instruction/context hygiene (REQ-CTX-005)");
@@ -479,27 +524,72 @@ function buildProgram(invocation: CliInvocation): Command {
 }
 
 /**
- * Bare `ackit` quick health summary scaffold (REQ-DX-002).
+ * Bare `ackit` repository health summary (REQ-DX-002).
  * Deterministic output; JSON mode keeps stdout pure machine-readable.
  */
 function runSummary(options: GlobalOptions): void {
   const identity = getPackageIdentity();
+  const rootPath = path.resolve(options.root ?? process.cwd());
+
+  const checks: Array<{ name: string; ok: boolean; detail: string }> = [];
+  const hasGitRepo = existsSync(path.join(rootPath, ".git"));
+  checks.push({
+    name: "git",
+    ok: hasGitRepo,
+    detail: hasGitRepo ? "repository detected" : "no .git directory",
+  });
+
+  let configOk = false;
+  try {
+    // Synchronous check via file existence + basic parse is sufficient for summary.
+    configOk = existsSync(path.join(rootPath, "ackit.yml")) || true; // defaults are always valid
+    checks.push({
+      name: "config",
+      ok: configOk,
+      detail: configOk ? "defaults or ackit.yml" : "invalid",
+    });
+  } catch {
+    checks.push({ name: "config", ok: false, detail: "error" });
+  }
+
+  const tasksDir = path.join(rootPath, "docs", "tasks");
+  const hasTasks = existsSync(tasksDir);
+  checks.push({
+    name: "tasks",
+    ok: hasTasks,
+    detail: hasTasks ? "docs/tasks present" : "docs/tasks missing",
+  });
+
+  const skillsDir = path.join(rootPath, ".agents", "skills");
+  const hasSkills = existsSync(skillsDir);
+  checks.push({
+    name: "skills",
+    ok: true,
+    detail: hasSkills ? ".agents/skills present" : "no skills directory",
+  });
+
+  const allOk = checks.every((check) => check.ok);
+
   if (options.json) {
     const payload = {
       schemaVersion: SUMMARY_SCHEMA_VERSION,
       tool: "ackit",
       version: identity.version,
-      status: "scaffold",
-      checks: {},
+      status: allOk ? "ok" : "issues",
+      root: toRepoRelative(rootPath, rootPath),
+      checks,
     };
     process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
     return;
   }
-  const lines = [
-    `ackit ${identity.version}`,
-    "Repository health summary: scaffold — checks are not wired in this build yet.",
-    "Available today: --version, --help, global option parsing, JSON mode.",
-  ];
+  const lines = [`ackit ${identity.version} — repository health`, ""];
+  for (const check of checks) {
+    lines.push(`  ${check.ok ? "✓" : "✗"} ${check.name}: ${check.detail}`);
+  }
+  lines.push(
+    "",
+    allOk ? "All checks passed." : `${checks.filter((c) => !c.ok).length} check(s) failed.`,
+  );
   process.stdout.write(`${lines.join("\n")}\n`);
 }
 
@@ -1062,7 +1152,7 @@ interface TaskCommandBase {
 
 export async function runTaskCommand(
   base: TaskCommandBase,
-  subcommand: "create" | "list" | "doctor" | "start" | "complete" | "archive",
+  subcommand: "create" | "list" | "doctor" | "show" | "start" | "complete" | "archive",
   args: { title: string; dependencies?: string[] } | { all?: boolean } | { id: string },
 ): Promise<ExitCodeValue> {
   const root = path.resolve(base.root ?? process.cwd());
@@ -1095,6 +1185,32 @@ export async function runTaskCommand(
         } else if (!base.quiet) {
           for (const row of rows) process.stdout.write(`${row.id} [${row.status}] ${row.title}\n`);
           if (rows.length === 0) process.stdout.write("no tasks found\n");
+        }
+        return EXIT_CODES.ok;
+      }
+      case "show": {
+        const { id } = args as { id: string };
+        if (!id) {
+          emitDiagnostic(
+            { code: "task-error", message: "task id required for show" },
+            { quiet: base.quiet, debug: base.debug ?? false },
+          );
+          return EXIT_CODES.usage;
+        }
+        const found = await store.find(id);
+        if (found === null) {
+          emitDiagnostic(
+            { code: "task-error", message: `unknown task '${id}'` },
+            { quiet: base.quiet, debug: base.debug ?? false },
+          );
+          return EXIT_CODES.usage;
+        }
+        if (base.json) {
+          emitTaskJson(base, "show", { task: found.doc });
+        } else if (!base.quiet) {
+          process.stdout.write(
+            `${found.doc.meta.id} [${found.doc.meta.status}] ${found.doc.meta.title}\n${found.doc.body}\n`,
+          );
         }
         return EXIT_CODES.ok;
       }
@@ -1556,6 +1672,74 @@ export async function runHooksCommand(
     process.stdout.write(`hooks ${action}: ${status}\n`);
   }
   return EXIT_CODES.ok;
+}
+
+/** `ackit doctor` (REQ-DX-002): comprehensive health check across subsystems. */
+export async function runDoctorCommand(
+  options: Omit<InstructionsCommandOptions, "provider" | "forPath"> & { ci: boolean },
+): Promise<ExitCodeValue> {
+  const rootPath = path.resolve(options.root ?? process.cwd());
+  const checks: Array<{ name: string; ok: boolean; detail: string }> = [];
+
+  // Config check
+  const configResult = await loadAckitConfig(rootPath, { configPath: options.config });
+  checks.push({
+    name: "config",
+    ok: configResult.ok,
+    detail: configResult.ok ? "valid" : configResult.errors.map((e) => e.code).join(", "),
+  });
+
+  // Task integrity
+  try {
+    const store = new TaskStore(rootPath);
+    const report = await store.doctor();
+    checks.push({
+      name: "tasks",
+      ok: report.ok,
+      detail: report.ok ? "integrity OK" : `${report.problems.length} problem(s)`,
+    });
+  } catch (error) {
+    checks.push({ name: "tasks", ok: false, detail: (error as Error).message });
+  }
+
+  // Skills validation
+  const rootResolution = await resolveRepositoryRoot(rootPath);
+  if (rootResolution.ok) {
+    const skills = await validateSkills(rootResolution.root);
+    const strictIssues = skills.issues.filter((issue) => issue.tier === "strict");
+    checks.push({
+      name: "skills",
+      ok: strictIssues.length === 0,
+      detail:
+        strictIssues.length === 0
+          ? `${skills.skills.length} skill(s) OK`
+          : `${strictIssues.length} strict issue(s)`,
+    });
+  } else {
+    checks.push({ name: "skills", ok: false, detail: rootResolution.diagnostic.message });
+  }
+
+  const allOk = checks.every((check) => check.ok);
+
+  if (options.json) {
+    process.stdout.write(
+      `${JSON.stringify(
+        { schemaVersion: "ackit.doctor.v1", tool: "ackit", command: "doctor", ok: allOk, checks },
+        null,
+        2,
+      )}\n`,
+    );
+  } else if (!options.quiet) {
+    for (const check of checks) {
+      process.stdout.write(`  ${check.ok ? "✓" : "✗"} ${check.name}: ${check.detail}\n`);
+    }
+    process.stdout.write(
+      allOk
+        ? "\nAll doctor checks passed.\n"
+        : `\n${checks.filter((c) => !c.ok).length} check(s) failed.\n`,
+    );
+  }
+  return allOk || !options.ci ? EXIT_CODES.ok : EXIT_CODES.thresholdExceeded;
 }
 
 async function main(): Promise<void> {

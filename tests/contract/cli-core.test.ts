@@ -25,19 +25,15 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("ackit CLI core behavior (scaffold)", () => {
-  it("prints a deterministic quick summary for the bare command", async () => {
+describe("ackit CLI core behavior", () => {
+  it("prints a deterministic health summary for the bare command", async () => {
     const captured = captureStdout();
     const code = await runCli([...ARGV_PREFIX]);
     captured.restore();
     expect(code).toBe(EXIT_CODES.ok);
-    expect(captured.lines()).toBe(
-      `${[
-        `ackit ${getPackageIdentity().version}`,
-        "Repository health summary: scaffold — checks are not wired in this build yet.",
-        "Available today: --version, --help, global option parsing, JSON mode.",
-      ].join("\n")}\n`,
-    );
+    const output = captured.lines();
+    expect(output).toContain(`ackit ${getPackageIdentity().version}`);
+    expect(output).toContain("repository health");
   });
 
   it("emits pure parseable JSON in --json mode", async () => {
@@ -52,7 +48,7 @@ describe("ackit CLI core behavior (scaffold)", () => {
     };
     expect(parsed.schemaVersion).toBe("ackit.summary.v0");
     expect(parsed.version).toBe(getPackageIdentity().version);
-    expect(parsed.status).toBe("scaffold");
+    expect(parsed.status).toBe("ok");
   });
 
   it("accepts all documented global options without error", async () => {

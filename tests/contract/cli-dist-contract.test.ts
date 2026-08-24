@@ -40,7 +40,7 @@ describe("built dist CLI contract", () => {
     expect(result.status).toBe(0);
     const parsed = JSON.parse(result.stdout) as { schemaVersion?: unknown; status?: unknown };
     expect(parsed.schemaVersion).toBe("ackit.summary.v0");
-    expect(parsed.status).toBe("scaffold");
+    expect(parsed.status).toBe("ok");
   });
 
   it("exits with code 2 on invalid usage from the real executable", () => {
