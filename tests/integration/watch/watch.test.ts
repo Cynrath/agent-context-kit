@@ -34,6 +34,8 @@ describe("watch runner (REQ-WATCH-001)", () => {
       },
     });
 
+    // Wait for initial snapshot to complete before writing.
+    await new Promise((resolve) => setTimeout(resolve, 300));
     // Burst of writes inside the debounce window.
     await writeFile(path.join(repo.rootPath, "a.txt"), "1\n");
     await writeFile(path.join(repo.rootPath, "a.txt"), "2\n");
