@@ -142,14 +142,16 @@ describe("release workflow hardening", () => {
     const tests = order("run: pnpm test");
     const smoke = order("run: pnpm run smoke:package");
     const absence = order("Confirm exact version is absent from the npm registry");
-    const publish = order("run: npm publish --access public --provenance");
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: literal bash text under test
+    const publish = order('run: npm publish "${TARBALL_PATH}" --access public');
     expect(tests).toBeLessThan(publish);
     expect(smoke).toBeLessThan(publish);
     expect(absence).toBeLessThan(publish);
   });
 
   it("creates the GitHub Release only AFTER publish + registry + npx verification", () => {
-    const publish = raw.indexOf("run: npm publish --access public --provenance");
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: literal bash text under test
+    const publish = raw.indexOf('run: npm publish "${TARBALL_PATH}" --access public');
     const verify = raw.indexOf("Verify registry metadata, shasum, and dist-tag");
     const npxSmoke = raw.indexOf("Real registry npx consumer smoke");
     const release = raw.indexOf("gh release create");
@@ -158,6 +160,20 @@ describe("release workflow hardening", () => {
     expect(verify).toBeGreaterThan(publish);
     expect(release).toBeGreaterThan(npxSmoke);
     expect(release).toBeGreaterThan(verify);
+  });
+
+  it("publishes the recorded tarball and parses registry metadata safely", () => {
+    // Regression (v0.1.1 release incident): argument-less `npm publish`
+    // re-packs, and this package's prepack hook rewrites dist/ mtimes, so a
+    // second pack can never be byte-identical to the recorded tarball.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: literal bash text under test
+    expect(raw).toContain('npm publish "${TARBALL_PATH}"');
+    // Multi-field `npm view` prints `key = 'value'` text; slicing that output
+    // produced a bogus shasum comparison. The value must come from JSON.
+    expect(raw).toContain("dist.shasum --json");
+    expect(raw).toContain("JSON.parse(require('fs').readFileSync(0,'utf8'))");
+    // Bounded but generous propagation window (>= 5 minutes).
+    expect(raw).toMatch(/seq 1 30/);
   });
 
   it("keeps GitHub Release creation as the strictly-last job step (failed publish aborts first)", () => {

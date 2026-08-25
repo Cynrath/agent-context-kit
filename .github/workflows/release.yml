@@ -139,25 +139,25 @@ jobs:
           exit 11
 
       - name: Publish to npm via OIDC Trusted Publishing
-        run: npm publish --access public --provenance
+        run: npm publish "${TARBALL_PATH}" --access public --provenance
 
       - name: Verify registry metadata, shasum, and dist-tag (bounded propagation retry)
         run: |
           set -euo pipefail
           seen=0
-          for attempt in $(seq 1 12); do
-            if npm view "@cynrath/agent-context-kit@${RELEASE_VERSION}" version dist.shasum > /tmp/reg-view.txt 2>/dev/null; then
+          for attempt in $(seq 1 30); do
+            if npm view "@cynrath/agent-context-kit@${RELEASE_VERSION}" version > /dev/null 2>&1; then
               seen=1
               break
             fi
-            echo "attempt ${attempt}/12: published version not visible yet; waiting 10s"
+            echo "attempt ${attempt}/30: published version not visible yet; waiting 10s"
             sleep 10
           done
           if [ "${seen}" -ne 1 ]; then
             echo "::error::published version never became visible on the registry"
             exit 20
           fi
-          REG_SHASUM="$(tail -n1 /tmp/reg-view.txt | tr -d "'\"[:space:]")"
+          REG_SHASUM="$(npm view "@cynrath/agent-context-kit@${RELEASE_VERSION}" dist.shasum --json | node -p "JSON.parse(require('fs').readFileSync(0,'utf8'))")"
           if [ "${REG_SHASUM}" != "${TARBALL_SHASUM}" ]; then
             echo "::error::registry shasum ${REG_SHASUM} != local tarball shasum ${TARBALL_SHASUM}"
             exit 21
