@@ -155,6 +155,14 @@ FINAL EVIDENCE OF THE POST-TASK-0002 CANDIDATE (recorded chronologically by TASK
 - Hosted CI run `32787110952`: **all 10 jobs green** at commit `b35ca59`
 - An independent audit of this state identified remaining defects (REQ-GOV-007 pack/policy silent catches, false-positive MCP cancellation test, tarball E2E --force success path); repair is owned by docs/tasks/active/TASK-0003-final-independent-closure-repair.md, whose own verification block is the authoritative latest evidence.
 
+## Latest evidence (TASK-0003 repair closure, 2026-08-25)
+
+- vitest at the repaired HEAD: **58 files / 289 tests**, 4 consecutive full-suite green runs locally
+- Hosted CI run `32850731471` @ `a91eff3`: **FAILED** (windows/macos verify only) — root-caused to a genuine cross-platform defect in the NEW cancellation test seam (absolute-path marker matching vs realpath divergence + spy-restoration ordering), fixed forward in `c48f262`; documented as a found-and-fixed defect, not flakiness
+- Hosted CI run `32852520676` @ `c48f262`: **SUCCESS — all 10 jobs green**
+- The final documentation-inclusive push of the repair closes with its own verified CI run recorded in TASK-0003 completion notes and the session closure report
+- MUST audit matrix result: see "Final MUST audit re-run" below
+
 ## Final MUST audit re-run (2026-08-25, TASK-0003)
 
 Authoritative requirement source: `docs/rebuild/VNEXT_REQUIREMENTS.md` — **114 MUST rows** (the earlier "113" figure undercounted; recount below is generated from the table itself).

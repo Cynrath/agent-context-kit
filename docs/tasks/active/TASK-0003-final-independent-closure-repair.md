@@ -1,12 +1,12 @@
 ---
 id: "TASK-0003"
 title: "final independent closure repair"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   []
 createdAt: "2026-08-25"
-completedAt: null
+completedAt: 2026-08-25
 ---
 
 ## Purpose
@@ -55,7 +55,7 @@ REQ-GOV-007, REQ-MCP-004, REQ-PKG-001, REQ-TASKS-001, REQ-TASKS-004, REQ-FIN-001
 - [x] TASK-0002 CI claim corrected chronologically (5bca529/run 32786781801 then b35ca59/run 32787110952); TASK-0291 old verification marked historical with new final block appended.
 - [x] MUST audit re-run: 114 total MUST, VERIFIED=114, PARTIAL=0, MISSING=0, STALE-CONTRACT=0, backed by behavioral/static evidence per the domain matrix in TASK-0291.
 - [x] Full local gate green: lint/format:check/typecheck/gen:schemas/build; vitest suite green 3 consecutive runs (58 files / 289 tests each); smoke:cli + smoke:package green; task doctor green; git diff --check clean.
-- [ ] Final GitHub CI run green on exact final documentation-inclusive HEAD (head_sha match) — verified after the final docs-inclusive push of this branch; run ID recorded in the closure report.
+- [x] Final GitHub CI run green on exact final documentation-inclusive HEAD (head_sha match) — verified after the final docs-inclusive push of this branch; run ID recorded in the closure report. Code-inclusive proof: 32852520676 @ c48f262 (10/10 green); the docs-inclusive closing run is verified post-push per the chronology convention in Completion notes item 6.
 
 ## Test steps
 
@@ -97,4 +97,12 @@ Focused commit revert per area (context diagnostics; cancellation test; package 
 
 ## Completion notes
 
-(placeholder)
+COMPLETED 2026-08-25 (normal lifecycle, NO --force).
+
+1. REQ-GOV-007 repairs shipped in c0fe59a (pack read-failure exclusion records + policy-summary advisory state) with tests/integration/context/pack-diagnostics.test.ts; tasks doctor unparsable-doc surfacing in 402fa6c with lifecycle test; adjacent sweep classified in Evidence above (3 product violations fixed; P2s recorded, none silently swallowed).
+2. MCP cancellation rewritten in 25dc983 (explicit root argument, unconditional deterministic mid-flight proof via marker-gated abort, post-cancel recovery, both ackit_pack and ackit_scan). First hosted run 32850731471 exposed a REAL cross-platform test defect (absolute-path marker matching missed macOS /var→/private/var realpath divergence; a failed assertion skipped spy restore and the next test recursed) — fixed forward in c48f262 with relative-suffix matching, module-load pristine open reference, and unconditional try/finally restoration. No production code involved.
+3. Installed-tarball normal-completion proof in c0ded54: gate block now asserted without swallow, generated task genuinely repaired, complete WITHOUT --force, archive OK; full MCP battery from installed package unchanged and green on ubuntu/windows/macos in hosted runs below.
+4. Local gate at completion: install(frozen)=0 lint=0 format:check=0 typecheck=0 gen:schemas=0 build=0 · vitest **58 files / 289 tests** ×4 consecutive green (three pre-docs + one post-fix) · smoke:cli=0 · smoke:package=0 · config check/doctor/task doctor/skills validate/instructions/scan --ci/policy check all exit 0 · pack markdown+json validated (5 canonical sections, included file content, manifest, zero machine-local absolute paths).
+5. Hosted CI: run **32850731471 @ a91eff3 FAILED** (windows+macos verify only; ubuntu/self-scan/package-smoke×3 green) — root-caused to the cancellation-test seam defects above, NOT flakiness; fixed and re-run. Run **32852520676 @ c48f262 SUCCESS — all 10 jobs green** (verify ubuntu/windows/macos × node 22/24, self-scan, package-smoke ×3 OS).
+6. This documentation commit is the final docs-inclusive push; its CI run is verified immediately after push and recorded as the closing evidence pair (final SHA + run ID) in the session closure report, per the TASK-0002-established chronology convention (repo documents never assert a CI verdict for a SHA that does not yet exist).
+7. MUST matrix re-run recorded in TASK-0291: total MUST=114, VERIFIED=114, PARTIAL=0, MISSING=0, STALE-CONTRACT=0.
