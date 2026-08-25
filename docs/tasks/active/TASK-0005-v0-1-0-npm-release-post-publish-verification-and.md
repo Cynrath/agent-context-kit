@@ -1,12 +1,12 @@
 ---
 id: "TASK-0005"
 title: "v0.1.0 npm release post-publish verification and tag GitHub Release"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   []
 createdAt: "2026-08-25"
-completedAt: null
+completedAt: 2026-08-25
 ---
 
 ## Purpose
@@ -61,22 +61,22 @@ REQ-PKG-001, REQ-CI-001, REQ-CI-003, REQ-DOC-001, REQ-DOC-004, REQ-ARCH-009, REQ
 
 ## Acceptance criteria
 
-- [ ] Release docs carry tense-neutral final-release wording; stale `not yet published` / `Unreleased` claims removed from canonical current docs while preserved historical records stay untouched.
-- [ ] package.json metadata verified publication-correct; no placeholders; not private.
-- [ ] Full local gate green on the final candidate SHA (frozen install, lint, format:check, typecheck, gen:schemas, build, test, smoke:cli, smoke:package, config check, doctor, task doctor, skills validate, instructions, scan --ci, git diff --check).
-- [ ] Master CI run for the exact candidate SHA: completed/success with 10/10 jobs.
-- [ ] Real tarball content audit clean (dist/templates/schemas/README/CHANGELOG/LICENSE/package.json only; no src/tests/.git/.github/env/secrets/cache/reports/task-runtime/temp leakage) and isolated consumer smoke green incl. MCP stdio battery.
-- [ ] npm registry/auth preflight documented (official registry, publish-capable account, scope access, pre-publish 404 expected, OTP requirement identified); no token/OTP/password values written to task, Git, or reports.
-- [ ] CHECKPOINT 1 passed: explicit user authorization for npm publish received and recorded before any publish command.
-- [ ] `npm publish --access public` executed only after re-verifying unchanged master SHA, clean tree, and empty registry state; publish succeeded.
-- [ ] Registry metadata verified: version 0.1.0, latest -> 0.1.0, integrity/shasum present, metadata matches local package.
-- [ ] Fresh registry-based consumer smoke green: temp-dir `npm install @cynrath/agent-context-kit@0.1.0` CLI/MCP battery plus `npx --yes @cynrath/agent-context-kit@0.1.0 --version/--help`.
-- [ ] Local global install green: `ackit --version` == 0.1.0 resolving from the npm global prefix; legacy .NET `ackit` absent; disposable-temp-repo smoke green.
-- [ ] Post-publish docs accuracy verified; fix-forward decision recorded either way.
-- [ ] CHECKPOINT 2 passed: explicit user authorization for tag + GitHub Release received and recorded.
-- [ ] Annotated tag `v0.1.0` created and pushed at the agreed provenance SHA; remote target verified read-only.
-- [ ] GitHub Release `v0.1.0` created with technical notes (no NuGet publish implication, legacy v1 kept separate); URL/metadata verified.
-- [ ] Final provenance tuple consistent (repo/npm/latest/integrity/shasum/package source SHA/master SHA/tag/release/local ackit/legacy absent) and working tree clean.
+- [x] Release docs carry tense-neutral final-release wording; stale `not yet published` / `Unreleased` claims removed from canonical current docs while preserved historical records stay untouched.
+- [x] package.json metadata verified publication-correct; no placeholders; not private.
+- [x] Full local gate green on the final candidate SHA (frozen install, lint, format:check, typecheck, gen:schemas, build, test, smoke:cli, smoke:package, config check, doctor, task doctor, skills validate, instructions, scan --ci, git diff --check).
+- [x] Master CI run for the exact candidate SHA: completed/success with 10/10 jobs.
+- [x] Real tarball content audit clean (dist/templates/schemas/README/CHANGELOG/LICENSE/package.json only; no src/tests/.git/.github/env/secrets/cache/reports/task-runtime/temp leakage) and isolated consumer smoke green incl. MCP stdio battery.
+- [x] npm registry/auth preflight documented (official registry, publish-capable account, scope access, pre-publish 404 expected, OTP requirement identified); no token/OTP/password values written to task, Git, or reports.
+- [x] CHECKPOINT 1 passed: explicit user authorization for npm publish received and recorded before any publish command.
+- [x] `npm publish --access public` executed only after re-verifying unchanged master SHA, clean tree, and empty registry state; publish succeeded.
+- [x] Registry metadata verified: version 0.1.0, latest -> 0.1.0, integrity/shasum present, metadata matches local package.
+- [x] Fresh registry-based consumer smoke green: temp-dir `npm install @cynrath/agent-context-kit@0.1.0` CLI/MCP battery plus `npx --yes @cynrath/agent-context-kit@0.1.0 --version/--help`.
+- [x] Local global install green: `ackit --version` == 0.1.0 resolving from the npm global prefix; legacy .NET `ackit` absent; disposable-temp-repo smoke green.
+- [x] Post-publish docs accuracy verified; fix-forward decision recorded either way.
+- [x] CHECKPOINT 2 passed: explicit user authorization for tag + GitHub Release received and recorded.
+- [x] Annotated tag `v0.1.0` created and pushed at the agreed provenance SHA; remote target verified read-only.
+- [x] GitHub Release `v0.1.0` created with technical notes (no NuGet publish implication, legacy v1 kept separate); URL/metadata verified.
+- [x] Final provenance tuple consistent (repo/npm/latest/integrity/shasum/package source SHA/master SHA/tag/release/local ackit/legacy absent) and working tree clean.
 
 ## Test steps
 
@@ -104,4 +104,18 @@ Any failed stage halts the chain before the next stage; failures are reported wi
 
 ## Completion notes
 
-(placeholder — filled at closure with real evidence)
+1. Preflight (2026-08-25): branch `master`; start HEAD == origin/master == origin/rebuild/ackit-vnext == `31088f8382d65b56ba57127523e41c4a7f7caf8b`; working tree clean; zero tags locally/remotely (`git ls-remote --tags` empty). Dogfood: `node dist/cli/index.js --version` → `0.1.0`, `doctor` all-pass, `scan --ci` exit 0 under existing policy suppressions.
+2. Docs finalization (tense-neutral, stays true pre/post publish): README.md (status block, Install with npm-global + `npx @…@0.1.0` + source-checkout paths, Versioning & status), CHANGELOG.md (`[0.1.0] - 2026-08-25` dated entry with real vNext feature bullets; legacy v1 section byte-preserved), CLAUDE.md + `.github/copilot-instructions.md` (Release Status), AGENTS.md intro, CONTRIBUTING.md landing sentence, `docs/guides/getting-started.md` Install. Preserved records (`docs/tasks/TASK-*`, `VNEXT_REQUIREMENTS.md`, ADRs, frozen legacy changelog section) untouched. Committed as `890a874fb8df724bb5250609b56be31560d468b2` — "chore(release): finalize v0.1.0 release metadata and docs"; tree clean after commit.
+3. Full local gate on `890a874`: frozen install, lint, format:check, typecheck, gen:schemas, build, test, smoke:cli, smoke:package, config check, doctor, task doctor, skills validate, instructions, scan --ci, git diff --check — every step exit 0 ("GATE RESULT: ALL GREEN").
+4. Master CI for exact SHA: run `32888308253`, head_branch=master, event=push, head_sha=`890a874…`, completed/**success**, **10/10** jobs success (6× verify matrix, self-scan, 3× package-smoke).
+5. Tarball audit: `cynrath-agent-context-kit-0.1.0.tgz`, 173.9 kB, shasum `f24f4f1af4636861c97dcd02139a792cf1326b52`, exactly 297 files = dist(282) + templates(8) + schemas(3) + README/CHANGELOG/LICENSE/package.json; leak-check clean (no `.git`, `.github`, `src`, `tests`, `docs`, `.env`, artifacts, reports, caches, credentials).
+6. Isolated tarball consumer battery (fresh temp dir, real `npm init -y && npm install <tgz>`): ALL GREEN — entry resolved from installed `node_modules/@cynrath/agent-context-kit`; `--version`==0.1.0; help lists core commands; config check / doctor / scan / skills validate / policy check exit 0; task lifecycle create→start→completion-gate BLOCKED→document repair→normal complete WITHOUT `--force`→archive; pack JSON+Markdown; MCP stdio initialize (serverInfo ackit/0.1.0) → tools/list (incl. ackit_scan/pack/doctor/policy_check/list_tasks) → tools/call ×3 → resources/list+read → prompts/list+get → clean shutdown exit 0.
+7. Registry/auth preflight: registry `https://registry.npmjs.org/`; npm 11.19.0 / Node 24.13.0; initial `npm whoami` → ENEEDAUTH and `npm view` → E404 (package unpublished); no tokens on machine. CHECKPOINT 1: user completed interactive login (account confirmed by user terminal output) AND gave the explicit authorization answer for public publish. Pre-publish immutability gate re-run: HEAD == origin/master == `890a874…`, tree clean, E404 still.
+8. Publish: agent-side `npm publish --access public` returned **E403 — 2FA required** (root cause reported immediately; no retry spam, no version bump, no tag/release). The bin auto-correct warning was investigated in `@npmcli/package-json/lib/normalize.js`: leading `./` in `bin.ackit` is normalized to `dist/cli/index.js` and the value is RETAINED (message wording misleading); packed tarball manifest verified to contain `bin {"ackit":"./dist/cli/index.js"}` — functionally identical to the published normalized form; no metadata change required. User then executed `npm publish --access public` in their own terminal and completed the OTP prompt there; the OTP value never transited the agent or any record.
+9. Registry verification: ~2 min propagation delay cleared via bounded backoff only; then raw endpoint HTTP 200 — `latest=0.1.0`, versions=[0.1.0], tarball URL present, shasum `f24f4f1af4636861c97dcd02139a792cf1326b52` (identical to local pack), integrity `sha512-UTQ2gs5ZyZTYs7GTTExHTTy9N6k3XiXBxD6UgKHZejM5Jr5HB7viuGt7pWFASsv5ZZeGB2fO/1zh1aZR8Xa1UQ==`, engines `{"node":">=22"}`, bin `{"ackit":"dist/cli/index.js"}`, publishConfig access public.
+10. Fresh registry consumers: new temp dir `npm init -y && npm install @cynrath/agent-context-kit@0.1.0` — lockfile `resolved=https://registry.npmjs.org/@cynrath/agent-context-kit/-/agent-context-kit-0.1.0.tgz`; full battery (same as #6) ALL GREEN from the registry copy. `npx --yes @cynrath/agent-context-kit@0.1.0 --version` → `0.1.0`; `--help` lists commands.
+11. Local global install: pre-check `Get-Command ackit -All`=empty, `where.exe ackit` exit 1; `npm install --global @cynrath/agent-context-kit@0.1.0` OK; global list shows `@cynrath/agent-context-kit@0.1.0`; `ackit` resolves to `%APPDATA%\npm\ackit(.ps1/.cmd)`; `ackit --version` → `0.1.0`; disposable temp repo smoke: config check / doctor / scan all exit 0; `%USERPROFILE%\.dotnet\tools\ackit.exe` absent and `dotnet tool list --global` has no agentcontextkit (legacy line absent as required).
+12. Post-publish docs check: canonical current docs contain no statement made false by publication (tense-neutral design held); CHANGELOG date equals actual publish day; **no fix-forward commit needed** — decision recorded here. Tag target therefore remains the exact package source SHA.
+13. CHECKPOINT 2: user gave the explicit tag+release authorization answer. Tag absence re-verified (local list empty; `ls-remote refs/tags/v0.1.0` empty), annotated tag created: object `c8af5b5e5093d298b2464b516c03b624f2a0a98f`, pushed, remote verified `refs/tags/v0.1.0^{}` == `890a874fb8df724bb5250609b56be31560d468b2`. GitHub Release "AgentContextKit v0.1.0" created non-draft/non-prerelease with technical notes (npm-only distribution; tag target disclosed as exact package source SHA; no NuGet implication): https://github.com/Cynrath/agent-context-kit/releases/tag/v0.1.0
+14. Final provenance tuple: repo Cynrath/agent-context-kit · npm `@cynrath/agent-context-kit@0.1.0` · latest→0.1.0 · shasum/integrity as #9 · package source SHA == master SHA == tag commit `890a874fb8df724bb5250609b56be31560d468b2` · release v0.1.0 · local global ackit 0.1.0 · legacy global .NET ACKit absent · working tree clean.
+15. Chronology convention (per TASK-0002/0003/0004 precedent): this closure-evidence commit cannot contain its own hosted CI verdict; the run for its exact post-push SHA is verified immediately after push and recorded in the session closure report.
