@@ -53,3 +53,6 @@ benchmarks/.fixtures/
 
 run-*.txt
 full-run.txt
+
+# Session-local temporary artifacts (never committed)
+temp/
