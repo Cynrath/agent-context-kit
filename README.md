@@ -4,8 +4,9 @@
 agent skills, security scanning, context budgeting, docs-first tasks,
 policy-as-code, and MCP. Offline-first and deterministic.
 
-> Status: **unpublished** — active rebuild on branch `rebuild/ackit-vnext`
-> (`0.1.0-dev`). No npm install yet; publishing is a separate authorization.
+> Status: **release candidate** — ACKit vNext `0.1.0` is feature-complete and
+> prepared for its first npm publication. **The package is not yet published**;
+> publishing is a separate, user-authorized step.
 > See [Docs](#docs) · [Security](docs/security/THREAT_MODEL.md) ·
 > [Contributing](CONTRIBUTING.md) · License: MIT.
 
@@ -52,13 +53,23 @@ task system the product ships.
 
 ## Install
 
+Requires Node **>= 22**.
+
+The npm package `@cynrath/agent-context-kit` `0.1.0` is a release candidate —
+**it is not on the npm registry yet** (publication is the final user-authorized
+release step). Until then, run ACKit from a checkout of this repository:
+
 ```bash
-# not published yet — from a checkout:
 pnpm install --frozen-lockfile && pnpm build
-alias ackit="node $(pwd)/dist/cli/index.js"
+node dist/cli/index.js --help
 ```
 
-Requires Node **>= 22**.
+After publication (not available yet), the registry commands will be:
+
+```bash
+npx @cynrath/agent-context-kit@0.1.0 --help
+npm install -g @cynrath/agent-context-kit
+```
 
 ## Quickstart
 
@@ -192,8 +203,9 @@ See `CONTRIBUTING.md` for the docs-first workflow.
 ## Versioning & status
 
 vNext restarts at `0.1.0`; v1 (.NET/NuGet `1.0.0-rc.1`) is frozen legacy.
-This branch is unpublished; any publish/tag/release requires separate
-explicit authorization. Changelog: `CHANGELOG.md` (rebuild entry atop a
+`0.1.0` is a release candidate: feature-complete and validated, **not yet
+published to npm**. Publishing, tagging, and GitHub Releases are separate,
+user-authorized steps. Changelog: `CHANGELOG.md` (the `0.1.0` entry atop a
 verbatim legacy section).
 
 ## License

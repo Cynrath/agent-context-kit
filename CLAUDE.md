@@ -1,33 +1,34 @@
 # Claude Project Context
 
-Use the same repository rules as AGENTS.md.
+Use the same repository rules as `AGENTS.md` (authoritative for all agents).
 
 ## Dogfood / ACKit-First
 This repository IS AgentContextKit. Every agent session must dogfood the tool.
 
-- Before ANY task: run `ackit --version`, `ackit doctor`, `ackit scan --ci`.
-- Create new task docs with `ackit task "<title>"` first, then fill/refine the generated Markdown.
-- Do not create task docs manually unless `ackit task` fails. If it fails, record the exact failure.
-- When testing CLI behavior beyond what the installed tool covers, use:
-  `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release -- <args>`
-- Run `ackit doctor` and `ackit scan --ci` before every final commit.
-- Never commit generated `.ackit/`, reports, SARIF, prompt packs, context exports, package artifacts, or temp outputs.
-- Preserve the task-first workflow, release immutability, and no-network/default safety rules.
+- Before ANY task: run `node dist/cli/index.js --version`,
+  `node dist/cli/index.js doctor`, `node dist/cli/index.js scan --ci`.
+- Create new task docs with `node dist/cli/index.js task "<title>"` first, then
+  fill/refine the generated Markdown.
+- Do not create task docs manually unless the CLI fails. If it fails, record the exact failure.
+- All vNext validation uses the repository-built CLI: `node dist/cli/index.js <command>`.
+  The old global .NET `ackit` tool and any `dotnet run` invocation are not valid
+  vNext validation tools on this branch.
+- Run `node dist/cli/index.js doctor` and `node dist/cli/index.js scan --ci` before every final commit.
+- Never commit generated `.ackit/`, reports, SARIF, prompt packs, context exports, package artifacts, packed tarballs, or temp outputs.
+- Preserve the task-first workflow, legacy-release immutability, and no-network/default safety rules.
 
 ## Workflow
-- Task-first: every implementation change starts from `docs/tasks/`.
+- Task-first: every implementation change starts from `docs/tasks/active/`.
 - Continuous progress: do not stop between documented tasks; proceed through them in order.
-- Do not commit generated `.ackit/`, SARIF, HTML, Web UI, prompt pack, context export, `bin/`, or `obj/` artifacts.
 
 ## Commit Completeness Hard Rule
 - Before any push, run `git status` and confirm the working tree is clean.
-- Run `powershell -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` to confirm no tracked source file is left untracked.
 - Never leave a newly created `.md` task file, plan, queue row, or test file uncommitted. New files must be added and committed in the same logical commit that creates them, or in an immediately following commit, before any push.
 
 ## Stack
-- .NET: .sln/.slnx/*proj/Program.cs
-- .NET CLI / .NET Tool: PackAsTool/ToolCommandName
-- GitHub Actions: .github/workflows
+- TypeScript (strict ESM) + Node.js >= 22
+- pnpm (`packageManager` pinned), Vitest, Biome
+- GitHub Actions: `.github/workflows/ci.yml`
 
 ## Repository Health
 - README: yes
@@ -38,28 +39,22 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 - Agent instructions: yes
 
 ## Release Status
-- Current complete prerelease: `v1.0.0-rc.1`; NuGet, exact tag, GitHub prerelease/body/assets, both attestations, and three-platform installed smoke are verified. This is not a `1.0.0` GA claim.
-- Exact package/tag commit: `258918b33c3d1359aac967604ee524e8b66ddf02`.
-- Previous complete prerelease: `v0.2.0-alpha.4` published and verified.
-- NuGet global tool install verification: completed for `0.2.0-alpha.4`.
-- Published-package smoke workflow is pinned to `AgentContextKit` `0.2.0-alpha.4` (TASK-0223).
-- Source-package smoke workflow installs the local `AgentContextKit` package from source.
+- Current line: AgentContextKit vNext, package `@cynrath/agent-context-kit`, version `0.1.0` — release candidate, **not yet published**.
+- Branch `rebuild/ackit-vnext` is prepared for merge to `master`; the merge itself, npm publish, tags, and GitHub Releases are user-authorized actions only (see Controlled-release governance in `AGENTS.md`).
+- Legacy .NET line is frozen and immutable: NuGet `AgentContextKit` `1.0.0-rc.1` (exact tag/release/assets/attestations at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`) and earlier prereleases remain untouchable; do not republish, reuse, move, replace, or delete them. Historical failed recovery evidence remains preserved.
 
 ## Risk Summary
 - No risk findings in the latest local scan.
-- `0.2.0-alpha.4` is published and verified by TASK-0220; do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
-- `1.0.0-rc.1` NuGet publication, exact tag, GitHub release body, and exact assets are immutable at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`; do not republish, reuse, move, replace, or delete them. Historical failed recovery evidence remains preserved.
+- Legacy .NET releases stay immutable; see Release Status above.
 
 ## Recommended Checks
-- `dotnet build AgentContextKit.sln -c Release --no-restore`
-- `dotnet test AgentContextKit.sln -c Release --no-build`
-- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci`
-- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- doctor`
-- `powershell -ExecutionPolicy Bypass -File scripts/verify-release.ps1`
+- `pnpm lint && pnpm format:check && pnpm typecheck`
+- `pnpm build && pnpm test && pnpm smoke:cli`
+- `pnpm run smoke:package`
+- `node dist/cli/index.js doctor`
+- `node dist/cli/index.js scan --ci`
 
 ## Commit And Push Policy
-- Follow `AGENTS.md` for the full commit and push policy. Hard prohibitions (force-push, history rewrite, tag movement, release/NuGet publish, secret exposure, user-file deletion) remain in force.
-- Normal `master` commit and push is allowed only when the active project control task explicitly authorizes agent write access and only after local validation passes. Tag, release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow.
+- Follow `AGENTS.md` for the full commit and push policy. Always-prohibited actions (force-push, history rewrite, tag movement/deletion, workflow dispatch, deployments) remain in force; master/publish/tag/release require explicit per-task user authorization.
+- Normal fast-forward pushes to `rebuild/ackit-vnext` are allowed after local validation passes and the working tree is clean.
 - Do not include model name, generator, or AI authorship in commit messages.
-## vNext Rebuild Transition (GOAL 2 active)
-On branch `rebuild/ackit-vnext`, start from `docs/rebuild/GOAL2_BOOTSTRAP.md`. Requirements/waves/traceability live under `docs/rebuild/`. Each task's own validation plan is authoritative there; the dotnet commands above apply only to v1/master maintenance. External actions ban: no push/tags/releases/publishes from agent sessions.

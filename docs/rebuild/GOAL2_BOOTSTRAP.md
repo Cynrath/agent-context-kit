@@ -1,5 +1,12 @@
 # GOAL 2 BOOTSTRAP — AgentContextKit vNext Rebuild
 
+> **Historical record — Goal 2 is complete.** This bootstrap governed the
+> Goal-2 rebuild execution loop and is preserved as evidence; its instructions
+> are no longer current. Current agent governance (controlled-release rules:
+> user-authorized `master`/publish/tag/release) and current validation commands
+> live in the repository root `AGENTS.md`. All vNext validation now uses the
+> repository-built CLI (`node dist/cli/index.js ...`), not a global .NET tool.
+
 You are a fresh agent. Everything needed to execute the rebuild is in this repository. Do not ask for prior conversation context; read, verify, and continue.
 
 ## Reality anchors

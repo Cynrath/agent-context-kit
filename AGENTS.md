@@ -1,18 +1,41 @@
-# AGENTS.md — AgentContextKit vNext Rebuild
+# AGENTS.md — AgentContextKit vNext
 
-This repository is being rebuilt as **AgentContextKit vNext** (`ackit`, TypeScript + Node.js + npm) on branch `rebuild/ackit-vnext`. The repository's own docs are the single source of truth for agents.
+AgentContextKit vNext (`ackit`, TypeScript + Node.js + npm) is feature-complete on
+branch `rebuild/ackit-vnext` and is in the **release-transition stage**: the branch
+is being prepared for merge to `master` and a future first npm publication of
+`@cynrath/agent-context-kit` `0.1.0`. The repository's own docs are the single
+source of truth for agents.
+
+## Controlled-release governance
+
+Release actions are **user-authorized, not agent-authorized**:
+
+- `master` push/merge, npm publish, tag creation/movement, and GitHub Releases may
+  be performed **only inside a task that carries explicit user authorization** for
+  that exact action. Absent that authorization in the active task, they are
+  prohibited — do not infer it from past tasks or this document.
+- Always prohibited: force-push, rebase, history rewrite, tag movement/deletion,
+  workflow dispatch, deployments.
+- The frozen legacy .NET line stays immutable everywhere: published NuGet
+  versions/tags/releases (`1.0.0-rc.1`, earlier alphas) are untouchable; no NuGet
+  or .NET release pipeline exists or may be created for vNext.
+- The old global .NET `ackit` tool must not be used as a vNext validation tool;
+  all vNext verification uses the repository-built CLI (see below).
+- Normal fast-forward pushes to `rebuild/ackit-vnext` are allowed and expected.
 
 ## Canonical entry points (read in this order)
 
-1. `docs/rebuild/GOAL2_BOOTSTRAP.md` — fresh-context bootstrap and execution loop
-2. `docs/rebuild/VNEXT_REQUIREMENTS.md` — authoritative requirements (REQ-*)
-3. `docs/rebuild/VNEXT_EXECUTION_ORDER.md` — dependency waves + binding next-task rule
-4. `docs/rebuild/VNEXT_TRACEABILITY.md` — coverage invariants
-5. The current active task under `docs/tasks/`
+1. `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md` — current governance (this file is authoritative)
+2. The current active task under `docs/tasks/active/`
+3. `docs/rebuild/VNEXT_REQUIREMENTS.md` — authoritative requirements contract (REQ-*)
+4. `docs/rebuild/VNEXT_EXECUTION_ORDER.md`, `docs/rebuild/VNEXT_TRACEABILITY.md` — Goal-2 wave/coverage records
+5. `docs/rebuild/GOAL2_BOOTSTRAP.md` — completed Goal-2 bootstrap, preserved as historical execution record
+6. Decisions: `docs/rebuild/decisions/ADR-0001..0013` and `docs/decisions/`
 
-## Task-first workflow
+## ACKit-first / task-first / docs-first workflow
 
-- New work requires a task doc created with the installed tool: `ackit task "<title>"`. Never invent task IDs.
+- New work requires a task doc created with the repository's own tool:
+  `node dist/cli/index.js task "<title>"`. Never invent task IDs.
 - Exactly one active checklist item at a time: `[ ]` pending, `[~]` active, `[x]` completed+verified, `[!]` blocked.
 - Complete a task only with real evidence recorded in its Completion notes; then a focused Conventional Commit; then immediately continue with the next dependency-ready task.
 
@@ -25,27 +48,32 @@ There is no such thing as "next session" for open work. This is a HARD RULE:
 - Work task-by-task through the dependency graph continuously; after each completed+committed task, immediately start the next dependency-ready task.
 - Only a real external blocker may stop execution; report it and stop only on that blocker.
 
-## vNext validation commands (this branch)
+## vNext validation commands (repository-built CLI only)
 
 ```powershell
 pnpm install --frozen-lockfile
 pnpm lint
 pnpm format:check
 pnpm typecheck
+pnpm gen:schemas   # when config/schema surface changed
 pnpm build
 pnpm test
 pnpm smoke:cli
-pnpm gen:schemas   # when config/schema surface changed
-ackit scan --ci --exclude pnpm-lock.yaml   # legacy v1 scanner; lockfile exclusion documented in TASK-0267
+pnpm run smoke:package   # real-tarball isolated consumer smoke
+node .\dist\cli\index.js config check
+node .\dist\cli\index.js doctor
+node .\dist\cli\index.js task doctor
+node .\dist\cli\index.js skills validate
+node .\dist\cli\index.js instructions
+node .\dist\cli\index.js scan --ci
 git diff --check
 ```
 
 ## Git discipline
 
 - Branch `rebuild/ackit-vnext`: normal fast-forward pushes to this branch are allowed.
-- Hard prohibitions at all times: master push, force-push, history rewrite, tags, GitHub releases, npm/NuGet publish, workflow dispatch, deployments.
-- Never commit generated junk: `.ackit/`, `artifacts/`, `dist/`, `node_modules/`, coverage, reports, prompt packs, context exports.
-- v1 release immutability: published NuGet versions/tags/releases of the frozen .NET line remain untouchable on every branch.
+- Everything else follows Controlled-release governance above.
+- Never commit generated junk: `.ackit/`, `artifacts/`, `dist/`, `node_modules/`, coverage, reports, prompt packs, context exports, packed tarballs.
 
 ## Safety
 

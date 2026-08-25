@@ -2,6 +2,30 @@
   "name": "@cynrath/agent-context-kit",
   "version": "0.1.0",
   "description": "ACKit turns any repository into an agent-ready repository: instruction graph, agent skills, security scanning, context budgeting, task-first workflow, policy-as-code, and MCP integration. Offline-first and deterministic.",
+  "keywords": [
+    "ackit",
+    "agent-context",
+    "coding-agent",
+    "ai-agent-tooling",
+    "instruction-graph",
+    "agent-skills",
+    "security-scanner",
+    "context-budget",
+    "task-workflow",
+    "policy-as-code",
+    "mcp",
+    "model-context-protocol",
+    "offline-first",
+    "deterministic"
+  ],
+  "homepage": "https://github.com/Cynrath/agent-context-kit",
+  "bugs": {
+    "url": "https://github.com/Cynrath/agent-context-kit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cynrath/agent-context-kit.git"
+  },
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -31,6 +55,9 @@
     "CHANGELOG.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "prepack": "pnpm build && pnpm gen:schemas",

@@ -27,13 +27,21 @@ describe("CI workflow hardening", () => {
     expect(raw).toContain("# pnpm/action-setup@v4");
   });
 
-  it("scopes permissions to contents: read and has no publish triggers", () => {
+  it("scopes permissions to contents: read and has no publish/release workflow", () => {
     expect(raw).toContain("permissions:");
     expect(raw).toMatch(/contents:\s*read/);
-    expect(raw).not.toMatch(/branches:\s*\n?\s*-\s*"?master/);
     expect(raw).not.toContain("release:");
     expect(raw).not.toContain("publish");
     expect(raw.toLowerCase()).not.toContain("npm publish");
+  });
+
+  it("triggers on master push/PR in addition to rebuild/** branches", () => {
+    // Release-transition requirement (TASK-0004): CI must gate master pushes
+    // and PRs targeting master while keeping rebuild/** coverage.
+    expect(raw).toMatch(/push:\s*\n\s*branches:\s*\n\s*-\s*"master"\s*\n\s*-\s*"rebuild\/\*\*"/);
+    expect(raw).toMatch(
+      /pull_request:\s*\n\s*branches:\s*\n\s*-\s*"master"\s*\n\s*-\s*"rebuild\/\*\*"/,
+    );
   });
 
   it("covers the required matrix and hardening jobs", () => {

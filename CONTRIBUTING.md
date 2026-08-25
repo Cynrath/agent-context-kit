@@ -5,12 +5,13 @@ task-first). The workflow below is enforced by the shipped `ackit` CLI.
 
 ## Workflow
 
-1. **Task first.** Every change needs a task under `docs/tasks/` created with
-   the tool: `ackit task "<title>"`. IDs are tool-allocated; never invent one.
+1. **Task first.** Every change needs a task under `docs/tasks/active/` created
+   with the repository's own CLI: `node dist/cli/index.js task "<title>"`.
+   IDs are tool-allocated; never invent one.
    Keep exactly one `[~]` active checklist item.
 2. **Read the canonical context** before non-trivial work:
-   `docs/rebuild/GOAL2_BOOTSTRAP.md`, `docs/rebuild/VNEXT_REQUIREMENTS.md`,
-   `docs/rebuild/VNEXT_EXECUTION_ORDER.md`, and the active task doc.
+   `AGENTS.md` (governance), `docs/rebuild/VNEXT_REQUIREMENTS.md`,
+   and the active task doc.
 3. **Implement minimum correct scope.** No placeholders, no TODO-core, no
    disabled tests, weakened rules, or `any` holes to get green.
 4. **Verify per the task's own test plan**, then run the standing chain:
@@ -18,7 +19,7 @@ task-first). The workflow below is enforced by the shipped `ackit` CLI.
    ```bash
    pnpm lint && pnpm format:check && pnpm typecheck
    pnpm build && pnpm test
-   ackit scan --ci --exclude pnpm-lock.yaml
+   node dist/cli/index.js scan --ci
    ```
 
 5. **Record evidence** (commands + pass/fail counts) in the task's Completion
@@ -33,8 +34,10 @@ task-first). The workflow below is enforced by the shipped `ackit` CLI.
 - No secret values or absolute local paths in outputs/artifacts.
 - User files are never overwritten without explicit intent flags.
 - Out-of-scope list is binding (`VNEXT_REQUIREMENTS.md` §1).
-- Remote: fast-forward pushes to `rebuild/ackit-vnext` only; master push,
-  force-push, tags, releases, publishes are prohibited.
+- Remote governance (see `AGENTS.md`): fast-forward pushes to
+  `rebuild/ackit-vnext` are open; `master` merge, npm publish, tags, and GitHub
+  Releases are user-authorized actions only; force-push and history rewrite are
+  always prohibited.
 
 ## Development
 
@@ -45,5 +48,6 @@ pnpm gen:schemas        # when config/schema surface changed
 pnpm run smoke:package  # pack → temp install → CLI smoke
 ```
 
-Node >= 22. PRs are not used during this rebuild phase; commits land on the
-rebuild branch with review by the maintainer.
+Node >= 22. Changes land on `rebuild/ackit-vnext` (fast-forward pushes) or via
+pull requests targeting `master` once the release transition completes; both run
+the same CI gate.

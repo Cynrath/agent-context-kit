@@ -5,13 +5,17 @@ Prefer minimal, tested, secure changes that follow the project docs and task fil
 ## Maintenance Note
 This file is hand-maintained. `ackit generate` does not regenerate it. Update it through a regular `docs/tasks/` task and a normal commit, never through the generator.
 
-## Commit Completeness Hard Rule
-- Before any push, run `git status` and confirm the working tree is clean.
-- Run `powershell -ExecutionPolicy Bypass -File scripts/check-tracked-vs-untracked-md.ps1 -FailOnIssues` to confirm no tracked source file is left untracked.
-- Never leave a newly created `.md` task file, plan, queue row, or test file uncommitted. New files must be added and committed in the same logical commit that creates them, or in an immediately following commit, before any push.
+## Governance
+- Authoritative agent policy: `AGENTS.md` — controlled-release governance.
+- Release actions (`master` push/merge, npm publish, tags, GitHub Releases) are user-authorized only; they require explicit authorization inside the active task. Always prohibited: force-push, history rewrite, tag movement/deletion, workflow dispatch, deployments.
+- Normal fast-forward pushes to `rebuild/ackit-vnext` are allowed after local validation passes.
 
 ## Workflow
-- Task-first workflow is mandatory. Every implementation change starts from a `docs/tasks/` record before code is written.
+- Task-first workflow is mandatory. Every implementation change starts from a task record under `docs/tasks/active/`, created with `node dist/cli/index.js task "<title>"`.
+
+## Commit Completeness Hard Rule
+- Before any push, run `git status` and confirm the working tree is clean.
+- Never leave a newly created `.md` task file, plan, queue row, or test file uncommitted. New files must be added and committed in the same logical commit that creates them, or in an immediately following commit, before any push.
 
 ## Repository Health
 - README: yes
@@ -21,23 +25,23 @@ This file is hand-maintained. `ackit generate` does not regenerate it. Update it
 - CI: yes
 - Agent instructions: yes
 
-## Release Status
-- Current complete prerelease: `v1.0.0-rc.1`; NuGet, exact tag, GitHub prerelease/body/assets, both attestations, and three-platform installed smoke are verified. This is not a `1.0.0` GA claim.
-- Exact package/tag commit: `258918b33c3d1359aac967604ee524e8b66ddf02`.
-- Previous complete prerelease: `v0.2.0-alpha.4` published and verified.
-- Main stack: `.NET`, `.NET CLI / .NET Tool`, and `GitHub Actions`.
-- `0.2.0-alpha.4` is published and verified by TASK-0220. Do not move the tag, replace assets, republish the version, or manually mutate the GitHub Release/NuGet package.
-- `1.0.0-rc.1` NuGet publication, exact tag, GitHub release body, and exact assets are immutable at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`; do not republish, reuse, move, replace, or delete them. Historical failed recovery evidence remains preserved.
+## Stack & Validation
+- Main stack: TypeScript (strict ESM) + Node.js >= 22, pnpm, Vitest, Biome.
+- All vNext validation uses the repository-built CLI: `node dist/cli/index.js <command>`.
+  The old global .NET `ackit` tool and `dotnet run` invocations are not valid vNext validation tools on this branch.
 
-## Commit And Push Policy
-- Hard prohibitions: never force-push, never rewrite history, never move an existing tag, never create a remote, never publish a package, never create a release, never delete user changes, never expose secrets, never fabricate owner, identity, signature, or recovery evidence.
-- Normal `master` commit and push is allowed only when the active project control task explicitly authorizes agent write access and only after local validation passes. Tag, release, and NuGet publication are allowed only through the explicitly authorized release task and OIDC workflow.
-- Do not include model name, generator, or AI authorship in commit messages.
-- Do not commit generated `.ackit/`, SARIF, HTML, Web UI, prompt pack, context export, `bin/`, or `obj/` artifacts.
+## Release Status
+- Current line: AgentContextKit vNext, package `@cynrath/agent-context-kit`, version `0.1.0` — release candidate, **not yet published**.
+- Branch `rebuild/ackit-vnext` is prepared for merge to `master`; merge/publish/tag/release require explicit user authorization.
+- Legacy .NET line is frozen and immutable: NuGet `AgentContextKit` `1.0.0-rc.1` (exact tag/release/assets/attestations at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`) and earlier prereleases remain untouchable; do not republish, reuse, move, replace, or delete them. Historical failed recovery evidence remains preserved.
 
 ## Recommended Checks
-- `dotnet build AgentContextKit.sln -c Release --no-restore`
-- `dotnet test AgentContextKit.sln -c Release --no-build`
-- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- scan --ci`
-- `dotnet run --project src/AgentContextKit.Cli/AgentContextKit.Cli.csproj -c Release --no-build -- doctor`
-- `powershell -ExecutionPolicy Bypass -File scripts/verify-release.ps1`
+- `pnpm lint && pnpm format:check && pnpm typecheck`
+- `pnpm build && pnpm test && pnpm smoke:cli`
+- `pnpm run smoke:package`
+- `node dist/cli/index.js doctor`
+- `node dist/cli/index.js scan --ci`
+
+## Commit Hygiene
+- Conventional Commits scoped to the real diff; no model name, generator, or AI authorship in commit messages.
+- Never commit generated `.ackit/`, SARIF, HTML, prompt pack, context export, `dist/`, `node_modules/`, coverage, or temp artifacts.

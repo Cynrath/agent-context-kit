@@ -7,8 +7,9 @@
 
 ## Install
 
-The package is **not published yet** (rebuild in progress; publishing is a
-separate authorization). Until then, from a checkout:
+The npm package `@cynrath/agent-context-kit` `0.1.0` is a release candidate and
+is **not on the npm registry yet** (publication is a separate user-authorized
+step). Until then, from a checkout:
 
 ```bash
 pnpm install --frozen-lockfile
@@ -16,7 +17,7 @@ pnpm build
 node dist/cli/index.js --version
 ```
 
-After the first authorized publish: `npx @cynrath/agent-context-kit --help`.
+After publication (not available yet): `npx @cynrath/agent-context-kit@0.1.0 --help`.
 
 ## 30-second tour (verified commands)
 

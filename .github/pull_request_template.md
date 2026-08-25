@@ -33,11 +33,11 @@
 ```
 
 # Checklist
-- [ ] `dotnet build AgentContextKit.sln -c Release --no-restore`
-- [ ] `dotnet test AgentContextKit.sln -c Release --no-build`
-- [ ] `dotnet run --project src/AgentContextKit.Cli -- scan --ci`
-- [ ] `dotnet run --project src/AgentContextKit.Cli -- doctor`
+- [ ] `pnpm lint && pnpm format:check && pnpm typecheck`
+- [ ] `pnpm build && pnpm test`
+- [ ] `node dist/cli/index.js scan --ci`
+- [ ] `node dist/cli/index.js doctor`
 - [ ] Docs updated where needed
 - [ ] No secrets, private config, or private repository content committed
-- [ ] No archives, packages, `bin/`, `obj/`, reports, or generated junk committed
-- [ ] No push, tag, GitHub Release, NuGet publish, or remote side effect included
+- [ ] No archives, packages, `dist/`, `node_modules/`, reports, or generated junk committed
+- [ ] No force-push, tag, GitHub Release, npm/NuGet publish, or remote side effect beyond the described branch change included
