@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { parse } from "yaml";
 
 const WORKFLOW = path.join(process.cwd(), ".github", "workflows", "ci.yml");
 const RELEASE_WORKFLOW = path.join(process.cwd(), ".github", "workflows", "release.yml");
@@ -135,5 +136,20 @@ describe("release workflow hardening", () => {
   it("prevents duplicate simultaneous releases via a concurrency group", () => {
     expect(raw).toMatch(/concurrency:\s*\n\s*group:\s*release-/);
     expect(raw).toMatch(/cancel-in-progress:\s*false/);
+  });
+
+  it("parses as strict YAML with tags-only push semantics (startup-failure guard)", () => {
+    // An unparseable workflow makes GitHub fall back to default triggers and
+    // record startup failures on EVERY push; this assertion keeps the file
+    // machine-valid before it can reach master.
+    const doc = parse(raw) as {
+      on?: { push?: { tags?: string[]; branches?: string[] } };
+      jobs?: Record<string, unknown>;
+      permissions?: Record<string, string>;
+    };
+    expect(doc.on?.push?.tags).toContain("v*.*.*");
+    expect(doc.on?.push?.branches).toBeUndefined();
+    expect(Object.keys(doc.jobs ?? {})).toEqual(["release"]);
+    expect(doc.permissions).toEqual({ contents: "write", "id-token": "write" });
   });
 });

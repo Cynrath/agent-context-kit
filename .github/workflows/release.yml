@@ -189,8 +189,4 @@ jobs:
           gh release create "${RELEASE_TAG}" \
             --verify-tag \
             --title "AgentContextKit ${RELEASE_TAG}" \
-            --notes "Automated release of @cynrath/agent-context-kit@${RELEASE_VERSION} from the exact tagged source commit.
-
-Published to npm through GitHub Actions OIDC Trusted Publishing (short-lived credentials, provenance attested); no long-lived npm token was involved.
-
-Distribution remains npm/npx only; the legacy .NET/NuGet v1 line stays frozen and untouched. See CHANGELOG.md for the release notes."
+            --notes "Automated release of @cynrath/agent-context-kit@${RELEASE_VERSION} from the exact tagged source commit. Published to npm through GitHub Actions OIDC Trusted Publishing (short-lived credentials, provenance attested); no long-lived npm token was involved. Distribution remains npm/npx only; the legacy .NET/NuGet v1 line stays frozen and untouched. See CHANGELOG.md for the release notes."
