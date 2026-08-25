@@ -68,26 +68,34 @@ async function makeMidFlightFixture(prefix: string): Promise<MidFlightFixture> {
  * operation truly began (the observation fires inside the running handler)
  * and lands strictly before normal completion — no wall-clock guessing, no
  * conditional skip. Production code is observed, never modified.
+ *
+ * Robustness rules learned from a cross-platform CI failure:
+ * - The pristine `open` reference is captured at module load, BEFORE any spy
+ *   exists, so spy-on-spy recursion is structurally impossible.
+ * - Matching is by relative path suffix (slash-normalized), never absolute
+ *   paths: macOS realpath-expands /var → /private/var (and runners may vary),
+ *   which silently missed the marker and let the request complete.
  */
+const PRISTINE_OPEN = fsp.open;
+
 function abortOnMarkerAccess(
-  markerAbsolutePath: string,
+  markerRelativePath: string,
   controller: AbortController,
 ): { sawMarker(): boolean; restore(): void } {
   let observed = false;
-  const realOpen = fsp.open;
+  const suffix = markerRelativePath.split("\\").join("/");
   const spy = vi.spyOn(fsp, "open").mockImplementation(async (...args) => {
-    const handle = await realOpen(...(args as Parameters<typeof realOpen>));
-    if (
-      !observed &&
-      typeof args[0] === "string" &&
-      path.resolve(args[0]) === path.resolve(markerAbsolutePath)
-    ) {
-      observed = true;
-      controller.abort();
+    const handle = await PRISTINE_OPEN.apply(fsp, args as Parameters<typeof fsp.open>);
+    if (!observed && typeof args[0] === "string") {
+      const normalized = args[0].split("\\").join("/");
+      if (normalized.endsWith(`/${suffix}`) || normalized === suffix) {
+        observed = true;
+        controller.abort();
+      }
     }
     return handle;
   });
-  return { sawMarker: () => observed, restore: () => spy.mockRestore() };
+  return { sawMarker: () => observed, restore: (): void => spy.mockRestore() };
 }
 
 describe("behavioral MCP cancellation (REQ-MCP-004)", () => {
@@ -125,9 +133,11 @@ describe("behavioral MCP cancellation (REQ-MCP-004)", () => {
   it("cancels ackit_pack mid-flight on the explicit large fixture and recovers afterwards", async () => {
     const fixture = await makeMidFlightFixture("ackit-mcp-cancel-pack-");
     const session = await connect(fixture.root);
+    const controller = new AbortController();
+    // Installed BEFORE the request so no candidate read can slip past it;
+    // restored in finally NO MATTER which assertion fails.
+    const seam = abortOnMarkerAccess("pkg/marker-cancel.txt", controller);
     try {
-      const controller = new AbortController();
-      const seam = abortOnMarkerAccess(fixture.marker, controller);
       // Unconditional: the request MUST reject (cancelled mid-flight), never
       // resolve to a full result. The marker observation proves the handler
       // had entered the content/classification phase before cancellation.
@@ -135,11 +145,7 @@ describe("behavioral MCP cancellation (REQ-MCP-004)", () => {
         signal: controller.signal,
       });
       await expect(pending).rejects.toThrow(/abort|cancel/i);
-      try {
-        expect(seam.sawMarker()).toBe(true);
-      } finally {
-        seam.restore();
-      }
+      expect(seam.sawMarker()).toBe(true);
 
       // Post-cancel health: subsequent MCP requests execute successfully.
       const doctorAfterCancel = await session.client.callTool({
@@ -153,6 +159,7 @@ describe("behavioral MCP cancellation (REQ-MCP-004)", () => {
       });
       expect(scanAfterCancel.isError ?? false).toBe(false);
     } finally {
+      seam.restore();
       await session.close();
       await fixture.cleanup();
     }
@@ -161,18 +168,14 @@ describe("behavioral MCP cancellation (REQ-MCP-004)", () => {
   it("cancels ackit_scan mid-flight on the explicit large fixture and recovers afterwards", async () => {
     const fixture = await makeMidFlightFixture("ackit-mcp-cancel-scan-");
     const session = await connect(fixture.root);
+    const controller = new AbortController();
+    const seam = abortOnMarkerAccess("pkg/marker-cancel.txt", controller);
     try {
-      const controller = new AbortController();
-      const seam = abortOnMarkerAccess(fixture.marker, controller);
       const pending = session.client.callTool({ name: "ackit_scan", arguments: {} }, undefined, {
         signal: controller.signal,
       });
       await expect(pending).rejects.toThrow(/abort|cancel/i);
-      try {
-        expect(seam.sawMarker()).toBe(true);
-      } finally {
-        seam.restore();
-      }
+      expect(seam.sawMarker()).toBe(true);
 
       const doctorAfterCancel = await session.client.callTool({
         name: "ackit_doctor",
@@ -185,6 +188,7 @@ describe("behavioral MCP cancellation (REQ-MCP-004)", () => {
       });
       expect(scanAfterCancel.isError ?? false).toBe(false);
     } finally {
+      seam.restore();
       await session.close();
       await fixture.cleanup();
     }
