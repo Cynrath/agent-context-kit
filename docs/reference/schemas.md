@@ -1,8 +1,9 @@
 # Schemas
 
 Machine-readable schemas are generated from the same zod sources of truth
-that validate at runtime (single identity, REQ-ARCH-009). Regenerate with
-`pnpm gen:schemas`; contract tests fail if a committed file drifts.
+that validate at runtime (single identity sourced from package.json).
+Regenerate with `pnpm gen:schemas`; contract tests fail if a committed file
+drifts.
 
 | File | Validates | Source |
 |---|---|---|
@@ -13,7 +14,7 @@ that validate at runtime (single identity, REQ-ARCH-009). Regenerate with
 Stable wire contracts also covered by tests (not schema files):
 
 - Scan JSON report: `ackit.scan.v0`
-- Findings array: strict zod `FindingSchema` (REQ-SCAN-002)
+- Findings array: strict zod `FindingSchema`
 - SARIF output: SARIF 2.1.0 structure
 - Pack JSON: `ackit.pack.v0` manifest
 - MCP tool/resource payloads: reuse the engine JSON shapes above

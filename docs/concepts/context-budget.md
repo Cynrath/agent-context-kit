@@ -1,6 +1,6 @@
 # Context Budget
 
-`ackit pack` builds a deterministic, budgeted context pack (REQ-CTX-001..004).
+`ackit pack` builds a deterministic, budgeted context pack.
 
 ## Ranking signals (transparent weights)
 

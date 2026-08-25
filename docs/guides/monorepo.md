@@ -1,6 +1,6 @@
 # Monorepo Guide
 
-`ackit workspaces` detects the workspace layout (REQ-MONO-001) with zero extra
+`ackit workspaces` detects the workspace layout with zero extra
 dependencies:
 
 1. `pnpm-workspace.yaml` packages globs (highest precedence)
