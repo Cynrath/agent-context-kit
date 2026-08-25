@@ -149,7 +149,7 @@ function emitTaskJson(command: string, payload: Record<string, unknown>): void {
  * Registers the `ackit task` command family on the program.
  */
 export function registerTaskCommands(program: Command, invocation: CliInvocation): void {
-  const taskCommand = program.command("task").description("docs-first task system (REQ-TASKS-001)");
+  const taskCommand = program.command("task").description("docs-first task management");
   taskCommand
     .command("create")
     .description("create a pending task with a tool-allocated id")

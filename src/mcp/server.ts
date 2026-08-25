@@ -279,7 +279,7 @@ export async function createAckitMcpServer(requestedRoot?: string | undefined): 
           type: "text",
           text: [
             "Read AGENTS.md (and provider shims) at the repository root.",
-            "Then read docs/rebuild/GOAL2_BOOTSTRAP.md if present.",
+            "Then skim README.md for a product overview.",
             "Finish by listing the active task under docs/tasks and its next unchecked criterion.",
           ].join("\n"),
         },

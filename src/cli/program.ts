@@ -132,7 +132,7 @@ function buildProgram(invocation: CliInvocation): Command {
 
   const initCommand = program
     .command("init")
-    .description("onboard a repository: instruction shims + built-in skills (REQ-INSTR-009)");
+    .description("onboard a repository with agent instructions and built-in skills");
   initCommand
     .option(
       "--agents <list>",
@@ -155,7 +155,7 @@ function buildProgram(invocation: CliInvocation): Command {
 
   const packCommand = program
     .command("pack")
-    .description("build a budgeted, deterministic context pack (REQ-CTX-001)");
+    .description("build a budgeted, deterministic context pack");
   packCommand
     .option("--max-tokens <n>", "token budget override", Number.parseInt)
     .option("--format <fmt>", "output format: markdown|json", "markdown")
@@ -197,7 +197,7 @@ function buildProgram(invocation: CliInvocation): Command {
 
   const policyCommand = program
     .command("policy")
-    .description("policy-as-code utilities (REQ-POL-001, offline by construction)");
+    .description("policy-as-code utilities (offline by construction)");
   policyCommand
     .command("check")
     .description("resolve the effective policy and print chain + digest + problems")
@@ -214,7 +214,7 @@ function buildProgram(invocation: CliInvocation): Command {
 
   const workspacesCommand = program
     .command("workspaces")
-    .description("detect monorepo workspace layout (REQ-MONO-001)");
+    .description("detect monorepo workspace layout");
   workspacesCommand.action(async () => {
     const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
     invocation.exitCode = await runWorkspacesCommand({
@@ -241,7 +241,7 @@ function buildProgram(invocation: CliInvocation): Command {
 
   const optimizeCommand = program
     .command("optimize")
-    .description("read-only advisor for instruction/context hygiene (REQ-CTX-005)");
+    .description("read-only advisor for instruction and context hygiene");
   optimizeCommand
     .option("--fix", "apply fixes limited to ACKit-managed surfaces", false)
     .option("--dry-run", "with --fix: print planned changes without writing", false)
@@ -297,9 +297,7 @@ function buildProgram(invocation: CliInvocation): Command {
       },
     );
 
-  const hooksCommand = program
-    .command("hooks")
-    .description("git pre-commit hook management (REQ-WATCH-002)");
+  const hooksCommand = program.command("hooks").description("git pre-commit hook management");
   hooksCommand
     .command("install")
     .description("append the ACKit managed pre-commit block, preserving user content")
