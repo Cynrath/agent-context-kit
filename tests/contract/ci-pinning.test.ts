@@ -98,15 +98,39 @@ describe("release workflow hardening", () => {
     expect(raw).toContain("--provenance");
   });
 
-  it("validates tag shape, checkout identity, and package/version parity", () => {
-    expect(raw).toContain("v[0-9]*.[0-9]*.[0-9]*) ;;");
+  it("gates on an anchored exact-tag regex, checkout identity, and package/version parity", () => {
+    // Regression guard: the former `case` glob (`v[0-9]*.[0-9]*.[0-9]*`)
+    // accepted non-exact tags such as `v0.1.1-beta` or `v1.2.3.4` because a
+    // glob `*` spans dots and suffixes. Only an anchored regex is exact.
+    expect(raw).not.toContain("v[0-9]*.[0-9]*.[0-9]*)");
     // The ${...} sequences below are LITERAL shell/YAML text asserted inside
     // release.yml, not template interpolations.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: literal bash text under test
+    expect(raw).toContain('if [[ ! "${TAG_NAME}" =~ ^v[0-9]+\\.[0-9]+\\.[0-9]+$ ]]; then');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: literal bash text under test
     expect(raw).toContain('"${TAG_COMMIT}" != "${HEAD_COMMIT}"');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: literal error message under test
     expect(raw).toContain("'${PKG_VERSION}' does not match tag");
     expect(raw).toContain("@cynrath/agent-context-kit");
+  });
+
+  it("rejects malformed tags and accepts only exact vX.Y.Z releases (behavioral)", () => {
+    // Extract the actual guard regex from release.yml so this regression test
+    // exercises the shipped validation instead of re-implementing it.
+    const guard = raw.match(/if \[\[ ! "\$\{TAG_NAME\}" =~ (.+?) \]\]; then/);
+    expect(guard, "release.yml must gate TAG_NAME on an anchored regex").not.toBeNull();
+    const tagRule = new RegExp(guard?.[1] ?? "(?!)");
+    const accepted = ["v0.1.1", "v1.0.0", "v12.34.56"];
+    const rejected = ["v0.1.1foo", "v0.1.1-beta", "v0.1", "0.1.1", "v1.2.3.4", "v1a.2.3"];
+    for (const tag of accepted) {
+      expect(tagRule.test(tag), `exact tag '${tag}' must pass the shape gate`).toBe(true);
+    }
+    for (const tag of rejected) {
+      expect(tagRule.test(tag), `malformed tag '${tag}' must fail the shape gate`).toBe(false);
+    }
+    // The failure branch must be loud and blocking.
+    expect(raw).toMatch(/::error::tag/);
+    expect(raw).toContain("is not an exact vX.Y.Z release tag");
   });
 
   it("runs gates and registry-absence check BEFORE npm publish", () => {
@@ -124,13 +148,27 @@ describe("release workflow hardening", () => {
     expect(absence).toBeLessThan(publish);
   });
 
-  it("creates the GitHub Release only AFTER publish + registry verification", () => {
+  it("creates the GitHub Release only AFTER publish + registry + npx verification", () => {
     const publish = raw.indexOf("run: npm publish --access public --provenance");
     const verify = raw.indexOf("Verify registry metadata, shasum, and dist-tag");
+    const npxSmoke = raw.indexOf("Real registry npx consumer smoke");
     const release = raw.indexOf("gh release create");
     expect(publish).toBeGreaterThan(-1);
+    expect(npxSmoke).toBeGreaterThan(publish);
     expect(verify).toBeGreaterThan(publish);
+    expect(release).toBeGreaterThan(npxSmoke);
     expect(release).toBeGreaterThan(verify);
+  });
+
+  it("keeps GitHub Release creation as the strictly-last job step (failed publish aborts first)", () => {
+    const releaseStep = raw.indexOf(
+      "- name: Create GitHub Release (strictly after successful publish + verification)",
+    );
+    expect(releaseStep).toBeGreaterThan(-1);
+    expect(releaseStep).toBe(raw.lastIndexOf("- name:"));
+    // Sequential steps under `set -euo pipefail` mean any earlier failure
+    // (publish, registry verify, npx smoke) aborts the job before this step.
+    expect(raw).toContain("set -euo pipefail");
   });
 
   it("prevents duplicate simultaneous releases via a concurrency group", () => {
@@ -143,12 +181,19 @@ describe("release workflow hardening", () => {
     // record startup failures on EVERY push; this assertion keeps the file
     // machine-valid before it can reach master.
     const doc = parse(raw) as {
-      on?: { push?: { tags?: string[]; branches?: string[] } };
+      on?: {
+        push?: { tags?: string[]; branches?: string[] };
+        pull_request?: unknown;
+        workflow_dispatch?: unknown;
+      };
       jobs?: Record<string, unknown>;
       permissions?: Record<string, string>;
     };
     expect(doc.on?.push?.tags).toContain("v*.*.*");
     expect(doc.on?.push?.branches).toBeUndefined();
+    // Master/PR pushes and manual dispatches must never be able to publish.
+    expect(doc.on?.pull_request).toBeUndefined();
+    expect(doc.on?.workflow_dispatch).toBeUndefined();
     expect(Object.keys(doc.jobs ?? {})).toEqual(["release"]);
     expect(doc.permissions).toEqual({ contents: "write", "id-token": "write" });
   });

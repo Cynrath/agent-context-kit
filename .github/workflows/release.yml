@@ -57,10 +57,10 @@ jobs:
         run: |
           set -euo pipefail
           TAG_NAME="${GITHUB_REF_NAME}"
-          case "${TAG_NAME}" in
-            v[0-9]*.[0-9]*.[0-9]*) ;;
-            *) echo "::error::tag '${TAG_NAME}' is not an exact vX.Y.Z release tag"; exit 1 ;;
-          esac
+          if [[ ! "${TAG_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::tag '${TAG_NAME}' is not an exact vX.Y.Z release tag"
+            exit 1
+          fi
           TAG_COMMIT="$(git rev-parse "${TAG_NAME}^{commit}")"
           HEAD_COMMIT="$(git rev-parse HEAD)"
           if [ "${TAG_COMMIT}" != "${HEAD_COMMIT}" ]; then
