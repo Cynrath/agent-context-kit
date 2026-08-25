@@ -47,15 +47,15 @@ REQ-GOV-007, REQ-MCP-004, REQ-PKG-001, REQ-TASKS-001, REQ-TASKS-004, REQ-FIN-001
 
 ## Acceptance criteria
 
-- [ ] Context-pack candidate read failure produces an explicit manifest exclusion record with stable reason code `pack-read-failed`, repo-relative path only; no absolute paths or raw machine-specific messages leak; pack output stays deterministic.
-- [ ] Context policy-summary failure yields explicit safe summary state plus stable advisory diagnostic code `context-policy-summary-failed`; no silent catch remains in orchestrate.ts.
-- [ ] Adjacent silent-catch sweep completed over listed core/MCP/CLI directories with each site classified (VALID EXPLICIT FALLBACK / DIAGNOSTIC REQUIRED / BUG / TEST-ONLY INTENTIONAL); all REQ-GOV-007 product-code violations fixed.
-- [ ] MCP cancellation test connects with the explicit fixture root under test (large fixture actually scanned); no conditional branch allows pass without a real mid-flight cancellation; cancellation proven before normal completion; post-cancel requests succeed.
-- [ ] Installed-tarball package smoke proves: initial completion gate failure, genuine fixture repair, normal completion WITHOUT `--force`, archive success, full MCP battery still green on 3 OS in CI.
-- [ ] TASK-0002 CI claim corrected chronologically (5bca529/run 32786781801 then b35ca59/run 32787110952); TASK-0291 old verification marked historical with new final block appended after this repair.
-- [ ] MUST audit re-run: VERIFIED count backed by behavioral/static evidence; PARTIAL=0, MISSING=0, STALE-CONTRACT=0 recorded truthfully.
-- [ ] Full local gate green: lint/format:check/typecheck/gen:schemas/build; vitest suite green 3 consecutive runs; smoke:cli + smoke:package green; task doctor green; git diff --check clean.
-- [ ] Final GitHub CI run green on exact final documentation-inclusive HEAD (head_sha match).
+- [x] Context-pack candidate read failure produces an explicit manifest exclusion record with stable reason code `pack-read-failed`, repo-relative path only; no absolute paths or raw machine-specific messages leak; pack output stays deterministic.
+- [x] Context policy-summary failure yields explicit safe summary state plus stable advisory diagnostic code `context-policy-summary-failed`; no silent catch remains in orchestrate.ts.
+- [x] Adjacent silent-catch sweep completed over listed core/MCP/CLI directories with each site classified (VALID EXPLICIT FALLBACK / DIAGNOSTIC REQUIRED / BUG / TEST-ONLY INTENTIONAL); all REQ-GOV-007 product-code violations fixed (3 fixed, P2s recorded in Evidence).
+- [x] MCP cancellation test connects with the explicit fixture root under test (large fixture actually scanned); no conditional branch allows pass without a real mid-flight cancellation; cancellation proven before normal completion; post-cancel requests succeed.
+- [x] Installed-tarball package smoke proves: initial completion gate failure (explicitly distinguished from pass), genuine fixture repair, normal completion WITHOUT `--force`, archive success, full MCP battery green locally; 3 OS confirmation via hosted CI below.
+- [x] TASK-0002 CI claim corrected chronologically (5bca529/run 32786781801 then b35ca59/run 32787110952); TASK-0291 old verification marked historical with new final block appended.
+- [x] MUST audit re-run: 114 total MUST, VERIFIED=114, PARTIAL=0, MISSING=0, STALE-CONTRACT=0, backed by behavioral/static evidence per the domain matrix in TASK-0291.
+- [x] Full local gate green: lint/format:check/typecheck/gen:schemas/build; vitest suite green 3 consecutive runs (58 files / 289 tests each); smoke:cli + smoke:package green; task doctor green; git diff --check clean.
+- [ ] Final GitHub CI run green on exact final documentation-inclusive HEAD (head_sha match) — verified after the final docs-inclusive push of this branch; run ID recorded in the closure report.
 
 ## Test steps
 
@@ -81,7 +81,19 @@ Focused commit revert per area (context diagnostics; cancellation test; package 
 
 ## Evidence
 
-(filled during execution)
+1. REQ-GOV-007 pack read failure (src/core/context/pack.ts): silent `catch { continue; }` replaced by an explicit manifest exclusion record — reason `pack-read-failed (<errno|unknown>)`, repo-relative path only, deterministic hash. Tests: tests/integration/context/pack-diagnostics.test.ts (EACCES exclusion + continue, ENOENT determinism, no absolute-path/raw-message leak in markdown+json, byte-identical reruns).
+2. REQ-GOV-007 policy summary (src/core/context/orchestrate.ts): bare advisory catch replaced by explicit `policy status: unavailable (context-policy-summary-failed)` section state; raw error text deliberately excluded (could carry paths). Triggered naturally by dangling policy extends (POL-NOT-FOUND); covered by the same new suite incl. full-pack artifact propagation.
+3. Adjacent sweep classification (product code, all `catch`/`.catch` sites reviewed):
+   - FIXED (REQ-GOV-007 violations): pack.ts read swallow; orchestrate.ts policy-summary swallow; tasks/store.ts unparsable-doc invisibility (comment claimed doctor covered it, but doctor listed through the same swallowing path) → doctor now reports `unparsable task document` per file (test added).
+   - VALID EXPLICIT FALLBACK (documented, safe direction): cache get-miss→null / size→0 / clean-idempotent; baseline read→null; pipeline `.catch(() => undefined)` cache-write (cache is best-effort by contract); policy realpath-root fallback; frontmatter parse-fail→null (surfaces via graph status); workspace detect diagnostics pushes; skills lock read→fresh lock; cachedVersion→0.0.0-dev fail-safe update; cli/index entry probe→false; orchestrate package.json→"(no package.json)".
+   - DIAGNOSTIC ALREADY SURFACED (no change needed): walk/engine FS-* diagnostics; scanner SCAN-READ-FAILED / SCAN-RULE-FAILED; config CFG-*; cli commands emitDiagnostic paths; mcp server structured error results; summary checks push ok:false.
+   - TEST-ONLY INTENTIONAL: none shipped behavioral hacks to production.
+   - P2 (recorded, not fixed — advisory degradation with retry/surfacing elsewhere): optimize.ts unreadable-node freshness skip + vanished-file fix-skip; instructions/graph listFiles readdir→skip (walk-level FS-READ-FAILED still covers canonical traversal); ignore.ts unreadable-gitignore→empty ruleset (fail-open toward MORE scanning); skills validate discovery readdir edge; watch loop transient snapshot catch (next poll re-snapshots; consumer surfaces re-scan failures since 297f7c9); hooks chmod best-effort.
+4. MCP cancellation (tests/integration/mcp/cancellation.test.ts): helper now takes the root EXPLICITLY (`requestedRoot ?? ACKIT_ROOT ?? cwd` precedence at src/mcp/server.ts made the old env-var trick a no-op — large fixture was never scanned). Conditional `warmMin >= 30` branch removed. Mid-flight proof is deterministic via a marker-gated abort on the first fs operation touching the marker candidate (observes production code, modifies nothing): request MUST reject (/abort|cancel/i), marker observation proves the handler entered the content/classification phase, post-cancel listTools/doctor/scan succeed. Applied to BOTH ackit_pack and ackit_scan.
+5. Context7 + installed-SDK source verification (@modelcontextprotocol/sdk 1.x): client abort → promise rejected with McpError wrapping the abort reason AND `notifications/cancelled` sent (protocol.js cancel()); server `_oncancel` aborts the per-request controller whose signal IS the tool handler's `extra.signal`; stdio/in-memory keep the notification path. Test semantics match the installed version, not just latest docs.
+6. Tarball E2E (scripts/package-smoke.mjs): old try/catch could not distinguish gate-block from gate-pass (its own throw was swallowed by the same catch) — restructured explicit `gateBlocked` assertion; generated task document genuinely repaired (criteria ticked, placeholder notes replaced with real notes); normal `task complete` WITHOUT --force; status verified completed; archive OK. Full installed-package MCP battery unchanged and still green (initialize identity/version, tools/list, scan/pack/doctor calls, resources, prompts, stdout JSON purity, exit 0).
+7. Local gate at repair completion: install(frozen)=0 · lint=0 · format:check=0 · typecheck=0 · gen:schemas=0 · build=0 · vitest **58 files / 289 tests** ×3 consecutive =0 · smoke:cli=0 · smoke:package=0 · config check=0 · doctor=0 · task doctor=0 · skills validate=0 · instructions=0 · scan --ci=0 · pack md/json validated (5 sections, 134 files, no absolute-path leaks) · git diff --check clean.
+8. Environment note: local Windows checkout uses core.autocrlf=true; committed blobs are LF (verified via git grep CR on HEAD and an LF-extracted tree lint run matching CI's view). Formatter normalization applied; no content changes to untouched files.
 
 ## Completion notes
 
