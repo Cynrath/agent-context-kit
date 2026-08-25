@@ -198,3 +198,15 @@ Authoritative requirement source: `docs/rebuild/VNEXT_REQUIREMENTS.md` — **114
 **Matrix result: total MUST = 114 · VERIFIED = 114 · PARTIAL = 0 · MISSING = 0 · STALE-CONTRACT = 0.**
 
 Basis: behavioral verification = the vitest suite plus the two smoke scripts plus the live CLI/MCP battery executed in TASK-0003; deterministic static contracts where runtime behavior is not applicable (architecture budgets, CI pinning, schemas); docs-review only for intrinsically governance/process requirements (REQ-GOV-010/011). Traceability ownership lives in this file's matrices above; behavioral truth lives in the named suites. The final hosted-CI run for the documentation-inclusive HEAD of the repair is recorded in TASK-0003.
+
+## Final governance closure evidence - 2026-08-25
+
+- TASK-0001 normalized from historical blocked state to completed using normal lifecycle (start -> complete); no --force. The INVALID FORCED CLOSE EVENT record is preserved verbatim in its completion notes.
+- TASK-0002 completed. TASK-0003 completed; post-closure verification chronology corrected (see its "Post-closure verification correction").
+- Full local suite: 58 files / 289 tests x3 consecutive on unchanged final implementation (post-closure proof).
+- skills doctor: exit 0.
+- Pack representative secret-shape check: 0 hits in both markdown and json artifacts.
+- task doctor: exit 0.
+- Current vNext task set: pending=0, active=0, blocked=0 (all tracked tasks completed).
+- Historical milestones preserved above (51/260 at 6afcf87 CI 32722086366; 57/282 at b35ca59 CI 32787110952; 58/289 runs 32850731471-fail/32852520676/32853803925) - these are milestones, not current final evidence.
+- The final documentation-inclusive SHA of this governance commit and its hosted CI run (head_sha exact match, 10/10 green) are recorded in the external final closure report per the established chronology convention (repo documents never assert a CI verdict for a SHA that does not yet exist).
