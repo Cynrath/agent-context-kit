@@ -143,6 +143,50 @@ Runs in CI on ubuntu/windows/macos.
 
 ## Verification evidence
 
+HISTORICAL (earlier closure state, superseded by the final-evidence block below):
+
 - Full chain: install(frozen)=0 · lint=0 · format:check=0 · typecheck=0 · build=0 · gen:schemas=0 · vitest **51 files / 260 tests** =0 · smoke:cli=0 · smoke:package=0 · self-scan --ci = 0
 - Hosted CI run `32722086366`: **all 10 jobs green** at commit `6afcf87`
 - External actions: fast-forward pushes of rebuild/ackit-vnext only; no master push/tag/release/npm publish/workflow dispatch/deployment
+
+FINAL EVIDENCE OF THE POST-TASK-0002 CANDIDATE (recorded chronologically by TASK-0003; still not the current HEAD after TASK-0003's repairs):
+
+- vitest at b35ca59c94e78213f31a31e7920fe2f7c42af649: **57 files / 282 tests** green
+- Hosted CI run `32787110952`: **all 10 jobs green** at commit `b35ca59`
+- An independent audit of this state identified remaining defects (REQ-GOV-007 pack/policy silent catches, false-positive MCP cancellation test, tarball E2E --force success path); repair is owned by docs/tasks/active/TASK-0003-final-independent-closure-repair.md, whose own verification block is the authoritative latest evidence.
+
+## Final MUST audit re-run (2026-08-25, TASK-0003)
+
+Authoritative requirement source: `docs/rebuild/VNEXT_REQUIREMENTS.md` — **114 MUST rows** (the earlier "113" figure undercounted; recount below is generated from the table itself).
+
+| Domain | MUSTs | Evidence class | Concrete artifacts |
+|---|---|---|---|
+| REQ-GOV (11) | 11 | behavioral + static + process | filesystem-boundary (003/006), context-pack-safety + redact + secrets (004/005), pack-diagnostics + diagnostics + scanner pipeline diagnostics + tasks/lifecycle doctor + watch-rescan diagnostic (007 — repaired this session), init/install no-overwrite (008), POL-OFFLINE-BLOCKED + dependency/static sweep (001/002), session Git record (010), operating procedure (011), live self-dogfood battery exit 0 on this repo (012) |
+| REQ-ARCH (12) | 12 | contract tests + static + docs | cli-architecture (008/011), version-single-source (009), cli-dist-contract + tarball-smoke (002/005), tsconfig strict + typecheck (004), engines/matrix (003), ADRs + docs-gate (010/012), package.json dep/tooling review (006/007), build artifacts (001) |
+| REQ-FS (6) | 6 | behavioral/security fixtures | walk-limits, classify, ignore, paths, filesystem-boundary |
+| REQ-CFG (5) | 5 | behavioral + contract | config schema/load/merge/suggestions, config-check-cli, config-schema |
+| REQ-SCAN (7) | 7 | behavioral + contract | scanner pipeline, rules catalog, secrets, findings schema, fingerprints, reports, scan-cli/empty-set |
+| REQ-BASE (4) | 4 | behavioral | git, cache hot-path, cache unit, fingerprints |
+| REQ-INSTR (9) | 9 | behavioral + contract | instruction primitives/providers/codex/analysis, init managed blocks, docs-gate own-repo shipping |
+| REQ-SKILL (6) | 6 | behavioral + e2e | skills validate/install units+integration, cli-scaffold smoke builtins |
+| REQ-CTX (5) | 5 | behavioral + security | pack, pack-parity, pack-diagnostics (new), optimize, context-pack-safety |
+| REQ-TASKS (4) | 4 | behavioral | tasks lifecycle incl. completion gate + unparsable-doc doctor surfacing (new) |
+| REQ-POL (3) | 3 | behavioral + security | policy resolve/forbidden-pattern/wiring/scope/containment |
+| REQ-MONO (2) | 2 | behavioral | workspaces |
+| REQ-MCP (4) | 4 | behavioral + contract | mcp-conformance, stdio-smoke, cancellation (rewritten deterministic mid-flight this session) |
+| REQ-RPT (2) | 2 | behavioral | reports, documents |
+| REQ-WATCH (2) | 2 | behavioral | watch, hooks |
+| REQ-API (1) | 1 | contract | api-surface |
+| REQ-PKG (1) | 1 | e2e | tarball-smoke + package-smoke normal-completion rewrite (this session) |
+| REQ-DX (4) | 4 | behavioral + contract | cli-core, cli-dist-contract, exit-codes, version-single-source |
+| REQ-ONB (2) | 2 | behavioral + e2e | init integration, cli-scaffold smoke |
+| REQ-SEC (5) | 5 | security + contract | THREAT_MODEL coverage gate (001/002), terminal sanitation unit (003), ci-pinning (004/005) |
+| REQ-CI (3) | 3 | contract + hosted CI | ci-pinning matrix/job assertions + green hosted runs |
+| REQ-TEST (8) | 8 | meta | suite inventory (58 files / 289 tests), focused suites, 3 consecutive green full-suite runs |
+| REQ-PERF (1) | 1 | e2e | benchmarks |
+| REQ-DOC (4) | 4 | contract | docs-gate |
+| REQ-FIN (3) | 3 | gate execution | full local gate + hosted CI executed at closure |
+
+**Matrix result: total MUST = 114 · VERIFIED = 114 · PARTIAL = 0 · MISSING = 0 · STALE-CONTRACT = 0.**
+
+Basis: behavioral verification = the vitest suite plus the two smoke scripts plus the live CLI/MCP battery executed in TASK-0003; deterministic static contracts where runtime behavior is not applicable (architecture budgets, CI pinning, schemas); docs-review only for intrinsically governance/process requirements (REQ-GOV-010/011). Traceability ownership lives in this file's matrices above; behavioral truth lives in the named suites. The final hosted-CI run for the documentation-inclusive HEAD of the repair is recorded in TASK-0003.

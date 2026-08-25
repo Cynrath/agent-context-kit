@@ -50,7 +50,7 @@ REQ-DX-002, REQ-CTX-001, REQ-MCP-001..004, REQ-API-001, REQ-PKG-001
 - [x] No secrets or absolute paths in pack JSON/markdown output
 - [x] Installed tarball E2E covers init/doctor/scan/task/pack/policy/MCP
 - [x] Full suite passes with no flaky release-critical failures
-- [x] Hosted CI green on exact final HEAD — run 32786781801 success (10/10 jobs) at 5bca529 on this tree content
+- [x] Hosted CI green — run 32786781801 (10/10 jobs) at 5bca529; a subsequent task-output wording correction produced b35ca59c94e78213f31a31e7920fe2f7c42af649, which then passed CI run 32787110952 (10/10 jobs)
 
 ## Test steps
 
@@ -117,3 +117,5 @@ Local gate at completion: install(frozen)=0 lint=0 format:check=0 typecheck=0 ge
 vitest 57 files / 282 tests =0 smoke:cli=0 smoke:package=0 task doctor=0 git diff --check clean.
 
 Hosted CI evidence is recorded after the final docs commit push (final acceptance criterion above).
+
+CHRONOLOGY CORRECTION (2026-08-25, recorded by TASK-0003 — supersedes the earlier "on this tree content" wording without rewriting history): the CI claim above was written when 5bca529 was the candidate HEAD, but the final commit of this task was b35ca59 (a source change in src/cli/commands/task.ts), so 5bca529 was NOT the final tree. b35ca59 subsequently passed hosted CI run 32787110952 (10/10 jobs green). Additionally, an independent post-closure audit (TASK-0003) found three concrete defects in this closure state: a REQ-GOV-007 silent read swallow in the context pack, a REQ-GOV-007 advisory-only policy-summary catch, and an MCP cancellation test whose large-fixture run never used its fixture root and could pass without testing mid-flight cancellation. Those are repaired under TASK-0003; this document's completion stands for the scope it verified at its time.
