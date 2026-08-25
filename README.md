@@ -4,8 +4,9 @@
 agent skills, security scanning, context budgeting, docs-first tasks,
 policy-as-code, and MCP. Offline-first and deterministic.
 
-> Status: **v0.1.0** — first release of the vNext line. Deterministic,
-> offline-first agent readiness for coding-agent repositories. Requires Node >= 22.
+> Status: **v0.1.1** — public CLI help cleanup and controlled-release
+> automation hardening on the vNext line. Deterministic,
+> offline-first agent readiness for coding agents. Requires Node >= 22.
 > See [Docs](#docs) · [Security](docs/security/THREAT_MODEL.md) ·
 > [Contributing](CONTRIBUTING.md) · License: MIT.
 
@@ -64,7 +65,7 @@ ackit --version
 Or run once with npx:
 
 ```bash
-npx --yes @cynrath/agent-context-kit@0.1.0 --version
+npx --yes @cynrath/agent-context-kit@0.1.1 --version
 ```
 
 To run from a source checkout instead:

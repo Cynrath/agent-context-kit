@@ -2,7 +2,7 @@
 
 AgentContextKit vNext (`ackit`, TypeScript + Node.js + npm) is feature-complete on
 `master` and ships as the scoped npm package `@cynrath/agent-context-kit`
-`0.1.0` (CLI binary `ackit`). The repository's own docs are the single
+`0.1.1` (CLI binary `ackit`). The repository's own docs are the single
 source of truth for agents.
 
 ## Controlled-release governance

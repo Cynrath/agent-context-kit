@@ -4,6 +4,21 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.1.1] - 2026-08-25
+
+Public CLI/MCP surface cleanup and controlled-release automation hardening. No behavior, command, flag, or exit-code changes.
+
+### Changed
+
+- Public CLI help is product-facing text only: internal requirement identifiers (`REQ-*`) were removed from `ackit --help` and every registered command/subcommand description (`init`, `pack`, `policy`, `workspaces`, `optimize`, `hooks`, `task`). Internal traceability IDs remain intact in requirements, ADRs, tests, and task/evidence documents.
+- The MCP `onboarding` prompt no longer points coding agents at internal rebuild documentation; it references repository-root agent instructions and README instead.
+- User-facing docs (`docs/guides/monorepo.md`, `docs/concepts/context-budget.md`, `docs/reference/schemas.md`) no longer cite internal requirement IDs in prose.
+
+### Added
+
+- Public-surface regression contract tests: a generated help matrix over every registered top-level and nested command plus MCP tool/resource/prompt metadata assertions that fail if `REQ-`, `ADR-`, `VNEXT`, `GOAL2`, or `rebuild/ackit-vnext` reappear in user-visible output. Legitimate user-facing task-id syntax (e.g., `--depends-on <ids...>` documented as `TASK-####`) stays explicitly allowed.
+- Controlled automatic release pipeline `.github/workflows/release.yml`: triggers ONLY on `v*.*.*` tags; validates exact tag shape, tagged-commit identity, package name, and package.json parity; confirms the exact version is absent from npm; runs install/lint/format/typecheck/build/schema-drift/tests/real-tarball consumer smoke before publishing; publishes via GitHub Actions OIDC Trusted Publishing with provenance (no long-lived npm token); verifies registry shasum/dist-tag plus an npx consumer smoke; creates the GitHub Release strictly after a successful publish under a per-tag concurrency group. Master pushes never publish.
+
 ## [0.1.0] - 2026-08-25
 
 First release of the AgentContextKit vNext line: AgentContextKit rebuilt as a TypeScript + Node.js + npm/npx product (CLI command `ackit`, package `@cynrath/agent-context-kit`), distributed through npm and requiring Node >= 22.

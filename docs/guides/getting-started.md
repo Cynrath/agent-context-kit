@@ -14,7 +14,7 @@ npm install --global @cynrath/agent-context-kit
 ackit --version
 ```
 
-One-shot usage: `npx --yes @cynrath/agent-context-kit@0.1.0 --help`.
+One-shot usage: `npx --yes @cynrath/agent-context-kit@0.1.1 --help`.
 
 From a source checkout instead:
 
