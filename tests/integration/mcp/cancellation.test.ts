@@ -1,9 +1,10 @@
+import { promises as fsp } from "node:fs";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { buildContextPack } from "../../../src/core/context/index.js";
 import { createAckitMcpServer } from "../../../src/mcp/server.js";
 
@@ -19,8 +20,15 @@ afterAll(async () => {
   await rm(rootPath, { recursive: true, force: true });
 });
 
-async function connect(): Promise<{ client: Client; close(): Promise<void> }> {
-  const { server } = await createAckitMcpServer(rootPath);
+/**
+ * Root is an EXPLICIT argument: createAckitMcpServer resolves
+ * requestedRoot ?? ACKIT_ROOT ?? cwd (src/mcp/server.ts). An environment
+ * variable cannot override an explicit argument — a previous version set
+ * ACKIT_ROOT while this helper kept passing the small default root, so the
+ * "large fixture" test never actually used its large fixture.
+ */
+async function connect(root: string): Promise<{ client: Client; close(): Promise<void> }> {
+  const { server } = await createAckitMcpServer(root);
   const client = new Client({ name: "cancel-client", version: "0.0.1" });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   await server.connect(serverTransport);
@@ -33,6 +41,55 @@ async function connect(): Promise<{ client: Client; close(): Promise<void> }> {
   };
 }
 
+interface MidFlightFixture {
+  root: string;
+  marker: string;
+  cleanup(): Promise<void>;
+}
+
+async function makeMidFlightFixture(prefix: string): Promise<MidFlightFixture> {
+  const root = await mkdtemp(path.join(tmpdir(), prefix));
+  await writeFile(path.join(root, "AGENTS.md"), "# mid-flight fixture\n");
+  await mkdir(path.join(root, "pkg"), { recursive: true });
+  for (let i = 0; i < 50; i++) {
+    await writeFile(
+      path.join(root, "pkg", `mod-${i}.ts`),
+      `export const mod${i} = ${i};\nfunction helper${i}(): number {\n  return ${i} * 2;\n}\n`,
+    );
+  }
+  const marker = path.join(root, "pkg", "marker-cancel.txt");
+  await writeFile(marker, "cancellation marker candidate\n");
+  return { root, marker, cleanup: () => rm(root, { recursive: true, force: true }) };
+}
+
+/**
+ * Test-only deterministic seam: the FIRST filesystem operation that touches
+ * the marker candidate aborts the caller's controller. This proves the
+ * operation truly began (the observation fires inside the running handler)
+ * and lands strictly before normal completion — no wall-clock guessing, no
+ * conditional skip. Production code is observed, never modified.
+ */
+function abortOnMarkerAccess(
+  markerAbsolutePath: string,
+  controller: AbortController,
+): { sawMarker(): boolean; restore(): void } {
+  let observed = false;
+  const realOpen = fsp.open;
+  const spy = vi.spyOn(fsp, "open").mockImplementation(async (...args) => {
+    const handle = await realOpen(...(args as Parameters<typeof realOpen>));
+    if (
+      !observed &&
+      typeof args[0] === "string" &&
+      path.resolve(args[0]) === path.resolve(markerAbsolutePath)
+    ) {
+      observed = true;
+      controller.abort();
+    }
+    return handle;
+  });
+  return { sawMarker: () => observed, restore: () => spy.mockRestore() };
+}
+
 describe("behavioral MCP cancellation (REQ-MCP-004)", () => {
   it("pack engine refuses work when the signal is already aborted", async () => {
     const controller = new AbortController();
@@ -43,20 +100,14 @@ describe("behavioral MCP cancellation (REQ-MCP-004)", () => {
   });
 
   it("an aborted tool call returns no result and the server stays healthy", async () => {
-    const session = await connect();
+    const session = await connect(rootPath);
     try {
       const controller = new AbortController();
       const pending = session.client.callTool({ name: "ackit_pack", arguments: {} }, undefined, {
         signal: controller.signal,
       });
       controller.abort();
-      let rejected = false;
-      try {
-        await pending;
-      } catch {
-        rejected = true;
-      }
-      expect(rejected).toBe(true);
+      await expect(pending).rejects.toThrow(/abort|cancel/i);
 
       // Server must remain fully responsive after the cancelled request.
       const { tools } = await session.client.listTools();
@@ -71,50 +122,23 @@ describe("behavioral MCP cancellation (REQ-MCP-004)", () => {
     }
   });
 
-  it("cancels ackit_scan mid-flight on a large fixture and recovers afterwards", async () => {
-    // Grow the fixture until a full scan takes a measurable amount of time so
-    // the scheduled abort lands while the operation is still running.
-    const bigRoot = await mkdtemp(path.join(tmpdir(), "ackit-mcp-cancel-big-"));
-    await writeFile(path.join(bigRoot, "AGENTS.md"), "# big fixture\n");
-    await mkdir(path.join(bigRoot, "pkg"), { recursive: true });
-    for (let i = 0; i < 400; i++) {
-      await writeFile(
-        path.join(bigRoot, "pkg", `mod-${i}.ts`),
-        `export const mod${i} = ${i};\nfunction helper${i}(): number {\n  return ${i} * 2;\n}\n`,
-      );
-    }
-
-    process.env["ACKIT_ROOT"] = bigRoot;
-    const session = await connect();
+  it("cancels ackit_pack mid-flight on the explicit large fixture and recovers afterwards", async () => {
+    const fixture = await makeMidFlightFixture("ackit-mcp-cancel-pack-");
+    const session = await connect(fixture.root);
     try {
-      // Warm runs establish a stable duration reference (cold JIT/cache skew
-      // the first measurement).
-      let warmMin = Number.POSITIVE_INFINITY;
-      for (let i = 0; i < 2; i++) {
-        const t0 = Date.now();
-        await session.client.callTool({ name: "ackit_scan", arguments: {} });
-        warmMin = Math.min(warmMin, Date.now() - t0);
-      }
-      expect(warmMin).toBeGreaterThan(0);
-
-      if (warmMin >= 30) {
-        let cancelled = false;
-        for (let attempt = 0; attempt < 3 && !cancelled; attempt++) {
-          const abortDelay = Math.max(5, Math.floor(warmMin / 3));
-          const controller = new AbortController();
-          const pending = session.client.callTool(
-            { name: "ackit_scan", arguments: {} },
-            undefined,
-            { signal: controller.signal },
-          );
-          setTimeout(() => controller.abort(), abortDelay);
-          try {
-            await pending;
-          } catch {
-            cancelled = true;
-          }
-        }
-        expect(cancelled).toBe(true);
+      const controller = new AbortController();
+      const seam = abortOnMarkerAccess(fixture.marker, controller);
+      // Unconditional: the request MUST reject (cancelled mid-flight), never
+      // resolve to a full result. The marker observation proves the handler
+      // had entered the content/classification phase before cancellation.
+      const pending = session.client.callTool({ name: "ackit_pack", arguments: {} }, undefined, {
+        signal: controller.signal,
+      });
+      await expect(pending).rejects.toThrow(/abort|cancel/i);
+      try {
+        expect(seam.sawMarker()).toBe(true);
+      } finally {
+        seam.restore();
       }
 
       // Post-cancel health: subsequent MCP requests execute successfully.
@@ -129,9 +153,40 @@ describe("behavioral MCP cancellation (REQ-MCP-004)", () => {
       });
       expect(scanAfterCancel.isError ?? false).toBe(false);
     } finally {
-      delete process.env["ACKIT_ROOT"];
       await session.close();
-      await rm(bigRoot, { recursive: true, force: true });
+      await fixture.cleanup();
     }
-  }, 180_000);
+  });
+
+  it("cancels ackit_scan mid-flight on the explicit large fixture and recovers afterwards", async () => {
+    const fixture = await makeMidFlightFixture("ackit-mcp-cancel-scan-");
+    const session = await connect(fixture.root);
+    try {
+      const controller = new AbortController();
+      const seam = abortOnMarkerAccess(fixture.marker, controller);
+      const pending = session.client.callTool({ name: "ackit_scan", arguments: {} }, undefined, {
+        signal: controller.signal,
+      });
+      await expect(pending).rejects.toThrow(/abort|cancel/i);
+      try {
+        expect(seam.sawMarker()).toBe(true);
+      } finally {
+        seam.restore();
+      }
+
+      const doctorAfterCancel = await session.client.callTool({
+        name: "ackit_doctor",
+        arguments: {},
+      });
+      expect(doctorAfterCancel.isError ?? false).toBe(false);
+      const scanAfterCancel = await session.client.callTool({
+        name: "ackit_scan",
+        arguments: {},
+      });
+      expect(scanAfterCancel.isError ?? false).toBe(false);
+    } finally {
+      await session.close();
+      await fixture.cleanup();
+    }
+  });
 });
