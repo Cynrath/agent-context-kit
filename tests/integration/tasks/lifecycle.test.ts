@@ -100,6 +100,31 @@ describe("task system lifecycle (REQ-TASKS-001..004)", () => {
     }
   });
 
+  it("doctor surfaces unparsable task documents instead of skipping them silently (REQ-GOV-007)", async () => {
+    const brokenRoot = await mkdtemp(path.join(tmpdir(), "ackit-tasks-broken-"));
+    try {
+      const store = new TaskStore(brokenRoot);
+      await store.create("healthy task");
+      // A hand-mangled document: no frontmatter at all.
+      await writeFile(
+        path.join(brokenRoot, "docs", "tasks", "active", "TASK-9001-broken.md"),
+        "# just markdown, no frontmatter\n",
+        "utf8",
+      );
+      // Listing stays tolerant (the healthy doc is still usable)…
+      const listed = await store.list(false);
+      expect(listed).toHaveLength(1);
+      // …but doctor must surface the unparsable file explicitly.
+      const report = await store.doctor();
+      expect(report.ok).toBe(false);
+      const problem = report.problems.find((item) => item.includes("TASK-9001-broken.md"));
+      expect(problem).toBeDefined();
+      expect(problem).toMatch(/unparsable task document/);
+    } finally {
+      await rm(brokenRoot, { recursive: true, force: true });
+    }
+  });
+
   it("schema validates tool-created docs; duplicate-ID creation impossible", async () => {
     const store = new TaskStore(repoPath);
     const docs = await store.list(true);

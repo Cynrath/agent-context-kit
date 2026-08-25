@@ -46,7 +46,8 @@ export class TaskStore {
       try {
         docs.push(await this.readDoc(absolute, `${relativeBase}/${entry.name}`));
       } catch {
-        // Unparsable files surface via doctor, not here.
+        // Listing stays tolerant (REQ-TASKS-001); unparsable documents are
+        // surfaced by doctor() (REQ-GOV-007), which re-reads raw entries.
       }
     }
     return docs;
@@ -177,6 +178,9 @@ export class TaskStore {
   async doctor(): Promise<{ ok: boolean; problems: string[] }> {
     const problems: string[] = [];
     const all = await this.list(true);
+    // REQ-GOV-007: documents that fail to parse must be visible to the
+    // integrity gate instead of being silently skipped by listing.
+    problems.push(...(await this.unparsableDocProblems()));
     const byId = new Map<string, TaskDoc>();
     for (const doc of all) {
       if (byId.has(doc.meta.id)) problems.push(`duplicate task id ${doc.meta.id}`);
@@ -227,6 +231,32 @@ export class TaskStore {
     const found = await this.find(id);
     if (found === null || found.archived) throw new Error(`unknown active task '${id}'`);
     return { doc: found.doc };
+  }
+
+  private async unparsableDocProblems(): Promise<string[]> {
+    const problems: string[] = [];
+    for (const [dir, base] of [
+      [this.activeDir, ACTIVE_DIR],
+      [this.archiveDir, ARCHIVE_DIR],
+    ] as const) {
+      let entries: Dirent[];
+      try {
+        entries = await fsp.readdir(dir, { withFileTypes: true });
+      } catch {
+        continue;
+      }
+      for (const entry of entries) {
+        if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
+        try {
+          await this.readDoc(path.join(dir, entry.name), `${base}/${entry.name}`);
+        } catch (error) {
+          problems.push(
+            `${base}/${entry.name}: unparsable task document (${(error as Error).message})`,
+          );
+        }
+      }
+    }
+    return problems;
   }
 
   private async writeStatus(
