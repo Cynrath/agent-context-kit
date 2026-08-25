@@ -4,9 +4,8 @@
 agent skills, security scanning, context budgeting, docs-first tasks,
 policy-as-code, and MCP. Offline-first and deterministic.
 
-> Status: **release candidate** — ACKit vNext `0.1.0` is feature-complete and
-> prepared for its first npm publication. **The package is not yet published**;
-> publishing is a separate, user-authorized step.
+> Status: **v0.1.0** — first release of the vNext line. Deterministic,
+> offline-first agent readiness for coding-agent repositories. Requires Node >= 22.
 > See [Docs](#docs) · [Security](docs/security/THREAT_MODEL.md) ·
 > [Contributing](CONTRIBUTING.md) · License: MIT.
 
@@ -55,20 +54,24 @@ task system the product ships.
 
 Requires Node **>= 22**.
 
-The npm package `@cynrath/agent-context-kit` `0.1.0` is a release candidate —
-**it is not on the npm registry yet** (publication is the final user-authorized
-release step). Until then, run ACKit from a checkout of this repository:
+Install globally from the npm registry:
+
+```bash
+npm install --global @cynrath/agent-context-kit
+ackit --version
+```
+
+Or run once with npx:
+
+```bash
+npx --yes @cynrath/agent-context-kit@0.1.0 --version
+```
+
+To run from a source checkout instead:
 
 ```bash
 pnpm install --frozen-lockfile && pnpm build
 node dist/cli/index.js --help
-```
-
-After publication (not available yet), the registry commands will be:
-
-```bash
-npx @cynrath/agent-context-kit@0.1.0 --help
-npm install -g @cynrath/agent-context-kit
 ```
 
 ## Quickstart
@@ -202,11 +205,12 @@ See `CONTRIBUTING.md` for the docs-first workflow.
 
 ## Versioning & status
 
-vNext restarts at `0.1.0`; v1 (.NET/NuGet `1.0.0-rc.1`) is frozen legacy.
-`0.1.0` is a release candidate: feature-complete and validated, **not yet
-published to npm**. Publishing, tagging, and GitHub Releases are separate,
-user-authorized steps. Changelog: `CHANGELOG.md` (the `0.1.0` entry atop a
-verbatim legacy section).
+vNext restarts at `0.1.0`; v1 (.NET/NuGet `1.0.0-rc.1`) is frozen legacy and is
+not part of this distribution line. Distribution is the scoped npm package
+`@cynrath/agent-context-kit` (CLI binary `ackit`). Publishing, tagging, and
+GitHub Releases follow the repository's controlled-release governance: each
+action is separately authorized and verified (`AGENTS.md`). Changelog:
+`CHANGELOG.md` (the `0.1.0` entry atop a verbatim legacy section).
 
 ## License
 

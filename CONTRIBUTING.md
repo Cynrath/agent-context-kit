@@ -48,6 +48,5 @@ pnpm gen:schemas        # when config/schema surface changed
 pnpm run smoke:package  # pack → temp install → CLI smoke
 ```
 
-Node >= 22. Changes land on `rebuild/ackit-vnext` (fast-forward pushes) or via
-pull requests targeting `master` once the release transition completes; both run
-the same CI gate.
+Node >= 22. Changes land via pull requests targeting `master` (or fast-forward
+pushes to an open development branch); both run the same CI gate.

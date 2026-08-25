@@ -31,8 +31,8 @@ This file is hand-maintained. `ackit generate` does not regenerate it. Update it
   The old global .NET `ackit` tool and `dotnet run` invocations are not valid vNext validation tools on this branch.
 
 ## Release Status
-- Current line: AgentContextKit vNext, package `@cynrath/agent-context-kit`, version `0.1.0` — release candidate, **not yet published**.
-- Branch `rebuild/ackit-vnext` is prepared for merge to `master`; merge/publish/tag/release require explicit user authorization.
+- Current line: AgentContextKit vNext, package `@cynrath/agent-context-kit`, version `0.1.0`.
+- npm publish, tag creation, GitHub Releases, and other master mutations require explicit user authorization.
 - Legacy .NET line is frozen and immutable: NuGet `AgentContextKit` `1.0.0-rc.1` (exact tag/release/assets/attestations at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`) and earlier prereleases remain untouchable; do not republish, reuse, move, replace, or delete them. Historical failed recovery evidence remains preserved.
 
 ## Recommended Checks

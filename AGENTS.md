@@ -1,9 +1,8 @@
 # AGENTS.md — AgentContextKit vNext
 
 AgentContextKit vNext (`ackit`, TypeScript + Node.js + npm) is feature-complete on
-branch `rebuild/ackit-vnext` and is in the **release-transition stage**: the branch
-is being prepared for merge to `master` and a future first npm publication of
-`@cynrath/agent-context-kit` `0.1.0`. The repository's own docs are the single
+`master` and ships as the scoped npm package `@cynrath/agent-context-kit`
+`0.1.0` (CLI binary `ackit`). The repository's own docs are the single
 source of truth for agents.
 
 ## Controlled-release governance

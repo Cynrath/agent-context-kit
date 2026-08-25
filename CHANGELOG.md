@@ -4,16 +4,25 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
-## [0.1.0] — Unreleased
+## [0.1.0] - 2026-08-25
 
-First release of the AgentContextKit vNext line: AgentContextKit rebuilt as a TypeScript + Node.js + npm/npx product (CLI command `ackit`, package `@cynrath/agent-context-kit`). This entry is prepared for release; the version has **not** been published yet.
+First release of the AgentContextKit vNext line: AgentContextKit rebuilt as a TypeScript + Node.js + npm/npx product (CLI command `ackit`, package `@cynrath/agent-context-kit`), distributed through npm and requiring Node >= 22.
 
+- Instruction graph across codex/claude/gemini/copilot instruction surfaces: nesting, overrides, `applyTo` globs, precedence resolution, conflict/duplicate/staleness/advisory analysis.
+- Agent Skills (open standard): parse/validate/install/sync with an ownership lock; four built-in skills shipped; scripts detected, never executed.
+- Security/hygiene scanning with redacted evidence: secret shapes, credential assignments, private keys, connection strings, entropy advisories, absolute-path leaks, CI pinning hygiene, dependency drift; terminal/JSON/SARIF 2.1.0/Markdown/self-contained HTML reports; baselines plus changed/staged/since/range incremental modes with content-addressed caching.
+- Token-budgeted context packs: deterministic weighted ranking, manifest with hash/reason/tokens for every include and exclusion.
+- Docs-first task workflow under `docs/tasks` with tool-allocated IDs, single-active rule, completion gate, and doctor validation.
+- Policy-as-code: `extends` chains (local files or pre-installed npm packages only), locked rules, scoped suppressions with expiry, digests — strictly offline.
+- Monorepo awareness for pnpm/npm/yarn/generic workspaces with path-scoped semantics.
+- MCP server over stdio on the official Model Context Protocol SDK: read-only tools, resources, and prompts.
+- Programmatic API from the same package (`scanRepository`, `buildInstructionGraph`, `buildContextPack`, config loading) behind a small deliberate surface.
 - TypeScript strict ESM skeleton with pnpm, Vitest, Biome, tsc build to `dist/` (TASK-0267).
 - `ackit` CLI core: global options (--root/--config/--json/--quiet/--no-color/--verbose/--debug/--strict), stable exit codes 0-5 per ADR-0007, deterministic bare-command summary scaffold, JSON mode with pure stdout.
 - Version/identity single source of truth in package.json (REQ-ARCH-009).
 - Terminal sanitation for diagnostics (ANSI/control-character stripping, REQ-SEC-003).
 - C# v1 runtime removed from the product path (REQ-ARCH-001); published v1 NuGet packages/tags/releases remain immutable historical artifacts.
-- Release status: candidate complete and validated for first publication; npm publish, tag creation, and GitHub Release are separate user-authorized steps that have not been performed.
+- Distribution: scoped npm package `@cynrath/agent-context-kit` (global install or one-shot `npx`); publish/tag/GitHub-Release steps follow the repository's controlled-release governance with explicit per-step user authorization.
 
 ## Legacy — v1 (.NET) line
 

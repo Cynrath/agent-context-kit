@@ -7,17 +7,22 @@
 
 ## Install
 
-The npm package `@cynrath/agent-context-kit` `0.1.0` is a release candidate and
-is **not on the npm registry yet** (publication is a separate user-authorized
-step). Until then, from a checkout:
+From the npm registry (requires Node >= 22):
+
+```bash
+npm install --global @cynrath/agent-context-kit
+ackit --version
+```
+
+One-shot usage: `npx --yes @cynrath/agent-context-kit@0.1.0 --help`.
+
+From a source checkout instead:
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm build
 node dist/cli/index.js --version
 ```
-
-After publication (not available yet): `npx @cynrath/agent-context-kit@0.1.0 --help`.
 
 ## 30-second tour (verified commands)
 
