@@ -8,6 +8,14 @@ import { TaskStore } from "../tasks/store.js";
 import type { PackContextSection } from "./pack.js";
 
 /**
+ * Stable advisory code (REQ-GOV-007) embedded in the policy-summary section
+ * when policy resolution fails unexpectedly. The summary stays advisory, but
+ * the failure is never silent: the explicit unavailable state plus this code
+ * surface in every emitted pack artifact.
+ */
+export const CONTEXT_POLICY_SUMMARY_UNAVAILABLE = "context-policy-summary-failed";
+
+/**
  * Canonical context-pack orchestration (REQ-CTX-001): collects the effective
  * instruction graph, active tasks, skills catalog, effective policy summary
  * and repository metadata into the deterministic REQ-CTX-001 section set.
@@ -44,7 +52,11 @@ export async function buildCanonicalContextSections(
       policyLine = `policy digest: ${policyDigest(resolvedPolicy.policy)}`;
     }
   } catch {
-    // Policy summary is advisory in pack context sections.
+    // Advisory by contract, but never silent (REQ-GOV-007): the explicit
+    // unavailable state plus the stable code below surface the failure. No
+    // raw error text is embedded — it could carry absolute paths or
+    // machine-specific internals.
+    policyLine = `policy status: unavailable (${CONTEXT_POLICY_SUMMARY_UNAVAILABLE})`;
   }
 
   let pkgMeta = "";

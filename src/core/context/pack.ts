@@ -17,6 +17,13 @@ export const PACK_SCHEMA_VERSION = "ackit.pack.v0";
 export const PACK_PREAMBLE_LABEL = "token counts are estimates";
 /** Stable abort message surfaced when a pack is cancelled mid-flight. */
 export const PACK_ABORTED_MESSAGE = "context pack aborted";
+/**
+ * Stable manifest reason prefix (REQ-GOV-007) recorded when a candidate file
+ * cannot be read at pack time. The parenthesized suffix is a deterministic
+ * errno category (e.g. ENOENT, EACCES) or "unknown" — never a raw message,
+ * absolute path, or secret content.
+ */
+export const PACK_READ_FAILED_REASON = "pack-read-failed";
 
 /** Ranking weight table (REQ-CTX-003 / ADR-0012) — transparent and documented. */
 export const RANKING_WEIGHTS = {
@@ -201,7 +208,18 @@ export async function buildContextPack(
     let content: string;
     try {
       content = await fsp.readFile(target.absolutePath, "utf8");
-    } catch {
+    } catch (error) {
+      // REQ-GOV-007: a candidate read failure is never silent — it becomes an
+      // explicit manifest exclusion record with a stable errno category and a
+      // repo-relative path only. The pack continues with the remaining set.
+      manifestDraft.push({
+        relativePath: target.relativePath,
+        action: "excluded",
+        reason: `${PACK_READ_FAILED_REASON} (${readFailureCategory(error)})`,
+        estimatedTokens: 0,
+        sha256: createHash("sha256").update(`${target.relativePath}:unreadable`).digest("hex"),
+        bytes: target.sizeBytes,
+      });
       continue;
     }
     // Checkpoint 5: after each expensive read.
@@ -476,4 +494,10 @@ export function assertNoSecretShapes(emitted: string): void {
 
 function toPosix(value: string): string {
   return value.split("\\").join("/");
+}
+
+/** Deterministic errno category for a read failure (never a raw message). */
+function readFailureCategory(error: unknown): string {
+  const code = (error as NodeJS.ErrnoException | null | undefined)?.code;
+  return typeof code === "string" && code.length > 0 ? code : "unknown";
 }
