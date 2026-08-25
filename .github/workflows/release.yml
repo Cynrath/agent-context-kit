@@ -1,0 +1,196 @@
+name: Release
+
+# Controlled npm release automation — the user-authorized tag boundary.
+#
+# A normal master push NEVER publishes; only CI (.github/workflows/ci.yml)
+# runs. The deliberate human/maintainer action is creating and pushing an
+# annotated vX.Y.Z tag AFTER explicit user authorization recorded in the
+# active task. This workflow then:
+#   1. checks out the exact tagged commit,
+#   2. validates tag <-> package.json <-> package-name identity,
+#   3. confirms the exact version is absent from the npm registry,
+#   4. runs the full quality gate (install/lint/format/typecheck/build/tests/
+#      schema-drift/real-tarball consumer smoke),
+#   5. publishes to npm via OIDC Trusted Publishing (short-lived credentials;
+#      NO long-lived npm token lives in GitHub Secrets),
+#   6. verifies registry metadata/shasum/dist-tag with bounded retries plus a
+#      real npx consumer smoke,
+#   7. and ONLY THEN creates the immutable GitHub Release.
+#
+# If publish succeeds but the GitHub Release step fails, do not republish npm:
+# the version-absence gate makes a rerun fail safely at step 3; repair only the
+# GitHub Release state manually.
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: validated publish + registry verify + GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout@v4 (f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a)
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+
+      # actions/setup-node@v4 (ae0d4ed08881f17d1511386f5be3e62356acd4a6)
+      - uses: actions/setup-node@ae0d4ed08881f17d1511386f5be3e62356acd4a6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      # pnpm/action-setup@v4 (b906affcce14559ad1aafd4ab0e942779e9f58b1)
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          package_json_file: package.json
+
+      - name: Validate tag shape, checkout identity, package identity, npm CLI capability
+        run: |
+          set -euo pipefail
+          TAG_NAME="${GITHUB_REF_NAME}"
+          case "${TAG_NAME}" in
+            v[0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "::error::tag '${TAG_NAME}' is not an exact vX.Y.Z release tag"; exit 1 ;;
+          esac
+          TAG_COMMIT="$(git rev-parse "${TAG_NAME}^{commit}")"
+          HEAD_COMMIT="$(git rev-parse HEAD)"
+          if [ "${TAG_COMMIT}" != "${HEAD_COMMIT}" ]; then
+            echo "::error::checked-out commit ${HEAD_COMMIT} is not the tagged commit ${TAG_COMMIT}"
+            exit 2
+          fi
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          if [ "${PKG_VERSION}" != "${TAG_NAME#v}" ]; then
+            echo "::error::package.json version '${PKG_VERSION}' does not match tag '${TAG_NAME}'"
+            exit 3
+          fi
+          PKG_NAME="$(node -p "require('./package.json').name")"
+          if [ "${PKG_NAME}" != "@cynrath/agent-context-kit" ]; then
+            echo "::error::unexpected package name '${PKG_NAME}'"
+            exit 4
+          fi
+          NPM_VERSION="$(npm --version)"
+          SMALLEST="$(printf '%s\n' '11.5.1' "${NPM_VERSION}" | sort -V | head -n1)"
+          if [ "${SMALLEST}" != '11.5.1' ]; then
+            echo "::error::npm ${NPM_VERSION} lacks Trusted Publishing support (requires >= 11.5.1)"
+            exit 5
+          fi
+          {
+            echo "RELEASE_TAG=${TAG_NAME}"
+            echo "RELEASE_VERSION=${PKG_VERSION}"
+          } >> "${GITHUB_ENV}"
+
+      - name: Frozen install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint, format check, typecheck
+        run: |
+          pnpm lint
+          pnpm format:check
+          pnpm typecheck
+
+      - name: Build and regenerate schemas (drift gate)
+        run: |
+          pnpm build
+          pnpm gen:schemas
+          git diff --exit-code -- schemas
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Pack tarball and record shasum
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/release-pack
+          pnpm pack --pack-destination /tmp/release-pack >/dev/null
+          TARBALL_PATH="$(ls -t /tmp/release-pack/*.tgz | head -n1)"
+          echo "TARBALL_PATH=${TARBALL_PATH}" >> "${GITHUB_ENV}"
+          echo "TARBALL_SHASUM=$(sha1sum "${TARBALL_PATH}" | cut -d' ' -f1)" >> "${GITHUB_ENV}"
+
+      - name: Real-tarball isolated consumer smoke
+        run: pnpm run smoke:package
+
+      - name: Confirm exact version is absent from the npm registry
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            view_err="$(mktemp)"
+            if npm view "@cynrath/agent-context-kit@${RELEASE_VERSION}" version > /dev/null 2> "${view_err}"; then
+              echo "::error::version ${RELEASE_VERSION} already exists on npm; refusing to overwrite"
+              exit 10
+            fi
+            if grep -q "E404" "${view_err}"; then
+              echo "registry reports 404 for ${RELEASE_VERSION}; safe to publish"
+              exit 0
+            fi
+            echo "attempt ${attempt}: non-404 registry error; retrying after 5s"
+            cat "${view_err}"
+            sleep 5
+          done
+          echo "::error::could not confirm version absence on npm"
+          exit 11
+
+      - name: Publish to npm via OIDC Trusted Publishing
+        run: npm publish --access public --provenance
+
+      - name: Verify registry metadata, shasum, and dist-tag (bounded propagation retry)
+        run: |
+          set -euo pipefail
+          seen=0
+          for attempt in $(seq 1 12); do
+            if npm view "@cynrath/agent-context-kit@${RELEASE_VERSION}" version dist.shasum > /tmp/reg-view.txt 2>/dev/null; then
+              seen=1
+              break
+            fi
+            echo "attempt ${attempt}/12: published version not visible yet; waiting 10s"
+            sleep 10
+          done
+          if [ "${seen}" -ne 1 ]; then
+            echo "::error::published version never became visible on the registry"
+            exit 20
+          fi
+          REG_SHASUM="$(tail -n1 /tmp/reg-view.txt | tr -d "'\"[:space:]")"
+          if [ "${REG_SHASUM}" != "${TARBALL_SHASUM}" ]; then
+            echo "::error::registry shasum ${REG_SHASUM} != local tarball shasum ${TARBALL_SHASUM}"
+            exit 21
+          fi
+          LATEST="$(npm view @cynrath/agent-context-kit dist-tags.latest)"
+          if [ "${LATEST}" != "${RELEASE_VERSION}" ]; then
+            echo "::error::dist-tag latest='${LATEST}' does not point at ${RELEASE_VERSION}"
+            exit 22
+          fi
+
+      - name: Real registry npx consumer smoke
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 6); do
+            if npx --yes "@cynrath/agent-context-kit@${RELEASE_VERSION}" --version | grep -qx "${RELEASE_VERSION}"; then
+              echo "npx consumer smoke passed"
+              exit 0
+            fi
+            echo "npx attempt ${attempt}/6 failed; retrying after 10s"
+            sleep 10
+          done
+          echo "::error::npx registry consumer smoke failed"
+          exit 30
+
+      - name: Create GitHub Release (strictly after successful publish + verification)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${RELEASE_TAG}" \
+            --verify-tag \
+            --title "AgentContextKit ${RELEASE_TAG}" \
+            --notes "Automated release of @cynrath/agent-context-kit@${RELEASE_VERSION} from the exact tagged source commit.
+
+Published to npm through GitHub Actions OIDC Trusted Publishing (short-lived credentials, provenance attested); no long-lived npm token was involved.
+
+Distribution remains npm/npx only; the legacy .NET/NuGet v1 line stays frozen and untouched. See CHANGELOG.md for the release notes."
