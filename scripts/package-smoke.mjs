@@ -113,22 +113,52 @@ const doctorJson = ackit(["--root", fixture, "--json", "doctor"]);
 const doctorParsed = JSON.parse(doctorJson);
 if (!doctorParsed.ok && !doctorParsed.checks) throw new Error("doctor output invalid");
 
-// task lifecycle: create → list → show → start → complete
+// task lifecycle: create → list → show → start → complete → archive.
+// REQ-TASKS-004 / REQ-PKG-001 final-lifecycle proof uses ONLY the NORMAL
+// completion path: the installed package's gate must block an incomplete
+// task, then a genuinely repaired document completes WITHOUT --force.
 const taskCreate = ackit(["--root", fixture, "--json", "task", "create", "smoke-test-task"]);
 const taskId = JSON.parse(taskCreate).created;
 ackit(["--root", fixture, "task", "start", taskId]);
 ackit(["--root", fixture, "--json", "task", "show", taskId]);
 const taskList = ackit(["--root", fixture, "--json", "task", "list"]);
 JSON.parse(taskList);
-// complete should fail (gate blocks unchecked criteria)
+// Completion gate MUST block while acceptance criteria are unchecked. The
+// block/fail branches are distinguished explicitly — swallowing either would
+// make this assertion vacuous.
+let gateBlocked = false;
 try {
   ackit(["--root", fixture, "--json", "task", "complete", taskId]);
-  throw new Error("completion gate should have blocked");
 } catch {
-  // expected — gate blocked
+  gateBlocked = true;
 }
-// force complete
-ackit(["--root", fixture, "--json", "task", "complete", taskId, "--force"]);
+if (!gateBlocked) throw new Error("completion gate should have blocked");
+
+// Repair the GENERATED task document so the criteria are genuinely satisfied:
+// real checkboxes ticked, real completion notes (no placeholder left).
+const taskShowBefore = JSON.parse(ackit(["--root", fixture, "--json", "task", "show", taskId]));
+const taskFile = path.join(fixture, ...String(taskShowBefore.task.relativePath).split("/"));
+let taskRaw = readFileSync(taskFile, "utf8");
+taskRaw = taskRaw
+  .replace("- [ ] Implementation matches scope.", "- [x] Implementation matches scope.")
+  .replace(
+    "- [ ] Test plan executed with pass counts recorded.",
+    "- [x] Test plan executed with pass counts recorded.",
+  )
+  .replace(
+    "(placeholder)",
+    "Installed-tarball smoke lifecycle verified: create/start/gate-block/document-repair/complete/archive all executed successfully.",
+  );
+if (taskRaw.includes("- [ ]") || taskRaw.includes("(placeholder)")) {
+  throw new Error("task document repair did not satisfy the completion gate inputs");
+}
+writeFileSync(taskFile, taskRaw, "utf8");
+
+// Normal completion — no --force anywhere in the success path.
+ackit(["--root", fixture, "--json", "task", "complete", taskId]);
+const completed = JSON.parse(ackit(["--root", fixture, "--json", "task", "show", taskId]));
+if (completed.task?.meta?.status !== "completed")
+  throw new Error(`normal completion did not complete the task (${completed.task?.meta?.status})`);
 ackit(["--root", fixture, "--json", "task", "archive", taskId]);
 
 // pack produces valid JSON with manifest AND canonical context sections/files
