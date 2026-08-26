@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - "master"
-      - "rebuild/**"
   pull_request:
     branches:
       - "master"
-      - "rebuild/**"
 
 permissions:
   contents: read
