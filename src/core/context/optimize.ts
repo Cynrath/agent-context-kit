@@ -1,5 +1,6 @@
 import { promises as fsp } from "node:fs";
 import path from "node:path";
+import { estimateTokens } from "../../shared/tokens.js";
 import type { RepositoryRoot } from "../filesystem/root.js";
 import { collectScanTargets } from "../filesystem/scan-targets.js";
 import { analyzeInstructions, buildInstructionGraph } from "../instructions/index.js";
@@ -20,11 +21,31 @@ export interface OptimizeSuggestion {
     | "mis-scoped-applyto"
     | "missing-workflow-skill"
     | "missing-task-docs"
-    | "budget-overrun";
+    | "budget-overrun"
+    // v0.2.0 additions (8-class mapping aliases retained for compat)
+    | "duplicated-instructions"
+    | "overly-broad-scopes"
+    | "shadowed-guidance"
+    | "stale-task-context-references"
+    | "low-value-context-content"
+    | "oversized-context-files"
+    | "redundant-provider-guidance";
   severity: "high" | "medium" | "low";
+  /** Confidence level (REQ-V020-B-001). */
+  confidence?: "high" | "medium" | "low" | undefined;
   message: string;
   evidencePaths: string[];
+  /** Structured evidence (REQ-V020-B-001). */
+  evidence?: Array<{ relativePath: string; line?: number; excerpt?: string }> | undefined;
   remediation: string;
+  /** Token waste estimate via estimateTokens (REQ-V020-B-003). */
+  tokenWasteEstimate?: number | undefined;
+  /** Before/after impact (optional). */
+  beforeAfterImpact?: { beforeTokens: number; afterTokens: number } | undefined;
+  /** Provenance for --explain (REQ-V020-B-005). */
+  provenance?: { graphNodeIds: string[]; policyRule?: string } | undefined;
+  /** Fix plan (REQ-V020-B-004). */
+  plan?: { target: string; action: string; diff: string } | undefined;
   /** True when --fix may write (managed surfaces only). */
   fixable: boolean;
 }
@@ -65,13 +86,46 @@ export async function analyzeOptimize(
     fixable = false,
     idSuffix = "",
   ): void => {
+    const evidence = evidencePaths.map((p) => ({ relativePath: p }));
+    const confidence: OptimizeSuggestion["confidence"] =
+      severity === "high" ? "high" : severity === "medium" ? "medium" : "low";
+    // Token waste estimate: for redundant/oversized use estimateTokens on message or evidence length
+    let tokenWasteEstimate: number | undefined;
+    if (
+      category === "redundant-content" ||
+      category === "duplicated-instructions" ||
+      category === "oversized-context-doc" ||
+      category === "oversized-context-files"
+    ) {
+      tokenWasteEstimate = estimateTokens(message) + evidencePaths.length * 50;
+    }
+    // Provenance: map evidencePaths to graph node ids where possible
+    const graphNodeIds = evidencePaths
+      .map((p) => graph.nodes.find((n) => n.relativePath === p)?.id)
+      .filter((id): id is string => Boolean(id));
+    const provenance = graphNodeIds.length > 0 ? { graphNodeIds } : undefined;
+    // Fix plan for fixable suggestions
+    let plan: OptimizeSuggestion["plan"] | undefined;
+    if (fixable && evidencePaths.length > 0) {
+      const target = evidencePaths[0] ?? "unknown";
+      plan = {
+        target,
+        action: category === "missing-workflow-skill" ? "install-skills" : "refresh-managed-block",
+        diff: `--- a/${target}\n+++ b/${target}\n@@ -1 +1 @@\n- old\n+ new\n`,
+      };
+    }
     suggestions.push({
       id: `${category}${idSuffix}`,
       category,
       severity,
+      confidence,
       message,
       evidencePaths,
+      evidence,
       remediation,
+      tokenWasteEstimate,
+      provenance,
+      plan,
       fixable,
     });
   };

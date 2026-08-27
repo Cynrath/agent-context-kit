@@ -264,12 +264,22 @@ function buildProgram(invocation: CliInvocation): Command {
     .option("--fix", "apply fixes limited to ACKit-managed surfaces", false)
     .option("--dry-run", "with --fix: print planned changes without writing", false)
     .option("--profile <name>", "provider profile for redundant guidance check")
+    .option("--explain", "show provenance for each finding", false)
+    .option("--category <cat>", "filter by category")
+    .option("--min-severity <level>", "filter by minimum severity (low|medium|high)")
+    .option("--format <fmt>", "output format: terminal|json|markdown|sarif", "terminal")
+    .option("--diff", "show diff for fix plan", false)
     .action(async () => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
       const commandOptions = (optimizeCommand.opts() ?? {}) as {
         fix?: boolean;
         dryRun?: boolean;
         profile?: string;
+        explain?: boolean;
+        category?: string;
+        minSeverity?: string;
+        format?: string;
+        diff?: boolean;
       };
       invocation.exitCode = await runOptimizeCommand({
         root: parentOptions.root,
@@ -280,6 +290,11 @@ function buildProgram(invocation: CliInvocation): Command {
         fix: commandOptions.fix ?? false,
         dryRun: commandOptions.dryRun ?? false,
         profile: commandOptions.profile,
+        explain: commandOptions.explain ?? false,
+        category: commandOptions.category,
+        minSeverity: commandOptions.minSeverity,
+        format: commandOptions.format ?? "terminal",
+        diff: commandOptions.diff ?? false,
       });
     });
 
