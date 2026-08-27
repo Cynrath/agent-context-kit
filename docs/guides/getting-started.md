@@ -14,27 +14,31 @@ npm install --global @cynrath/agent-context-kit
 ackit --version
 ```
 
-One-shot usage: `npx --yes @cynrath/agent-context-kit@0.1.1 --help`.
+One-shot usage: `npx --yes @cynrath/agent-context-kit@0.2.0 --help` (pinned to current `0.2.0`).
 
 From a source checkout instead:
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm build
-node dist/cli/index.js --version
+node dist/cli/index.js --version  # 0.2.0
 ```
 
-## 30-second tour (verified commands)
+## 30-second tour (verified commands — v0.2.0)
 
 ```bash
 ackit init --dry-run          # plan instruction shims + builtin skills
-ackit skills install          # install the four built-in skills
-ackit scan                    # security/hygiene scan (report only)
-ackit scan --ci               # gate mode: exit 1 at/over threshold
-ackit instructions            # print the resolved instruction graph
-ackit pack --max-tokens 50000 # budgeted context pack
+ackit scan --ci               # gate mode: exit 1 at/over threshold (medium)
+ackit readiness               # 0–100 scoring across 6 categories
+ackit instructions --explain  # graph v2 with provenance
+ackit optimize --explain      # 8-class advisor with waste estimates
+ackit pack --profile codex --max-tokens 50000 # provider-aware pack
+ackit diagnostics --json      # env/config/instructions/cache/policy/tasks
+ackit dashboard --port 0 --open # localhost-only dashboard
 ackit task "first task"       # docs-first task with tool-allocated id
 ```
+
+Deeper references: `docs/concepts/readiness.md` · `docs/reference/readiness.md` · `docs/guides/ci.md` · `docs/guides/watch-dashboard.md` · `docs/guides/vscode.md` · `docs/reference/sdk.md`.
 
 ## Configuration
 
@@ -50,7 +54,14 @@ context:
   maxTokens: 80000
 policy:
   extends: []
+  rulePacks: []               # declarative packs (local or node_modules)
+readiness:
+  weights: { instructions: 25, security: 25, contextEfficiency: 20, taskHygiene: 10, skills: 10, policy: 10 }
+  strictThreshold: 80
+profile: codex                # codex|claude|copilot|gemini|generic
+profiles:
+  extend: []                  # repo-relative custom profiles
 ```
 
-Validate anytime: `ackit config check`. Full reference:
-`docs/reference/config.md`.
+Validate anytime: `ackit config check` (`ackit.yml OK — schemaVersion 1, digest …` still valid; `readiness`/`profile` additive). Full reference:
+`docs/reference/config.md` · `docs/v0.2.0/config-v2-design.md`.

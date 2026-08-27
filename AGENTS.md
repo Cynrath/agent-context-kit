@@ -1,8 +1,8 @@
-# AGENTS.md — AgentContextKit vNext
+# AGENTS.md — AgentContextKit v0.2.0
 
-AgentContextKit vNext (`ackit`, TypeScript + Node.js + npm) is feature-complete on
+AgentContextKit (`ackit`, TypeScript + Node.js + npm) is feature-complete on
 `master` and ships as the scoped npm package `@cynrath/agent-context-kit`
-`0.1.1` (CLI binary `ackit`). The repository's own docs are the single
+`0.2.0` (CLI binary `ackit`). The repository's own docs are the single
 source of truth for agents.
 
 ## Controlled-release governance
@@ -18,18 +18,17 @@ Release actions are **user-authorized, not agent-authorized**:
 - The frozen legacy .NET line stays immutable everywhere: published NuGet
   versions/tags/releases (`1.0.0-rc.1`, earlier alphas) are untouchable; no NuGet
   or .NET release pipeline exists or may be created for vNext.
-- The old global .NET `ackit` tool must not be used as a vNext validation tool;
-  all vNext verification uses the repository-built CLI (see below).
-- Normal fast-forward pushes to `rebuild/ackit-vnext` are allowed and expected.
+- The old global .NET `ackit` tool must not be used as a validation tool;
+  all verification uses the repository-built CLI (see below).
 
 ## Canonical entry points (read in this order)
 
 1. `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md` — current governance (this file is authoritative)
 2. The current active task under `docs/tasks/active/`
-3. `docs/rebuild/VNEXT_REQUIREMENTS.md` — authoritative requirements contract (REQ-*)
-4. `docs/rebuild/VNEXT_EXECUTION_ORDER.md`, `docs/rebuild/VNEXT_TRACEABILITY.md` — Goal-2 wave/coverage records
-5. `docs/rebuild/GOAL2_BOOTSTRAP.md` — completed Goal-2 bootstrap, preserved as historical execution record
-6. Decisions: `docs/rebuild/decisions/ADR-0001..0013` and `docs/decisions/`
+3. `docs/v0.2.0/REQUIREMENTS.md`, `docs/v0.2.0/TRACEABILITY.md`, `docs/v0.2.0/ROADMAP.md`, `docs/v0.2.0/EXECUTION_PLAN.md` — v0.2.0 canonical contract
+4. `docs/decisions/ADR-0015..0024` (v0.2.0) + `docs/decisions/ADR-0001..0014` (baseline, reused)
+5. `docs/rebuild/` — historical vNext Goal-2 evidence, preserved verbatim (not active)
+6. Decisions: `docs/decisions/`
 
 ## ACKit-first / task-first / docs-first workflow
 
@@ -47,7 +46,7 @@ There is no such thing as "next session" for open work. This is a HARD RULE:
 - Work task-by-task through the dependency graph continuously; after each completed+committed task, immediately start the next dependency-ready task.
 - Only a real external blocker may stop execution; report it and stop only on that blocker.
 
-## vNext validation commands (repository-built CLI only)
+## Validation commands (repository-built CLI only)
 
 ```powershell
 pnpm install --frozen-lockfile
@@ -70,7 +69,8 @@ git diff --check
 
 ## Git discipline
 
-- Branch `rebuild/ackit-vnext`: normal fast-forward pushes to this branch are allowed.
+- Canonical development branch is `master` (fast-forward pushes per governance).
+- The `rebuild/ackit-vnext` branch is retired and preserved as historical evidence only; do not push to it.
 - Everything else follows Controlled-release governance above.
 - Never commit generated junk: `.ackit/`, `artifacts/`, `dist/`, `node_modules/`, coverage, reports, prompt packs, context exports, packed tarballs.
 

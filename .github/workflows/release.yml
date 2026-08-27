@@ -186,7 +186,37 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
+          # Extract exact version section from CHANGELOG.md deterministically
+          RELEASE_NOTES_TMP="$(mktemp)"
+          # Use Node script to extract section for $RELEASE_VERSION (fails if absent/empty)
+          node scripts/extract-changelog-section.mjs "${RELEASE_VERSION}" CHANGELOG.md "${RELEASE_NOTES_TMP}.section"
+          if [ ! -s "${RELEASE_NOTES_TMP}.section" ]; then
+            echo "::error::CHANGELOG section for ${RELEASE_VERSION} is missing or empty"
+            exit 40
+          fi
+          # Prepend header/install block
+          {
+            echo "# AgentContextKit v${RELEASE_VERSION}"
+            echo ""
+            echo "AgentContextKit v${RELEASE_VERSION} is the consolidated product-expansion release. See highlights and detailed notes below."
+            echo ""
+            echo "## Install / upgrade"
+            echo ""
+            echo '```bash'
+            echo "npm install --global @cynrath/agent-context-kit@${RELEASE_VERSION}"
+            echo "npx --yes @cynrath/agent-context-kit@${RELEASE_VERSION} --version"
+            echo '```'
+            echo ""
+            cat "${RELEASE_NOTES_TMP}.section"
+            echo ""
+            echo "## Distribution"
+            echo "- npm: @cynrath/agent-context-kit@${RELEASE_VERSION}"
+            echo "- Node >= 22"
+            echo "- npm/npx distribution via OIDC Trusted Publishing + provenance"
+            echo "- legacy .NET/NuGet line unchanged"
+          } > "${RELEASE_NOTES_TMP}"
           gh release create "${RELEASE_TAG}" \
             --verify-tag \
             --title "AgentContextKit ${RELEASE_TAG}" \
-            --notes "Automated release of @cynrath/agent-context-kit@${RELEASE_VERSION} from the exact tagged source commit. Published to npm through GitHub Actions OIDC Trusted Publishing (short-lived credentials, provenance attested); no long-lived npm token was involved. Distribution remains npm/npx only; the legacy .NET/NuGet v1 line stays frozen and untouched. See CHANGELOG.md for the release notes."
+            --notes-file "${RELEASE_NOTES_TMP}"

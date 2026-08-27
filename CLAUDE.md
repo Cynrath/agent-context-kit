@@ -10,9 +10,9 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 - Create new task docs with `node dist/cli/index.js task "<title>"` first, then
   fill/refine the generated Markdown.
 - Do not create task docs manually unless the CLI fails. If it fails, record the exact failure.
-- All vNext validation uses the repository-built CLI: `node dist/cli/index.js <command>`.
+- All validation uses the repository-built CLI: `node dist/cli/index.js <command>`.
   The old global .NET `ackit` tool and any `dotnet run` invocation are not valid
-  vNext validation tools on this branch.
+  validation tools on this branch.
 - Run `node dist/cli/index.js doctor` and `node dist/cli/index.js scan --ci` before every final commit.
 - Never commit generated `.ackit/`, reports, SARIF, prompt packs, context exports, package artifacts, packed tarballs, or temp outputs.
 - Preserve the task-first workflow, legacy-release immutability, and no-network/default safety rules.
@@ -39,7 +39,7 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 - Agent instructions: yes
 
 ## Release Status
-- Current line: AgentContextKit vNext, package `@cynrath/agent-context-kit`, version `0.1.1`; development happens on `master` and PR branches running the same CI gate.
+- Current line: AgentContextKit, package `@cynrath/agent-context-kit`, version `0.2.0` on `master` (consolidated v0.2.0 release, tag `v0.2.0`, npm `latest → 0.2.0`, GitHub Release `v0.2.0`); development on `master` and PR branches running the same CI gate. `0.1.1`/`0.1.0` remain as historical releases.
 - npm publish, tags, and GitHub Releases are user-authorized actions only (see Controlled-release governance in `AGENTS.md`). Automated publishing runs ONLY through the tag-triggered `.github/workflows/release.yml` after explicit user authorization; master pushes never publish.
 - Legacy .NET line is frozen and immutable: NuGet `AgentContextKit` `1.0.0-rc.1` (exact tag/release/assets/attestations at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`) and earlier prereleases remain untouchable; do not republish, reuse, move, replace, or delete them. Historical failed recovery evidence remains preserved.
 
@@ -56,5 +56,5 @@ This repository IS AgentContextKit. Every agent session must dogfood the tool.
 
 ## Commit And Push Policy
 - Follow `AGENTS.md` for the full commit and push policy. Always-prohibited actions (force-push, history rewrite, tag movement/deletion, workflow dispatch, deployments) remain in force; master/publish/tag/release require explicit per-task user authorization.
-- Normal fast-forward pushes to `rebuild/ackit-vnext` are allowed after local validation passes and the working tree is clean.
+- Normal fast-forward pushes to `master` are allowed after local validation passes and the working tree is clean; `rebuild/ackit-vnext` is retired (historical only, do not push).
 - Do not include model name, generator, or AI authorship in commit messages.
