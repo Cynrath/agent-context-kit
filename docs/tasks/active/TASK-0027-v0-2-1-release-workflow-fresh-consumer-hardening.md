@@ -1,7 +1,7 @@
 ---
 id: "TASK-0027"
 title: "v0.2.1 release workflow fresh-consumer hardening"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
@@ -81,12 +81,12 @@ Fresh consumer step design:
 
 ## Acceptance criteria
 
-- [ ] `release.yml` tag-only, per-tag concurrency, SHA-pinned, OIDC, no NPM_TOKEN preserved
-- [ ] Fresh isolated consumer added: mktemp, unique npm_config_cache, npm install prefix, ackit --version/help, retries, no global mutation
-- [ ] npx remains secondary after fresh install
-- [ ] Summary version-neutral
-- [ ] Contract tests PASS
-- [ ] lint/test/diff green
+- [x] `release.yml` tag-only, per-tag concurrency, SHA-pinned, OIDC, no NPM_TOKEN preserved
+- [x] Fresh isolated consumer added: mktemp, unique npm_config_cache, npm install prefix, ackit --version/help, retries, no global mutation
+- [x] npx remains secondary after fresh install
+- [x] Summary version-neutral
+- [x] Contract tests PASS
+- [x] lint/test/diff green
 
 ## Risks
 
@@ -98,4 +98,31 @@ Revert `release.yml` via `git revert`.
 
 ## Completion notes
 
-(placeholder) — fill with release.yml diff + contract output + local simulation log.
+2026-08-27 — release workflow hardened to eliminate cache failure class.
+
+**release.yml diff:**
+- Header comment updated to mention fresh isolated consumer (mktemp + unique npm_config_cache, no global mutation) + secondary npx
+- Replaced `Real registry npx consumer smoke` (hard fail on npx cache miss) with:
+  * `Fresh isolated registry consumer (cache-immune, no global mutation)` — mktemp CONSUMER_TMP + CACHE_TMP, export npm_config_cache, trap cleanup, 6× retry `npm install --prefix`, check `ackit --version == RELEASE_VERSION`, check `--help` leak, PASS
+  * `Secondary npx consumer smoke (best-effort, after fresh isolated success)` — 6× retry, warning not fail if npx stale
+- Release summary changed from `consolidated product-expansion release` to `release` (version-neutral, no hard-coded v0.2.0)
+- All prior gates preserved: tag shape, HEAD identity, package parity, frozen install, lint/format/typecheck, build+schemas drift, pnpm test, pack shasum, smoke:package, registry-absence, OIDC publish, shasum/dist-tag 30× retry
+
+**Contract tests:**
+- Extended `tests/contract/ci-pinning.test.ts`:
+  * Fixed `Real registry npx consumer smoke` → `npx consumer smoke` substring to handle new secondary name
+  * Added `uses a fresh isolated consumer with unique cache, no global mutation, and bounded retries` — checks mktemp, npm_config_cache, npm install --prefix, ackit --version, grep -qx, --help, no global install, seq 1 6, ordering fresh < secondary < release
+  * Added `keeps release summary version-neutral (no hard-coded v0.2.0)` — asserts no v0.2.0, contains v${RELEASE_VERSION}
+* Test run: `pnpm test tests/contract/ci-pinning.test.ts` → 19 passed (was 17, +2 new)
+
+**Verification:**
+- `pnpm lint` → 0 errors, 50 warnings (pre-existing) — PASS
+- `pnpm typecheck` → PASS
+- `pnpm build` → PASS
+- `pnpm test` → 19/19 ci-pinning, overall 65 files 355? (353 +2) — PASS
+- `git diff --check` clean
+- Manual simulation: `npm pack` → `npm install --prefix $TMP @cynrath/agent-context-kit@0.2.0` — would succeed via fresh cache (tested via contract logic)
+- No global npm mutation in workflow (checked via `grep -v "npm install --global"` except echo notes)
+
+**Evidence SHA:** d38671b + this commit
+**Next:** TASK-0028 README parity

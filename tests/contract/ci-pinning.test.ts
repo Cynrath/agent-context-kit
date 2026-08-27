@@ -142,7 +142,7 @@ describe("release workflow hardening", () => {
   it("creates the GitHub Release only AFTER publish + registry + npx verification", () => {
     const publish = raw.indexOf('run: npm publish "${TARBALL_PATH}" --access public');
     const verify = raw.indexOf("Verify registry metadata, shasum, and dist-tag");
-    const npxSmoke = raw.indexOf("Real registry npx consumer smoke");
+    const npxSmoke = raw.indexOf("npx consumer smoke");
     const release = raw.indexOf("gh release create");
     expect(publish).toBeGreaterThan(-1);
     expect(npxSmoke).toBeGreaterThan(publish);
@@ -188,5 +188,33 @@ describe("release workflow hardening", () => {
     expect(doc.on?.workflow_dispatch).toBeUndefined();
     expect(Object.keys(doc.jobs ?? {})).toEqual(["release"]);
     expect(doc.permissions).toEqual({ contents: "write", "id-token": "write" });
+  });
+
+  it("uses a fresh isolated consumer with unique cache, no global mutation, and bounded retries", () => {
+    expect(raw).toContain("Fresh isolated registry consumer");
+    expect(raw).toContain("mktemp -d");
+    expect(raw).toContain("npm_config_cache");
+    expect(raw).toContain('npm install --prefix "${CONSUMER_TMP}"');
+    expect(raw).toContain("@cynrath/agent-context-kit@${RELEASE_VERSION}");
+    expect(raw).toContain('node_modules/.bin/ackit" --version');
+    expect(raw).toContain('grep -qx "${RELEASE_VERSION}"');
+    expect(raw).toContain("--help");
+    // No direct global install step (echo in release notes is fine, but no `run: npm install --global`)
+    expect(raw).not.toMatch(/\n\s*run:\s*npm install --global/);
+    expect(raw).not.toMatch(/\n\s*run:\s*npm install -g/);
+    expect(raw).toMatch(/seq 1 6/);
+    // Fresh consumer must be before secondary npx and before release
+    const fresh = raw.indexOf("Fresh isolated registry consumer");
+    const secondary = raw.indexOf("Secondary npx consumer smoke");
+    const release = raw.indexOf("gh release create");
+    expect(fresh).toBeGreaterThan(-1);
+    expect(secondary).toBeGreaterThan(fresh);
+    expect(release).toBeGreaterThan(secondary);
+  });
+
+  it("keeps release summary version-neutral (no hard-coded v0.2.0)", () => {
+    expect(raw).not.toContain("v0.2.0");
+    expect(raw).toContain("v${RELEASE_VERSION}");
+    expect(raw).toContain("AgentContextKit v${RELEASE_VERSION} release");
   });
 });

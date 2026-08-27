@@ -14,7 +14,8 @@ name: Release
 #   5. publishes to npm via OIDC Trusted Publishing (short-lived credentials;
 #      NO long-lived npm token lives in GitHub Secrets),
 #   6. verifies registry metadata/shasum/dist-tag with bounded retries plus a
-#      real npx consumer smoke,
+#      fresh isolated consumer (mktemp + unique npm_config_cache, no global mutation)
+#      and a secondary npx smoke,
 #   7. and ONLY THEN creates the immutable GitHub Release.
 #
 # If publish succeeds but the GitHub Release step fails, do not republish npm:
@@ -168,7 +169,38 @@ jobs:
             exit 22
           fi
 
-      - name: Real registry npx consumer smoke
+      - name: Fresh isolated registry consumer (cache-immune, no global mutation)
+        run: |
+          set -euo pipefail
+          CONSUMER_TMP="$(mktemp -d)"
+          CACHE_TMP="$(mktemp -d)"
+          export npm_config_cache="${CACHE_TMP}"
+          trap 'rm -rf "${CONSUMER_TMP}" "${CACHE_TMP}"' EXIT
+          echo "consumer=${CONSUMER_TMP} cache=${CACHE_TMP}"
+          for attempt in $(seq 1 6); do
+            if npm install --prefix "${CONSUMER_TMP}" "@cynrath/agent-context-kit@${RELEASE_VERSION}" --no-package-lock --no-save > /dev/null 2>&1; then
+              break
+            fi
+            echo "fresh install attempt ${attempt}/6 failed; retrying after 10s"
+            sleep 10
+            if [ "${attempt}" -eq 6 ]; then
+              echo "::error::fresh consumer install failed"
+              exit 30
+            fi
+          done
+          INSTALLED_VER="$("${CONSUMER_TMP}/node_modules/.bin/ackit" --version)"
+          if [ "${INSTALLED_VER}" != "${RELEASE_VERSION}" ]; then
+            echo "::error::fresh consumer version mismatch installed='${INSTALLED_VER}' expected='${RELEASE_VERSION}'"
+            exit 31
+          fi
+          "${CONSUMER_TMP}/node_modules/.bin/ackit" --help > /tmp/fresh-help.txt
+          if grep -q "REQ-\|ADR-\|VNEXT\|GOAL2\|rebuild/ackit-vnext" /tmp/fresh-help.txt; then
+            echo "::error::fresh consumer --help contains internal identifiers"
+            exit 32
+          fi
+          echo "fresh isolated consumer PASS -- version ${INSTALLED_VER}"
+
+      - name: Secondary npx consumer smoke (best-effort, after fresh isolated success)
         run: |
           set -euo pipefail
           for attempt in $(seq 1 6); do
@@ -179,8 +211,8 @@ jobs:
             echo "npx attempt ${attempt}/6 failed; retrying after 10s"
             sleep 10
           done
-          echo "::error::npx registry consumer smoke failed"
-          exit 30
+          echo "::warning::npx smoke failed but fresh isolated consumer already passed; continuing"
+          # do not fail the release — fresh consumer is the hard gate; npx cache may be stale
 
       - name: Create GitHub Release (strictly after successful publish + verification)
         env:
@@ -199,7 +231,7 @@ jobs:
           {
             echo "# AgentContextKit v${RELEASE_VERSION}"
             echo ""
-            echo "AgentContextKit v${RELEASE_VERSION} is the consolidated product-expansion release. See highlights and detailed notes below."
+            echo "AgentContextKit v${RELEASE_VERSION} release. See highlights and detailed notes below."
             echo ""
             echo "## Install / upgrade"
             echo ""
