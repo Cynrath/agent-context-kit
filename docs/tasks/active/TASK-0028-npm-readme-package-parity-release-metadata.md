@@ -1,11 +1,11 @@
 ---
 id: "TASK-0028"
 title: "npm README/package parity + release metadata"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: 2026-08-27
 ---
 
 
