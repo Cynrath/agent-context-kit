@@ -1,7 +1,6 @@
 import { createHash } from "node:crypto";
 import http from "node:http";
 import path from "node:path";
-import { loadAckitConfig } from "../config/load.js";
 import { buildContextPack } from "../context/pack.js";
 import { resolveRepositoryRoot } from "../filesystem/root.js";
 import { buildInstructionGraph } from "../instructions/graph.js";
@@ -11,7 +10,7 @@ import { executeConfiguredScan } from "../scanner/orchestrate.js";
 import { validateSkills } from "../skills/validate.js";
 import { TaskStore } from "../tasks/store.js";
 
-function escapeHtml(s: string): string {
+function _escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

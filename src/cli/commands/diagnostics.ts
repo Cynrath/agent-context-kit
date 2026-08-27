@@ -160,7 +160,7 @@ export async function runDiagnosticsBundle(options: {
   // Gather diagnostics payload (reuse)
   const prevJson = options.json;
   // Temporarily capture JSON
-  const payload: Record<string, unknown> | null = null;
+  const _payload: Record<string, unknown> | null = null;
   const originalWriteJson = writeJson;
   // Instead, manually build payload similar to runDiagnosticsCommand
   const configResult = await loadAckitConfig(rootRequested, { configPath: options.config });

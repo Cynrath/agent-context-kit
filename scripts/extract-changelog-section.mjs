@@ -78,9 +78,9 @@ if (
     process.exit(1);
   }
   if (outPath) {
-    writeFileSync(path.resolve(outPath), section + "\n", "utf8");
+    writeFileSync(path.resolve(outPath), `${section}\n`, "utf8");
   } else {
-    process.stdout.write(section + "\n");
+    process.stdout.write(`${section}\n`);
   }
 }
 

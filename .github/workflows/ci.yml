@@ -41,6 +41,8 @@ jobs:
         run: pnpm typecheck
       - name: Build
         run: pnpm build
+      - name: Offline-egress static gate
+        run: node scripts/check-offline-egress.mjs
       - name: Tests (unit/integration/contract/security)
         run: pnpm test
 

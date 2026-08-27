@@ -33,3 +33,14 @@
   (TASK-0286), minimal dependency set per ADR-0006/0008.
 
 See `THREAT_MODEL.md` for the enumerated threat table and regression map.
+
+## Offline-first permanent enforcement (v0.2.1)
+
+Product/runtime invariant (REQ-GOV-001/002): **zero outbound product egress** after installation. Verified by:
+
+- `scripts/check-offline-egress.mjs` (static, allowlisted `node:http` servers + relative `fetch`) run in CI `verify` job.
+- `tests/security/offline-egress-contract.test.ts` (file-content contract) + `tests/security/offline-runtime.test.ts` (deny-egress patched execution of `doctor`/`scan`/`readiness`/`instructions`/`pack`/`optimize`/`diagnostics`/rule-pack/SDK/MCP) = 21 tests green.
+- Dashboard/report servers default `127.0.0.1`; `--allow-nonlocal` required otherwise (exit 2, `NonLocalBindRefusedError`).
+- Rule packs/profiles refuse network URLs; npm packs resolved via pre-installed `node_modules` only.
+
+CI gate is permanent (normal CI, not release-only). `git diff --check` + `pnpm test` + `node scripts/check-offline-egress.mjs` must all pass before any tag or publish.

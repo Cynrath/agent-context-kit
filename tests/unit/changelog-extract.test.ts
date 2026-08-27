@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-// @ts-ignore — JS module without declaration, test covers runtime behavior
+// @ts-expect-error — JS module without declaration, test covers runtime behavior
 import { extractChangelogSection } from "../../scripts/extract-changelog-section.mjs";
 
 const FIXTURE = `

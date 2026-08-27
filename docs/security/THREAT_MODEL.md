@@ -27,4 +27,14 @@ Out of scope by product decision (REQ-GOV-009): LLM APIs, vector stores,
 SAST/SBOM platforms, cloud services — these surfaces cannot introduce
 threats because they do not exist.
 
+## Offline-first guarantee (v0.2.1)
+
+The product/runtime never initiates outbound network access. Distribution/maintainer steps may use the network (npm install/publish, Actions download, Marketplace), but repository analysis/runtime never sends content anywhere.
+
+- **Static gate**: `scripts/check-offline-egress.mjs` + `tests/security/offline-egress-contract.test.ts` forbid `fetch`, `node:https`, `http.request/get`, `net.connect`, `tls.connect`, `dgram`, `dns.resolve`, `WebSocket`, `EventSource`, `axios/got/undici`, `curl`, git network commands. Allowlist: `node:http` only in `src/core/dashboard/server.ts` / `src/core/reporting/serve.ts` for localhost `createServer`; `fetch('/api/...')` relative only (no absolute/protocol-relative/dynamic).
+- **Runtime harness**: `tests/security/offline-runtime.test.ts` patches `fetch`, `http.request/get`, `https.request/get`, `net.connect`, `Socket.connect`, `tls.connect`, `dgram`, `dns`, `WebSocket`, `EventSource` and runs `doctor`, `scan`, `scan --ci`, `readiness`, `instructions`, `pack`, `optimize`, `diagnostics`, rule-pack evaluation, SDK and MCP consumers — all pass without egress. Dashboard/report may bind `127.0.0.1` loopback only; non-loopback requires `--allow-nonlocal` warning (see `assertBindableHost`).
+- **Policy isolation**: rule packs and provider profiles refuse `http/https/ftp` locations (`POL-NETWORK-REFUSED`, `PROFILE-NETWORK-REFUSED`); missing npm packs are not auto-fetched (`POL-OFFLINE-BLOCKED`); provider profiles are bundled/local, no API calls; MCP is stdio-only (`src/mcp/stdio.ts` + `McpServer`); VS Code extension has no telemetry/network client.
+
+Permanent CI enforcement: `scripts/check-offline-egress.mjs` + `tests/security/offline-*` run in normal `ci.yml` verify job, not release-only. A future commit introducing outbound primitives fails CI (allowlisted loopback servers excluded). Manual verification: `node scripts/check-offline-egress.mjs` must show `PASS` and `pnpm test` must show 21 offline tests green.
+
 Reporting: see SECURITY.md for private vulnerability disclosure.

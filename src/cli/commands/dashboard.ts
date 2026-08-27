@@ -21,7 +21,7 @@ export async function runDashboardCommand(options: {
     if (!options.quiet) {
       const msg = `dashboard serving at ${handle.url} (Ctrl+C to stop)\n`;
       if (options.json) {
-        process.stdout.write(JSON.stringify({ url: handle.url, port: handle.port }) + "\n");
+        process.stdout.write(`${JSON.stringify({ url: handle.url, port: handle.port })}\n`);
       } else {
         process.stdout.write(msg);
       }
