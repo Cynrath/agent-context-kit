@@ -52,6 +52,8 @@ export type {
   ScoreReport,
   Severity as ReadinessSeverity,
 } from "./core/readiness/types.js";
+export { analyzeOptimize } from "./core/context/optimize.js";
+export type { AnalyzeOptions, OptimizeSuggestion } from "./core/context/optimize.js";
 export type {
   Finding,
   ScanCategory,

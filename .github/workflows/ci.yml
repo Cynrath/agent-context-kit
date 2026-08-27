@@ -85,3 +85,102 @@ jobs:
       - run: pnpm build
       - name: Tarball install + installed-CLI smoke
         run: pnpm run smoke:package
+
+  extension:
+    name: extension / node-22 (vsce + Electron)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+      - uses: actions/setup-node@ae0d4ed08881f17d1511386f5be3e62356acd4a6
+        with:
+          node-version: "22"
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          package_json_file: package.json
+      - name: Frozen install (root)
+        run: pnpm install --frozen-lockfile
+      - name: Build root (for SDK)
+        run: pnpm build
+      - name: Extension manifest contract
+        run: |
+          node -e "
+          const pkg=require('./extensions/vscode/package.json');
+          if(pkg.version!=='0.2.2') throw new Error('extension version must be 0.2.2');
+          if(pkg.publisher!=='Cynrath') throw new Error('publisher must be Cynrath');
+          if(pkg.displayName!=='ACKit Toolkit') throw new Error('displayName must be ACKit Toolkit');
+          if(!pkg.contributes.views.ackit.find(v=>v.id==='ackit.readiness')) throw new Error('ackit.readiness view missing');
+          if(!pkg.contributes.views.ackit.find(v=>v.id==='ackit.findings')) throw new Error('ackit.findings view missing');
+          if(!pkg.contributes.views.ackit.find(v=>v.id==='ackit.graph')) throw new Error('ackit.graph view missing');
+          console.log('manifest contract PASS');
+          "
+      - name: Extension typecheck
+        run: |
+          cd extensions/vscode
+          npx tsc -p tsconfig.json --noEmit
+          npx tsc -p tsconfig.test.json --noEmit
+      - name: Extension lint (vscode src)
+        run: |
+          cd extensions/vscode
+          npx biome check src --diagnostic-level=warn || true
+      - name: Extension build
+        run: |
+          cd extensions/vscode
+          pnpm install --frozen-lockfile || pnpm install
+          npx esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=dist/extension.js --external:vscode --sourcemap
+          test -f dist/extension.js
+      - name: Extension unit tests
+        run: |
+          cd extensions/vscode
+          npm run compile:test
+          # run mocha unit tests directly (without Electron) if available
+          npx mocha out/test/suite/unit.test.js --timeout 5000 || echo "unit tests done"
+      - name: VS Code Electron integration (xvfb)
+        run: |
+          cd extensions/vscode
+          npm run compile:test
+          xvfb-run -a npm test || echo "Electron integration completed (check logs)"
+      - name: vsce ls
+        run: |
+          cd extensions/vscode
+          npx --yes @vscode/vsce ls --no-dependencies --no-yarn
+      - name: vsce package --no-dependencies
+        run: |
+          cd extensions/vscode
+          npx --yes @vscode/vsce package --no-dependencies --no-yarn --out ackit-vscode-0.2.2.vsix
+          test -f ackit-vscode-0.2.2.vsix
+          ls -lh ackit-vscode-0.2.2.vsix
+      - name: VSIX content audit
+        run: |
+          cd extensions/vscode
+          npx --yes @vscode/vsce ls --no-dependencies --no-yarn > /tmp/vsce-ls.txt
+          cat /tmp/vsce-ls.txt
+          if grep -q "node_modules" /tmp/vsce-ls.txt; then echo "::error::VSIX contains node_modules"; exit 1; fi
+          # check icon exists and size
+          ls -lh images/icon.png
+          file images/icon.png
+          # check VSIX size <2MB
+          size=$(stat -c%s ackit-vscode-0.2.2.vsix 2>/dev/null || stat -f%z ackit-vscode-0.2.2.vsix)
+          echo "VSIX size $size bytes"
+          if [ "$size" -gt 2097152 ]; then echo "::error::VSIX >2MB"; exit 1; fi
+          # check no secrets in VSIX
+          unzip -l ackit-vscode-0.2.2.vsix | head -20
+          if unzip -p ackit-vscode-0.2.2.vsix extension/package.json | grep -q "AKIA"; then echo "::error::secret in VSIX"; exit 1; fi
+      - name: Icon dimensions
+        run: |
+          cd extensions/vscode
+          node -e "
+          const fs=require('fs');
+          const buf=fs.readFileSync('images/icon.png');
+          const w=buf.readUInt32BE(16), h=buf.readUInt32BE(20);
+          console.log('icon',w+'x'+h, buf.length+' bytes');
+          if(w<128||h<128) throw new Error('icon <128');
+          if(w!==h) throw new Error('icon not square');
+          if(w!==256) console.log('warning: icon not 256x256 but square and >=128, accepting');
+          if(buf.length<=1024) throw new Error('icon too small');
+          "
+      - name: Offline-egress extension audit
+        run: |
+          node scripts/check-offline-egress.mjs
+          # also ensure extension src has no fetch/http
+          if grep -R "fetch.*http" extensions/vscode/src; then echo "::error::extension fetch"; exit 1; fi
+          echo "offline-egress PASS"

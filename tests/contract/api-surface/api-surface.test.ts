@@ -7,6 +7,7 @@ const ALLOWLIST = [
   "AckitError",
   "ProfileSchema",
   "READINESS_ENGINE_VERSION",
+  "analyzeOptimize",
   "buildContextPack",
   "buildInstructionGraph",
   "detectProfiles",

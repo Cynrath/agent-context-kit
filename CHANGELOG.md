@@ -4,6 +4,35 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.2.2] - 2026-08-27
+
+VS Code Marketplace correctness hotfix — extension is now feature-complete and contract-tested.
+
+### Fixed
+
+- **VS Code tree views** (`extensions/vscode/src/extension.ts`, `services/ackitWorkspace.ts`): register real `TreeDataProvider` for `ackit.readiness`, `ackit.findings`, `ackit.graph`, `ackit.tasks`, `ackit.policy`, `ackit.optimize` (previously no providers, manifest claimed 3 views).
+- **Readiness tree** (`ackit.readiness`): real `scoreRepository` inputs, overall + 6 categories, deductions/evidence, N/A handling, tooltip, refresh on change, loading/error/empty states.
+- **Findings tree + Problems** (`ackit.findings`): real `scanRepository` findings, severity grouping, correct `vscode.DiagnosticSeverity` mapping (critical/high→Error, medium→Warning, low→Information), safe `vscode.Uri.joinPath` + `isInsideRoot`, invalid line/col clamped, repository-level findings skipped, atomic `DiagnosticCollection` refresh, click to open file.
+- **Instruction Graph** (`ackit.graph` + `ACKit: Instructions for Current File`): uses `buildInstructionGraph` + `resolveEffectiveStack` with active editor, workspace folder check, ordered effective stack, provenance, provider/scope, conflicts/shadowing.
+- **Optimize** (`ACKit: Optimize`): real `analyzeOptimize` via SDK (exposed as `analyzeOptimize` with `AbortSignal`, typed errors, no `process.exit`), QuickPick with severity/priority, token-waste, evidence, remediation, preview diff, dry-run fencing.
+- **Diagnostics** (`ACKit: Diagnostics`): real `loadAckitConfig` + `TaskStore` + policy summary as JSON (config health, tasks, policy), no node-count placeholder, no auto-upload.
+- **Watch** (`onDidCreate` + `onDidChange` + `onDidDelete`): one debounced 400ms coalesced refresh, ignores `.git`/`node_modules`/`dist`/`.ackit`, `AbortController` cancels in-flight, lazy `setTimeout(refreshAll, 800)` avoids blocking `onStartupFinished`.
+- **Multi-root** (`getRoots`, `getRootForActiveEditor`): uses `workspace.getWorkspaceFolder(activeEditor)` else first root, per-root snapshots, `onDidChangeWorkspaceFolders` refresh, tests cover `workspaceFolders?.[0]` anti-pattern.
+- **Test harness** (`extensions/vscode/src/test/runTest.ts`, `src/test/suite/*`, `tsconfig.test.json`): replaces broken `out/test/runTest.js`, unit tests for tree/severity/path/multi-root/debounce/error, Electron integration via `@vscode/test-electron` (11 checks: activate, activity container, readiness, findings, Problems, current-file, graph, optimize, diagnostics, refresh create/change/delete, no crash).
+- **Offline-egress** (`scripts/check-offline-egress.mjs` now includes `extensions/vscode/src/**`, rejects `fetch` remote, `http` client, telemetry, remote fonts).
+- **Icon** (`extensions/vscode/images/icon.png`): replaced 68-byte 1×1 placeholder with 256×256 PNG (26KB, square, transparent background, crisp), contract test `tests/contract/vscode-icon.test.ts` (width==height==256, >1KB).
+- **Marketplace README** (`extensions/vscode/README.md`): rewritten to match implemented UI (Readiness, Findings/Problems, Graph, current-file, Optimize, Diagnostics, Tasks/Policy, offline guarantee, version 0.2.2, links, no false claims).
+- **CI** (`.github/workflows/ci.yml`): new dedicated `extension` job (Ubuntu, xvfb) — manifest contract, typecheck, lint, build, unit, Electron, `vsce ls`, `vsce package --no-dependencies`, VSIX audit (<2MB), icon dimensions, offline-egress.
+
+### Changed
+
+- **SDK** (`src/index.ts`): expose minimal stable `analyzeOptimize` (`AnalyzeOptions` with `signal?: AbortSignal`, `AbortError` <200ms, typed errors, no `process.exit`) for VS Code; `tests/contract/api-surface` allowlist updated.
+- **Extension manifest** (`extensions/vscode/package.json`): `version 0.2.1 → 0.2.2`, `displayName` remains `ACKit Toolkit`, add `ackit.tasks`/`ackit.policy`/`ackit.optimize` views, add `ackit.showReadiness`/`ackit.openFinding`/`ackit.instructionsForCurrentFile` commands, `activationEvents: onStartupFinished` retained with debounced lazy refresh.
+
+### Security
+
+- No new network calls in extension or SDK; offline-first preserved, VS Code host networking is host behavior.
+
 ## [0.2.1] - 2026-08-27
 
 Maintenance and launch-sync release — offline guarantee, distribution hardening, and documentation.

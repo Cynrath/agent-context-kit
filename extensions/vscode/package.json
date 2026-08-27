@@ -2,7 +2,7 @@
   "name": "ackit-vscode",
   "displayName": "ACKit Toolkit",
   "description": "Offline-first agent readiness toolkit for VS Code",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "publisher": "Cynrath",
   "engines": {
     "vscode": "^1.90.0"
@@ -30,6 +30,18 @@
       {
         "command": "ackit.showGraph",
         "title": "ACKit: Show Graph"
+      },
+      {
+        "command": "ackit.showReadiness",
+        "title": "ACKit: Show Readiness"
+      },
+      {
+        "command": "ackit.openFinding",
+        "title": "ACKit: Open Finding"
+      },
+      {
+        "command": "ackit.instructionsForCurrentFile",
+        "title": "ACKit: Instructions for Current File"
       },
       {
         "command": "ackit.optimize",
@@ -65,18 +77,39 @@
           "type": "tree",
           "id": "ackit.graph",
           "name": "Instruction Graph"
+        },
+        {
+          "type": "tree",
+          "id": "ackit.tasks",
+          "name": "Tasks"
+        },
+        {
+          "type": "tree",
+          "id": "ackit.policy",
+          "name": "Policy"
+        },
+        {
+          "type": "tree",
+          "id": "ackit.optimize",
+          "name": "Optimize"
         }
       ]
     }
   },
   "scripts": {
     "build": "esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=dist/extension.js --external:vscode --sourcemap",
-    "test": "node ./out/test/runTest.js"
+    "compile:test": "tsc -p tsconfig.test.json",
+    "test": "npm run compile:test && node ./out/test/runTest.js",
+    "pretest": "npm run compile:test"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.19.43",
     "@types/vscode": "^1.90.0",
     "@vscode/test-electron": "^2.4.0",
     "esbuild": "^0.23.0",
+    "glob": "^10.5.0",
+    "mocha": "^10.8.2",
     "typescript": "^5.5.0"
   },
   "repository": {

@@ -56,6 +56,7 @@ export interface AnalyzeOptions {
     | import("../profiles/types.js").ResolvedProfile
     | import("../profiles/types.js").Profile
     | undefined;
+  signal?: AbortSignal | undefined;
 }
 
 const ROOT_INSTRUCTION_FILES = new Set(["AGENTS.md", "CLAUDE.md", "GEMINI.md"]);
@@ -69,9 +70,12 @@ export async function analyzeOptimize(
   root: RepositoryRoot,
   options: AnalyzeOptions = {},
 ): Promise<OptimizeSuggestion[]> {
+  if (options.signal?.aborted) {
+    throw new DOMException("analyzeOptimize aborted", "AbortError");
+  }
   const maxTokens = options.maxTokens ?? 20_000;
   const suggestions: OptimizeSuggestion[] = [];
-  const graph = await buildInstructionGraph(root);
+  const graph = await buildInstructionGraph(root, { signal: options.signal });
   const knownFiles = (await collectScanTargets(root, { skipClassification: true })).targets.map(
     (target) => target.relativePath,
   );
