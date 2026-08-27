@@ -1,11 +1,11 @@
 ---
 id: "TASK-0032"
 title: "Sponsors/community/repository discovery cleanup"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0031"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: 2026-08-27
 ---
 
 
