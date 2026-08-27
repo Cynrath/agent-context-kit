@@ -49,6 +49,10 @@ shared/           exit codes, diagnostics sanitizer, version source, tokens
 4. **Offline by construction** — resolution paths cannot reach the network.
 5. **Single identity source** — package.json feeds CLI/MCP/reports alike.
 
+## SDK as shared engine (v0.2.0, ADR-0021)
+
+`src/index.ts` is the frozen public SDK surface (contract-tested). CLI (`src/cli/**`), MCP (`src/mcp/**`), dashboard, GitHub Action, and VS Code extension all reuse `scanRepository` / `buildContextPack` / `buildInstructionGraph` / `loadAckitConfig` via this boundary. External consumers (`npm install @cynrath/agent-context-kit` → `import { scanRepository }`) use the same ESM import. `src/core/**` is internal; the distributed `package.json` `exports` exposes only `"."` and `"./mcp"`.
+
 ### Reserved subsystems (v0.2.0)
 
 The following modules are reserved for v0.2.0 and not yet implemented in this baseline:

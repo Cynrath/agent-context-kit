@@ -64,13 +64,22 @@ export async function buildInstructionGraph(
   root: RepositoryRoot,
   options: BuildGraphOptions = {},
 ): Promise<InstructionGraph> {
+  if (options.signal?.aborted) {
+    throw new DOMException("buildInstructionGraph aborted", "AbortError");
+  }
   const maxTokens = options.maxTokenEstimatePerFile ?? 20000;
   const diagnostics: DiscoveryDiagnostic[] = [];
   const nodes: InstructionNode[] = [];
 
   const walkRoot = await fsp.realpath(root.canonicalPath);
+  if (options.signal?.aborted) {
+    throw new DOMException("buildInstructionGraph aborted", "AbortError");
+  }
   const allFiles = await listFiles(walkRoot);
   for (const absoluteFile of allFiles) {
+    if (options.signal?.aborted) {
+      throw new DOMException("buildInstructionGraph aborted", "AbortError");
+    }
     const relativePath = toPosix(path.relative(walkRoot, absoluteFile));
     const surface = classifySurface(relativePath);
     if (surface === null) continue;
