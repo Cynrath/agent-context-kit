@@ -4,6 +4,34 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.2.1] - 2026-08-27
+
+Maintenance and launch-sync release — offline guarantee, distribution hardening, and documentation.
+
+### Added
+
+- **Offline-egress invariant** (`scripts/check-offline-egress.mjs`, `tests/security/offline-egress-contract.test.ts`, `tests/security/offline-runtime.test.ts`): static + runtime deny-egress harness, 21 tests, permanent CI gate in `ci.yml` (allowlisted `node:http` for localhost, relative `fetch('/api/...')` only, `POL-NETWORK-REFUSED` for rule packs/profiles, MCP stdio-only, VS Code no telemetry), documented in `docs/security/THREAT_MODEL.md` and `SECURITY_MODEL.md`.
+- **Public benchmark evidence** (`benchmarks/public-repos.json`, `benchmarks/run-public.mjs`, `docs/benchmarks/public-evidence.md`, `benchmarks/public-evidence.json`): 20 pinned OSS repos across 6 ecosystems (TypeScript 11, JavaScript 1, Python 3, Go 3, Rust 1, Java 1) with exact SHAs, offline-only `scanRepository` analysis, aggregate methodology (31100 files, 668 findings, median readiness ~68), deterministic, no raw secrets, no `npm install` in third-party repos.
+- **Demos** (`examples/demo-*`): 7 reproducible demos (readiness before/after, optimize explain, instruction graph, provider pack, dashboard, GitHub Action, diagnostics) validated against `ackit@0.2.1` built CLI.
+- **Static docs deployment** (`Cynrath.github.io/agent-context-kit/`): framework-free HTML/CSS/JS, no CDN/analytics, deterministic `scripts/sync-ackit-docs.mjs` (`--source`, offline, idempotent, only `agent-context-kit/**` + `sitemap.xml`/homepage), 17 subpages + assets, responsive, canonical/OG, sitemap 18 URLs.
+- **Repository discovery** (`.github/FUNDING.yml`): `github: Cynrath` (Sponsors active), 20 topics exactly (`agents-md`, `agent-skills`, `ai-agents`, `claude-code`, `cli`, `codex`, `coding-agents`, `context-engineering`, `cursor`, `developer-tools`, `gemini`, `github-actions`, `mcp`, `model-context-protocol`, `offline-first`, `policy-as-code`, `repository-scanner`, `security`, `typescript`, `vscode-extension`), description `Offline-first toolkit for agent-ready repositories: readiness scoring, instruction graphs, context packs, policy/rule packs, MCP, GitHub Actions, diagnostics, and VS Code.`, website `https://cynrath.github.io/agent-context-kit/`, Sponsors/Discussions badges in `README.md`, `SUPPORT.md` with Discussions categories.
+- **VS Code Marketplace** (`extensions/vscode` `0.2.1`, publisher `Cynrath`): `Cynrath.ackit-vscode` v0.2.1 published (451KB, SHA 58c7a3c), displayName `ACKit Toolkit`, categories Linters, onStartupFinished, no telemetry.
+
+### Changed
+
+- `README.md` polished badges/links 0.2.0→0.2.1 (npm, release, npx, Action, VS Code, versioning) while preserving table/responsive design; `docs/v0.2.0` historical path unchanged.
+- `.github/workflows/release.yml` fresh isolated consumer: mktemp + unique `npm_config_cache`, `npm install --prefix` + `ackit --version`/`--help` checks, 6× bounded retry, no global mutation, secondary `npx` best-effort, version-neutral release notes.
+- `extensions/vscode/package.json` 0.2.1 (repository/homepage/bugs/license/icon/keywords, README/CHANGELOG/.vscodeignore).
+
+### Fixed
+
+- `scripts/extract-changelog-section.mjs` and `src/cli/commands/dashboard.ts` template literals (biome).
+- `src/core/dashboard/server.ts` unused import, `src/cli/commands/diagnostics.ts` unused variable, `tests/unit/changelog-extract.test.ts` ts-expect-error.
+
+### Security
+
+- No new network calls, no telemetry, no arbitrary plugin exec; offline-first invariant permanently enforced.
+
 ## [0.2.0] - 2026-08-27
 
 One consolidated feature release — offline-first, deterministic, task-first.

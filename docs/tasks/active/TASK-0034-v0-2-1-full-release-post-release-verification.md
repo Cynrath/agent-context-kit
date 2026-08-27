@@ -1,7 +1,7 @@
 ---
 id: "TASK-0034"
 title: "v0.2.1 full release + post-release verification"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0027", "TASK-0028", "TASK-0029", "TASK-0030", "TASK-0031", "TASK-0032", "TASK-0033"]
 createdAt: "2026-08-27"

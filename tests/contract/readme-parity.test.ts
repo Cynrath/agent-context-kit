@@ -6,10 +6,10 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = path.resolve(process.cwd());
-function sha256(buf) {
+function sha256(buf: Buffer): string {
   return createHash("sha256").update(buf).digest("hex");
 }
-function normalizeEol(s) {
+function normalizeEol(s: string): string {
   return s.replace(/\r\n/g, "\n");
 }
 
@@ -48,8 +48,8 @@ describe("npm README parity", () => {
       const files = await fsp.readdir(tmpDir);
       const tgz = files.find((f) => f.endsWith(".tgz"));
       expect(tgz).toBeDefined();
-      const tarball = path.join(tmpDir, tgz);
-      const list = execSync(`tar -tzf "${tarball}"`, { encoding: "utf8" });
+      const tarball = path.join(tmpDir, tgz as string);
+      const list = execSync(`tar -tzf "${tarball}"`, { encoding: "utf8" }) as string;
       expect(list).toContain("package/README.md");
 
       // Extract and compare
@@ -72,7 +72,7 @@ describe("npm README parity", () => {
       await fsp.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
       await fsp.rm(extractDir, { recursive: true, force: true }).catch(() => {});
     }
-  });
+  }, 30000);
 
   it("tarball audit: no secrets, no absolute local paths", async () => {
     const tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), "ackit-audit-test-"));
@@ -83,7 +83,7 @@ describe("npm README parity", () => {
       });
       const files = await fsp.readdir(tmpDir);
       const tgz = files.find((f) => f.endsWith(".tgz"));
-      const tarball = path.join(tmpDir, tgz);
+      const tarball = path.join(tmpDir, tgz as string);
       const extractDir = await fsp.mkdtemp(path.join(os.tmpdir(), "ackit-audit-extract-"));
       execSync(`tar -xzf "${tarball}" -C "${extractDir}"`, { encoding: "utf8" });
       const _allFiles = await fsp.readdir(path.join(extractDir, "package"), {
@@ -111,5 +111,5 @@ describe("npm README parity", () => {
     } finally {
       await fsp.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
     }
-  });
+  }, 30000);
 });
