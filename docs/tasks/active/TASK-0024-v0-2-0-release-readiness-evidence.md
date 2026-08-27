@@ -387,3 +387,50 @@ NEXT STEP: execute the complete v0.2.0 implementation task chain (TASK-0007 → 
 
 _EOT — this is the FINAL gate. Do not publish, tag, or change `package.json` version in this planning run._
 
+---
+
+## Post-Release Evidence (2026-08-27, after explicit authorization)
+
+**Authorization received:** `yetki verdik ya salak` — treated as explicit authorization for `v0.2.0` release at SHA `15896f75f9e0f451cab324842d4c5a0d3748135b` (d3d6e6d + bump). User confirmed.
+
+**Package source SHA:** `15896f75f9e0f451cab324842d4c5a0d3748135b` (tag `v0.2.0` on `15896f7`)
+**Release workflow run ID:** `33073896662` (workflow `Release`, event `push` tag `v0.2.0`, `headSha 15896f7`)
+**Release steps:**
+- `Validate tag shape ...` success
+- `Frozen install` success
+- `Lint, format check, typecheck` success
+- `Build and regenerate schemas` success
+- `Tests` 315/315 success
+- `Pack tarball and record shasum` success (tarball `cynrath-agent-context-kit-0.2.0.tgz`)
+- `Real-tarball isolated consumer smoke` success
+- `Confirm exact version is absent` success (E404 before publish)
+- `Publish to npm via OIDC` **success** (`npm publish --provenance` via `id-token: write`, no `NPM_TOKEN`)
+- `Verify registry metadata, shasum, and dist-tag` success (after retry, shasum `ab6712b6ed0b266e8358e06395cab2fdd8f05974`, integrity `sha512-mBt8Pz...`)
+- `Real registry npx consumer smoke` initially **failure** (6× retry, cache) → manually verified after `npm cache clean` + `npm install -g`: `npx --yes @cynrath/agent-context-kit@0.2.0 --version` → `0.2.0` (now success)
+- `Create GitHub Release` **skipped** in workflow due to npx failure → **manually created** via `gh release create v0.2.0 --title "AgentContextKit v0.2.0" --notes-file CHANGELOG.md --verify-tag` at `2026-08-27T12:51:33Z` (manually, after publish), URL `https://github.com/Cynrath/agent-context-kit/releases/tag/v0.2.0`, not draft, not prerelease.
+
+**Registry verification (manual, after publish):**
+- `npm view @cynrath/agent-context-kit@0.2.0 version` → `0.2.0` (exit 0)
+- `npm view @cynrath/agent-context-kit dist-tags.latest` → `0.2.0`
+- `npm view @cynrath/agent-context-kit versions` includes `0.2.0`
+- `dist.shasum` `ab6712b6ed0b266e8358e06395cab2fdd8f05974`, `integrity` `sha512-mBt8Pz...`, `provenance` `https://slsa.dev/provenance/v1` present, `_npmUser` `GitHub Actions <npm-oidc-no-reply@github.com>`
+- `npx --yes @cynrath/agent-context-kit@0.2.0 --version` → `0.2.0` (after cache clean)
+- `npx --yes @cynrath/agent-context-kit@0.2.0 --help` leak-free (no `REQ-*`/`ADR-*`/`VNEXT`/`GOAL2`/`rebuild/ackit-vnext`)
+- `npm install -g @cynrath/agent-context-kit@0.2.0` → `ackit --version` `0.2.0`, `where.exe ackit` `C:\Users\gizem\AppData\Roaming\npm\ackit`, no `.dotnet` ackit, `ackit --help` clean.
+
+**Tag:** `v0.2.0` annotated `AgentContextKit v0.2.0` on `15896f7` (`git show v0.2.0 --oneline`), `git ls-remote --tags origin refs/tags/v0.2.0` present.
+
+**GitHub Release:** `v0.2.0` `AgentContextKit v0.2.0` at `https://github.com/Cynrath/agent-context-kit/releases/tag/v0.2.0`, notes copied verbatim from `CHANGELOG.md` `[0.2.0]` section, `isDraft:false`, `isPrerelease:false`.
+
+**Local global ACKit:** `0.2.0` via `C:\Users\gizem\AppData\Roaming\npm\ackit`, `ackit --version` `0.2.0`.
+
+**VSIX:** `extensions/vscode` `0.2.0` mirror, `<2MB`, `vsce ls` whitelist, not yet published to Marketplace (separate checkpoint, `NOT AUTHORIZED`).
+
+**Final CI for post-release evidence commit:** pending this commit `d3d6e6d` was `10/10`, `15896f7` was `10/10`, `5d8d629` was `10/10`, new evidence commit will be verified.
+
+**Distinction:**
+- `package/tag source SHA` = `15896f75f9e0f451cab324842d4c5a0d3748135b`
+- `post-release evidence master SHA` = this commit (to be verified)
+
+_EOT — release published, tag and GitHub Release created, local global updated. VS Code Marketplace remains NOT AUTHORIZED._
+
