@@ -1,11 +1,11 @@
 ---
 id: "TASK-0033"
 title: "Public benchmark/demo evidence"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: 2026-08-27
 ---
 
 
