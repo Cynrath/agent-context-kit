@@ -154,79 +154,35 @@ ackit dashboard --port 0 --open  # localhost-only
 
 ### 🖥️ CLI Overview
 
-<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:10px;">
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
-
 **`init`** — plan/write shims + skills<br>
 `--dry-run` `--agents`
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
 
 **`scan`** — security/hygiene scan<br>
 `--ci` `--changed` `--staged` `--since` `--range` `--baseline` `--watch` `--fail-below`
 
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
-
-**`readiness`** — **0–100 scoring**<br>
+**`readiness`** — 0–100 scoring<br>
 `--fail-below` `--strict` `--baseline`/`--compare` `--json`
 
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
-
-**`optimize`** — hygiene advisor **v2**<br>
+**`optimize`** — hygiene advisor v2<br>
 `--fix` `--dry-run` `--profile` `--explain` `--category` `--min-severity` `--format`
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
 
 **`diagnostics`** — env/config/cache/policy/tasks<br>
 `--json` `bundle --out` `--redact-check`
 
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
-
-**`dashboard`** — **local dashboard** (localhost-only)<br>
+**`dashboard`** — local dashboard (localhost-only)<br>
 `--host` `--port` `--allow-nonlocal` `--open`
 
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
-
-**`instructions`** — graph **v2**<br>
+**`instructions`** — graph v2<br>
 `--provider` `--profile` `--for` `--explain` `--json`
 
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
-
-**`pack`** — **provider-aware** pack<br>
+**`pack`** — provider-aware pack<br>
 `--max-tokens` `--profile` `--include` `--changed`
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
 
 **`skills` / `task` / `policy` / `config`**<br>
 `skills list/validate/install` · `task create/list/start/complete` · `policy check` · `config check`
 
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
-
 **`cache` / `workspaces` / `hooks` / `report` / `mcp`**<br>
 utilities — `cache clean`, `workspaces`, `hooks`, `report serve`, `mcp serve`
-
-</div>
-
-</div>
 
 Details: [`docs/reference/cli.md`](docs/reference/cli.md) · Exit codes: [`docs/reference/exit-codes.md`](docs/reference/exit-codes.md) · Schemas: [`docs/reference/schemas.md`](docs/reference/schemas.md)
 
