@@ -1,11 +1,11 @@
 ---
 id: "TASK-0030"
 title: "GitHub Action Marketplace 0.2.1 update readiness"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: 2026-08-27
 ---
 
 
