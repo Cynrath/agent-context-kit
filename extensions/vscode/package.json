@@ -1,0 +1,42 @@
+{
+  "name": "ackit-vscode",
+  "displayName": "AgentContextKit",
+  "description": "Offline-first agent readiness toolkit for VS Code",
+  "version": "0.2.0",
+  "publisher": "cynrath",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": ["Linters"],
+  "keywords": ["ackit", "agent-readiness", "context"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "ackit.refresh", "title": "ACKit: Refresh" },
+      { "command": "ackit.showGraph", "title": "ACKit: Show Graph" },
+      { "command": "ackit.optimize", "title": "ACKit: Optimize" },
+      { "command": "ackit.diagnostics", "title": "ACKit: Diagnostics" }
+    ],
+    "viewsContainers": {
+      "activitybar": [{ "id": "ackit", "title": "ACKit", "icon": "$(shield)" }]
+    },
+    "views": {
+      "ackit": [
+        { "type": "tree", "id": "ackit.readiness", "name": "Readiness" },
+        { "type": "tree", "id": "ackit.findings", "name": "Findings" },
+        { "type": "tree", "id": "ackit.graph", "name": "Instruction Graph" }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=dist/extension.js --external:vscode --sourcemap",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@vscode/test-electron": "^2.4.0",
+    "esbuild": "^0.23.0",
+    "typescript": "^5.5.0"
+  }
+}

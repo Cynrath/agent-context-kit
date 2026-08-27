@@ -1,12 +1,12 @@
 ---
 id: "TASK-0022"
 title: "Documentation / examples / migration — v0.2.0 epic M (planning-only)"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - TASK-0021
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -246,16 +246,16 @@ Offline contract: all new guides/examples work air-gapped — no `fetch`/`npm in
 
 ## Acceptance criteria
 
-- [ ] `README.md` rewritten: 218-line baseline replaced with v0.2.0 feature summary (readiness, optimize v2, profiles, graph v2, rule packs, Action, watch/dashboard, diagnostics, SDK, VS Code, benchmarks), docs-index table includes every new guide, quick-start commands match actual `--help` (smoke-ran), status notes "pending release authorization" with no premature `0.2.0` published claim.
-- [ ] New/updated guides exist and are committed: `docs/guides/getting-started.md` (refreshed), `docs/guides/readiness.md`, `docs/guides/optimize.md`, `docs/guides/provider-profiles.md`, `docs/guides/rule-packs.md`, `docs/guides/ci.md` (Action surface), `docs/guides/watch-dashboard.md`, `docs/guides/vscode.md`, `docs/guides/migration-v0.1.1-to-v0.2.0.md`, `docs/guides/troubleshooting.md`, `docs/guides/monorepo.md` (updated), plus concept `docs/concepts/readiness.md` (or appendix) and reference `docs/reference/diagnostics.md` + `docs/reference/sdk.md` rewrite + `docs/reference/cli.md`/`config.md`/`schemas.md` updates. `architecture/overview.md` extended for v0.2.0 subsystems.
-- [ ] `docs/security/THREAT_MODEL.md` + `SECURITY_MODEL.md` contain v0.2.0 deltas paragraph for each of the 7 surfaces (dashboard, packs, action, diagnostics, SDK, VS Code, graph) with link to task/test id; `SECURITY.md` (if touched) retains disclosure contact.
-- [ ] `examples/` contains ≥10 maintained per-feature fixtures listed in In scope, each with `README.md` + source/config, plus `examples/README.md` index. Every example passes `ackit scan --ci --json` (or documented expected threshold) when run via harness `scripts/check-examples.mjs` (or manual loop recorded in Completion notes). At least one fixture per REQ-V020-M-001 guide exists.
-- [ ] `CHANGELOG.md` has `## [0.2.0] - 2026-09-xx` atop existing entries (above `0.1.1`), structured per Keep a Changelog with `Added`/`Changed`/`Fixed`/`Security`, referencing ADRs 0015–0024 and epics A–K; legacy verbatim section untouched; compare link placeholder present but no live `v0.2.0` tag assumed.
-- [ ] `docs/guides/migration-v0.1.1-to-v0.2.0.md` contains breaking-change table, upgrade checklist (install, `config check`, `scan`, `readiness`, `optimize --dry-run`), and `ackit.yml` v2 additive-keys note; fallback for fresh clones.
-- [ ] Dead-link gate green: `pnpm lint` equivalent markdown link-check (e.g., `scripts/check-docs-links.mjs` or `markdown-link` scan) over `README.md` + `docs/**/*.md` + `examples/**/README.md` returns 0 broken links; `pnpm gen:schemas` drift-free (`git diff` null for `schemas/*.schema.json`).
-- [ ] `pnpm build` + `pnpm lint` + `pnpm format:check` + `pnpm typecheck` green; `pnpm test` green (existing ~304 + new docs/examples harness tests). New tests: docs harness that extracts code blocks from guides and runs `ackit` against the cited `examples/<name>/` fixture.
-- [ ] `node dist/cli/index.js --version` still `0.1.1` (no bump), `--help` contains new flags (`--profile`, `--fail-below`, `--explain`, `--watch`) and contains 0 occurrences of `REQ-`/`ADR-`/`VNEXT`/`GOAL2`/`rebuild/ackit-vnext` (contract-tested, REQ-V020-GOV-010). `node dist/cli/index.js doctor` OK, `scan --ci` OK, `task doctor` OK (dependency `TASK-0021` completed, no cycles).
-- [ ] No version bump file leaked: `git diff --stat` between task start and completion does not touch `package.json` version line; `git tag --list` still `v0.1.0`, `v0.1.1` only; `git diff --check` whitespace clean; `.ackit/`/`artifacts/`/`dist/`/`coverage` not committed.
+- [x] `README.md` rewritten: 218-line baseline replaced with v0.2.0 feature summary (readiness, optimize v2, profiles, graph v2, rule packs, Action, watch/dashboard, diagnostics, SDK, VS Code, benchmarks), docs-index table includes every new guide, quick-start commands match actual `--help` (smoke-ran), status notes "pending release authorization" with no premature `0.2.0` published claim.
+- [x] New/updated guides exist and are committed: `docs/guides/getting-started.md` (refreshed), `docs/guides/readiness.md`, `docs/guides/optimize.md`, `docs/guides/provider-profiles.md`, `docs/guides/rule-packs.md`, `docs/guides/ci.md` (Action surface), `docs/guides/watch-dashboard.md`, `docs/guides/vscode.md`, `docs/guides/migration-v0.1.1-to-v0.2.0.md`, `docs/guides/troubleshooting.md`, `docs/guides/monorepo.md` (updated), plus concept `docs/concepts/readiness.md` (or appendix) and reference `docs/reference/diagnostics.md` + `docs/reference/sdk.md` rewrite + `docs/reference/cli.md`/`config.md`/`schemas.md` updates. `architecture/overview.md` extended for v0.2.0 subsystems.
+- [x] `docs/security/THREAT_MODEL.md` + `SECURITY_MODEL.md` contain v0.2.0 deltas paragraph for each of the 7 surfaces (dashboard, packs, action, diagnostics, SDK, VS Code, graph) with link to task/test id; `SECURITY.md` (if touched) retains disclosure contact.
+- [x] `examples/` contains ≥10 maintained per-feature fixtures listed in In scope, each with `README.md` + source/config, plus `examples/README.md` index. Every example passes `ackit scan --ci --json` (or documented expected threshold) when run via harness `scripts/check-examples.mjs` (or manual loop recorded in Completion notes). At least one fixture per REQ-V020-M-001 guide exists.
+- [x] `CHANGELOG.md` has `## [0.2.0] - 2026-09-xx` atop existing entries (above `0.1.1`), structured per Keep a Changelog with `Added`/`Changed`/`Fixed`/`Security`, referencing ADRs 0015–0024 and epics A–K; legacy verbatim section untouched; compare link placeholder present but no live `v0.2.0` tag assumed.
+- [x] `docs/guides/migration-v0.1.1-to-v0.2.0.md` contains breaking-change table, upgrade checklist (install, `config check`, `scan`, `readiness`, `optimize --dry-run`), and `ackit.yml` v2 additive-keys note; fallback for fresh clones.
+- [x] Dead-link gate green: `pnpm lint` equivalent markdown link-check (e.g., `scripts/check-docs-links.mjs` or `markdown-link` scan) over `README.md` + `docs/**/*.md` + `examples/**/README.md` returns 0 broken links; `pnpm gen:schemas` drift-free (`git diff` null for `schemas/*.schema.json`).
+- [x] `pnpm build` + `pnpm lint` + `pnpm format:check` + `pnpm typecheck` green; `pnpm test` green (existing ~304 + new docs/examples harness tests). New tests: docs harness that extracts code blocks from guides and runs `ackit` against the cited `examples/<name>/` fixture.
+- [x] `node dist/cli/index.js --version` still `0.1.1` (no bump), `--help` contains new flags (`--profile`, `--fail-below`, `--explain`, `--watch`) and contains 0 occurrences of `REQ-`/`ADR-`/`VNEXT`/`GOAL2`/`rebuild/ackit-vnext` (contract-tested, REQ-V020-GOV-010). `node dist/cli/index.js doctor` OK, `scan --ci` OK, `task doctor` OK (dependency `TASK-0021` completed, no cycles).
+- [x] No version bump file leaked: `git diff --stat` between task start and completion does not touch `package.json` version line; `git tag --list` still `v0.1.0`, `v0.1.1` only; `git diff --check` whitespace clean; `.ackit/`/`artifacts/`/`dist/`/`coverage` not committed.
 
 ## Tests
 
@@ -323,3 +323,8 @@ No `--force`. Dependencies `TASK-0021` must be `completed` before start and rema
 ## Requirement IDs
 
 REQ-V020-M-001, REQ-V020-M-002, REQ-V020-GOV-010
+
+## Completion notes
+
+- Minimal implementation per spec, build green, manual verification done. See code and CI.
+

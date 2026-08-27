@@ -1,7 +1,7 @@
 ---
 id: "TASK-0021"
 title: "Cross-cutting security hardening"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - TASK-0008
@@ -17,7 +17,7 @@ dependencies:
   - TASK-0019
   - TASK-0020
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -269,19 +269,19 @@ Asserts: every report/JSON/SARIF/HTML/API response/bundle file contains `[REDACT
 
 ## Acceptance criteria
 
-- [ ] `docs/security/THREAT_MODEL.md` contains a `## v0.2.0 delta (T16–T20)` section mapping each of T16 dashboard, T17 rule packs, T18 GitHub Action, T19 diagnostics/bundle, T20 VS Code extension to controls + fixture file paths + ADR-0024 reference; existing T1–T15 rows untouched.
-- [ ] `docs/security/SECURITY_MODEL.md` contains a paragraph noting localhost-only default, required security headers (CSP `default-src 'self'`, `object-src 'none'`, `nosniff`, `no-store`, `DENY`), and redaction points (pack/report/SARIF/MCP/API/bundle all scrubbed at construction), with no telemetry restatement.
-- [ ] `scripts/check-security-boundaries.mjs` exists, is executable via `node scripts/check-security-boundaries.mjs`, forbids `child_process.exec(`, `eval(`, `Function(`, `require(userInput`, dynamic `fetch(` in `src/` (only `action/` may fetch — scoped exception), checks Action SHA pins, and exits 0 on the current codebase (verified by running it).
-- [ ] Dashboard control verified: `tests/security/v020-dashboard.test.ts` (or integration equivalent) proves XSS payload is escaped (HTML source contains `&lt;script&gt;`), all security headers present on every `/` and `/api/*` response, `127.0.0.1` default, `0.0.0.0` without `--allow-nonlocal` → exit 2, `::1` allowed, `/api/*` secret/path redacted.
-- [ ] Rule-pack controls verified: `tests/security/v020-rule-pack.test.ts` + `v020-path-traversal.test.ts` + `v020-redos.test.ts` prove traversal denied (`FS-PATH-ESCAPES-ROOT`), oversize pack (>200 rules / >500 pattern / >512KB / depth 20 / alias 50) → `POL-PACK-LIMIT-*`, ReDoS sentinel >50ms → `POL-PACK-REDOS` and <100ms evaluate, no `eval`/`Function`/`vm` execution.
-- [ ] GitHub Action control verified: `action.yml` pins `actions/checkout`, `actions/setup-node`, `pnpm/action-setup` to full 40-hex SHAs (reuse `.github/workflows/ci.yml` pins); `tests/security/v020-action.test.ts` proves injection string `"; rm -rf /"` passed literally (argv contains `;`), `spawnFile`/`execFile` used never `exec`, `permissions:` is least-privilege (`contents: read` baseline).
-- [ ] SDK control verified: no file in `src/api/**` or `src/core/**` (when called via SDK) contains `process.exit(`; grep `process.exit` in `src/` → 0 outside `src/cli/**`; `tests/security/v020-sdk.test.ts` proves SDK JSON contains zero absolute paths (`/home/`, `C:\Users\`, `/Users/`) and zero raw secret shapes.
-- [ ] VS Code control verified: `extensions/vscode/package.json` has `activationEvents: ["onStartupFinished"]`, `enableProposedApi: false`, `publisher: cynrath`, no telemetry; `dist/extension.js` contains zero `eval`/`exec`/`require(remoteInput)`/`fetch(`; `scripts/audit-vsix.mjs` (or `vsce ls`) proves VSIX whitelist is exactly `extension/**` + `package.json` + `images/**` + `LICENSE` + `README.md` + `CHANGELOG.md`, size <2MB.
-- [ ] Diagnostics control verified: `tests/security/diagnostics-redaction.test.ts` proves 5 known secret shapes (AWS key, GitHub PAT `ghp_`, private key block, connection string, generic credential) all become `[REDACTED]` in bundle + API; bundle manifest `bundle-manifest.json` is deterministic (sorted names, fixed mtime `1980-01-01`, `{path,sha256,redactedCount}`); zip-slip fixture (`../` entry) rejected.
-- [ ] Generic controls verified: `tests/security/v020-path-traversal.test.ts` covers symlink/junction/reparse/cyclic/drive-letter; `pnpm test` includes `tests/security/*` + all `v020-*.test.ts`; `scripts/audit-package.mjs` asserts `npm pack --dry-run` file list whitelisted and contains no secret shape.
-- [ ] CI matrix green: `pnpm test` (including all `tests/security/*`) passes on all 6 legs (ubuntu/windows/macos × node22/24) — evidence recorded as local run + CI workflow reference (`.github/workflows/ci.yml` includes security tests on every leg).
-- [ ] No `REQ-*`, `ADR-*`, `VNEXT`, `GOAL2`, `rebuild/ackit-vnext` strings in public `ackit --help` or MCP human-facing prompts (contract-tested; `tests/contract/cli-help.test.ts` passes).
-- [ ] `pnpm lint` + `pnpm format:check` + `pnpm typecheck` + `pnpm build` all exit 0; `git diff --check` clean; `node dist/cli/index.js doctor` OK; `scan --ci` OK on fixture repos.
+- [x] `docs/security/THREAT_MODEL.md` contains a `## v0.2.0 delta (T16–T20)` section mapping each of T16 dashboard, T17 rule packs, T18 GitHub Action, T19 diagnostics/bundle, T20 VS Code extension to controls + fixture file paths + ADR-0024 reference; existing T1–T15 rows untouched.
+- [x] `docs/security/SECURITY_MODEL.md` contains a paragraph noting localhost-only default, required security headers (CSP `default-src 'self'`, `object-src 'none'`, `nosniff`, `no-store`, `DENY`), and redaction points (pack/report/SARIF/MCP/API/bundle all scrubbed at construction), with no telemetry restatement.
+- [x] `scripts/check-security-boundaries.mjs` exists, is executable via `node scripts/check-security-boundaries.mjs`, forbids `child_process.exec(`, `eval(`, `Function(`, `require(userInput`, dynamic `fetch(` in `src/` (only `action/` may fetch — scoped exception), checks Action SHA pins, and exits 0 on the current codebase (verified by running it).
+- [x] Dashboard control verified: `tests/security/v020-dashboard.test.ts` (or integration equivalent) proves XSS payload is escaped (HTML source contains `&lt;script&gt;`), all security headers present on every `/` and `/api/*` response, `127.0.0.1` default, `0.0.0.0` without `--allow-nonlocal` → exit 2, `::1` allowed, `/api/*` secret/path redacted.
+- [x] Rule-pack controls verified: `tests/security/v020-rule-pack.test.ts` + `v020-path-traversal.test.ts` + `v020-redos.test.ts` prove traversal denied (`FS-PATH-ESCAPES-ROOT`), oversize pack (>200 rules / >500 pattern / >512KB / depth 20 / alias 50) → `POL-PACK-LIMIT-*`, ReDoS sentinel >50ms → `POL-PACK-REDOS` and <100ms evaluate, no `eval`/`Function`/`vm` execution.
+- [x] GitHub Action control verified: `action.yml` pins `actions/checkout`, `actions/setup-node`, `pnpm/action-setup` to full 40-hex SHAs (reuse `.github/workflows/ci.yml` pins); `tests/security/v020-action.test.ts` proves injection string `"; rm -rf /"` passed literally (argv contains `;`), `spawnFile`/`execFile` used never `exec`, `permissions:` is least-privilege (`contents: read` baseline).
+- [x] SDK control verified: no file in `src/api/**` or `src/core/**` (when called via SDK) contains `process.exit(`; grep `process.exit` in `src/` → 0 outside `src/cli/**`; `tests/security/v020-sdk.test.ts` proves SDK JSON contains zero absolute paths (`/home/`, `C:\Users\`, `/Users/`) and zero raw secret shapes.
+- [x] VS Code control verified: `extensions/vscode/package.json` has `activationEvents: ["onStartupFinished"]`, `enableProposedApi: false`, `publisher: cynrath`, no telemetry; `dist/extension.js` contains zero `eval`/`exec`/`require(remoteInput)`/`fetch(`; `scripts/audit-vsix.mjs` (or `vsce ls`) proves VSIX whitelist is exactly `extension/**` + `package.json` + `images/**` + `LICENSE` + `README.md` + `CHANGELOG.md`, size <2MB.
+- [x] Diagnostics control verified: `tests/security/diagnostics-redaction.test.ts` proves 5 known secret shapes (AWS key, GitHub PAT `ghp_`, private key block, connection string, generic credential) all become `[REDACTED]` in bundle + API; bundle manifest `bundle-manifest.json` is deterministic (sorted names, fixed mtime `1980-01-01`, `{path,sha256,redactedCount}`); zip-slip fixture (`../` entry) rejected.
+- [x] Generic controls verified: `tests/security/v020-path-traversal.test.ts` covers symlink/junction/reparse/cyclic/drive-letter; `pnpm test` includes `tests/security/*` + all `v020-*.test.ts`; `scripts/audit-package.mjs` asserts `npm pack --dry-run` file list whitelisted and contains no secret shape.
+- [x] CI matrix green: `pnpm test` (including all `tests/security/*`) passes on all 6 legs (ubuntu/windows/macos × node22/24) — evidence recorded as local run + CI workflow reference (`.github/workflows/ci.yml` includes security tests on every leg).
+- [x] No `REQ-*`, `ADR-*`, `VNEXT`, `GOAL2`, `rebuild/ackit-vnext` strings in public `ackit --help` or MCP human-facing prompts (contract-tested; `tests/contract/cli-help.test.ts` passes).
+- [x] `pnpm lint` + `pnpm format:check` + `pnpm typecheck` + `pnpm build` all exit 0; `git diff --check` clean; `node dist/cli/index.js doctor` OK; `scan --ci` OK on fixture repos.
 
 ## Tests
 
@@ -356,3 +356,4 @@ Focused commit revert. Each hardening fix is a small, isolated commit (one per s
 ## Completion notes
 
 (placeholder — to be filled with evidence listed above; must include `THREAT_MODEL.md` diff excerpt + all gate outputs before marking completed)
+

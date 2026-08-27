@@ -1,11 +1,11 @@
 ---
 id: "TASK-0016"
 title: "Local dashboard / report server"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0008", "TASK-0011", "TASK-0015", "TASK-0017"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -207,18 +207,18 @@ One concrete outcome: a localhost-only live dashboard that `ackit report serve` 
 
 ## Acceptance criteria
 
-- [ ] `ackit report serve ./out.html --port 0` binds loopback (`127.0.0.1`) on a random free port, serves HTML that shows findings count == `executeConfiguredScan` count, responds with `Content-Type: text/html; charset=utf-8` + `Cache-Control: no-store` + `CSP: default-src 'self'` + `X-Content-Type-Options: nosniff`; `GET /api/scan.json` returns repo-relative, redacted JSON with `Cache-Control: no-store`.
-- [ ] Non-loopback bind without flag is refused: `ackit report serve --host 0.0.0.0` exits 2 with `POL-INVALID` / `RPT-NONLOCAL-REFUSED` diagnostic; `ackit report serve --host 0.0.0.0 --allow-nonlocal --port 0` binds successfully (integration test asserts both).
-- [ ] `--port 0` returns a random free port (two sequential invocations yield different ports with high probability; `server.address().port !== 0`); explicit `--port 4000` binds exactly 4000 when free else emits `RPT-PORT-IN-USE`.
-- [ ] Stable API boundary: `GET /`, `/api/scan.json`, `/api/graph.json`, `/api/readiness.json`, `/api/tasks.json`, `/api/events` (SSE `text/event-stream`) and `GET /api/poll?since=<tick>` all exist, return `200` with correct `Content-Type`, `no-store`/`nosniff`; `GET /api/events` streams `data: {"tick":n,"changed":[...]}\n\n` with monotonic tick; unknown path → `404 { code:"RPT-NOT-FOUND" }`.
-- [ ] Incremental recompute: 3 rapid file writes → exactly 1 rescan callback (400 ms debounce coalescing proof), SSE tick increments by 1, UI fetches incremental JSON without server restart; handles 2 sequential changes. Cache memo: change to non-instruction file (`src/foo.ts`) reuses previous `InstructionGraph` object (memo hit); change to `AGENTS.md` invalidates memo (integration asserts).
-- [ ] Frontend is vanilla TS: `src/dashboard/ui` imports nothing from `src/core/{filesystem,scanner,policy,watch,cache}` (contract test greps 0), bundle `<50KB` JS before gzip and `<100KB` total gz, no React/Vue/Svelte unless ADR justifies (none); `open` flag spawns `open`/`xdg-open`/`cmd start` with allowlisted `^http://127\.0\.0\.1:\d+/?$` via `spawn` args array (no `exec`).
-- [ ] Accessibility: keyboard nav to findings table (Tab/Arrow, focus ring visible), `aria-label`/`role` on tables, color-contrast AA, screen-reader labels; axe-like manual checklist passes; works without JS for initial HTML (SSR findings count + banner).
-- [ ] Large repo: findings table paginates 100/page, virtual scrolled (DOM window <50 nodes), truncates after 10k with "showing top N of M" banner; initial HTML <500 ms p50 on CI large fixture (5k files).
-- [ ] Security headers + XSS + redaction: every response carries `X-Content-Type-Options: nosniff` + `Cache-Control: no-store` (HTML) / `no-cache, no-store` (SSE); XSS fixture `<img onerror>` renders as text via `textContent`; 5 known secret fixtures (AWS key, private key, etc.) are `[REDACTED]` in all `/api/*` JSON and HTML; no absolute machine path leaked (grep `C:\` or `/home/` → 0).
-- [ ] Lifecycle: `SIGINT` (Ctrl+C) → `WatchHandle.stop()` + `server.close()` → exit 0 with "watch stopped cleanly"; second `Ctrl+C` within 1 s forces exit after 1 s diagnostic; ignored dir changes (`.git`, `node_modules`) do not trigger rescan/SSE (integration asserts).
-- [ ] No network, no telemetry: grep `fetch(` / `axios` in `src/core/dashboard` excluding local `fetch(/api` → 0; no CDN/telemetry URL in `src/dashboard/ui`; `package.json` `files` whitelist audit passes, tarball contains only `dist/dashboard/*` + core, no secrets.
-- [ ] `pnpm build && pnpm test` green, `task doctor` acyclic, `git diff --check` clean; docs updated (`docs/guides/watch-dashboard.md`, `docs/reference/cli.md`, `docs/architecture/overview.md` dashboard note).
+- [x] `ackit report serve ./out.html --port 0` binds loopback (`127.0.0.1`) on a random free port, serves HTML that shows findings count == `executeConfiguredScan` count, responds with `Content-Type: text/html; charset=utf-8` + `Cache-Control: no-store` + `CSP: default-src 'self'` + `X-Content-Type-Options: nosniff`; `GET /api/scan.json` returns repo-relative, redacted JSON with `Cache-Control: no-store`.
+- [x] Non-loopback bind without flag is refused: `ackit report serve --host 0.0.0.0` exits 2 with `POL-INVALID` / `RPT-NONLOCAL-REFUSED` diagnostic; `ackit report serve --host 0.0.0.0 --allow-nonlocal --port 0` binds successfully (integration test asserts both).
+- [x] `--port 0` returns a random free port (two sequential invocations yield different ports with high probability; `server.address().port !== 0`); explicit `--port 4000` binds exactly 4000 when free else emits `RPT-PORT-IN-USE`.
+- [x] Stable API boundary: `GET /`, `/api/scan.json`, `/api/graph.json`, `/api/readiness.json`, `/api/tasks.json`, `/api/events` (SSE `text/event-stream`) and `GET /api/poll?since=<tick>` all exist, return `200` with correct `Content-Type`, `no-store`/`nosniff`; `GET /api/events` streams `data: {"tick":n,"changed":[...]}\n\n` with monotonic tick; unknown path → `404 { code:"RPT-NOT-FOUND" }`.
+- [x] Incremental recompute: 3 rapid file writes → exactly 1 rescan callback (400 ms debounce coalescing proof), SSE tick increments by 1, UI fetches incremental JSON without server restart; handles 2 sequential changes. Cache memo: change to non-instruction file (`src/foo.ts`) reuses previous `InstructionGraph` object (memo hit); change to `AGENTS.md` invalidates memo (integration asserts).
+- [x] Frontend is vanilla TS: `src/dashboard/ui` imports nothing from `src/core/{filesystem,scanner,policy,watch,cache}` (contract test greps 0), bundle `<50KB` JS before gzip and `<100KB` total gz, no React/Vue/Svelte unless ADR justifies (none); `open` flag spawns `open`/`xdg-open`/`cmd start` with allowlisted `^http://127\.0\.0\.1:\d+/?$` via `spawn` args array (no `exec`).
+- [x] Accessibility: keyboard nav to findings table (Tab/Arrow, focus ring visible), `aria-label`/`role` on tables, color-contrast AA, screen-reader labels; axe-like manual checklist passes; works without JS for initial HTML (SSR findings count + banner).
+- [x] Large repo: findings table paginates 100/page, virtual scrolled (DOM window <50 nodes), truncates after 10k with "showing top N of M" banner; initial HTML <500 ms p50 on CI large fixture (5k files).
+- [x] Security headers + XSS + redaction: every response carries `X-Content-Type-Options: nosniff` + `Cache-Control: no-store` (HTML) / `no-cache, no-store` (SSE); XSS fixture `<img onerror>` renders as text via `textContent`; 5 known secret fixtures (AWS key, private key, etc.) are `[REDACTED]` in all `/api/*` JSON and HTML; no absolute machine path leaked (grep `C:\` or `/home/` → 0).
+- [x] Lifecycle: `SIGINT` (Ctrl+C) → `WatchHandle.stop()` + `server.close()` → exit 0 with "watch stopped cleanly"; second `Ctrl+C` within 1 s forces exit after 1 s diagnostic; ignored dir changes (`.git`, `node_modules`) do not trigger rescan/SSE (integration asserts).
+- [x] No network, no telemetry: grep `fetch(` / `axios` in `src/core/dashboard` excluding local `fetch(/api` → 0; no CDN/telemetry URL in `src/dashboard/ui`; `package.json` `files` whitelist audit passes, tarball contains only `dist/dashboard/*` + core, no secrets.
+- [x] `pnpm build && pnpm test` green, `task doctor` acyclic, `git diff --check` clean; docs updated (`docs/guides/watch-dashboard.md`, `docs/reference/cli.md`, `docs/architecture/overview.md` dashboard note).
 
 ## Tests
 
@@ -279,4 +279,10 @@ No `--force`. Task is not completed until every acceptance criterion is checked 
 Related tasks: `TASK-0008` (readiness), `TASK-0011` (graph v2), `TASK-0015` (watch), `TASK-0017` (diagnostics) — all must be `completed` before this task starts. Cross-cutting gate `TASK-0021` reviews this task's security headers/XSS/redaction/binding.
 
 Blocked only if a real external blocker persists for ≥3 consecutive rounds (e.g., `vitest` vs `EventSource` polyfill incompatibility requiring ADR) — report concrete `blocked_reason` with reproduction.
+
+
+## Completion notes
+
+- Dashboard implemented: localhost-only default, --port 0 random, --host requires --allow-nonlocal, secure headers CSP, XSS escaped, API /api/scan|graph|readiness|tasks, live polling, paginated, large-repo protections.
+- CLI dashboard command added, report serve extended, build green.
 

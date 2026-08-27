@@ -458,6 +458,34 @@ function buildProgram(invocation: CliInvocation): Command {
       });
     });
 
+  const dashboardCommand = program
+    .command("dashboard")
+    .description("local dashboard / report server (localhost-only)");
+  dashboardCommand
+    .option("--host <host>", "bind host (default 127.0.0.1)", "127.0.0.1")
+    .option("--port <n>", "port (0 = random)", (v) => Number.parseInt(v, 10))
+    .option("--allow-nonlocal", "allow non-loopback bind", false)
+    .option("--open", "open browser", false)
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const opts = (dashboardCommand.opts() ?? {}) as {
+        host?: string;
+        port?: number;
+        allowNonlocal?: boolean;
+        open?: boolean;
+      };
+      const { runDashboardCommand } = await import("./commands/dashboard.js");
+      invocation.exitCode = await runDashboardCommand({
+        root: parentOptions.root,
+        host: opts.host ?? "127.0.0.1",
+        port: opts.port,
+        allowNonLocal: opts.allowNonlocal ?? false,
+        open: opts.open ?? false,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+      });
+    });
+
   program.addHelpText("after", `\n${HELP_TEXT_SUFFIX}`);
   return program;
 }

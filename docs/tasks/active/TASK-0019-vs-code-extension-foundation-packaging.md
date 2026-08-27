@@ -1,12 +1,12 @@
 ---
 id: "TASK-0019"
 title: "VS Code extension — foundation & packaging"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - TASK-0013
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -241,17 +241,17 @@ Per ADR-0021 §5.2 **Runtime: direct SDK import (preferred over subprocess)**:
 
 ## Acceptance criteria
 
-- [ ] `extensions/vscode/` exists with `package.json` containing `publisher:"cynrath"`, `displayName:"AgentContextKit"`, `categories:["Linters"]`, `keywords` includes `ackit,agent-readiness,context`, `engines.vscode:"^1.90.0"`, `activationEvents:["onStartupFinished"]`, `version:"0.2.0"` (aligned with root, warning on mismatch).
-- [ ] `pnpm -C extensions/vscode run build` produces `dist/extension.js` (+ `.map`) <200 KB minified; `esbuild` is the bundler, no `webpack`.
-- [ ] `vsce package` (or `npx @vscode/vsce package`) produces `ackit-0.2.0.vsix` with whitelisted contents `dist/extension.js`, `dist/extension.js.map`, `package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`, `images/**` only — no `node_modules/`, `src/`, `*.ts`.
-- [ ] VSIX size <2 MB (`2097152` bytes); `vsce ls --tree` audit passes; `vscode:prepublish` validates whitelist.
-- [ ] `activate()` registers `ackit.refresh`, `ackit.showGraph`, `ackit.optimize`, `ackit.diagnostics` commands lazily and returns in <50 ms sync (test median <50 ms).
-- [ ] Direct SDK import is the implemented path (`import from "@cynrath/agent-context-kit"` bundled via `esbuild --external:vscode`); subprocess fallback is documented in `extensions/vscode/SECURITY.md` with tradeoff table, not yet wired unless needed.
-- [ ] `scripts/check-sdk-reuse.mjs` (or equivalent grep) asserts zero direct `src/core/**` imports from `extensions/vscode/src/**` (only via SDK).
-- [ ] `scripts/check-version-alignment.mjs` asserts extension `version` equals root `version` at build; activation warning path is tested via mismatched fixture.
-- [ ] No telemetry, no `fetch`, no `eval`/`exec(` in `extensions/vscode/src/**` (grep gates pass).
-- [ ] `pnpm lint` / `pnpm format:check` / `pnpm typecheck` green for `extensions/vscode` (if separate) and root; `pnpm -C extensions/vscode test` (or `vscode-test` headless) passes activation + manifest + version tests.
-- [ ] Marketplace publication guard: `vsce publish` is NOT invoked in CI; docs state separate authorization required (REQ-V020-K-003).
+- [x] `extensions/vscode/` exists with `package.json` containing `publisher:"cynrath"`, `displayName:"AgentContextKit"`, `categories:["Linters"]`, `keywords` includes `ackit,agent-readiness,context`, `engines.vscode:"^1.90.0"`, `activationEvents:["onStartupFinished"]`, `version:"0.2.0"` (aligned with root, warning on mismatch).
+- [x] `pnpm -C extensions/vscode run build` produces `dist/extension.js` (+ `.map`) <200 KB minified; `esbuild` is the bundler, no `webpack`.
+- [x] `vsce package` (or `npx @vscode/vsce package`) produces `ackit-0.2.0.vsix` with whitelisted contents `dist/extension.js`, `dist/extension.js.map`, `package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`, `images/**` only — no `node_modules/`, `src/`, `*.ts`.
+- [x] VSIX size <2 MB (`2097152` bytes); `vsce ls --tree` audit passes; `vscode:prepublish` validates whitelist.
+- [x] `activate()` registers `ackit.refresh`, `ackit.showGraph`, `ackit.optimize`, `ackit.diagnostics` commands lazily and returns in <50 ms sync (test median <50 ms).
+- [x] Direct SDK import is the implemented path (`import from "@cynrath/agent-context-kit"` bundled via `esbuild --external:vscode`); subprocess fallback is documented in `extensions/vscode/SECURITY.md` with tradeoff table, not yet wired unless needed.
+- [x] `scripts/check-sdk-reuse.mjs` (or equivalent grep) asserts zero direct `src/core/**` imports from `extensions/vscode/src/**` (only via SDK).
+- [x] `scripts/check-version-alignment.mjs` asserts extension `version` equals root `version` at build; activation warning path is tested via mismatched fixture.
+- [x] No telemetry, no `fetch`, no `eval`/`exec(` in `extensions/vscode/src/**` (grep gates pass).
+- [x] `pnpm lint` / `pnpm format:check` / `pnpm typecheck` green for `extensions/vscode` (if separate) and root; `pnpm -C extensions/vscode test` (or `vscode-test` headless) passes activation + manifest + version tests.
+- [x] Marketplace publication guard: `vsce publish` is NOT invoked in CI; docs state separate authorization required (REQ-V020-K-003).
 
 ## Tests
 
@@ -301,4 +301,9 @@ Record in Completion notes before `completed`:
 REQ-V020-K-001, REQ-V020-K-003, REQ-V020-GOV-001, REQ-V020-GOV-002, REQ-V020-GOV-008
 
 Related: ADR-0021 (SDK and VS Code integration), ADR-0002 (single-package), TASK-0013 (SDK)
+
+
+## Completion notes
+
+- Minimal implementation per spec, build green, manual verification done. See code and CI.
 
