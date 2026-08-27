@@ -4,6 +4,43 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.2.0] - 2026-08-27
+
+One consolidated feature release — offline-first, deterministic, task-first.
+
+### Added
+
+- **Agent Readiness** (`ackit scan --json` → `readiness`, `ackit readiness --json/--strict/--fail-below/--baseline/--compare`): deterministic 0–100 scoring across 6 categories (Instructions 25, Security 25, Context 20, Task 10, Skills 10, Policy 10) with weighted renormalization, typed `Deduction` (severity→points, evidence, remediation), `ackit.readiness.v1` schema, terminal tree, CI threshold gating, N/A handling, baseline/compare, golden-fixture stability contract.
+- **Instruction Graph v2** (`schemas/instruction-graph.schema.json` v2): `includeScopes`/`excludeScopes`/`providerApplicability`/`provenance`/`shadowedBy`/`duplicateOf`/`orderIndex`, deterministic `depth→precedence→id` ordering, POSIX normalization, realpath symlink handling, circular protection, `maxNodes`/`maxDepth` limits (`INSTR-LIMIT-*`), conflict/duplicate/shadow/dead detection (`INSTR-CONFLICT|DUPLICATE|SHADOWED|UNREACHABLE`).
+- **Provider-Aware Profiles** (`templates/profiles/{codex,claude,copilot,gemini,generic}.yml`, `schemas/profile.schema.json`): built-ins, selection `CLI --profile > ackit.yml profile > auto-detect > generic` with `PROFILE-UNKNOWN` diagnostics, `pack --profile` budget/`includePriority` integration, `instructions --provider` profile file-conventions, `diagnostics --json` profile trace.
+- **Declarative Rule Packs** (`schemas/rule-pack.schema.json` v1): `packId/namespace/version/severity/rules[]` (presence/pattern/config/dependency/instruction), `glob`/`scope`/`match`, `overrides`/`composition`, local `policy.rulePacks` + `node_modules` package-dist only (no fetch), `POL-PACK-COLLISION`/`POL-NETWORK-REFUSED`, ReDoS/size limits, pure `evaluatePack` integrated into `executeConfiguredScan`.
+- **Optimize v2** (`ackit optimize --explain/--category/--min-severity/--format/--diff`): 8-class taxonomy, `evidence[]`/`confidence`/`tokenWasteEstimate` (via `estimateTokens`) /`provenance`/`plan {target,action,diff}`, `--fix --dry-run` preview (managed surfaces only), `terminal|json|markdown|sarif` outputs.
+- **Official GitHub Action** (`action.yml`, `dist/action/index.js`, `.github/workflows/ackit-action-dogfood.yml`): Node24, inputs `command/args/fail-threshold/upload-sarif`, outputs `findings-json/sarif-path`, safe `execFile` arg split, SARIF 2.1.0, job summary, `contents: read` least-privilege, SHA-pinned actions.
+- **Watch Engine** (`src/core/watch/watch.ts`): debounced/coalesced 400ms, ignored `.git/node_modules/dist/.ackit/coverage/artifacts`, incremental cache, graceful `SIGINT` → `WatchHandle.done` exit 0, cross-platform.
+- **Diagnostics** (`ackit diagnostics --json`, `ackit diagnostics bundle --out/--redact-check`): environment/config/instructions/cache/policy/tasks, `ackit.diagnostics.v1` schema, deterministic manifest `bundle-manifest.json` with `sha256` + redaction count, 5-secret `[REDACTED]` proof, no absolute paths.
+- **Benchmark System** (`benchmarks/{generate-fixtures.mjs,run.mjs,thresholds.json,baselines}`): 7 deterministic fixture classes (small/medium/large/monorepo/instruction-heavy/skill-heavy/binary-heavy), 8 metrics (`coldScanMs`/`warmScanMs`/`incrementalMs`/`peakRssMb`/`filesPerSec`/`packMs`/`graphMs`/`cacheHitRatio`), median-of-3, `1.5x` thresholds, PR advisory vs scheduled.
+- **Local Dashboard** (`ackit dashboard` / `ackit report serve --port 0`): localhost-only `127.0.0.1` default, `--allow-nonlocal` required for non-loopback, CSP `default-src 'self'` + `X-Content-Type-Options: nosniff`, XSS-escaped, `/api/scan|graph|readiness|tasks.json` paginated, polling live updates, `<50KB` vanilla JS.
+- **Public SDK v1** (`src/index.ts` allowlist): `AckitError` (`code`+`remediation`), `AbortSignal` on `scanRepository`/`buildContextPack`/`buildInstructionGraph` (<200ms `AbortError`), `sideEffects:false`, `type:module`, `exports {".","./mcp"}` only, `docs/reference/sdk.md` + `examples/sdk-consumer.mjs`.
+- **VS Code Extension** (`extensions/vscode` `0.2.0`, publisher `cynrath`, `lints` Linters, `onStartupFinished`): readiness tree, Problems (`DiagnosticCollection` `ACKITxxx`), graph “instructions for current file” via `resolveEffectiveStack`, tasks/policy/optimize views, palette `Refresh/Show Graph/Optimize/Diagnostics`, file watcher debounced, no telemetry, `<2MB` VSIX.
+- **Security Hardening** (ADR-0024): path traversal/realpath containment, ReDoS guard, YAML depth 20/size 512KB, dashboard CSP/binding, diagnostics redaction, action input injection via `execFile`, SDK no `process.exit`, tarball/VSIX audits, SHA pinning.
+- **Docs/Examples**: `docs/reference/{readiness,profile,rule-pack,instruction-graph,diagnostics,sdk}` + `docs/guides/{ci,watch-dashboard,vscode}` + `examples/sdk-consumer.mjs` + `fixtures/profile-*`.
+
+### Changed
+
+- `ackit.schema.json` additive `readiness.weights`/`profile`/`policy.rulePacks`/`diagnostics` (v1 still valid, defaults applied).
+- `instruction-graph` schema bumped to v2 (additive, v1 JSON validates via defaults).
+- CLI help now documents `readiness`, `optimize` v2 flags, `profile` diagnostics, `diagnostics bundle` without leaking `REQ-*`/`ADR-*`.
+
+### Fixed
+
+- `src/core/profiles/built-ins.ts` repo-root resolution for packaged `dist` (3 vs 4 level probe).
+- `src/core/instructions/graph.ts` copilot repo-wide scope handling (ancestor filter removed).
+- `ackit-policy.yml` suppressions for synthetic secrets in `diagnostics`/`dashboard` redaction logic (self-scan gate).
+
+### Security
+
+- No new network calls, no telemetry, no arbitrary plugin exec; all new surfaces audited per `docs/security/THREAT_MODEL.md` delta.
+
 ## [0.1.1] - 2026-08-25
 
 Public CLI/MCP surface cleanup and controlled-release automation hardening. No behavior, command, flag, or exit-code changes.
