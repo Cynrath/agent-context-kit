@@ -1,11 +1,11 @@
 ---
 id: "TASK-0027"
 title: "v0.2.1 release workflow fresh-consumer hardening"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: 2026-08-27
 ---
 
 
