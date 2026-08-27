@@ -1,7 +1,7 @@
 ---
 id: "TASK-0039"
 title: "v0.2.2 release + Marketplace + post-release verification — tag, OIDC, VSIX publish, Action, docs sync, global"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0038"]
 createdAt: "2026-08-27"
