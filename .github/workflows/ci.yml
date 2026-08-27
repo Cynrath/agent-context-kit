@@ -97,7 +97,7 @@ jobs:
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
         with:
           package_json_file: package.json
-      - name: Frozen install (root)
+      - name: Frozen install (workspace)
         run: pnpm install --frozen-lockfile
       - name: Build root (for SDK)
         run: pnpm build
@@ -115,30 +115,24 @@ jobs:
           "
       - name: Extension typecheck
         run: |
-          cd extensions/vscode
-          npx tsc -p tsconfig.json --noEmit
-          npx tsc -p tsconfig.test.json --noEmit
+          pnpm --filter ackit-vscode exec tsc -p tsconfig.json --noEmit
+          pnpm --filter ackit-vscode exec tsc -p tsconfig.test.json --noEmit
       - name: Extension lint (vscode src)
         run: |
-          cd extensions/vscode
-          npx biome check src --diagnostic-level=warn || true
+          pnpm --filter ackit-vscode exec biome check src --diagnostic-level=warn || true
       - name: Extension build
         run: |
-          cd extensions/vscode
-          pnpm install --frozen-lockfile || pnpm install
-          npx esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=dist/extension.js --external:vscode --sourcemap
-          test -f dist/extension.js
+          pnpm --filter ackit-vscode exec esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=dist/extension.js --external:vscode --sourcemap
+          test -f extensions/vscode/dist/extension.js
       - name: Extension unit tests
         run: |
-          cd extensions/vscode
-          npm run compile:test
+          pnpm --filter ackit-vscode run compile:test
           # run mocha unit tests directly (without Electron) if available
-          npx mocha out/test/suite/unit.test.js --timeout 5000 || echo "unit tests done"
+          pnpm --filter ackit-vscode exec mocha out/test/suite/unit.test.js --timeout 5000 || echo "unit tests done"
       - name: VS Code Electron integration (xvfb)
         run: |
-          cd extensions/vscode
-          npm run compile:test
-          xvfb-run -a npm test || echo "Electron integration completed (check logs)"
+          pnpm --filter ackit-vscode run compile:test
+          xvfb-run -a pnpm --filter ackit-vscode test || echo "Electron integration completed (check logs)"
       - name: vsce ls
         run: |
           cd extensions/vscode

@@ -2,16 +2,19 @@
   "compilerOptions": {
     "module": "NodeNext",
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
+    "moduleResolution": "NodeNext",
     "outDir": "out",
     "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "NodeNext",
     "sourceMap": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node", "vscode"],
+    "declaration": false,
+    "declarationMap": false
   },
   "exclude": ["node_modules", "dist", "out"],
   "include": ["src/**/*"]

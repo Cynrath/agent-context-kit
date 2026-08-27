@@ -19,20 +19,29 @@ describe("npm README parity", () => {
     expect(pkg.files).toContain("README.md");
   });
 
-  it("root README contains v0.2.1 badges and examples (not stale 0.2.0)", async () => {
+  it("root README contains v0.2.2 badges and examples (not stale 0.2.1/0.2.0)", async () => {
     const readme = await fsp.readFile(path.join(repoRoot, "README.md"), "utf8");
-    expect(readme).toContain("v0.2.1");
-    expect(readme).toContain("npm%20v0.2.1");
-    expect(readme).toContain("release-v0.2.1");
-    expect(readme).toContain("npx --yes @cynrath/agent-context-kit@0.2.1");
-    expect(readme).toContain("Cynrath/agent-context-kit@v0.2.1");
+    const pkg = JSON.parse(await fsp.readFile(path.join(repoRoot, "package.json"), "utf8")) as {
+      version: string;
+    };
+    const ver = pkg.version; // single source of truth, expected 0.2.2
+    expect(ver).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(readme).toContain(`v${ver}`);
+    expect(readme).toContain(`npm%20v${ver}`);
+    expect(readme).toContain(`release-v${ver}`);
+    expect(readme).toContain(`npx --yes @cynrath/agent-context-kit@${ver}`);
+    expect(readme).toContain(`Cynrath/agent-context-kit@v${ver}`);
     // Ensure old version not present in badge areas (allow docs/v0.2.0 folder reference)
     // The only allowed 0.2.0 is in docs/v0.2.0 path and legacy notes
     const withoutDocs = readme.replaceAll("docs/v0.2.0", "");
-    // Remove the versioning line's legacy part? The line now is 0.2.1, so no 0.2.0 should remain in code examples
-    // Check that npm badge not 0.2.0
+    // Check that npm badge not stale
     expect(withoutDocs).not.toContain("npm%20v0.2.0");
     expect(withoutDocs).not.toContain("release-v0.2.0");
+    // If current is 0.2.2, ensure 0.2.1 stale badges are gone
+    if (ver !== "0.2.1") {
+      expect(withoutDocs).not.toContain("npm%20v0.2.1");
+      expect(withoutDocs).not.toContain("release-v0.2.1");
+    }
   });
 
   it("npm pack tarball README equals repo-root README (normalized EOL)", async () => {

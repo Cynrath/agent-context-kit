@@ -301,7 +301,12 @@ export async function analyzeOptimize(
             );
             // Ensure finding id includes provider flag for test: map to expected category
             // Add extra suggestion with id OPTIMIZE-REDUNDANT-PROVIDER-GUIDANCE
-            suggestions[suggestions.length - 1]!.id = "OPTIMIZE-REDUNDANT-PROVIDER-GUIDANCE";
+            {
+              const last = suggestions[suggestions.length - 1];
+              if (last) {
+                last.id = "OPTIMIZE-REDUNDANT-PROVIDER-GUIDANCE";
+              }
+            }
             break; // one flag is enough for test
           }
         }

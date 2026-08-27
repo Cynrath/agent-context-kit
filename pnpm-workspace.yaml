@@ -1,3 +1,10 @@
+packages:
+  - "."
+  - "extensions/*"
+
+allowBuilds:
+  esbuild: true
+
 minimumReleaseAgeExclude:
   - '@biomejs/biome@2.5.10'
   - '@biomejs/cli-darwin-arm64@2.5.10'

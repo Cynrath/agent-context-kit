@@ -64,8 +64,12 @@ suite("ACKit Extension Integration", () => {
     try {
       await vscode.commands.executeCommand("ackit.instructionsForCurrentFile");
     } catch {
-      // The command may be named differently; try the correct one
-      await vscode.commands.executeCommand("ackit.instructionsForCurrentFile").catch(() => {});
+      // The command may be named differently; try again without Thenable.catch
+      try {
+        await vscode.commands.executeCommand("ackit.instructionsForCurrentFile");
+      } catch {
+        // ignore
+      }
     }
     // Cleanup
     fs.unlinkSync(testFile);

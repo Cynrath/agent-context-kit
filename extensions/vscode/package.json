@@ -123,6 +123,6 @@
   "license": "MIT",
   "icon": "images/icon.png",
   "dependencies": {
-    "@cynrath/agent-context-kit": "file:../.."
+    "@cynrath/agent-context-kit": "workspace:*"
   }
 }

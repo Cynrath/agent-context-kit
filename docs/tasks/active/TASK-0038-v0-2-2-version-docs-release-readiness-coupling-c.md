@@ -1,11 +1,11 @@
 ---
 id: "TASK-0038"
 title: "v0.2.2 version/docs/release readiness — coupling, CHANGELOG, parity"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0035", "TASK-0036", "TASK-0037"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: 2026-08-27
 ---
 
 ## Purpose
@@ -89,10 +89,10 @@ Verified via `cat package.json | grep version` (`0.2.1`), `cat extensions/vscode
 
 ## Acceptance criteria
 
-- [ ] `package.json` `0.2.2`, `extensions/vscode/package.json` `0.2.2`, `pnpm-lock.yaml` updated (or still up-to-date)
-- [ ] `README.md` all `0.2.1` badges/links → `0.2.2` (except `docs/v0.2.0`), `CHANGELOG.md` `## [0.2.2]` exists, `extensions/vscode/CHANGELOG.md` `## [0.2.2]`
-- [ ] `pnpm build` → `dist` `0.2.2`, `pnpm test` 359+ PASS, `parity` PASS, `offline-egress` PASS
-- [ ] Coupling: `root 0.2.2 == vscode 0.2.2` (will be `== tag v0.2.2` after TASK-0039)
+- [x] `package.json` `0.2.2`, `extensions/vscode/package.json` `0.2.2`, `pnpm-lock.yaml` updated (or still up-to-date)
+- [x] `README.md` all `0.2.1` badges/links → `0.2.2` (except `docs/v0.2.0`), `CHANGELOG.md` `## [0.2.2]` exists, `extensions/vscode/CHANGELOG.md` `## [0.2.2]`
+- [x] `pnpm build` → `dist` `0.2.2`, `pnpm test` 359+ PASS, `parity` PASS, `offline-egress` PASS
+- [x] Coupling: `root 0.2.2 == vscode 0.2.2` (will be `== tag v0.2.2` after TASK-0039)
 
 ## Risks
 
@@ -105,4 +105,18 @@ Verified via `cat package.json | grep version` (`0.2.1`), `cat extensions/vscode
 
 ## Completion notes
 
-(placeholder) — include: versions (`package.json` 0.2.2, `vscode` 0.2.2), `pnpm install` log, `pnpm build` version, `CHANGELOG` head, `README` grep counts, parity SHA, coupling check.
+2026-08-27 — version coupling restored 0.2.2, docs parity verified, follow-up CI fixes included.
+
+**Versions:** `package.json` `0.2.2` (`node -p "require('./package.json').version"` 0.2.2), `extensions/vscode/package.json` `0.2.2` (`node -p "require('./extensions/vscode/package.json').version"` 0.2.2), `pnpm-workspace.yaml` `packages: [".","extensions/*"]` + `allowBuilds: esbuild: true`, `pnpm-lock.yaml` importer `extensions/vscode: workspace:*` link:../.., `pnpm install` 2 workspace projects `Lockfile is up to date` (after esbuild allow), `pnpm install --frozen-lockfile` PASS.
+
+**README:** `README.md` badges/links `0.2.1→0.2.2` (npm%20v0.2.2 1 hit, release-v0.2.2 1, `releases/tag/v0.2.2` 1, `ackit --version # 0.2.2` 1, `npx --yes @cynrath/agent-context-kit@0.2.2` 2 hits, `Cynrath/agent-context-kit@v0.2.2` 2 hits, VS Code table `0.2.2` + `ackit-0.2.2.vsix` + `extensions/vscode 0.2.2`, `Current: 0.2.2` `latest → 0.2.2`), `docs/v0.2.0` preserved (2 hits), `grep -c "0.2.2" README.md` 15 hits.
+
+**CHANGELOG:** `CHANGELOG.md` `## [0.2.2] - 2026-08-27` 34 lines (Fixed: VS Code UI contract 8 defects, tree providers, Problems severity, current-file, Optimize/Diagnostics real, multi-root/watch, SDK analyzeOptimize, icon 1×1→256×256, test harness; Changed: extension manifest 6 views, build packaging; Security: offline-egress includes extension), `extensions/vscode/CHANGELOG.md` `## [0.2.2]` 15 lines, `head -n 1 CHANGELOG.md` `## [0.2.2] - 2026-08-27` PASS.
+
+**Build/docs:** `pnpm build` `tsc -p tsconfig.build.json` PASS `dist/cli/index.js` `ackit --version` `0.2.2`, `pnpm gen:schemas` PASS `schemas` no diff, `pnpm lint` 0 errors, `pnpm format:check` PASS, `pnpm typecheck` PASS, `pnpm test` 67 files 361 tests PASS (including `readme-parity` 4/4 SHA `7f8910a5af6fed3d11bc90f018dd7dd839f227686e8bc82551774d97fb788eff`, `ci-pinning` 19/19 after publish→publisher fix), `node scripts/check-readme-parity.mjs` PASS parity SHA `7f8910a...`, `node scripts/check-offline-egress.mjs` 139 files PASS, `git diff --check` clean.
+
+**Coupling:** `node -e "console.log(require('./package.json').version === require('./extensions/vscode/package.json').version)"` `true` (0.2.2==0.2.2), `package.json` `files` still `["dist","templates","schemas","README.md","CHANGELOG.md","LICENSE"]`, `README.md` parity with tarball PASS via `pnpm test`.
+
+**Follow-up fixes in this task range:** `src/index.ts` organizeImports sorted, `src/core/context/optimize.ts` guarded `last.id`, `pnpm-workspace.yaml` + `workspace:*` + `allowBuilds`, `ci.yml` extension job workspace install before typecheck via `pnpm --filter`, `tsconfig.json/test` types/lib, `extension.test.ts` Thenable.catch fix — all verified via `pnpm --filter ackit-vscode exec tsc`.
+
+**Artifacts:** `package.json` 0.2.2, `vscode` 0.2.2, `pnpm-lock.yaml` updated (1226 lines importer), `README` 0.2.2, `CHANGELOG` 0.2.2, coupling true, gates green ready for TASK-0039 tag.

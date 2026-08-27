@@ -16,6 +16,8 @@ export { AckitError } from "./api/errors.js";
 export { scanRepository } from "./api/scan-repository.js";
 export { loadAckitConfig } from "./core/config/load.js";
 export type { AckitConfig } from "./core/config/schema.js";
+export type { AnalyzeOptions, OptimizeSuggestion } from "./core/context/optimize.js";
+export { analyzeOptimize } from "./core/context/optimize.js";
 export type { PackManifestEntry, PackResult } from "./core/context/pack.js";
 export { buildContextPack } from "./core/context/pack.js";
 export { buildInstructionGraph, resolveEffectiveStack } from "./core/instructions/graph.js";
@@ -52,8 +54,6 @@ export type {
   ScoreReport,
   Severity as ReadinessSeverity,
 } from "./core/readiness/types.js";
-export { analyzeOptimize } from "./core/context/optimize.js";
-export type { AnalyzeOptions, OptimizeSuggestion } from "./core/context/optimize.js";
 export type {
   Finding,
   ScanCategory,

@@ -1,11 +1,11 @@
 ---
 id: "TASK-0037"
 title: "VS Code Marketplace UX/assets/icon — professional 256x256 PNG, README correctness"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0035"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: 2026-08-27
 ---
 
 ## Purpose
@@ -101,10 +101,10 @@ Verified via `ls -lh extensions/vscode/images/icon.png` (68 → 346389 → after
 
 ## Acceptance criteria
 
-- [ ] `images/icon.png` is 256×256 PNG, square, width==height==256, >=128, >1024 bytes, not 1×1, not 68 bytes
-- [ ] `images/icon.svg` preserved as source (22KB, 5225×5225 SVG) if user provided, `icon.ico` preserved if exists, `package.json` `icon` still `images/icon.png`
-- [ ] `tests/contract/vscode-icon.test.ts` exists and passes (2 tests)
-- [ ] `extensions/vscode/README.md` is version `0.2.2`, accurately describes all 6 views, 7 commands, Problems, offline-first, links, no false claims
+- [x] `images/icon.png` is 256×256 PNG, square, width==height==256, >=128, >1024 bytes, not 1×1, not 68 bytes
+- [x] `images/icon.svg` preserved as source (22KB, 5225×5225 SVG) if user provided, `icon.ico` preserved if exists, `package.json` `icon` still `images/icon.png`
+- [x] `tests/contract/vscode-icon.test.ts` exists and passes (2 tests)
+- [x] `extensions/vscode/README.md` is version `0.2.2`, accurately describes all 6 views, 7 commands, Problems, offline-first, links, no false claims
 
 ## Risks
 
@@ -117,4 +117,16 @@ Revert `images/icon.png` to 68-byte 1×1 via `git checkout HEAD -- extensions/vs
 
 ## Completion notes
 
-(placeholder) — include: icon dimensions (256×256, 26534 bytes), SVG source (22447 bytes, 5225×5225), contract test counts, README diff (31→80 lines, version 0.2.2, 6 views, offline guarantee).
+2026-08-27 — icon + README hardened, preserved user artwork.
+
+**Icon:** `extensions/vscode/images/icon.png` 256×256 PNG, 26534 bytes, `width==256`, `height==256`, square, `>=128`, `>1024`, not 1×1, not 68 bytes, rendered via `System.Drawing` `HighQualityBicubic` `DrawImage 0,0,256,256` from source `icon.svg` 22447 bytes 5225×5225 SVG (user-provided design, preserved), `icon.ico` 63919 bytes preserved, `package.json` `icon` still `images/icon.png` (PNG not SVG per Marketplace).
+
+**Contract test:** `tests/contract/vscode-icon.test.ts` 33 lines `buf.readUInt32BE(16)` width, `20` height, `expect(width).toBe(256)` `expect(height).toBe(256)` `expect(w).toBe(h)` `expect(buf.length).toBeGreaterThan(1024)` — `pnpm test tests/contract/vscode-icon.test.ts` 2 tests PASS (256×256, not 1×1, square).
+
+**README:** `extensions/vscode/README.md` 31→~80 lines rewritten 0.2.2 accurate: header `ACKit Toolkit` `Cynrath` `0.2.2` `VS Code ^1.90.0` `onStartupFinished` debounced lazy `Linters` `Offline No network` `No telemetry`, 6 views `ackit.readiness/findings/graph/tasks/policy/optimize` per-view details (Readiness overall+categories+deductions, Findings grouped+click, Graph nodes+provider, Tasks/Policy summaries, Optimize token-waste), Problems severity mapping `critical/high→Error etc` + `Uri.joinPath` + `isInsideRoot` + clamped `line/col`, Commands 7 (`Refresh/Show Readiness/Show Graph/Open Finding/InstructionsForCurrentFile/Optimize/Diagnostics`) via `resolveEffectiveStack` + `analyzeOptimize` QuickPick diff preview, Watch `onDidCreate/Change/Delete` 400 ms `AbortController`, Multi-root `getRoots/getRootForActiveEditor`, offline-first guarantee `no fetch remote/http/telemetry/remote fonts` verified `scripts/check-offline-egress.mjs` PASS 139 files, links Repo/Docs/Marketplace `Cynrath.ackit-vscode` Changelog v0.2.2, no false claims, no telemetry claims.
+
+**VSIX audit:** `vsce ls --no-dependencies --no-yarn` includes `images/icon.png` 256×256 (>1KB), no `node_modules`, `vsce package` 640323 bytes <2 MB, `file icon.png` 256×256, `unzip -l` no secrets.
+
+**Preserved:** `images/**` artwork not redesigned per user instruction — SVG source kept, PNG rendered at high quality, ICO kept.
+
+**Evidence:** `node -e` icon 256×256 26534 bytes PASS, `pnpm test vscode-icon` 2 PASS, `vsce ls` PASS, offline-egress PASS.

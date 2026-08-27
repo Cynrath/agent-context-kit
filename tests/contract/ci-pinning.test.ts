@@ -32,8 +32,10 @@ describe("CI workflow hardening", () => {
   it("scopes permissions to contents: read and has no publish/release workflow", () => {
     expect(raw).toContain("permissions:");
     expect(raw).toMatch(/contents:\s*read/);
-    expect(raw).not.toContain("release:");
-    expect(raw).not.toContain("publish");
+    expect(raw).not.toMatch(/^\s*release:/m);
+    // allow `publisher` field in manifest contract but forbid publish workflow steps
+    expect(raw).not.toMatch(/\bpublish\b\s*:/i);
+    expect(raw).not.toMatch(/\bvsce\s+publish\b/i);
     expect(raw.toLowerCase()).not.toContain("npm publish");
   });
 
