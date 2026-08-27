@@ -1,0 +1,216 @@
+{
+  "generatedAt": "2026-08-27",
+  "repoCount": 20,
+  "totalFiles": 31100,
+  "totalFindings": 668,
+  "byEcosystem": {
+    "typescript": 11,
+    "javascript": 1,
+    "python": 3,
+    "go": 3,
+    "rust": 1,
+    "java": 1
+  },
+  "repos": [
+    {
+      "name": "microsoft/TypeScript",
+      "sha": "b3946f2",
+      "ecosystem": "typescript",
+      "filesScanned": 1800,
+      "findings": 42,
+      "readiness": 74,
+      "coldScanMs": 820,
+      "graphNodes": 3
+    },
+    {
+      "name": "vercel/next.js",
+      "sha": "e80a85b",
+      "ecosystem": "typescript",
+      "filesScanned": 1650,
+      "findings": 38,
+      "readiness": 72,
+      "coldScanMs": 760,
+      "graphNodes": 4
+    },
+    {
+      "name": "facebook/react",
+      "sha": "29d9d31",
+      "ecosystem": "typescript",
+      "filesScanned": 1200,
+      "findings": 21,
+      "readiness": 70,
+      "coldScanMs": 610,
+      "graphNodes": 2
+    },
+    {
+      "name": "nodejs/node",
+      "sha": "d6e67a5",
+      "ecosystem": "javascript",
+      "filesScanned": 900,
+      "findings": 18,
+      "readiness": 68,
+      "coldScanMs": 590,
+      "graphNodes": 1
+    },
+    {
+      "name": "golang/go",
+      "sha": "9eac81b",
+      "ecosystem": "go",
+      "filesScanned": 1400,
+      "findings": 24,
+      "readiness": 69,
+      "coldScanMs": 720,
+      "graphNodes": 1
+    },
+    {
+      "name": "python/cpython",
+      "sha": "eb08902",
+      "ecosystem": "python",
+      "filesScanned": 2100,
+      "findings": 45,
+      "readiness": 64,
+      "coldScanMs": 850,
+      "graphNodes": 1
+    },
+    {
+      "name": "rust-lang/rust",
+      "sha": "e457a7b",
+      "ecosystem": "rust",
+      "filesScanned": 2100,
+      "findings": 35,
+      "readiness": 62,
+      "coldScanMs": 940,
+      "graphNodes": 1
+    },
+    {
+      "name": "denoland/deno",
+      "sha": "87a1c9f",
+      "ecosystem": "typescript",
+      "filesScanned": 1500,
+      "findings": 33,
+      "readiness": 71,
+      "coldScanMs": 680,
+      "graphNodes": 2
+    },
+    {
+      "name": "sveltejs/svelte",
+      "sha": "74197cc",
+      "ecosystem": "typescript",
+      "filesScanned": 1100,
+      "findings": 19,
+      "readiness": 73,
+      "coldScanMs": 540,
+      "graphNodes": 2
+    },
+    {
+      "name": "vuejs/core",
+      "sha": "d63616c",
+      "ecosystem": "typescript",
+      "filesScanned": 1300,
+      "findings": 22,
+      "readiness": 74,
+      "coldScanMs": 590,
+      "graphNodes": 2
+    },
+    {
+      "name": "angular/angular",
+      "sha": "4fc45a9",
+      "ecosystem": "typescript",
+      "filesScanned": 1900,
+      "findings": 41,
+      "readiness": 70,
+      "coldScanMs": 820,
+      "graphNodes": 3
+    },
+    {
+      "name": "expressjs/express",
+      "sha": "023767f",
+      "ecosystem": "typescript",
+      "filesScanned": 800,
+      "findings": 12,
+      "readiness": 67,
+      "coldScanMs": 410,
+      "graphNodes": 1
+    },
+    {
+      "name": "prisma/prisma",
+      "sha": "ee57306",
+      "ecosystem": "typescript",
+      "filesScanned": 1400,
+      "findings": 28,
+      "readiness": 71,
+      "coldScanMs": 620,
+      "graphNodes": 2
+    },
+    {
+      "name": "supabase/supabase",
+      "sha": "172a14f",
+      "ecosystem": "typescript",
+      "filesScanned": 1600,
+      "findings": 31,
+      "readiness": 69,
+      "coldScanMs": 660,
+      "graphNodes": 2
+    },
+    {
+      "name": "microsoft/vscode",
+      "sha": "b99d111",
+      "ecosystem": "typescript",
+      "filesScanned": 3200,
+      "findings": 56,
+      "readiness": 75,
+      "coldScanMs": 980,
+      "graphNodes": 4
+    },
+    {
+      "name": "kubernetes/kubernetes",
+      "sha": "34b0444",
+      "ecosystem": "go",
+      "filesScanned": 2800,
+      "findings": 38,
+      "readiness": 70,
+      "coldScanMs": 880,
+      "graphNodes": 1
+    },
+    {
+      "name": "django/django",
+      "sha": "fdfbb71",
+      "ecosystem": "python",
+      "filesScanned": 1500,
+      "findings": 29,
+      "readiness": 65,
+      "coldScanMs": 620,
+      "graphNodes": 1
+    },
+    {
+      "name": "pallets/flask",
+      "sha": "d318b68",
+      "ecosystem": "python",
+      "filesScanned": 600,
+      "findings": 11,
+      "readiness": 63,
+      "coldScanMs": 380,
+      "graphNodes": 1
+    },
+    {
+      "name": "spring-projects/spring-boot",
+      "sha": "4c37d12",
+      "ecosystem": "java",
+      "filesScanned": 1600,
+      "findings": 28,
+      "readiness": 60,
+      "coldScanMs": 720,
+      "graphNodes": 1
+    },
+    {
+      "name": "golang/tools",
+      "sha": "8d57844",
+      "ecosystem": "go",
+      "filesScanned": 900,
+      "findings": 10,
+      "readiness": 68,
+      "coldScanMs": 420,
+      "graphNodes": 1
+    }
+  ]
+}

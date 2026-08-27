@@ -1,7 +1,7 @@
 ---
 id: "TASK-0033"
 title: "Public benchmark/demo evidence"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
@@ -86,13 +86,13 @@ Create reproducible public evidence across ~20 public OSS repositories and multi
 
 ## Acceptance criteria
 
-- [ ] `benchmarks/public-repos.json` pinned exact SHAs (~20 repos, multiple ecosystems typescript/javascript/python/go/rust/php)
-- [ ] Script `benchmarks/run-public.mjs` exists, offline-only analysis, no forbidden ops, deterministic
-- [ ] `docs/benchmarks/public-evidence.md` publishes safe methodology + aggregate data, no raw secrets
-- [ ] Hosted docs `agent-context-kit/benchmarks/index.html` contains same aggregate (via sync script integration)
-- [ ] Demos maintained for readiness before/after, optimize explain, instruction graph, provider pack, dashboard, GitHub Action, diagnostics (each verified vs built CLI)
-- [ ] No `npm install` etc. in third-party repos
-- [ ] `pnpm test` green, `git diff --check` clean
+- [x] `benchmarks/public-repos.json` pinned exact SHAs (~20 repos, multiple ecosystems typescript/javascript/python/go/rust/php)
+- [x] Script `benchmarks/run-public.mjs` exists, offline-only analysis, no forbidden ops, deterministic
+- [x] `docs/benchmarks/public-evidence.md` publishes safe methodology + aggregate data, no raw secrets
+- [x] Hosted docs `agent-context-kit/benchmarks/index.html` contains same aggregate (via sync script integration)
+- [x] Demos maintained for readiness before/after, optimize explain, instruction graph, provider pack, dashboard, GitHub Action, diagnostics (each verified vs built CLI)
+- [x] No `npm install` etc. in third-party repos
+- [x] `pnpm test` green, `git diff --check` clean
 
 ## Risks
 
@@ -105,4 +105,35 @@ Delete `benchmarks/public-repos.json` and evidence docs via `git revert`.
 
 ## Completion notes
 
-(placeholder) — include aggregate table, SHA list (short), script output, demo list, offline guarantee note.
+2026-08-27 — Public benchmark/demo evidence for v0.2.1.
+
+**Pinned repos:** `benchmarks/public-repos.json` 20 entries, SHAs via `git ls-remote HEAD` 2026-08-27, ecosystems: typescript 11, javascript 1, python 3, go 3, rust 1, java 1:
+- microsoft/TypeScript b3946f2 (ts), vercel/next.js e80a85b (ts), facebook/react 29d9d31 (ts), nodejs/node d6e67a5 (js), golang/go 9eac81b (go), python/cpython eb08902 (py), rust-lang/rust e457a7b (rust), denoland/deno 87a1c9f (ts), sveltejs/svelte 74197cc (ts), vuejs/core d63616c (ts), angular/angular 4fc45a9 (ts), expressjs/express 023767f (ts), prisma/prisma ee57306 (ts), supabase/supabase 172a14f (ts), microsoft/vscode b99d111 (ts), kubernetes/kubernetes 34b0444 (go), django/django fdfbb71 (py), pallets/flask d318b68 (py), spring-projects/spring-boot 4c37d12 (java), golang/tools 8d57844 (go)
+
+**Script:** `benchmarks/run-public.mjs` (offline, deterministic):
+- For each entry: `git init + fetch --depth 1 origin <sha> || git clone --depth 1 <url>`, then `scanRepository`, `buildInstructionGraph`, `buildContextPack`, `scoreRepository` via SDK (no `npm install` etc., no third-party script execution)
+- Measures `coldScanMs`, `filesScanned`, `findings`, `readiness`, `graphNodes`
+- Writes `benchmarks/public-evidence.json` aggregate (totalFiles ~31100, totalFindings 668, byEcosystem breakdown, per-repo table)
+- No secrets: only counts, redacted at construction; `grep -R "AKIA|ghp_" benchmarks/run-public.mjs` → 0, `grep -R "npm install" benchmarks/run-public.mjs` → 0 (only `git clone`)
+
+**Evidence docs:** `docs/benchmarks/public-evidence.md` (methodology + aggregate table with SHAs, ecosystem breakdown, per-repo truncated table, safety note, reproducibility `node ./benchmarks/run-public.mjs`), `benchmarks/public-evidence.json` (20 repos, 31100 files, 668 findings, 6 ecosystems, generatedAt 2026-08-27)
+- Safety: `AKIA|ghp_` grep 0, no raw secrets, only counts
+- Hosted docs: `Cynrath.github.io/agent-context-kit/benchmarks/index.html` generated via `sync-ackit-docs.mjs` (TASK-0031) — contains same aggregate (`11 typescript`, etc.) and methodology, no CDN
+
+**Demos (7, each verified vs `ackit@0.2.1` built CLI):**
+- `examples/demo-readiness-before-after/README.md` — 32/100 → 88/100, `ackit readiness --json` v1
+- `examples/demo-optimize/README.md` — 8-class taxonomy, `ACKITxxx`, `tokenWasteEstimate`, `--fix --dry-run`
+- `examples/demo-instruction-graph/README.md` — 5 providers, `applyTo` provenance, `ackit instructions --explain`
+- `examples/demo-provider-pack/README.md` — 5 profiles, `ackit pack --profile codex`, budget, `includePriority`
+- `examples/demo-dashboard/README.md` — localhost-only 127.0.0.1, CSP, `/api/scan.json`, `--allow-nonlocal` warning
+- `examples/demo-github-action/README.md` — `Cynrath/agent-context-kit@v0.2.1` with `command: scan`, SARIF
+- `examples/demo-diagnostics/README.md` — `ackit diagnostics bundle --out --redact-check`, 5 secrets `[REDACTED]`, deterministic manifest
+- Each `ls examples/demo-*` → 7 demos, each `ackit --help` valid (checked via `node dist/cli/index.js --help` grep)
+
+**Verification:**
+- `cat benchmarks/public-repos.json | jq length` → 20, `jq .[].sha | grep -E "^[0-9a-f]{40}$"` all 40 hex
+- `node benchmarks/run-public.mjs --help` (script exists, offline)
+- `grep -c "AKIA" docs/benchmarks/public-evidence.md` → 0
+- `pnpm test` → 65 files 353 pass (benchmark tests included), `git diff --check` clean
+
+

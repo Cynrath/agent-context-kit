@@ -1,0 +1,122 @@
+[
+  {
+    "name": "microsoft/TypeScript",
+    "url": "https://github.com/microsoft/TypeScript.git",
+    "sha": "b3946f2d9b94beeb049948726024d8130b4dae5b",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "vercel/next.js",
+    "url": "https://github.com/vercel/next.js.git",
+    "sha": "e80a85bcff19a4764182cb90bc34da4559fc5fef",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "facebook/react",
+    "url": "https://github.com/facebook/react.git",
+    "sha": "29d9d3184484b03cb0369e0494617207df777b7a",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "nodejs/node",
+    "url": "https://github.com/nodejs/node.git",
+    "sha": "d6e67a5e3040c8f901a8316f5bbf903f83b1448d",
+    "ecosystem": "javascript"
+  },
+  {
+    "name": "golang/go",
+    "url": "https://github.com/golang/go.git",
+    "sha": "9eac81ba2fee319314ed26eebd4f9d4c12dfcdb6",
+    "ecosystem": "go"
+  },
+  {
+    "name": "python/cpython",
+    "url": "https://github.com/python/cpython.git",
+    "sha": "eb089020696e451e64a51534726efa80dcbdc902",
+    "ecosystem": "python"
+  },
+  {
+    "name": "rust-lang/rust",
+    "url": "https://github.com/rust-lang/rust.git",
+    "sha": "e457a7b0d326d67b4322ef0d11bd715cfaeda48f",
+    "ecosystem": "rust"
+  },
+  {
+    "name": "denoland/deno",
+    "url": "https://github.com/denoland/deno.git",
+    "sha": "87a1c9f47ab2b28d163bed80c73cf6b7761ed399",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "sveltejs/svelte",
+    "url": "https://github.com/sveltejs/svelte.git",
+    "sha": "74197ccbe1d84cab76c1eefbf3def43903661691",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "vuejs/core",
+    "url": "https://github.com/vuejs/core.git",
+    "sha": "d63616ca17de965ed32dcb449a4c5cd9982f15d2",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "angular/angular",
+    "url": "https://github.com/angular/angular.git",
+    "sha": "4fc45a9b38bdcc38da07236a98116f9fc9e13636",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "expressjs/express",
+    "url": "https://github.com/expressjs/express.git",
+    "sha": "023767fe9872e029271df1418f73401bff20ff40",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "prisma/prisma",
+    "url": "https://github.com/prisma/prisma.git",
+    "sha": "ee57306ad2b1c9b48a7764ac7f80d5d595880760",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "supabase/supabase",
+    "url": "https://github.com/supabase/supabase.git",
+    "sha": "172a14fe34d623e2ddaad6156b1251b0990159e8",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "microsoft/vscode",
+    "url": "https://github.com/microsoft/vscode.git",
+    "sha": "b99d111f220c9f55ed5ba289957f330c1e38522a",
+    "ecosystem": "typescript"
+  },
+  {
+    "name": "kubernetes/kubernetes",
+    "url": "https://github.com/kubernetes/kubernetes.git",
+    "sha": "34b0444a2d7ad1b61a3c8ad0cdfe85a8e69b71be",
+    "ecosystem": "go"
+  },
+  {
+    "name": "django/django",
+    "url": "https://github.com/django/django.git",
+    "sha": "fdfbb711e3dd52683ae633f568761efe2735d5f0",
+    "ecosystem": "python"
+  },
+  {
+    "name": "pallets/flask",
+    "url": "https://github.com/pallets/flask.git",
+    "sha": "d318b683471101618febed18996405ad26462110",
+    "ecosystem": "python"
+  },
+  {
+    "name": "spring-projects/spring-boot",
+    "url": "https://github.com/spring-projects/spring-boot.git",
+    "sha": "4c37d1291617c58111b1f25a0ca71d7ada28737c",
+    "ecosystem": "java"
+  },
+  {
+    "name": "golang/tools",
+    "url": "https://github.com/golang/tools.git",
+    "sha": "8d57844e45f64edbd53d04aa3c3f884b35e4058f",
+    "ecosystem": "go"
+  }
+]
