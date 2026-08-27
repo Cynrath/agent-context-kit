@@ -11,7 +11,7 @@ beforeAll(async () => {
   // A file that triggers ACKIT020 (TODO marker) and ACKIT001 (token shape).
   await writeFile(
     path.join(rootPath, "sample.txt"),
-    ["// TODO fix this", `aws_key = ${"AKIA"}IOSFODNN7EXAMPLE`].join("\n") + "\n",
+    `${["// TODO fix this", `aws_key = ${"AKIA"}IOSFODNN7EXAMPLE`].join("\n")}\n`,
     "utf8",
   );
   repo = { rootPath, cleanup: () => rm(rootPath, { recursive: true, force: true }) };
@@ -31,7 +31,7 @@ describe("policy rule plan wiring (audit item 2)", () => {
     );
     await writeFile(
       path.join(repo.rootPath, "ackit.yml"),
-      ["schemaVersion: 1", "policy:", "  extends:", "    - ackit-policy.yml"].join("\n") + "\n",
+      `${["schemaVersion: 1", "policy:", "  extends:", "    - ackit-policy.yml"].join("\n")}\n`,
       "utf8",
     );
 
@@ -45,14 +45,14 @@ describe("policy rule plan wiring (audit item 2)", () => {
   it("forbiddenPatterns produce findings as first-class rules", async () => {
     await writeFile(
       path.join(repo.rootPath, "ackit-policy.yml"),
-      [
+      `${[
         "schemaVersion: 1",
         "forbiddenPatterns:",
         "  - id: ACKIT950",
         '    pattern: "eval\\\\("',
         "    severity: high",
         "    message: eval() is forbidden",
-      ].join("\n") + "\n",
+      ].join("\n")}\n`,
       "utf8",
     );
     await writeFile(path.join(repo.rootPath, "code.js"), "eval(input);\n");
@@ -60,14 +60,14 @@ describe("policy rule plan wiring (audit item 2)", () => {
     // Remove the disable so we can see all rules.
     await writeFile(
       path.join(repo.rootPath, "ackit-policy.yml"),
-      [
+      `${[
         "schemaVersion: 1",
         "forbiddenPatterns:",
         "  - id: ACKIT950",
         '    pattern: "eval\\\\("',
         "    severity: high",
         "    message: eval() is forbidden",
-      ].join("\n") + "\n",
+      ].join("\n")}\n`,
       "utf8",
     );
     await writeFile(path.join(repo.rootPath, "code.js"), "eval(input);\n");
@@ -82,7 +82,7 @@ describe("policy rule plan wiring (audit item 2)", () => {
   it("severity override upgrades finding severity deterministically", async () => {
     await writeFile(
       path.join(repo.rootPath, "ackit.yml"),
-      ["schemaVersion: 1", "policy:", "  extends:", "    - ackit-policy.yml"].join("\n") + "\n",
+      `${["schemaVersion: 1", "policy:", "  extends:", "    - ackit-policy.yml"].join("\n")}\n`,
       "utf8",
     );
     await writeFile(

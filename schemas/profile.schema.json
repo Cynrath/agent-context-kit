@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cynrath.github.io/agent-context-kit/schemas/profile.schema.json",
+  "title": "AgentContextKit Provider Profile v1",
+  "type": "object",
+  "required": ["name", "provider", "fileConventions", "contextBudget"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string", "pattern": "^[a-z0-9-]+$", "minLength": 1, "maxLength": 32 },
+    "provider": { "type": "string", "enum": ["codex", "claude", "copilot", "gemini", "generic"] },
+    "displayName": { "type": "string", "maxLength": 64 },
+    "version": { "type": "integer", "const": 1 },
+    "instructionApplicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "applyToResolvedBy": { "type": "string", "enum": ["profile", "graph"] },
+        "notes": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "fileConventions": {
+      "type": "object",
+      "required": ["instructionFiles"],
+      "additionalProperties": false,
+      "properties": {
+        "instructionFiles": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "maxItems": 32
+        },
+        "skillDirs": { "type": "array", "items": { "type": "string" }, "maxItems": 8 },
+        "extraSurfaces": { "type": "array", "items": { "type": "string" }, "maxItems": 16 }
+      }
+    },
+    "contextBudget": {
+      "type": "object",
+      "required": ["maxTokens", "includePriority"],
+      "additionalProperties": false,
+      "properties": {
+        "maxTokens": { "type": "integer", "minimum": 1000, "maximum": 500000 },
+        "includePriority": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[a-zA-Z0-9_.-]+$" },
+          "additionalProperties": { "type": "number", "minimum": -10, "maximum": 10 }
+        }
+      }
+    },
+    "precedenceOverrides": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z0-9.-]+$" },
+      "additionalProperties": { "type": "number", "minimum": -1000, "maximum": 1000 }
+    }
+  }
+}

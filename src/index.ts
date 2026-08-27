@@ -21,10 +21,37 @@ export { buildContextPack } from "./core/context/pack.js";
 export { buildInstructionGraph, resolveEffectiveStack } from "./core/instructions/graph.js";
 export type {
   BuildGraphOptions,
+  EffectiveStackInfo,
   InstructionGraph,
   InstructionNode,
+  ProvenanceEntry,
   ProviderId,
 } from "./core/instructions/types.js";
+export { evaluateRulePacks } from "./core/policy/packs/evaluate.js";
+export { loadRulePacks } from "./core/policy/packs/load.js";
+export type { EffectiveRulePack, RulePackV1, RuleV1 } from "./core/policy/packs/types.js";
+export { detectProfiles, loadBuiltInProfiles, resolveProfile } from "./core/profiles/index.js";
+export { ProfileSchema } from "./core/profiles/schema.js";
+export type {
+  Profile,
+  ProfileDiagnostic,
+  ProfileId,
+  ProfileProvider,
+  ResolvedProfile,
+} from "./core/profiles/types.js";
+export {
+  ENGINE_VERSION as READINESS_ENGINE_VERSION,
+  scoreRepository,
+} from "./core/readiness/index.js";
+export type {
+  CategoryId,
+  CategoryReport,
+  Deduction,
+  ReadinessInputs,
+  ReadinessOptions,
+  ScoreReport,
+  Severity as ReadinessSeverity,
+} from "./core/readiness/types.js";
 export type {
   Finding,
   ScanCategory,

@@ -1,0 +1,4 @@
+---
+applyTo: src/**
+---
+# Feature instructions

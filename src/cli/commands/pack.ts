@@ -21,6 +21,7 @@ export async function runPackCommand(
     format: "markdown" | "json";
     include?: string[] | undefined;
     changed: boolean;
+    profile?: string | undefined;
   },
 ): Promise<ExitCodeValue> {
   const rootRequested = path.resolve(options.root ?? process.cwd());
@@ -36,6 +37,20 @@ export async function runPackCommand(
       { quiet: options.quiet, debug: options.debug },
     );
     return EXIT_CODES.environment;
+  }
+  // Profile resolution (TASK-0010)
+  const { resolveProfileForCommand } = await import("../profile.js");
+  const profileRes = await resolveProfileForCommand(rootRequested, {
+    cliProfile: options.profile,
+    configProfile: configResult.config.profile,
+    extendPaths: configResult.config.profiles.extend,
+  });
+  // Emit profile diagnostics to stderr (not failing)
+  for (const d of profileRes.diagnostics) {
+    emitDiagnostic(
+      { code: d.code.toLowerCase(), message: d.message },
+      { quiet: options.quiet, debug: options.debug },
+    );
   }
 
   let restrictToFiles: string[] | undefined;
@@ -55,12 +70,18 @@ export async function runPackCommand(
   }
   // Canonical orchestration shared with the MCP `ackit_pack` tool.
   const sections = await buildCanonicalContextSections(rootResolution.root);
+  const effectiveMaxTokens =
+    options.maxTokens ??
+    (profileRes.resolved.source !== "fallback"
+      ? profileRes.resolved.resolved.contextBudget.maxTokens
+      : configResult.config.context.maxTokens);
   const pack = await buildContextPack(rootResolution.root, {
-    maxTokens: options.maxTokens ?? configResult.config.context.maxTokens,
+    maxTokens: effectiveMaxTokens,
     format: options.format,
     includeGlobs: options.include,
     restrictToFiles,
     contextSections: sections,
+    profile: profileRes.resolved,
   });
 
   if (options.json || options.format === "json") {

@@ -211,11 +211,13 @@ const SECTION_KEYS: Record<string, readonly string[]> = {
   instructions: ["enabled", "maxTokenEstimatePerFile"],
   skills: ["enabled"],
   context: ["maxTokens"],
-  policy: ["extends"],
+  policy: ["extends", "rulePacks"],
   baseline: [],
   output: ["format"],
   cache: ["enabled"],
   workspaces: ["enabled"],
+  profiles: ["extend"],
+  readiness: ["weights", "strictThreshold"],
 };
 
 const ROOT_KEYS = [
@@ -230,6 +232,9 @@ const ROOT_KEYS = [
   "output",
   "cache",
   "workspaces",
+  "profile",
+  "profiles",
+  "readiness",
 ];
 
 /**

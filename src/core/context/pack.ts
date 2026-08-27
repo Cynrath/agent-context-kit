@@ -107,6 +107,11 @@ export interface BuildPackOptions {
   contextSections?: readonly PackContextSection[] | undefined;
   /** Cancellation signal (REQ-MCP-004 / audit 6C). */
   signal?: AbortSignal | undefined;
+  /** Provider-aware profile (TASK-0010): when present, ranking and budget adjust. */
+  profile?:
+    | import("../profiles/types.js").ResolvedProfile
+    | import("../profiles/types.js").Profile
+    | undefined;
 }
 
 export interface PackResult {
@@ -116,6 +121,7 @@ export interface PackResult {
   manifest: PackManifestEntry[];
   totalIncludedTokens: number;
   maxTokens: number;
+  profile?: { requested: string | null; resolved: string; source: string } | undefined;
 }
 
 /**
@@ -138,7 +144,20 @@ export async function buildContextPack(
   const signal = options.signal;
   // Checkpoint 1: before discovery.
   if (signal?.aborted) throw new DOMException(PACK_ABORTED_MESSAGE, "AbortError");
-  const maxTokens = options.maxTokens ?? 100_000;
+  const profileData = options.profile as unknown as
+    | {
+        resolved?: import("../profiles/types.js").Profile;
+        provider?: string;
+        contextBudget?: { maxTokens: number };
+      }
+    | undefined;
+  const profileBudget =
+    profileData !== undefined
+      ? "resolved" in profileData && profileData.resolved !== undefined
+        ? (profileData.resolved as import("../profiles/types.js").Profile).contextBudget.maxTokens
+        : (profileData as import("../profiles/types.js").Profile).contextBudget?.maxTokens
+      : undefined;
+  const maxTokens = options.maxTokens ?? profileBudget ?? 100_000;
   const collection = await collectScanTargets(root, { skipClassification: false });
   // Checkpoint 2: after discovery, before any content work.
   if (signal?.aborted) throw new DOMException(PACK_ABORTED_MESSAGE, "AbortError");
@@ -277,7 +296,7 @@ export async function buildContextPack(
       });
     }
 
-    const score =
+    let score =
       (includeMatch?.(target.relativePath) ? RANKING_WEIGHTS.explicitInclude : 0) +
       (restrictSet !== null ? RANKING_WEIGHTS.changed : 0) +
       (changedSetHas(options.restrictToFiles, target.relativePath) ? RANKING_WEIGHTS.changed : 0) +
@@ -288,6 +307,45 @@ export async function buildContextPack(
       (instructionRefs.has(target.relativePath) ? RANKING_WEIGHTS.importProximity : 0) +
       (isReadmeOrArchitecture(target.relativePath) ? RANKING_WEIGHTS.readmeArchRelevance : 0) +
       typeWeight(target.relativePath);
+
+    // Profile includePriority adjustment
+    if (profileData !== undefined) {
+      const includePriority = (
+        "resolved" in profileData && profileData.resolved !== undefined
+          ? (profileData.resolved as import("../profiles/types.js").Profile).contextBudget
+              .includePriority
+          : (profileData as import("../profiles/types.js").Profile).contextBudget?.includePriority
+      ) as Record<string, number> | undefined;
+      if (includePriority) {
+        const basename = target.relativePath.split("/").pop() ?? target.relativePath;
+        let weight: number | undefined;
+        if (includePriority[target.relativePath] !== undefined)
+          weight = includePriority[target.relativePath];
+        else if (includePriority[basename] !== undefined) weight = includePriority[basename];
+        else {
+          // glob match via picomatch
+          for (const [pattern, w] of Object.entries(includePriority)) {
+            if (pattern.includes("*") || pattern.includes("?")) {
+              try {
+                if (
+                  picomatch(pattern, { dot: true })(target.relativePath) ||
+                  picomatch(pattern, { dot: true })(basename)
+                ) {
+                  weight = w;
+                  break;
+                }
+              } catch {
+                // ignore invalid pattern
+              }
+            }
+          }
+        }
+        if (weight !== undefined) {
+          const multiplier = Math.max(0.5, Math.min(2.0, 1 + weight * 0.1));
+          score = Math.round(score * multiplier);
+        }
+      }
+    }
 
     const penalty = Math.min(
       Math.floor(Buffer.byteLength(content) / 4096) * RANKING_WEIGHTS.sizePenaltyPer4k,
@@ -345,6 +403,17 @@ export async function buildContextPack(
 
   const manifest = finalizeManifest(manifestDraft);
   const identity = getPackageIdentity();
+  // Build profile trace for JSON & result
+  let profileTrace: { requested: string | null; resolved: string; source: string } | undefined;
+  if (profileData !== undefined) {
+    if ("resolved" in profileData && profileData.resolved !== undefined) {
+      const rp = profileData as import("../profiles/types.js").ResolvedProfile;
+      profileTrace = { requested: rp.requested, resolved: rp.resolved.name, source: rp.source };
+    } else {
+      const p = profileData as import("../profiles/types.js").Profile;
+      profileTrace = { requested: p.name, resolved: p.name, source: "cli" };
+    }
+  }
   const markdown = renderMarkdown(identity.version, maxTokens, usedTokens, sectionBodies, included);
   const json = renderJson(
     identity.version,
@@ -353,6 +422,7 @@ export async function buildContextPack(
     manifest,
     sectionBodies,
     included,
+    profileTrace,
   );
 
   // Final defense-in-depth: the same catalog rules verify EMITTED surfaces.
@@ -366,6 +436,7 @@ export async function buildContextPack(
     manifest,
     totalIncludedTokens: usedTokens,
     maxTokens,
+    profile: profileTrace,
   };
 }
 
@@ -452,6 +523,7 @@ function renderJson(
   manifest: readonly PackManifestEntry[],
   sections: Map<string, string>,
   files: readonly Scored[],
+  profile?: { requested: string | null; resolved: string; source: string } | undefined,
 ): string {
   const contextSectionEntries = [...sections.entries()].map(([rel, body]) => ({
     id: rel.replace("(context)/", ""),
@@ -472,6 +544,7 @@ function renderJson(
       tool: "ackit",
       version,
       budget: { maxTokens, totalIncludedTokens: used, estimator: PACK_PREAMBLE_LABEL },
+      ...(profile ? { profile } : {}),
       contextSections: contextSectionEntries,
       files: fileEntries,
       manifest,

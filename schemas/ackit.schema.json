@@ -118,11 +118,19 @@
     },
     "policy": {
       "default": {
-        "extends": []
+        "extends": [],
+        "rulePacks": []
       },
       "type": "object",
       "properties": {
         "extends": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rulePacks": {
           "default": [],
           "type": "array",
           "items": {
@@ -176,6 +184,70 @@
           "type": "boolean"
         }
       }
+    },
+    "profile": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "profiles": {
+      "default": {
+        "extend": []
+      },
+      "type": "object",
+      "properties": {
+        "extend": {
+          "default": [],
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "readiness": {
+      "type": "object",
+      "properties": {
+        "weights": {
+          "type": "object",
+          "properties": {
+            "instructions": {
+              "type": "number",
+              "minimum": 0
+            },
+            "security": {
+              "type": "number",
+              "minimum": 0
+            },
+            "contextEfficiency": {
+              "type": "number",
+              "minimum": 0
+            },
+            "taskHygiene": {
+              "type": "number",
+              "minimum": 0
+            },
+            "skills": {
+              "type": "number",
+              "minimum": 0
+            },
+            "policy": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "strictThreshold": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "additionalProperties": false
     }
   },
   "required": [

@@ -10,3 +10,10 @@ export {
   normalizeForDuplicateCheck,
   similarity,
 } from "./analyze.js";
+export {
+  analyzeGraph,
+  detectConflicts,
+  detectDead,
+  detectDuplicates,
+  detectShadowed,
+} from "./graph-v2.js";

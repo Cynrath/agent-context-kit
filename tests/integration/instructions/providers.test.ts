@@ -64,9 +64,9 @@ describe("copilot applyTo semantics (REQ-INSTR-004)", () => {
 
   it("keeps provider chains isolated (claude does not see codex/copilot nodes)", async () => {
     const graph = await buildInstructionGraph(repo.root);
-    const claudeChain = resolveEffectiveStack(graph, "claude");
-    expect(claudeChain.every((id) => id.startsWith("instr:claude:"))).toBe(true);
-    const nested = resolveEffectiveStack(graph, "claude");
+    const claudeChain = resolveEffectiveStack(graph, "claude") as string[];
+    expect(claudeChain.every((id: string) => id.startsWith("instr:claude:"))).toBe(true);
+    const nested = resolveEffectiveStack(graph, "claude") as string[];
     expect(nested).toContain("instr:claude:CLAUDE.md");
     expect(nested).toContain("instr:claude:sub/CLAUDE.md");
     expect(nested.indexOf("instr:claude:sub/CLAUDE.md")).toBeGreaterThan(
@@ -86,6 +86,7 @@ describe("copilot applyTo semantics (REQ-INSTR-004)", () => {
     await writeFile(path.join(repo.root.canonicalPath, "CURSOR.md"), "foreign\n");
     const graph = await buildInstructionGraph(repo.root);
     expect(graph.nodes.some((n) => n.relativePath === "CURSOR.md")).toBe(false);
-    expect(graph.diagnostics).toHaveLength(0);
+    // v2 graph emits INSTR-SHADOWED/UNREACHABLE for existing fixtures (4 diagnostics); CURSOR must not add new diagnostics
+    expect(graph.diagnostics.some((d) => d.relativePath === "CURSOR.md")).toBe(false);
   });
 });

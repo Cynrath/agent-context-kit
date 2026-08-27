@@ -1,0 +1,20 @@
+# copilot profile — source: https://docs.github.com/en/copilot/customizing-copilot/using-custom-instructions
+# per-provider fixture: fixtures/profile-copilot/
+name: copilot
+provider: copilot
+displayName: GitHub Copilot
+version: 1
+fileConventions:
+  instructionFiles:
+    - .github/copilot-instructions.md
+    - .github/instructions/**/*.instructions.md
+  skillDirs:
+    - .agents/skills
+  extraSurfaces:
+    - .github/copilot-instructions.md
+contextBudget:
+  maxTokens: 32000
+  includePriority:
+    copilot-instructions.md: 1.5
+    README.md: 0.8
+precedenceOverrides: {}

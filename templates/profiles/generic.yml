@@ -1,0 +1,18 @@
+# generic profile — fallback, conservative budget, no provider-specific surfaces
+# per-provider fixture: fixtures/profile-generic/
+name: generic
+provider: generic
+displayName: Generic
+version: 1
+fileConventions:
+  instructionFiles:
+    - AGENTS.md
+  skillDirs:
+    - .agents/skills
+  extraSurfaces: []
+contextBudget:
+  maxTokens: 16000
+  includePriority:
+    AGENTS.md: 1.0
+    README.md: 1.0
+precedenceOverrides: {}

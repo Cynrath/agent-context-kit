@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { ackitConfigJsonSchema } from "../dist/core/config/json-schema.js";
+import { InstructionNodeSchema } from "../dist/core/instructions/types.js";
 import { POLICY_SCHEMA_VERSION, PolicyDocumentSchema } from "../dist/core/policy/index.js";
 import { TASK_SCHEMA_VERSION, TaskMetaSchema } from "../dist/core/tasks/index.js";
 
@@ -34,4 +35,41 @@ writeFileSync(
   `${JSON.stringify(policySchema, null, 2)}\n`,
   "utf8",
 );
-console.log("schemas/ackit+task+policy schemas written");
+
+// instruction graph v2
+const instructionNodeJsonSchema = z.toJSONSchema(InstructionNodeSchema, {
+  io: "input",
+  unrepresentable: "any",
+});
+const instructionGraphSchema = {
+  $schema: "https://json-schema.org/draft/2020-12/schema",
+  $id: "https://cynrath.github.io/agent-context-kit/schemas/instruction-graph.schema.json",
+  title: "Instruction Graph v2",
+  description:
+    "Instruction graph v2 (REQ-V020-D-001) — deterministic ordering, provenance, shadow/duplicate scope.",
+  type: "object",
+  properties: {
+    schemaVersion: { const: 2, type: "number", description: "Graph schema version" },
+    nodes: { type: "array", items: instructionNodeJsonSchema },
+    diagnostics: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          code: { type: "string" },
+          message: { type: "string" },
+          relativePath: { type: "string" },
+        },
+        required: ["code", "message"],
+      },
+    },
+  },
+  required: ["schemaVersion", "nodes", "diagnostics"],
+  additionalProperties: false,
+};
+writeFileSync(
+  path.join(schemasDir, "instruction-graph.schema.json"),
+  `${JSON.stringify(instructionGraphSchema, null, 2)}\n`,
+  "utf8",
+);
+console.log("schemas/ackit+task+policy+instruction-graph schemas written");

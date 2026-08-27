@@ -24,7 +24,9 @@ export interface InstructionsCommandOptions {
   quiet: boolean;
   debug: boolean;
   provider?: string | undefined;
+  profile?: string | undefined;
   forPath?: string | undefined;
+  explain?: boolean | undefined;
 }
 
 export interface ScanCommandOptions {

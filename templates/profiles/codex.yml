@@ -1,0 +1,19 @@
+# codex profile — source: https://developers.openai.com/codex/cli + AGENTS.md spec
+# per-provider fixture: fixtures/profile-codex/
+name: codex
+provider: codex
+displayName: OpenAI Codex
+version: 1
+fileConventions:
+  instructionFiles:
+    - AGENTS.md
+    - AGENTS.override.md
+  skillDirs:
+    - .agents/skills
+  extraSurfaces: []
+contextBudget:
+  maxTokens: 32000
+  includePriority:
+    AGENTS.md: 1.5
+    README.md: 0.8
+precedenceOverrides: {}

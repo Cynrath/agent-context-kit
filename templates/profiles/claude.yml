@@ -1,0 +1,18 @@
+# claude profile — source: https://docs.anthropic.com/en/docs/claude-code + CLAUDE.md spec
+# per-provider fixture: fixtures/profile-claude/
+name: claude
+provider: claude
+displayName: Claude Code
+version: 1
+fileConventions:
+  instructionFiles:
+    - CLAUDE.md
+  skillDirs:
+    - .agents/skills
+  extraSurfaces: []
+contextBudget:
+  maxTokens: 32000
+  includePriority:
+    CLAUDE.md: 1.5
+    README.md: 0.8
+precedenceOverrides: {}

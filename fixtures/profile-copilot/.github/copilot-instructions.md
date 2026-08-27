@@ -1,0 +1,2 @@
+# Copilot root
+Copilot instructions

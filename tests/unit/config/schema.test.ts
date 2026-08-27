@@ -16,12 +16,13 @@ describe("AckitConfigSchema", () => {
       instructions: { enabled: true, maxTokenEstimatePerFile: 20000 },
       skills: { enabled: true },
       context: { maxTokens: 100000 },
-      policy: { extends: [] },
+      policy: { extends: [], rulePacks: [] },
       baseline: undefined,
       output: { format: "terminal" },
       cache: { enabled: true },
       workspaces: { enabled: false },
-    });
+      profiles: { extend: [] },
+    } as unknown as AckitConfig);
   });
 
   it("types each section independently (table-driven)", () => {

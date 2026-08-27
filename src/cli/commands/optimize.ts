@@ -13,6 +13,7 @@ export async function runOptimizeCommand(
   options: Omit<InstructionsCommandOptions, "provider" | "forPath"> & {
     fix: boolean;
     dryRun: boolean;
+    profile?: string | undefined;
   },
 ): Promise<ExitCodeValue> {
   const rootRequested = path.resolve(options.root ?? process.cwd());
@@ -32,8 +33,21 @@ export async function runOptimizeCommand(
     return EXIT_CODES.environment;
   }
 
+  const { resolveProfileForCommand } = await import("../profile.js");
+  const profileRes = await resolveProfileForCommand(rootRequested, {
+    cliProfile: options.profile,
+    configProfile: configResult.config.profile,
+    extendPaths: configResult.config.profiles.extend,
+  });
+  for (const d of profileRes.diagnostics) {
+    emitDiagnostic(
+      { code: d.code.toLowerCase(), message: d.message },
+      { quiet: options.quiet, debug: options.debug },
+    );
+  }
   const suggestions = await analyzeOptimize(rootResolution.root, {
     maxTokens: configResult.config.instructions.maxTokenEstimatePerFile,
+    profile: profileRes.resolved,
   });
   let outcomes: Awaited<ReturnType<typeof applyFixes>> = [];
   if (options.fix) {
@@ -51,6 +65,11 @@ export async function runOptimizeCommand(
           suggestionCount: suggestions.length,
           suggestions,
           fixOutcomes: outcomes,
+          profile: {
+            requested: profileRes.resolved.requested,
+            resolved: profileRes.resolved.resolved.name,
+            source: profileRes.resolved.source,
+          },
         },
         null,
         2,

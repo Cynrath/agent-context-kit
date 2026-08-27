@@ -18,15 +18,20 @@ export type {
   BuildGraphOptions,
   DiscoveryDiagnostic,
   EffectiveStack,
+  EffectiveStackInfo,
   InstructionGraph,
   InstructionNode,
   InstructionStatus,
+  ProvenanceEntry,
   ProviderId,
   SecurityFlag,
 } from "./types.js";
 export {
+  INSTRUCTION_GRAPH_SCHEMA_VERSION,
   INSTRUCTION_STATUSES,
   InstructionNodeSchema,
+  InstructionNodeSchemaV2,
   PROVIDERS,
+  ProvenanceEntrySchema,
   SECURITY_FLAGS,
 } from "./types.js";

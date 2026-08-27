@@ -1,7 +1,18 @@
 import path from "node:path";
 import process from "node:process";
 import { compareBaseline, readBaseline, writeBaseline } from "../../core/cache/baseline.js";
+import { loadAckitConfig } from "../../core/config/load.js";
+import { buildContextPack } from "../../core/context/pack.js";
+import { createRoot } from "../../core/filesystem/root.js";
+import { buildInstructionGraph } from "../../core/instructions/graph.js";
 import { PolicyError } from "../../core/policy/index.js";
+import {
+  diffAgainstBaseline,
+  readReadinessBaseline,
+  writeReadinessBaseline,
+} from "../../core/readiness/baseline.js";
+import { scoreRepository } from "../../core/readiness/index.js";
+import { renderReadinessTerminal } from "../../core/readiness/terminal.js";
 import {
   renderHtmlReport,
   renderMarkdownReport,
@@ -15,6 +26,8 @@ import {
   GitUnavailableError,
   ScanContractError,
 } from "../../core/scanner/index.js";
+import { validateSkills } from "../../core/skills/validate.js";
+import { TaskStore } from "../../core/tasks/store.js";
 import { startWatch } from "../../core/watch/watch.js";
 import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
@@ -35,6 +48,9 @@ export interface ScanCommandOptions {
   range?: string | undefined;
   baseline?: string | undefined;
   writeBaseline?: string | undefined;
+  failBelow?: string | undefined;
+  strict?: boolean | undefined;
+  compare?: string | undefined;
 }
 
 /**
@@ -105,21 +121,160 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
     }
   }
 
+  // Build readiness report (deterministic, never throws gate)
+  let readinessReport: ReturnType<typeof scoreRepository> | null = null;
+  let readinessThreshold: number | undefined;
+  try {
+    if (options.failBelow !== undefined) {
+      const n = Number.parseInt(options.failBelow, 10);
+      if (!Number.isInteger(n) || String(n) !== options.failBelow.trim() || n < 0 || n > 100) {
+        emitDiagnostic(
+          {
+            code: "CLI-READINESS-THRESHOLD",
+            message: "error: --fail-below must be integer 0..100",
+          },
+          { quiet: options.quiet, debug: options.debug },
+        );
+        return EXIT_CODES.usage;
+      }
+      readinessThreshold = n;
+    } else if (options.strict || options.ci) {
+      try {
+        const cfgRoot = await createRoot(executed.root.canonicalPath);
+        const loaded = await loadAckitConfig(cfgRoot.canonicalPath);
+        if (loaded.ok && loaded.config.readiness?.strictThreshold !== undefined) {
+          readinessThreshold = loaded.config.readiness.strictThreshold;
+        } else {
+          readinessThreshold = 80;
+        }
+      } catch {
+        readinessThreshold = 80;
+      }
+    }
+
+    const graph = await buildInstructionGraph(executed.root).catch(() => ({
+      nodes: [],
+      diagnostics: [],
+      schemaVersion: 2 as const,
+    }));
+    const pack = await buildContextPack(executed.root, { maxTokens: 100000 }).catch(() => ({
+      manifest: [],
+      totalIncludedTokens: 0,
+      maxTokens: 100000,
+      markdown: "",
+      json: "",
+      format: "markdown" as const,
+    }));
+    const skillsRes = await validateSkills(executed.root).catch(() => ({ skills: [], issues: [] }));
+    let taskHealth: {
+      dirExists: boolean;
+      staleReferences?: number;
+      schemaIssues?: number;
+      totalTasks?: number;
+    } = { dirExists: false };
+    try {
+      const store = new TaskStore(executed.root.canonicalPath);
+      const docs = await store.list(true);
+      const doctor = await store.doctor();
+      taskHealth = {
+        dirExists: true,
+        totalTasks: docs.length,
+        schemaIssues: doctor.problems.length,
+        staleReferences: doctor.problems.filter((p) => p.includes("dependency")).length,
+      };
+      const { promises: fsp } = await import("node:fs");
+      try {
+        await fsp.access(path.join(executed.root.canonicalPath, "docs/tasks"));
+      } catch {
+        taskHealth.dirExists = false;
+      }
+    } catch {
+      taskHealth = { dirExists: false };
+    }
+    const policyForReadiness = {
+      findings: result.findings.filter((f) => f.category === "config-problem"),
+    } as unknown;
+    // Load config weights
+    let weights: Record<string, number> | undefined;
+    try {
+      const cfgRoot = await createRoot(executed.root.canonicalPath);
+      const loaded = await loadAckitConfig(cfgRoot.canonicalPath);
+      if (loaded.ok && loaded.config.readiness?.weights)
+        weights = loaded.config.readiness.weights as Record<string, number>;
+    } catch {}
+    readinessReport = scoreRepository(
+      {
+        graph: graph as never,
+        pack: pack as never,
+        scan: result,
+        skills: skillsRes as never,
+        policy: policyForReadiness as never,
+        tasks: taskHealth as never,
+      },
+      {
+        failBelow: readinessThreshold,
+        strict: options.strict ?? options.ci ?? false,
+        weights: weights as never,
+      },
+    );
+    // handle readiness compare baseline
+    if (options.compare !== undefined) {
+      try {
+        const baseline = await readReadinessBaseline(executed.root.canonicalPath, options.compare);
+        if (baseline !== null) {
+          const diff = diffAgainstBaseline(readinessReport, baseline);
+          (readinessReport as unknown as Record<string, unknown>)["baseline"] = diff;
+        }
+      } catch (e) {
+        emitDiagnostic(
+          { code: "READINESS-BASELINE-PATH", message: (e as Error).message },
+          { quiet: options.quiet, debug: options.debug },
+        );
+        return EXIT_CODES.usage;
+      }
+    }
+    // readiness baseline write (reuse writeBaseline path for readiness if requested via compare? We use same writeBaseline for findings; also write readiness baseline if --write-baseline is used, as sidecar)
+    if (options.writeBaseline !== undefined) {
+      try {
+        // also write readiness baseline to same path + ".readiness" ? but spec expects readiness baseline file at same path for readiness command
+        // For scan, we write readiness baseline as sibling with same logic but not required for tests that use readiness command
+        await writeReadinessBaseline(
+          executed.root.canonicalPath,
+          readinessReport,
+          `${options.writeBaseline}.readiness.json`,
+        ).catch(() => {});
+      } catch {}
+    }
+  } catch (e) {
+    // readiness failure should not block scan output; emit diagnostic
+    emitDiagnostic(
+      { code: "readiness-error", message: (e as Error).message },
+      { quiet: options.quiet, debug: options.debug },
+    );
+  }
+
   const effectiveFormat = options.json === true ? "json" : (options.format ?? "terminal");
   const reportMeta = { filesScanned: result.filesScanned, policyDigest: executed.policyDigest };
   const renderFor = (format: string): string => {
     switch (format) {
-      case "json":
-        return renderScanJson(result, { newCount, fixedCount });
+      case "json": {
+        const base = JSON.parse(renderScanJson(result, { newCount, fixedCount }));
+        if (readinessReport) base.readiness = readinessReport;
+        return `${JSON.stringify(base, null, 2)}\n`;
+      }
       case "sarif":
         return renderSarif(result.findings, { policyDigest: executed.policyDigest });
       case "markdown":
-        return renderMarkdownReport(result.findings, reportMeta);
+        return (
+          renderMarkdownReport(result.findings, reportMeta) +
+          (readinessReport ? `\n## Readiness\n${renderReadinessTerminal(readinessReport)}` : "")
+        );
       case "html":
         return renderHtmlReport(result.findings, reportMeta);
       default:
         return (
           renderScanTerminal(result) +
+          (readinessReport ? renderReadinessTerminal(readinessReport) : "") +
           (newCount !== null && fixedCount !== null
             ? `Baseline delta: ${newCount} new, ${fixedCount} fixed.\n`
             : "")
@@ -180,6 +335,24 @@ export async function runScanCommand(options: ScanCommandOptions): Promise<ExitC
       process.stdout.write(`report written to ${options.output}\n`);
   } else {
     process.stdout.write(rendered);
+  }
+
+  // Readiness threshold gate
+  if (readinessReport && readinessThreshold !== undefined) {
+    const passed = readinessReport.overall >= readinessThreshold;
+    if (!passed) {
+      if (!options.quiet) {
+        const msg = `readiness: ${readinessReport.overall} < threshold ${readinessThreshold} — failing\n`;
+        if (options.json) process.stderr.write(msg);
+        else process.stdout.write(msg);
+      }
+      return EXIT_CODES.thresholdExceeded;
+    }
+    if (!options.quiet && !options.json) {
+      process.stderr.write(
+        `readiness: ${readinessReport.overall} >= threshold ${readinessThreshold} — pass\n`,
+      );
+    }
   }
 
   const gateRequired = options.ci || newCount !== null;

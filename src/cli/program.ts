@@ -68,6 +68,9 @@ function buildProgram(invocation: CliInvocation): Command {
     .option("--format <fmt>", "output format: terminal|json|sarif|markdown|html", "terminal")
     .option("--output <file>", "write report to this file instead of stdout")
     .option("--watch", "re-run scan on file changes until Ctrl+C", false)
+    .option("--fail-below <n>", "fail if readiness score below N (0..100)")
+    .option("--strict", "strict readiness gate (80 or config readiness.strictThreshold)", false)
+    .option("--compare <file>", "compare readiness against baseline file")
     .action(async () => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
       const commandOptions = (scanCommand.opts() ?? {}) as {
@@ -81,6 +84,9 @@ function buildProgram(invocation: CliInvocation): Command {
         format?: string;
         output?: string;
         watch?: boolean;
+        failBelow?: string;
+        strict?: boolean;
+        compare?: string;
       };
       invocation.exitCode = await runScanCommand({
         root: parentOptions.root,
@@ -98,6 +104,9 @@ function buildProgram(invocation: CliInvocation): Command {
         format: commandOptions.format ?? "terminal",
         output: commandOptions.output,
         watch: commandOptions.watch ?? false,
+        failBelow: commandOptions.failBelow,
+        strict: commandOptions.strict ?? false,
+        compare: commandOptions.compare,
       });
     });
 
@@ -109,12 +118,16 @@ function buildProgram(invocation: CliInvocation): Command {
       "--provider <id>",
       "restrict effective resolution to one provider (codex|claude|gemini|copilot)",
     )
+    .option("--profile <name>", "provider profile (codex|claude|copilot|gemini|generic)")
     .option("--for <path>", "repository-relative path for applyTo matching")
+    .option("--explain", "show per-node provenance for the resolved chain", false)
     .action(async () => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
       const commandOptions = (instructionsCommand.opts() ?? {}) as {
         provider?: string;
+        profile?: string;
         for?: string;
+        explain?: boolean;
       };
       invocation.exitCode = await runInstructionsCommand({
         root: parentOptions.root,
@@ -123,7 +136,9 @@ function buildProgram(invocation: CliInvocation): Command {
         quiet: parentOptions.quiet ?? false,
         debug: parentOptions.debug ?? false,
         provider: commandOptions.provider,
+        profile: (commandOptions as unknown as { profile?: string }).profile,
         forPath: commandOptions.for,
+        explain: commandOptions.explain ?? false,
       });
     });
   registerSkillsCommands(program, invocation);
@@ -161,6 +176,7 @@ function buildProgram(invocation: CliInvocation): Command {
     .option("--format <fmt>", "output format: markdown|json", "markdown")
     .option("--include <globs...>", "explicit include globs (highest ranking signal)")
     .option("--changed", "boost/limit candidates to git-changed files", false)
+    .option("--profile <name>", "provider profile (codex|claude|copilot|gemini|generic)")
     .action(async () => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
       const commandOptions = (packCommand.opts() ?? {}) as {
@@ -168,6 +184,7 @@ function buildProgram(invocation: CliInvocation): Command {
         format?: string;
         include?: string[];
         changed?: boolean;
+        profile?: string;
       };
       invocation.exitCode = await runPackCommand({
         root: parentOptions.root,
@@ -179,6 +196,7 @@ function buildProgram(invocation: CliInvocation): Command {
         format: commandOptions.format === "json" ? "json" : "markdown",
         include: commandOptions.include,
         changed: commandOptions.changed ?? false,
+        profile: commandOptions.profile,
       });
     });
 
@@ -245,9 +263,14 @@ function buildProgram(invocation: CliInvocation): Command {
   optimizeCommand
     .option("--fix", "apply fixes limited to ACKit-managed surfaces", false)
     .option("--dry-run", "with --fix: print planned changes without writing", false)
+    .option("--profile <name>", "provider profile for redundant guidance check")
     .action(async () => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
-      const commandOptions = (optimizeCommand.opts() ?? {}) as { fix?: boolean; dryRun?: boolean };
+      const commandOptions = (optimizeCommand.opts() ?? {}) as {
+        fix?: boolean;
+        dryRun?: boolean;
+        profile?: string;
+      };
       invocation.exitCode = await runOptimizeCommand({
         root: parentOptions.root,
         config: parentOptions.config,
@@ -256,6 +279,7 @@ function buildProgram(invocation: CliInvocation): Command {
         debug: parentOptions.debug ?? false,
         fix: commandOptions.fix ?? false,
         dryRun: commandOptions.dryRun ?? false,
+        profile: commandOptions.profile,
       });
     });
 
@@ -339,6 +363,58 @@ function buildProgram(invocation: CliInvocation): Command {
         },
         "status",
       );
+    });
+
+  const diagnosticsCommand = program
+    .command("diagnostics")
+    .description("diagnostics and profile trace");
+  diagnosticsCommand.action(async () => {
+    const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+    const cmdOpts = (diagnosticsCommand.opts() ?? {}) as { profile?: string };
+    const { runDiagnosticsCommand } = await import("./commands/diagnostics.js");
+    invocation.exitCode = await runDiagnosticsCommand({
+      root: parentOptions.root,
+      config: parentOptions.config,
+      json: parentOptions.json ?? false,
+      quiet: parentOptions.quiet ?? false,
+      debug: parentOptions.debug ?? false,
+      profile: cmdOpts.profile,
+    });
+  });
+  diagnosticsCommand.option("--profile <name>", "provider profile override");
+
+  const readinessCommand = program
+    .command("readiness")
+    .description("readiness scoring (deterministic 0–100)");
+  readinessCommand
+    .option("--fail-below <n>", "fail if readiness score below N (0..100)")
+    .option("--strict", "strict gate (80 or config readiness.strictThreshold)", false)
+    .option("--baseline <file>", "write readiness baseline file")
+    .option("--write-baseline <file>", "alias for --baseline")
+    .option("--compare <file>", "compare readiness against baseline file")
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const commandOptions = (readinessCommand.opts() ?? {}) as {
+        failBelow?: string;
+        strict?: boolean;
+        baseline?: string;
+        writeBaseline?: string;
+        compare?: string;
+      };
+      const { runReadinessCommand } = await import("./commands/readiness.js");
+      invocation.exitCode = await runReadinessCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        failBelow: commandOptions.failBelow,
+        strict: commandOptions.strict ?? false,
+        ci: (parentOptions.strict ?? false) ? true : !!commandOptions.strict,
+        baseline: commandOptions.baseline ?? commandOptions.writeBaseline,
+        compare: commandOptions.compare,
+        writeBaseline: commandOptions.writeBaseline,
+      });
     });
 
   program.addHelpText("after", `\n${HELP_TEXT_SUFFIX}`);

@@ -1,0 +1,2 @@
+# GEMINI root
+Gemini instructions

@@ -47,8 +47,9 @@ export const AckitConfigSchema = z.object({
   policy: z
     .object({
       extends: z.array(z.string()).default([]),
+      rulePacks: z.array(z.string()).default([]),
     })
-    .default({ extends: [] }),
+    .default({ extends: [], rulePacks: [] }),
   baseline: z.string().optional(),
   output: z
     .object({
@@ -65,6 +66,34 @@ export const AckitConfigSchema = z.object({
       enabled: z.boolean().default(false),
     })
     .default({ enabled: false }),
+  profile: z
+    .string()
+    .regex(/^[a-z0-9-]+$/)
+    .min(1)
+    .max(32)
+    .optional(),
+  profiles: z
+    .object({
+      extend: z.array(z.string().min(1)).max(8).default([]),
+    })
+    .default({ extend: [] }),
+  readiness: z
+    .object({
+      weights: z
+        .object({
+          instructions: z.number().nonnegative().optional(),
+          security: z.number().nonnegative().optional(),
+          contextEfficiency: z.number().nonnegative().optional(),
+          taskHygiene: z.number().nonnegative().optional(),
+          skills: z.number().nonnegative().optional(),
+          policy: z.number().nonnegative().optional(),
+        })
+        .strict()
+        .optional(),
+      strictThreshold: z.number().int().min(0).max(100).optional(),
+    })
+    .strict()
+    .optional(),
 });
 
 export type AckitConfig = z.infer<typeof AckitConfigSchema>;

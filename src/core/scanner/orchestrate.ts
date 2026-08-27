@@ -141,6 +141,77 @@ export async function executeConfiguredScan(
         policyDigest: pd,
       },
     });
+
+    // Rule packs integration (TASK-0012): pure evaluation over repoFiles already in memory.
+    // Load packs offline, evaluate, and merge findings/diagnostics.
+    let packDiagnostics: import("../scanner/types.js").ScanDiagnostic[] = [];
+    let packFindings: import("../scanner/types.js").Finding[] = [];
+    if (config.policy.rulePacks.length > 0) {
+      try {
+        const { loadRulePacks } = await import("../policy/packs/load.js");
+        const { evaluateRulePacks } = await import("../policy/packs/evaluate.js");
+        const loaded = await loadRulePacks(root, config.policy.rulePacks);
+        packDiagnostics = loaded.diagnostics;
+        if (loaded.packs.length > 0) {
+          // collect repoFiles for pack evaluation: reuse targets from result? Re-collect text targets
+          const { collectScanTargets } = await import("../filesystem/scan-targets.js");
+          const collection = await collectScanTargets(root, {
+            limits: config.limits,
+            userExcludeGlobs: config.scan.exclude,
+          });
+          const textFiles: { relativePath: string; content: string }[] = [];
+          const textTargets = collection.targets.filter((t) => t.kind === "text");
+          const fsp = await import("node:fs/promises");
+          for (const t of textTargets) {
+            try {
+              const content = await fsp.readFile(t.absolutePath, "utf8");
+              textFiles.push({ relativePath: t.relativePath, content });
+            } catch {
+              // skip unreadable
+            }
+          }
+          // ensure ackit.yml and package.json are included even if not textTargets (e.g., excluded)
+          for (const must of ["ackit.yml", "package.json", "AGENTS.md"]) {
+            if (!textFiles.some((f) => f.relativePath === must)) {
+              try {
+                const p = (await import("node:path")).default.join(root.canonicalPath, must);
+                const content = await fsp.readFile(p, "utf8");
+                textFiles.push({ relativePath: must, content });
+              } catch {
+                // missing is fine
+              }
+            }
+          }
+          let instructionGraph: import("../instructions/types.js").InstructionGraph | undefined;
+          try {
+            const { buildInstructionGraph } = await import("../instructions/graph.js");
+            instructionGraph = await buildInstructionGraph(root);
+          } catch {
+            instructionGraph = undefined;
+          }
+          const packEval = evaluateRulePacks(loaded.packs, {
+            repoFiles: textFiles,
+            config,
+            instructionGraph,
+            signal: options.signal,
+          });
+          packFindings = packEval.findings;
+          packDiagnostics = [...packDiagnostics, ...packEval.diagnostics];
+        }
+        result.diagnostics.push(...packDiagnostics);
+        result.findings.push(...packFindings);
+        result.findings.sort((a, b) => {
+          if (a.relativePath !== b.relativePath) return a.relativePath < b.relativePath ? -1 : 1;
+          if (a.ruleId !== b.ruleId) return a.ruleId < b.ruleId ? -1 : 1;
+          if (a.line !== b.line) return a.line - b.line;
+          return a.column - b.column;
+        });
+      } catch (e) {
+        // pack load failure surfaces as diagnostic, not crash
+        const msg = (e as Error).message;
+        result.diagnostics.push({ code: "POL-PACK-LOAD-FAILED", message: msg });
+      }
+    }
     result.findings = applyPolicyToFindings(result.findings, {
       policy: resolvedPolicy.policy,
       documents: resolvedPolicy.documents,

@@ -1,0 +1,2 @@
+# AGENTS nested
+Nested codex

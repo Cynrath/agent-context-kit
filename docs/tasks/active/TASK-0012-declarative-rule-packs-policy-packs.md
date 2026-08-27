@@ -1,12 +1,12 @@
 ---
 id: "TASK-0012"
 title: "Declarative rule packs / policy packs"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - TASK-0013
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -379,21 +379,21 @@ Error surfacing: unknown pack id → diagnostic `POL-PACK-NOT-FOUND`; collision 
 
 ## Acceptance criteria
 
-- [ ] `schemas/rule-pack.schema.json` v1 exists, `additionalProperties:false`, `required: [schemaVersion, packId, namespace, version, severity, rules]`, `rules` `1..200`, `match` `≤500`, `maxFileBytes`/`maxDepth` enforced in loader; `pnpm gen:schemas && pnpm typecheck` green and `schemas/rule-pack.schema.json` validates a minimal `acme-security-baseline` fixture via `ajv` or `zod` snapshot.
-- [ ] `ackit.yml` `policy.rulePacks: ["./packs/acme.yml", "./packs/hygiene.json"]` (repo-relative) loads 1..2 packs from a temp repo; outside-root entry `../evil.yml` or `/abs/pack.yml` emits `FS-PATH-ESCAPES-ROOT` / `POL-ROOT-ESCAPE` and denies load (no file read outside root). Symlink/junction escape via `realpath` also denied.
-- [ ] Optional package-distributed pack `npm:acme-pack/ackit-packs/security.yml` loads only when `node_modules/acme-pack/package.json` exists on disk; missing package → `POL-OFFLINE-BLOCKED` diagnostic; URL `https://example.com/pack.yml` or `extends: "https://…"` → `POL-NETWORK-REFUSED` / `POL-OFFLINE-BLOCKED` (no fetch path).
-- [ ] `packId` (kebab 3..64), `namespace` (DNS-like 2..64), `version` (semver), `severity` enum validated; `rule.id` as `packId:slug` or `ACKIT\d{3}` alias; global `ACKITxxx` cannot be redefined by a pack (diagnostic `POL-PACK-COLLISION`, builtin remains authoritative).
-- [ ] Composition is deterministic DFS: two packs with same `packId` and overlapping `ruleId` produce last-wins after sorted `chain`; if winner `overrides[ruleId].locked===true`, earlier locked severity is retained and weakening emits `POL-PACK-LOCKED`. Fixture with `locked: true` base + conflicting severity-weakening override proves lock retains `critical`.
-- [ ] `overrides` patch limited to `severity/remediation/enabled/locked` (no body rewrite); unknown `ruleId` in `overrides` emits `POL-PACK-UNKNOWN-OVERRIDE` without crash.
-- [ ] Size/complexity limits: `maxRules 200` (`POL-PACK-LIMIT-RULES`), `maxPatternLen 500` (`POL-PACK-LIMIT-PATTERN`), `maxFileBytes 512KB` (`POL-PACK-LIMIT-BYTES`), `maxDepth 20` (`POL-PACK-LIMIT-DEPTH`) each refuse the offending pack with diagnostic and allow remaining packs to evaluate.
-- [ ] ReDoS guard: `match` with catastrophic backtracking (e.g., `(a+)+b` over `"a".repeat(10_000)`) is rejected at load with `POL-PACK-REDOS`; normal regex `AKIA[0-9A-Z]{16}` loads and evaluates without guard firing.
-- [ ] Types `presence|absence|pattern|config|dependency|instruction` each covered by a fixture that triggers exactly one finding: `presence` absence of `README.md` → finding at `"."`; `absence` match of `temp/*.tmp` → finding per file; `pattern` `match` over `src/**` → finding at line/column with redacted evidence; `config` dotted path mismatch → finding at `ackit.yml:1`; `dependency` missing `zod` → finding at `package.json:1`; `instruction` graph predicate → finding at `AGENTS.md:1`.
-- [ ] `glob` and `scope` AND-filter works: rule `{ glob: "**/*.md", scope: ["docs/**"] }` matches `docs/readme.md` but not `src/readme.md` (integration temp repo proof).
-- [ ] Evaluation `evaluateRulePacks(effectivePacks, repoFiles, config, instructionGraph)` is pure, bounded, offline, `AbortSignal`-aware (aborted mid-pack → returns partial findings + `POL-PACK-ABORTED` diagnostic within 200ms).
-- [ ] Findings reuse scanner `Finding` schema (strict `FindingSchema.safeParse` passes), carry `fingerprint = sha256(packId|canonicalRuleId|relativePath|line|message)`, deterministic across win32/posix, and integrate into SARIF/JSON (`sarif.build` includes pack `ruleId`s). `Finding.evidence` is redacted (no raw secret).
-- [ ] `ackit policy check --json` reports `effectivePacks: [{ packId, namespace, version, digest, ruleCount, chain }]` + `diagnostics: [{ code: "POL-..." }]`. `ackit diagnostics --json` includes `packs` summary. Machine stdout pure JSON (diagnostics on stderr).
-- [ ] `scan --ci --threshold high` fails (`exit 1`) when a pack produces a `high` finding; passes when pack severity is `low` and threshold is `high`. Baseline compare includes pack fingerprints (machine-path independent).
-- [ ] `pnpm lint` + `pnpm format:check` + `pnpm typecheck` green; no `fetch`/`eval`/`Function`/`child_process.exec` path in `src/core/policy/packs/**` (grep-gate proof).
+- [x] `schemas/rule-pack.schema.json` v1 exists, `additionalProperties:false`, `required: [schemaVersion, packId, namespace, version, severity, rules]`, `rules` `1..200`, `match` `≤500`, `maxFileBytes`/`maxDepth` enforced in loader; `pnpm gen:schemas && pnpm typecheck` green and `schemas/rule-pack.schema.json` validates a minimal `acme-security-baseline` fixture via `ajv` or `zod` snapshot.
+- [x] `ackit.yml` `policy.rulePacks: ["./packs/acme.yml", "./packs/hygiene.json"]` (repo-relative) loads 1..2 packs from a temp repo; outside-root entry `../evil.yml` or `/abs/pack.yml` emits `FS-PATH-ESCAPES-ROOT` / `POL-ROOT-ESCAPE` and denies load (no file read outside root). Symlink/junction escape via `realpath` also denied.
+- [x] Optional package-distributed pack `npm:acme-pack/ackit-packs/security.yml` loads only when `node_modules/acme-pack/package.json` exists on disk; missing package → `POL-OFFLINE-BLOCKED` diagnostic; URL `https://example.com/pack.yml` or `extends: "https://…"` → `POL-NETWORK-REFUSED` / `POL-OFFLINE-BLOCKED` (no fetch path).
+- [x] `packId` (kebab 3..64), `namespace` (DNS-like 2..64), `version` (semver), `severity` enum validated; `rule.id` as `packId:slug` or `ACKIT\d{3}` alias; global `ACKITxxx` cannot be redefined by a pack (diagnostic `POL-PACK-COLLISION`, builtin remains authoritative).
+- [x] Composition is deterministic DFS: two packs with same `packId` and overlapping `ruleId` produce last-wins after sorted `chain`; if winner `overrides[ruleId].locked===true`, earlier locked severity is retained and weakening emits `POL-PACK-LOCKED`. Fixture with `locked: true` base + conflicting severity-weakening override proves lock retains `critical`.
+- [x] `overrides` patch limited to `severity/remediation/enabled/locked` (no body rewrite); unknown `ruleId` in `overrides` emits `POL-PACK-UNKNOWN-OVERRIDE` without crash.
+- [x] Size/complexity limits: `maxRules 200` (`POL-PACK-LIMIT-RULES`), `maxPatternLen 500` (`POL-PACK-LIMIT-PATTERN`), `maxFileBytes 512KB` (`POL-PACK-LIMIT-BYTES`), `maxDepth 20` (`POL-PACK-LIMIT-DEPTH`) each refuse the offending pack with diagnostic and allow remaining packs to evaluate.
+- [x] ReDoS guard: `match` with catastrophic backtracking (e.g., `(a+)+b` over `"a".repeat(10_000)`) is rejected at load with `POL-PACK-REDOS`; normal regex `AKIA[0-9A-Z]{16}` loads and evaluates without guard firing.
+- [x] Types `presence|absence|pattern|config|dependency|instruction` each covered by a fixture that triggers exactly one finding: `presence` absence of `README.md` → finding at `"."`; `absence` match of `temp/*.tmp` → finding per file; `pattern` `match` over `src/**` → finding at line/column with redacted evidence; `config` dotted path mismatch → finding at `ackit.yml:1`; `dependency` missing `zod` → finding at `package.json:1`; `instruction` graph predicate → finding at `AGENTS.md:1`.
+- [x] `glob` and `scope` AND-filter works: rule `{ glob: "**/*.md", scope: ["docs/**"] }` matches `docs/readme.md` but not `src/readme.md` (integration temp repo proof).
+- [x] Evaluation `evaluateRulePacks(effectivePacks, repoFiles, config, instructionGraph)` is pure, bounded, offline, `AbortSignal`-aware (aborted mid-pack → returns partial findings + `POL-PACK-ABORTED` diagnostic within 200ms).
+- [x] Findings reuse scanner `Finding` schema (strict `FindingSchema.safeParse` passes), carry `fingerprint = sha256(packId|canonicalRuleId|relativePath|line|message)`, deterministic across win32/posix, and integrate into SARIF/JSON (`sarif.build` includes pack `ruleId`s). `Finding.evidence` is redacted (no raw secret).
+- [x] `ackit policy check --json` reports `effectivePacks: [{ packId, namespace, version, digest, ruleCount, chain }]` + `diagnostics: [{ code: "POL-..." }]`. `ackit diagnostics --json` includes `packs` summary. Machine stdout pure JSON (diagnostics on stderr).
+- [x] `scan --ci --threshold high` fails (`exit 1`) when a pack produces a `high` finding; passes when pack severity is `low` and threshold is `high`. Baseline compare includes pack fingerprints (machine-path independent).
+- [x] `pnpm lint` + `pnpm format:check` + `pnpm typecheck` green; no `fetch`/`eval`/`Function`/`child_process.exec` path in `src/core/policy/packs/**` (grep-gate proof).
 
 ## Tests
 
@@ -471,3 +471,4 @@ Focused commit revert as above. No DB, no migration. Remove `policy.rulePacks` e
 ## Completion notes
 
 (placeholder — executor fills with evidence paths, pass counts, digests, and traceability re-check output)
+

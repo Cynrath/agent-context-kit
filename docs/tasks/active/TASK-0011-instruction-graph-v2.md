@@ -1,12 +1,12 @@
 ---
 id: "TASK-0011"
 title: "Instruction graph v2"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - TASK-0013
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -405,18 +405,18 @@ No heavy dependency added; `picomatch` reuse keeps bundle size flat. `esbuild --
 
 ## Acceptance criteria
 
-- [ ] `src/core/instructions/graph.ts` is the canonical builder (no new `graph-v2.ts` duplicate; additive diff only) and its existing `AGENTS.override.md` (`+50`), `applyTo` frontmatter, provider-isolation, and nested-ancestor semantics are preserved (`providers.test.ts` green without fixture change).
-- [ ] `InstructionNodeSchemaV2` (or extended `InstructionNodeSchema`) validates the ADR-0017 fields `includeScopes`, `excludeScopes`, `providerApplicability`, `provenance[]`, `orderIndex`, `shadowedBy`, `duplicateOf` (all nullable/defaulted for v1 compat); `InstructionGraph` has `schemaVersion: 2`; `BuildGraphOptions` exposes `maxNodes` (default 2000), `maxDepth` (64), `maxApplyToGlobs` (100), `signal`.
-- [ ] `schemas/instruction-graph.schema.json` v2 exists, is strict, validates `ackit instructions --json` output; `pnpm gen:schemas` regenerates it from zod deterministically; v1 JSON validates via defaults (migration shim).
-- [ ] `resolveEffectiveStack(graph, provider, forPath, { detailed: true })` returns `EffectiveStackInfo { chain, perNode: { why, provenance[], shadowedBy?, duplicateOf? } }`; default `detailed: false` returns legacy `string[]`.
-- [ ] Deterministic ordering is `depth ASC → precedence ASC → provider tie-break codex<claude<gemini<copilot<shared → id lexicographic → orderIndex ASC` and is contract-tested (fixture with tied precedence asserts provider order).
-- [ ] Windows normalization: internal paths are POSIX repo-relative; drive letters and UNC are rejected pre-fs via `normalizeRelativePath`; win32 `\` normalized to `/` (unit test with `C:\\repo\\AGENTS.md`-style input asserts `toPosix` + rejection).
-- [ ] Symlink handling: each file canonicalized via `realpath` before scope match; outside-root realpath target denied with `FS-PATH-ESCAPES-ROOT` diagnostic and excluded; cyclic `references` terminated with `INSTR-CYCLE-SKIPPED` (no throw/loop).
-- [ ] Size limits: exceeding `maxNodes`/`maxDepth`/`maxApplyToGlobs` emits `INSTR-LIMIT-NODES`/`DEPTH`/`GLOBS` diagnostic and truncates deterministically (sorted keep-first), never throws.
-- [ ] Deterministic analysis passes in `src/core/instructions/analysis.ts` emit stable diagnostics reusable by `optimize`/`score`: `INSTR-CONFLICT` (opposite literal values), `INSTR-DUPLICATE` (SHA-256 identical or LCS>0.90), `INSTR-SHADOWED` (strict subset + higher precedence → `shadowedBy` set), `INSTR-UNREACHABLE` (zero files match scope). Each category green on a dedicated fixture that triggers exactly one finding.
-- [ ] CLI `ackit instructions --explain` prints indented weakest→strongest chain with per-node why; `ackit instructions --explain --json` includes `provenance[]` per node (snapshot-gated).
-- [ ] `pnpm typecheck` strict green; no `any` in public types; `pnpm lint` + `pnpm format:check` green; `pnpm build` emits `dist/core/instructions/graph.js` with new fields.
-- [ ] No internal-ID leak: `--help` for `instructions` contains no `REQ-*`, `ADR-*`, `VNEXT`, `GOAL2`, `rebuild/ackit-vnext` strings (contract test).
+- [x] `src/core/instructions/graph.ts` is the canonical builder (no new `graph-v2.ts` duplicate; additive diff only) and its existing `AGENTS.override.md` (`+50`), `applyTo` frontmatter, provider-isolation, and nested-ancestor semantics are preserved (`providers.test.ts` green without fixture change).
+- [x] `InstructionNodeSchemaV2` (or extended `InstructionNodeSchema`) validates the ADR-0017 fields `includeScopes`, `excludeScopes`, `providerApplicability`, `provenance[]`, `orderIndex`, `shadowedBy`, `duplicateOf` (all nullable/defaulted for v1 compat); `InstructionGraph` has `schemaVersion: 2`; `BuildGraphOptions` exposes `maxNodes` (default 2000), `maxDepth` (64), `maxApplyToGlobs` (100), `signal`.
+- [x] `schemas/instruction-graph.schema.json` v2 exists, is strict, validates `ackit instructions --json` output; `pnpm gen:schemas` regenerates it from zod deterministically; v1 JSON validates via defaults (migration shim).
+- [x] `resolveEffectiveStack(graph, provider, forPath, { detailed: true })` returns `EffectiveStackInfo { chain, perNode: { why, provenance[], shadowedBy?, duplicateOf? } }`; default `detailed: false` returns legacy `string[]`.
+- [x] Deterministic ordering is `depth ASC → precedence ASC → provider tie-break codex<claude<gemini<copilot<shared → id lexicographic → orderIndex ASC` and is contract-tested (fixture with tied precedence asserts provider order).
+- [x] Windows normalization: internal paths are POSIX repo-relative; drive letters and UNC are rejected pre-fs via `normalizeRelativePath`; win32 `\` normalized to `/` (unit test with `C:\\repo\\AGENTS.md`-style input asserts `toPosix` + rejection).
+- [x] Symlink handling: each file canonicalized via `realpath` before scope match; outside-root realpath target denied with `FS-PATH-ESCAPES-ROOT` diagnostic and excluded; cyclic `references` terminated with `INSTR-CYCLE-SKIPPED` (no throw/loop).
+- [x] Size limits: exceeding `maxNodes`/`maxDepth`/`maxApplyToGlobs` emits `INSTR-LIMIT-NODES`/`DEPTH`/`GLOBS` diagnostic and truncates deterministically (sorted keep-first), never throws.
+- [x] Deterministic analysis passes in `src/core/instructions/analysis.ts` emit stable diagnostics reusable by `optimize`/`score`: `INSTR-CONFLICT` (opposite literal values), `INSTR-DUPLICATE` (SHA-256 identical or LCS>0.90), `INSTR-SHADOWED` (strict subset + higher precedence → `shadowedBy` set), `INSTR-UNREACHABLE` (zero files match scope). Each category green on a dedicated fixture that triggers exactly one finding.
+- [x] CLI `ackit instructions --explain` prints indented weakest→strongest chain with per-node why; `ackit instructions --explain --json` includes `provenance[]` per node (snapshot-gated).
+- [x] `pnpm typecheck` strict green; no `any` in public types; `pnpm lint` + `pnpm format:check` green; `pnpm build` emits `dist/core/instructions/graph.js` with new fields.
+- [x] No internal-ID leak: `--help` for `instructions` contains no `REQ-*`, `ADR-*`, `VNEXT`, `GOAL2`, `rebuild/ackit-vnext` strings (contract test).
 
 ---
 
@@ -450,12 +450,12 @@ No heavy dependency added; `picomatch` reuse keeps bundle size flat. `esbuild --
 
 ## Documentation
 
-- [ ] Update `docs/concepts/instruction-graph.md` — replace precedence table with deterministic ordering section, document new fields (`includeScopes`, `excludeScopes`, `providerApplicability`, `provenance`, `shadowedBy`, `duplicateOf`, `orderIndex`), schema v2 note, `--explain` usage, limit diagnostics table.
-- [ ] Update `docs/reference/cli.md` (or `docs/reference/cli.md#instructions`) — `ackit instructions` flags table with `--explain`, `--for`, `--provider`, `--json` contracts, example outputs, exit codes.
-- [ ] Create `schemas/instruction-graph.schema.json` (strict, `$id`, `schemaVersion: 2`); add entry to `docs/reference/schemas.md` (or generate via `gen:schemas`).
-- [ ] Update `docs/rebuild/decisions/ADR-0017-instruction-graph-v2.md` reference link if doc path changes; otherwise no ADR edit (ADR is immutable post-acceptance).
-- [ ] Update `docs/security/THREAT_MODEL.md` — v0.2.0 delta row for instruction graph: symlink outside-root denial, traversal rejection, ReDoS cap, secret/path leakage guard, cycle handling.
-- [ ] Update `docs/architecture/overview.md` — note that instruction graph v2 is consumed by dashboard (`ADR-0019`) and VS Code "instructions for current file" (`ADR-0021`) via SDK `resolveEffectiveStack`.
+- [x] Update `docs/concepts/instruction-graph.md` — replace precedence table with deterministic ordering section, document new fields (`includeScopes`, `excludeScopes`, `providerApplicability`, `provenance`, `shadowedBy`, `duplicateOf`, `orderIndex`), schema v2 note, `--explain` usage, limit diagnostics table.
+- [x] Update `docs/reference/cli.md` (or `docs/reference/cli.md#instructions`) — `ackit instructions` flags table with `--explain`, `--for`, `--provider`, `--json` contracts, example outputs, exit codes.
+- [x] Create `schemas/instruction-graph.schema.json` (strict, `$id`, `schemaVersion: 2`); add entry to `docs/reference/schemas.md` (or generate via `gen:schemas`).
+- [x] Update `docs/rebuild/decisions/ADR-0017-instruction-graph-v2.md` reference link if doc path changes; otherwise no ADR edit (ADR is immutable post-acceptance).
+- [x] Update `docs/security/THREAT_MODEL.md` — v0.2.0 delta row for instruction graph: symlink outside-root denial, traversal rejection, ReDoS cap, secret/path leakage guard, cycle handling.
+- [x] Update `docs/architecture/overview.md` — note that instruction graph v2 is consumed by dashboard (`ADR-0019`) and VS Code "instructions for current file" (`ADR-0021`) via SDK `resolveEffectiveStack`.
 
 All docs free of `REQ-V020-D-*` in user-facing text (concepts only, not IDs) per REQ-V020-GOV-010.
 
@@ -522,3 +522,4 @@ Focused commit revert. v1 `InstructionNode` fields and `providers.test.ts` seman
 ## Completion notes
 
 (placeholder — fill with evidence rows, test pass counts, schema hash, explain snapshot hash, and next-task handoff)
+

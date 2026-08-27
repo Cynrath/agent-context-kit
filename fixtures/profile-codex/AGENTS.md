@@ -1,0 +1,2 @@
+# AGENTS root
+Codex instructions

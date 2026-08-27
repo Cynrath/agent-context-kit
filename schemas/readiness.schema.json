@@ -1,0 +1,76 @@
+{
+  "$id": "ackit.readiness.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["version", "engineVersion", "overall", "categories", "deductions", "inputsHash"],
+  "properties": {
+    "version": { "const": "ackit.readiness.v1" },
+    "engineVersion": { "type": "string" },
+    "overall": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "weight", "effectiveWeight", "status", "score", "maxPoints", "deductions"],
+        "properties": {
+          "id": { "enum": ["instructions", "security", "contextEfficiency", "taskHygiene", "skills", "policy"] },
+          "label": { "type": "string" },
+          "weight": { "type": "number", "minimum": 0 },
+          "effectiveWeight": { "type": "number", "minimum": 0 },
+          "status": { "enum": ["ok", "n/a"] },
+          "score": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+          "maxPoints": { "type": "integer", "minimum": 0 },
+          "deductions": { "type": "array", "items": { "$ref": "#/$defs/deduction" } },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "deductions": { "type": "array", "items": { "$ref": "#/$defs/deduction" } },
+    "inputsHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "threshold": {
+      "type": "object",
+      "required": ["requested", "source", "passed"],
+      "properties": {
+        "requested": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "source": { "type": "string" },
+        "passed": { "type": "boolean" }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "required": ["baselineScore", "delta", "baselineVersion", "baselineInputsHash"],
+      "properties": {
+        "baselineScore": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "delta": { "type": "integer" },
+        "baselineVersion": { "type": "string" },
+        "baselineInputsHash": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "deduction": {
+      "type": "object",
+      "required": ["id", "category", "points", "severity", "reason", "evidence"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^READINESS-[A-Z]+-[A-Z0-9-]+$" },
+        "category": { "enum": ["instructions", "security", "contextEfficiency", "taskHygiene", "skills", "policy"] },
+        "points": { "type": "integer", "minimum": 0, "maximum": 15 },
+        "severity": { "enum": ["critical", "high", "medium", "low", "info"] },
+        "reason": { "type": "string", "minLength": 1 },
+        "evidence": {
+          "type": "object",
+          "required": ["relativePath"],
+          "properties": {
+            "relativePath": { "type": "string", "minLength": 1 },
+            "line": { "type": "integer", "minimum": 1 },
+            "excerpt": { "type": "string" }
+          }
+        },
+        "remediation": { "type": "string" },
+        "fingerprint": { "type": "string" }
+      }
+    }
+  }
+}

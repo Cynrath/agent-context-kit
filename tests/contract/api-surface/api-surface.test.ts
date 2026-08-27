@@ -5,11 +5,19 @@ import * as ackit from "../../../src/index.js";
 /** Documented public allowlist (REQ-API-001, REQ-V020-J-001). Any diff = contract change. */
 const ALLOWLIST = [
   "AckitError",
-  "scanRepository",
-  "buildInstructionGraph",
-  "resolveEffectiveStack",
+  "ProfileSchema",
+  "READINESS_ENGINE_VERSION",
   "buildContextPack",
+  "buildInstructionGraph",
+  "detectProfiles",
+  "evaluateRulePacks",
   "loadAckitConfig",
+  "loadBuiltInProfiles",
+  "loadRulePacks",
+  "resolveEffectiveStack",
+  "resolveProfile",
+  "scanRepository",
+  "scoreRepository",
   "validateSkills",
 ].sort();
 
@@ -25,8 +33,13 @@ describe("public API surface (REQ-API-001)", () => {
   });
 
   it("exposes functions/classes, not mutable state", () => {
+    const nonFunctions = new Set(["ProfileSchema", "READINESS_ENGINE_VERSION"]);
     for (const name of ALLOWLIST) {
       const value = (ackit as Record<string, unknown>)[name];
+      if (nonFunctions.has(name)) {
+        expect(value).toBeDefined();
+        continue;
+      }
       expect(typeof value).toBe("function");
     }
   });

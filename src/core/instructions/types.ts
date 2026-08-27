@@ -9,16 +9,24 @@ export type InstructionStatus = (typeof INSTRUCTION_STATUSES)[number];
 export const SECURITY_FLAGS = ["external-link", "root-escape-reference", "hidden-unicode"] as const;
 export type SecurityFlag = (typeof SECURITY_FLAGS)[number];
 
+export const ProvenanceEntrySchema = z.object({
+  source: z.string(),
+  reason: z.string(),
+  line: z.number().int().nonnegative().optional(),
+});
+export type ProvenanceEntry = z.infer<typeof ProvenanceEntrySchema>;
+
 /**
- * Instruction-graph node metadata model (REQ-INSTR-002).
+ * Instruction-graph node metadata model v2 (REQ-V020-D-001, ADR-0017).
+ * Extended additively from v1; v1 JSON validates via defaults (migration shim).
  */
-export const InstructionNodeSchema = z.strictObject({
+export const InstructionNodeSchema = z.object({
   id: z.string(),
   provider: z.enum(PROVIDERS),
   kind: z.enum(["instruction", "skill"]),
   relativePath: z.string(),
   scopeRoot: z.string(),
-  applyTo: z.array(z.string()).nullable(),
+  applyTo: z.array(z.string().max(500)).nullable().default(null),
   depth: z.number().int().nonnegative(),
   precedence: z.number().int().nonnegative(),
   managed: z.boolean(),
@@ -29,9 +37,20 @@ export const InstructionNodeSchema = z.strictObject({
   duplicates: z.array(z.string()).default([]),
   references: z.array(z.string()).default([]),
   securityFlags: z.array(z.enum(SECURITY_FLAGS)).default([]),
+  // v2 additions
+  includeScopes: z.array(z.string().max(500)).nullable().default(null),
+  excludeScopes: z.array(z.string().max(500)).nullable().default(null),
+  providerApplicability: z.array(z.enum(PROVIDERS)).nullable().default(null),
+  provenance: z.array(ProvenanceEntrySchema).default([]),
+  orderIndex: z.number().int().nonnegative().default(0),
+  shadowedBy: z.string().nullable().default(null),
+  duplicateOf: z.string().nullable().default(null),
 });
 
 export type InstructionNode = z.infer<typeof InstructionNodeSchema>;
+// Alias for v2 explicit naming
+export const InstructionNodeSchemaV2 = InstructionNodeSchema;
+export type InstructionNodeV2 = InstructionNode;
 
 export interface DiscoveryDiagnostic {
   code: string;
@@ -39,7 +58,10 @@ export interface DiscoveryDiagnostic {
   relativePath?: string | undefined;
 }
 
+export const INSTRUCTION_GRAPH_SCHEMA_VERSION = 2 as const;
+
 export interface InstructionGraph {
+  schemaVersion: typeof INSTRUCTION_GRAPH_SCHEMA_VERSION;
   nodes: InstructionNode[];
   diagnostics: DiscoveryDiagnostic[];
 }
@@ -50,7 +72,15 @@ export interface BuildGraphOptions {
   codexGlobalDir?: string | undefined;
   /** Maximum token estimate before a node is flagged oversized. */
   maxTokenEstimatePerFile?: number | undefined;
+  maxNodes?: number | undefined; // default 2000
+  maxDepth?: number | undefined; // default 64
+  maxApplyToGlobs?: number | undefined; // default 100
   signal?: AbortSignal | undefined;
+  /** Provider-aware profile for fileConventions/precedenceOverrides (TASK-0010). */
+  profile?:
+    | import("../profiles/types.js").ResolvedProfile
+    | import("../profiles/types.js").Profile
+    | undefined;
 }
 
 /**
@@ -63,4 +93,17 @@ export interface EffectiveStack {
   forPath: string;
   /** Node ids ordered weakest→strongest precedence. */
   chain: string[];
+}
+
+export interface EffectiveStackInfo extends EffectiveStack {
+  perNode: Record<
+    string,
+    {
+      why: string;
+      provenance: ProvenanceEntry[];
+      shadowedBy?: string | null;
+      duplicateOf?: string | null;
+    }
+  >;
+  diagnostics: DiscoveryDiagnostic[];
 }

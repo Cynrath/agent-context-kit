@@ -60,6 +60,12 @@ export async function createFilesystemEngine(
   return { ok: true, engine: new FilesystemEngine(resolved.root) };
 }
 
+export async function createRoot(requested?: string): Promise<RepositoryRoot> {
+  const res = await resolveRepositoryRoot(requested);
+  if (!res.ok) throw new Error(res.diagnostic.message);
+  return res.root;
+}
+
 export function describeError(error: unknown): string {
   if (error instanceof Error) {
     const code = (error as NodeJS.ErrnoException).code;
