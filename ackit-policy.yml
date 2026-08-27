@@ -6,15 +6,15 @@ suppressions:
   # Scanner test fixtures intentionally embed credential-shaped literals to
   # prove redaction; they are not real secrets.
   - ruleId: ACKIT001
-    pathGlobs: ["tests/**", "docs/tasks/**", "docs/rebuild/**"]
+    pathGlobs: ["tests/**", "docs/tasks/**", "docs/rebuild/**", "docs/decisions/**", "docs/v0.2.0/**"]
     reason: "fixture credentials used by scanner/security tests and their evidence notes"
     expiresAt: 2027-08-22
   - ruleId: ACKIT002
-    pathGlobs: ["tests/security/**"]
-    reason: "synthetic private key block fixtures"
+    pathGlobs: ["tests/security/**", "docs/tasks/**", "docs/decisions/**", "docs/v0.2.0/**"]
+    reason: "synthetic private key block fixtures and documentation examples"
     expiresAt: 2027-08-22
   - ruleId: ACKIT003
-    pathGlobs: ["tests/**", "docs/tasks/**", "docs/rebuild/**", "src/core/policy/**"]
+    pathGlobs: ["tests/**", "docs/tasks/**", "docs/rebuild/**", "src/core/policy/**", "docs/decisions/**", "docs/v0.2.0/**"]
     reason: "fixture credentials + policy engine error messages trigger assignment patterns"
     expiresAt: 2027-08-22
   - ruleId: ACKIT004
@@ -29,3 +29,15 @@ suppressions:
     pathGlobs: ["tests/**", "docs/**", "src/**"]
     reason: "TODO markers in test fixtures and documentation examples are intentional"
     expiresAt: 2027-08-22
+  - ruleId: ACKIT010
+    pathGlobs: ["docs/**", "docs/tasks/**", "docs/decisions/**", "docs/rebuild/**", "docs/v0.2.0/**", "tests/**"]
+    reason: "example absolute paths in documentation and fixtures are not real leaks; sanitized in product artifacts"
+    expiresAt: 2027-12-31
+  - ruleId: ACKIT004
+    pathGlobs: ["tests/security/**", "docs/tasks/**", "docs/v0.2.0/**", "docs/decisions/**"]
+    reason: "example connection strings in security hardening docs are fixtures, not real credentials"
+    expiresAt: 2027-12-31
+  - ruleId: ACKIT040
+    pathGlobs: ["docs/tasks/**", "docs/v0.2.0/**", "docs/decisions/**"]
+    reason: "planning task docs and ADRs exceed token heuristic but are not instruction files scanned for context budget; informational"
+    expiresAt: 2027-12-31

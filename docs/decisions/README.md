@@ -1,13 +1,14 @@
 # Decisions
 
-Architecture decisions for vNext live in **`docs/rebuild/decisions/`**
-(ADR-0001 … ADR-0014, all Accepted). That directory is the canonical,
-traceability-linked record; this file is the stable entry point from the
-canonical docs tree.
+Architecture decisions live in **`docs/decisions/`** (new v0.2.0 additions) and the
+historical **`docs/rebuild/decisions/`** (ADR-0001 … ADR-0014, all Accepted).
+Both directories are traceability-linked; this file is the stable entry point
+from the canonical docs tree.
 
-Index and per-area mapping: `docs/rebuild/decisions/README.md`.
+Index and per-area mapping: `docs/rebuild/decisions/README.md` (includes vNext
+baseline + v0.2.0 additions ADR-0015 … 0024).
 
-Highlights:
+Highlights (vNext baseline):
 
 - ADR-0001 TS/Node/pnpm/Biome toolchain · Node ≥22 (CI 22+24)
 - ADR-0002 single npm package · ADR-0003 offline-first invariant
@@ -16,3 +17,16 @@ Highlights:
 - ADR-0008 official MCP SDK (`@modelcontextprotocol/sdk@^1.30.0`)
 - ADR-0013 package identity `@cynrath/agent-context-kit`, version line 0.1.0+
 - ADR-0014 docs-first task system model
+
+v0.2.0 additions (ADR-0015 … ADR-0024, Accepted 2026-08-27):
+
+- ADR-0015 v0.2.0 consolidated release architecture
+- ADR-0016 readiness scoring model + provider profile model
+- ADR-0017 instruction graph v2
+- ADR-0018 rule-pack format & security boundary
+- ADR-0019 local dashboard architecture
+- ADR-0020 GitHub Action architecture
+- ADR-0021 public SDK boundary + VS Code extension integration
+- ADR-0022 benchmark / regression policy
+- ADR-0023 multi-artifact version/release strategy
+- ADR-0024 cross-cutting security hardening
