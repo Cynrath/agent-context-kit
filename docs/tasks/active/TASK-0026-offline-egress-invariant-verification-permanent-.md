@@ -1,11 +1,11 @@
 ---
 id: "TASK-0026"
 title: "Offline-egress invariant verification + permanent CI contract"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: 2026-08-27
 ---
 
 ## Purpose
