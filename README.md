@@ -92,121 +92,26 @@ $ ackit dashboard --port 0 --open   # localhost-only, CSP, live polling
 
 ### 🎁 Features at a glance
 
-<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:12px;">
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**📊 Agent Readiness**<br>
-<code>ackit readiness</code><br>
-0–100 across 6 categories (25/25/20/10/10/10), weighted renormalization, `ackit.readiness.v1` JSON + terminal tree, `--fail-below`/`--strict`/`--baseline`/`--compare`
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**🧩 Instruction Graph v2**<br>
-<code>ackit instructions --explain</code><br>
-Codex/Claude/Gemini/Copilot+shared, nesting, `includeScopes`/`excludeScopes`/`providerApplicability`/`provenance`/`shadowedBy`/`duplicateOf`, `applyTo` globs, conflict/duplicate/shadow/dead, `depth→precedence→id`
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**🎭 Provider Profiles**<br>
-<code>ackit pack --profile codex</code><br>
-5 built-ins (`codex`/`claude`/`copilot`/`gemini`/`generic`), `CLI --profile > ackit.yml > auto-detect > generic`, budget/`includePriority`
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**📜 Rule/Policy Packs**<br>
-<code>ackit policy check</code><br>
-`schemas/rule-pack.schema.json` v1 (`presence|pattern|config|dependency|instruction`), `glob`/`scope`/`match`, `overrides`/`composition`, ReDoS/size guards
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**🧹 Optimize v2**<br>
-<code>ackit optimize --explain</code><br>
-8-class taxonomy, `evidence[]`/`confidence`/`tokenWasteEstimate`/`provenance`/`plan`, `--fix --dry-run`, `terminal|json|markdown|sarif`
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**📦 Context Packs**<br>
-<code>ackit pack --max-tokens 50000</code><br>
-Weighted deterministic ranking, manifest `hash/reason/tokens` per file
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**🔒 Scanning**<br>
-<code>ackit scan --ci</code><br>
-Secrets/assignments/private keys/connection strings/entropy/absolute-path/CI pinning/drift, redacted evidence, SARIF 2.1.0
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**✅ Tasks**<br>
-<code>ackit task</code><br>
-`docs/tasks` single-active, `[ ]/[~]/[x]/[!]`, completion gate, `task doctor`
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**🔭 Watch/Dashboard**<br>
-<code>ackit dashboard</code><br>
-`scan --watch` debounced 400ms + cache; `dashboard` localhost-only `127.0.0.1`, `CSP` + `nosniff`, `/api/*` paginated, `<50KB` vanilla JS
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**🩺 Diagnostics**<br>
-<code>ackit diagnostics bundle</code><br>
-`ackit.diagnostics.v1` + deterministic `bundle-manifest.json` (`sha256` + redaction count), 5-secret `[REDACTED]` proof
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**⚡ Benchmarks**<br>
-<code>benchmarks/run.mjs</code><br>
-7 deterministic fixtures, 8 metrics (`coldScanMs`/`warmScanMs`/`incrementalMs`/`peakRssMb`/`filesPerSec`/`packMs`/`graphMs`/`cacheHitRatio`), median-of-3
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**🔌 SDK v1**<br>
-<code>import { scanRepository } from "@cynrath/agent-context-kit"</code><br>
-`sideEffects:false`, `type:module`, `exports {".","./mcp"}`, `AbortSignal` <200ms, `AckitError`
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**🧩 VS Code**<br>
-<code>extensions/vscode</code><br>
-`0.2.0`, `cynrath`, `lints` Linters, `onStartupFinished`, readiness tree + Problems `ACKITxxx`, `<2MB` VSIX — **VSIX-ready, not yet Marketplace**
-
-</div>
-
-<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
-
-**🤖 MCP**<br>
-<code>ackit mcp serve</code><br>
-Official SDK stdio, 9 read-only tools, 5 resources, 4 prompts, `InMemoryTransport` cancellation
-
-</div>
-
-</div>
+<table style="width:100%; table-layout:fixed; border-collapse:collapse; word-break:break-word; overflow-wrap:anywhere;">
+<colgroup><col style="width:40px"><col style="width:170px"><col style="width:210px"><col></colgroup>
+<thead><tr><th style="border:1px solid #d0d7de; padding:8px; text-align:left;"></th><th style="border:1px solid #d0d7de; padding:8px; text-align:left;">Capability</th><th style="border:1px solid #d0d7de; padding:8px; text-align:left;">Command</th><th style="border:1px solid #d0d7de; padding:8px; text-align:left;">What you get</th></tr></thead>
+<tbody>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">📊</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Agent Readiness</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit readiness</code></td><td style="border:1px solid #d0d7de; padding:8px;">0–100 across 6 categories (25/25/20/10/10/10), weighted renormalization, <code>ackit.readiness.v1</code> JSON + terminal tree, <code>--fail-below</code>/<code>--strict</code>/<code>--baseline</code>/<code>--compare</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Instruction Graph v2</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit instructions --explain</code></td><td style="border:1px solid #d0d7de; padding:8px;">Codex/Claude/Gemini/Copilot+shared, nesting, <code>includeScopes</code>/<code>excludeScopes</code>/<code>providerApplicability</code>/<code>provenance</code>/<code>shadowedBy</code>/<code>duplicateOf</code>, <code>applyTo</code> globs, conflict/duplicate/shadow/dead, <code>depth→precedence→id</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🎭</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Provider Profiles</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit pack --profile codex</code></td><td style="border:1px solid #d0d7de; padding:8px;">5 built-ins (<code>codex</code>/<code>claude</code>/<code>copilot</code>/<code>gemini</code>/<code>generic</code>), <code>CLI --profile > ackit.yml > auto-detect > generic</code>, budget/<code>includePriority</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">📜</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Rule/Policy Packs</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit policy check</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>schemas/rule-pack.schema.json</code> v1 (<code>presence|pattern|config|dependency|instruction</code>), <code>glob</code>/<code>scope</code>/<code>match</code>, <code>overrides</code>/<code>composition</code>, ReDoS/size guards</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧹</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Optimize v2</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit optimize --explain</code></td><td style="border:1px solid #d0d7de; padding:8px;">8-class taxonomy, <code>evidence[]</code>/<code>confidence</code>/<code>tokenWasteEstimate</code>/<code>provenance</code>/<code>plan</code>, <code>--fix --dry-run</code>, <code>terminal|json|markdown|sarif</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">📦</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Context Packs</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit pack --max-tokens 50000</code></td><td style="border:1px solid #d0d7de; padding:8px;">Weighted deterministic ranking, manifest <code>hash/reason/tokens</code> per file</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🔒</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Scanning</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit scan --ci</code></td><td style="border:1px solid #d0d7de; padding:8px;">Secrets/assignments/private keys/connection strings/entropy/absolute-path/CI pinning/drift, redacted evidence, SARIF 2.1.0</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">✅</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Tasks</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit task</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>docs/tasks</code> single-active, <code>[ ]/[~]/[x]/[!]</code>, completion gate, <code>task doctor</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🔭</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Watch/Dashboard</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit dashboard</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>scan --watch</code> debounced 400ms + cache; <code>dashboard</code> localhost-only <code>127.0.0.1</code>, <code>CSP</code> + <code>nosniff</code>, <code>/api/*</code> paginated, <code>&lt;50KB</code> vanilla JS</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🩺</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Diagnostics</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit diagnostics bundle</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit.diagnostics.v1</code> + deterministic <code>bundle-manifest.json</code> (<code>sha256</code> + redaction count), 5-secret <code>[REDACTED]</code> proof</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">⚡</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Benchmarks</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>benchmarks/run.mjs</code></td><td style="border:1px solid #d0d7de; padding:8px;">7 deterministic fixtures, 8 metrics (<code>coldScanMs</code>/<code>warmScanMs</code>/<code>incrementalMs</code>/<code>peakRssMb</code>/<code>filesPerSec</code>/<code>packMs</code>/<code>graphMs</code>/<code>cacheHitRatio</code>), median-of-3</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🔌</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>SDK v1</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>import { scanRepository } from "@cynrath/agent-context-kit"</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>sideEffects:false</code>, <code>type:module</code>, <code>exports {".","./mcp"}</code>, <code>AbortSignal</code> &lt;200ms, <code>AckitError</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>VS Code</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>extensions/vscode</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>0.2.0</code>, <code>cynrath</code>, <code>lints</code> Linters, <code>onStartupFinished</code>, readiness tree + Problems <code>ACKITxxx</code>, <code>&lt;2MB</code> VSIX — <strong>VSIX-ready, not yet Marketplace</strong></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🤖</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>MCP</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit mcp serve</code></td><td style="border:1px solid #d0d7de; padding:8px;">Official SDK stdio, 9 read-only tools, 5 resources, 4 prompts, <code>InMemoryTransport</code> cancellation</td></tr>
+</tbody>
+</table>
 
 ---
 
