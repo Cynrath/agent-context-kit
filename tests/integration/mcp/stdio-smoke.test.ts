@@ -224,10 +224,7 @@ describe("MCP stdio transport (integration)", () => {
         params: { name: "ackit_list_tasks", arguments: {} },
       });
 
-      const { responses } = await talkToServer(
-        [initMessage, initializedNote, callMessage],
-        [1, 3],
-      );
+      const { responses } = await talkToServer([initMessage, initializedNote, callMessage], [1, 3]);
       const callResponse = responses
         .map((line) => JSON.parse(line) as { id?: unknown })
         .find((message) => message.id === 3);
