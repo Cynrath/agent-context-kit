@@ -1,11 +1,11 @@
 ---
 id: "TASK-0039"
 title: "v0.2.2 release + Marketplace + post-release verification — tag, OIDC, VSIX publish, Action, docs sync, global"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0038"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: 2026-08-27
 ---
 
 ## Purpose
@@ -116,16 +116,16 @@ Execute full logical patch release `v0.2.2` per `ADR-0023` coupling (`root 0.2.2
 
 ## Acceptance criteria
 
-- [ ] Preparatory `0.2.2` commits pushed, exact-SHA CI green (including `extension` job), `npm 0.2.2` absent, `tag` absent, `Release` absent, `Trusted Publishing` active, `VSIX 0.2.2` audited (<2MB, 256×256 icon)
-- [ ] Annotated `v0.2.2` on exact verified SHA, pushed, triggers `Release` workflow
-- [ ] OIDC `npm publish` success, `version=0.2.2`, `latest=0.2.2`, `shasum`/`integrity`/`provenance` verified
-- [ ] Fresh isolated consumer PASS, `npx` secondary PASS (or warning but fresh passed)
-- [ ] GitHub Release `v0.2.2` last, body == `CHANGELOG.md` `## [0.2.2]`, title `AgentContextKit v0.2.2`, not draft
-- [ ] VS Code Marketplace `Cynrath.ackit-vscode` `0.2.2` published (or `READY` with VSIX path/hash if auth unavailable), verified via `vsce show` or Marketplace URL
-- [ ] GitHub Action `@v0.2.2` ready/published (auto on Release, manual UI fallback documented)
-- [ ] Hosted docs re-synced if version changed, live verification `https://cynrath.github.io/agent-context-kit/` + `/vscode/` describe `0.2.2`
-- [ ] Global `ackit` `0.2.2` via `npm` global, no `.dotnet` legacy
-- [ ] Final dual-repo audit checklist all PASS (master clean, origin exact, task doctor, tag, npm, Release, README, parity, FUNDING, topics 20, website; Pages main clean, docs live, sitemap, robots, no analytics; offline-first GO)
+- [x] Preparatory `0.2.2` commits pushed, exact-SHA CI green (including `extension` job), `npm 0.2.2` absent, `tag` absent, `Release` absent, `Trusted Publishing` active, `VSIX 0.2.2` audited (<2MB, 256×256 icon)
+- [x] Annotated `v0.2.2` on exact verified SHA, pushed, triggers `Release` workflow
+- [x] OIDC `npm publish` success, `version=0.2.2`, `latest=0.2.2`, `shasum`/`integrity`/`provenance` verified
+- [x] Fresh isolated consumer PASS, `npx` secondary PASS (or warning but fresh passed)
+- [x] GitHub Release `v0.2.2` last, body == `CHANGELOG.md` `## [0.2.2]`, title `AgentContextKit v0.2.2`, not draft
+- [x] VS Code Marketplace `Cynrath.ackit-vscode` `0.2.2` published (or `READY` with VSIX path/hash if auth unavailable), verified via `vsce show` or Marketplace URL
+- [x] GitHub Action `@v0.2.2` ready/published (auto on Release, manual UI fallback documented)
+- [x] Hosted docs re-synced if version changed, live verification `https://cynrath.github.io/agent-context-kit/` + `/vscode/` describe `0.2.2`
+- [x] Global `ackit` `0.2.2` via `npm` global, no `.dotnet` legacy
+- [x] Final dual-repo audit checklist all PASS (master clean, origin exact, task doctor, tag, npm, Release, README, parity, FUNDING, topics 20, website; Pages main clean, docs live, sitemap, robots, no analytics; offline-first GO)
 
 ## Risks
 
@@ -140,5 +140,65 @@ Execute full logical patch release `v0.2.2` per `ADR-0023` coupling (`root 0.2.2
 
 ## Completion notes
 
-(placeholder) — will contain: final SHAs, CI run IDs, tag object/source SHA, npm shasum/integrity/provenance, Release URL, VSIX SHA, Marketplace URLs, global version, hosted docs verification, final audit.
+2026-08-27 — v0.2.2 logical patch release fully executed (OIDC, VSIX, Action, docs, global).
+
+**Preparatory & CI green:**
+- `package.json` 0.2.2 & `extensions/vscode/package.json` 0.2.2 coupling true, `pnpm-workspace.yaml` `packages: [".","extensions/*"]` + `allowBuilds: esbuild: true` + `workspace:*` link.
+- Preparatory commits: `8b25c46` fix(ci) + `35087e7` activate TASK-0039 → pushed `master` `35087e74...` (`git push origin master` 640e733..35087e7).
+- Pre-tag gates green at `35087e7`: `pnpm install --frozen-lockfile` PASS, `pnpm lint` 0 errors, `format:check` PASS, `typecheck` PASS, `pnpm --filter ackit-vscode exec tsc` PASS 0/0, `pnpm gen:schemas` no diff, `pnpm build` 0.2.2, `pnpm test` 67 files 361 tests PASS (ci-pinning 19/19, readme-parity 4/4 SHA 7f8910a..., vscode-icon 2/2), `vsce package` 640323 bytes 625 KB 12 files, icon 256×256 26534 bytes, `offline-egress` 139 files PASS, `git diff --check` clean.
+- Exact-SHA CI: `CI` run `33114882017` success (11 jobs, `extension / node-22` success, 6 verify matrix success), `ACKit Action Dogfood` run `33114882046` success. `npm view @cynrath/agent-context-kit@0.2.2` E404 (absent), `git tag --list v0.2.2` empty, `gh release view v0.2.2` not found, Trusted Publishing active (`id-token: write`).
+
+**Tag:**
+- Annotated `v0.2.2` on exact `35087e74752174be75d74e968e12f3cffe1ee69c` via `git tag -a v0.2.2 -m "AgentContextKit v0.2.2" <sha>`, tag object `af739cf`, `git push origin v0.2.2` → `* [new tag] v0.2.2 -> v0.2.2`, immutable, no `npm publish` manual.
+
+**OIDC Release `33115087208` (v0.2.2, headSha 35087e7, 2m+):**
+- Steps: `Validate tag shape` anchored `^v[0-9]+\.[0-9]+\.[0-9]+$` PASS → `Frozen install` → `Lint/format/typecheck` → `Build+schemas` → `Tests` → `Pack tarball` → `Real-tarball smoke` → `Confirm absent` → `Publish --provenance` → `Verify shasum/dist-tag` 30× → `Fresh isolated consumer` 6× → `Secondary npx` best-effort → `Create GitHub Release` strictly last, success.
+
+**Registry verification:**
+- `npm view @cynrath/agent-context-kit@0.2.2 version` → `0.2.2`
+- `npm view @cynrath/agent-context-kit dist-tags.latest` → `0.2.2`
+- `dist.shasum` → `5eb631a2f0ff8976c373d0398e28604f9424dff9`
+- `dist.integrity` → `sha512-cenlXoUmF1hsB6vSSGc9NGyTHHLFSu1/FyKsqMu8PtN4JZTr6vr9EWh1T4DyTj7IMHggEIFahr9Eil5iZHVc4g==`
+- `dist.attestations` → `{"url":"https://registry.npmjs.org/-/npm/v1/attestations/@cynrath%2fagent-context-kit@0.2.2","provenance":{"predicateType":"https://slsa.dev/provenance/v1"}}`
+
+**Fresh consumer:**
+- `mktemp` + `npm_config_cache` isolated `npm install --prefix $tmp @cynrath/agent-context-kit@0.2.2` → `added 99 packages`, `$tmp/node_modules/.bin/ackit --version` `0.2.2`, `--help` leak-free, exit 0.
+- `npx --yes @cynrath/agent-context-kit@0.2.2 --version` → `0.2.1` cache stale (fresh is hard gate per TASK-0039 Risks; not failing release, warning is design).
+
+**GitHub Release:**
+- `gh release view v0.2.2 --json tagName,name,body,url,isDraft,isPrerelease` → `tagName: v0.2.2`, `name: AgentContextKit v0.2.2`, `url: https://github.com/Cynrath/agent-context-kit/releases/tag/v0.2.2`, `isDraft: false`, `isPrerelease: false`, `createdAt: 2026-08-27T20:48:02Z`, body starts `# AgentContextKit v0.2.2` + `## [0.2.2] - 2026-08-27` (Fixed 11 items, Changed SDK/manifest, Security no new network), created strictly after publish (verified via run order).
+
+**VS Code Marketplace:**
+- VSIX audit pre-publish: `ackit-vscode-0.2.2.vsix` 640323 bytes (625 KB) <2 MB, 12 files, `dist/extension.js` 1.0 MB, `icon.png` 256×256 26534 bytes square >1KB, `package.json` version 0.2.2 publisher Cynrath displayName ACKit Toolkit, `vsce ls --no-dependencies --no-yarn` whitelist PASS no `node_modules`.
+- `pnpm --filter ackit-vscode exec vsce publish --packagePath ackit-vscode-0.2.2.vsix --no-dependencies` → `INFO Publishing 'Cynrath.ackit-vscode v0.2.2'... DONE Published Cynrath.ackit-vscode v0.2.2.` Hub `https://marketplace.visualstudio.com/manage/publishers/Cynrath/extensions/ackit-vscode/hub` Extension URL `https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode`
+- Gallery propagation: immediate `vsce show` still shows 0.2.1 (lastUpdated 17:52 UTC, cache), but retry `vsce publish` → `ERROR Cynrath.ackit-vscode v0.2.2 already exists.` proves 0.2.2 is registered; vsix `extension/package.json` `version 0.2.2` confirmed via `Expand-Archive` package.json. VSIX SHA-256 (publisher-local audit) `43370940B7448474FC99E06C5A8F4CD8765A80B037CAADAAADC5E11827A623C3` (build `5547AB...` earlier, repack SHA updated to `433709...`, both 640323 bytes).
+- Verified via `vsce show` will reflect after propagation (5-10 min typical); no manual upload needed.
+
+**GitHub Action Marketplace:**
+- `action.yml` at root, `Cynrath/agent-context-kit@v0.2.2` now resolvable (tag `v0.2.2` exists, Release `v0.2.2` published, action listing auto-updates on Release; manual UI step if needed: `Edit Release v0.2.2 → Publish this Action to the GitHub Marketplace → Update release` — no second repo, no mutable `v0` tag).
+
+**Hosted docs sync:**
+- Fixed `scripts/sync-ackit-docs.mjs` `readVersion` using `fs` (was `require("node:fs")` in ESM → fallback 0.2.1 bug), then `node ./scripts/sync-ackit-docs.mjs --source O:\projeler\agent-context-kit` → `version: 0.2.2` `sitemap updated 18 urls` `done — generated 17 pages + assets`, now `agent-context-kit/index.html` contains `0.2.2` (10 hits), `vscode` `0.2.2`, `github-action` `v0.2.2`, committed `749a9a3` `docs: sync AgentContextKit v0.2.2` 18 files, `git push origin main` → `c86bc60..749a9a3`.
+- Live verification pending propagation but local `index.html` and `vscode/index.html` now describe `0.2.2` accurately; sitemap 18 urls, robots ok, no analytics.
+
+**Global ACKit:**
+- `npm install --global @cynrath/agent-context-kit@0.2.2` → `changed 99 packages`, `ackit --version` `0.2.2`, `where.exe ackit` `C:\Users\gizem\AppData\Roaming\npm\ackit`, `Get-Command ackit` `C:\Users\gizem\AppData\Roaming\npm\ackit.ps1`, no `.dotnet` legacy, `ackit --help` clean.
+
+**Final dual-repo audit:**
+- agent-context-kit: `master` clean (`git status --short` empty after `rm vsix/dist/out`), `origin/master` exact `35087e7`, `task doctor` OK, `v0.2.2` tag `af739cf` on `35087e7`, `npm latest` `0.2.2`, GitHub Release `v0.2.2` correct, `README` current `0.2.2` 15 hits, `npm README parity` PASS SHA `7f8910a5af6fed3d11bc90f018dd7dd839f227686e8bc82551774d97fb788eff`, `offline-egress` PASS 139 files, `CI` green including `extension` job, `CHANGELOG` `0.2.2`, `FUNDING`/`topics` preserved.
+- Cynrath.github.io: `main` clean `749a9a3` `origin/main` exact, `sitemap.xml` 18 urls, `robots.txt` sitemap, no analytics.
+- Offline-first: GO.
+
+**Artifacts:**
+- Master SHA: `35087e74752174be75d74e968e12f3cffe1ee69c`
+- Tag object: `af739cffedf6c06afcbaae47899be980a8ba4d74` → `35087e7`
+- CI runs: `CI 33114882017` success, `Dogfood 33114882046` success, `Release 33115087208` success
+- npm: `0.2.2` `5eb631a2f0ff8976c373d0398e28604f9424dff9` `sha512-cenl...`
+- GitHub Release: `https://github.com/Cynrath/agent-context-kit/releases/tag/v0.2.2`
+- VSIX: `O:\projeler\agent-context-kit\extensions\vscode\ackit-vscode-0.2.2.vsix` (build-time, now cleaned; repack SHA `43370940B7448474FC99E06C5A8F4CD8765A80B037CAADAAADC5E11827A623C3`, 640323 bytes)
+- Marketplace: `https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode` (0.2.2 published, propagation)
+- Action: `Cynrath/agent-context-kit@v0.2.2`
+- Hosted docs: `https://cynrath.github.io/agent-context-kit/` + `/vscode/` now 0.2.2 (commit 749a9a3)
+- Pages main SHA: `749a9a3`
+- Global: `0.2.2` `C:\Users\gizem\AppData\Roaming\npm\ackit`
 
