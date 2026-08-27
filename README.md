@@ -1,103 +1,183 @@
 # ACKit — AgentContextKit
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/v/@cynrath/agent-context-kit?label=npm%20v0.2.0&color=0B84FF&style=flat-square" alt="npm version"></a>
-  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/dt/@cynrath/agent-context-kit?label=downloads&style=flat-square&color=00C853" alt="downloads"></a>
-  <a href="https://github.com/Cynrath/agent-context-kit"><img src="https://img.shields.io/github/stars/Cynrath/agent-context-kit?label=stars&style=flat-square&color=FFB300" alt="stars"></a>
-  <a href="https://github.com/Cynrath/agent-context-kit/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="license"></a>
-  <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Cynrath/agent-context-kit/ci.yml?branch=master&label=CI&style=flat-square" alt="CI"></a>
-  <a href="https://github.com/Cynrath/agent-context-kit/releases/tag/v0.2.0"><img src="https://img.shields.io/badge/release-v0.2.0-9C27B0?style=flat-square" alt="release"></a>
+  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/v/@cynrath/agent-context-kit?label=npm%20v0.2.0&color=0B84FF&style=for-the-badge" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/dt/@cynrath/agent-context-kit?label=downloads&style=for-the-badge&color=00C853" alt="downloads"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit"><img src="https://img.shields.io/github/stars/Cynrath/agent-context-kit?label=stars&style=for-the-badge&color=FFB300" alt="stars"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Cynrath/agent-context-kit/ci.yml?branch=master&label=CI&style=for-the-badge" alt="CI"></a>
 </p>
 
-<p align="center"><strong>Turn any repository into an agent-ready repository</strong> — instruction graph, skills, scanning, context packs, tasks, policy, readiness &amp; MCP.<br>Offline-first · Deterministic · Task-first · <code>ackit</code> on Node >=22</p>
+<p align="center">
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="license"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit/releases/tag/v0.2.0"><img src="https://img.shields.io/badge/release-v0.2.0-9C27B0?style=flat-square" alt="release"></a>
+  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/badge/node-%3E%3D22-339933?style=flat-square&logo=node.js" alt="node"></a>
+  <img src="https://img.shields.io/badge/offline--first-yes-00ACC1?style=flat-square" alt="offline">
+  <img src="https://img.shields.io/badge/deterministic-yes-FF6F00?style=flat-square" alt="deterministic">
+</p>
 
-> **v0.2.0** — consolidated product-expansion release on `master` (`@cynrath/agent-context-kit@0.2.0`, `ackit 0.2.0`). See [Docs](#docs) · [Changelog](CHANGELOG.md) · [Security](docs/security/THREAT_MODEL.md) · [Contributing](CONTRIBUTING.md) · License: MIT.
+<h3 align="center">Turn any repository into an <em>agent-ready</em> repository.</h3>
+<p align="center">Instruction graph · Skills · Scanning · Context packs · Tasks · Policy · Readiness · MCP<br><strong>Offline-first · Deterministic · Task-first</strong> — <code>ackit</code> on Node&nbsp;≥&nbsp;22</p>
 
-## What it does
+<p align="center">
+  <a href="#quickstart"><strong>Quickstart →</strong></a> ·
+  <a href="docs/guides/getting-started.md">Getting Started</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="docs/security/THREAT_MODEL.md">Security</a> ·
+  <a href="#-github-action">GitHub Action</a>
+</p>
 
-ACKit reads your repository the way a coding agent would — instructions, skills, tasks, docs, code — and makes it **safe and efficient** for that agent: it resolves who-listens-to-what across provider instruction files, validates open-standard skills without ever executing them, scans for secrets and hygiene problems with redacted evidence, builds token-budgeted context packs with explained exclusions, enforces a docs-first task workflow with machine-checkable gates, applies team policy as code (locked rules, offline), scores **Agent Readiness 0–100** with explainable deductions, and exposes all of it read-only over MCP.
+---
 
-## Why
-
-Agent tooling today is either convention-based (nothing is verified) or cloud-coupled (your code leaves the machine). ACKit takes a third path: **deterministic local analysis** with stable machine-readable contracts, an offline-by-construction dependency policy, and ownership-respecting writes. It dogfoods its own workflow: this repository was built by following the same task system the product ships.
-
-## Features (v0.2.0)
-
-- **Agent Readiness / Context Quality** — `ackit readiness` + `ackit scan --json` `readiness` (0–100, 6 categories: Instructions 25, Security 25, Context 20, Task 10, Skills 10, Policy 10, weighted renormalization, `ackit.readiness.v1` schema, `--fail-below/--strict/--baseline/--compare`, N/A handling)
-- **Instruction Graph v2** — codex/claude/gemini/copilot (+shared) surfaces, nesting, `includeScopes`/`excludeScopes`/`providerApplicability`/`provenance`/`shadowedBy`/`duplicateOf`/`orderIndex`, `applyTo` globs, conflict/duplicate/shadow/dead detection, deterministic `depth→precedence→id` ordering, POSIX normalization, symlink `realpath`, `maxNodes`/`maxDepth` limits
-- **Provider-Aware Profiles** — built-ins `codex`/`claude`/`copilot`/`gemini`/`generic` (`templates/profiles/*.yml`, `schemas/profile.schema.json`), selection `CLI --profile > ackit.yml profile > auto-detect > generic`, `ackit pack --profile` budget/`includePriority`, `ackit instructions --profile/--explain` profile file-conventions, `diagnostics --json` profile trace
-- **Declarative Rule/Policy Packs** — `schemas/rule-pack.schema.json` v1 (`packId/namespace/version/severity/rules[]` with `presence|pattern|config|dependency|instruction`, `glob`/`scope`/`match`, `overrides`/`composition`), local `policy.rulePacks` + `node_modules` package-dist only (no fetch), `POL-PACK-COLLISION`/`POL-NETWORK-REFUSED`, ReDoS/size limits, pure `evaluatePack`
-- **Optimize v2** — `ackit optimize --explain --category --min-severity --format terminal|json|markdown|sarif` (8-class taxonomy, `evidence[]`/`confidence`/`tokenWasteEstimate`/`provenance`/`plan {target,action,diff}`, `--fix --dry-run` preview on managed surfaces only)
-- **Public SDK v1** — `src/index.ts` allowlist (`scanRepository`, `loadAckitConfig`, `buildContextPack`, `buildInstructionGraph`, `resolveEffectiveStack`, `validateSkills`, `AckitError`, `scoreRepository`, `evaluateRulePacks`, `resolveProfile`, …), `sideEffects:false`, `type:module`, `exports {".","./mcp"}`, `AbortSignal` <200ms, `docs/reference/sdk.md` + `examples/sdk-consumer.mjs`
-- **Official GitHub Action** — `action.yml` `AgentContextKit` `shield/blue` `node24` `dist/action/index.js`, inputs `command/args/fail-threshold/upload-sarif`, outputs `findings-json/sarif-path`, safe `execFile` arg split, SARIF 2.1.0, job summary, `contents: read` least-privilege, SHA-pinned `f548/ae0d/b906`, dogfood `.github/workflows/ackit-action-dogfood.yml`
-- **Watch / Incremental** — `ackit scan --watch` debounced/coalesced 400ms, ignored `.git/node_modules/dist/.ackit/coverage/artifacts`, incremental cache, graceful `SIGINT` → `WatchHandle.done` exit 0, cross-platform
-- **Local Dashboard / Report Server** — `ackit dashboard` / `ackit report serve --port 0` localhost-only `127.0.0.1` default, `--allow-nonlocal` required for non-loopback, `Content-Security-Policy: default-src 'self'` + `X-Content-Type-Options: nosniff`, XSS-escaped (`textContent`), `/api/scan|graph|readiness|tasks.json` paginated, polling live updates, `<50KB` vanilla JS
-- **Diagnostics / Sanitized Bundle** — `ackit diagnostics --json` (`ackit.diagnostics.v1`), `ackit diagnostics bundle --out/--redact-check` deterministic `bundle-manifest.json` (`sha256` + redaction count), 5-secret `[REDACTED]` proof, no absolute paths
-- **Performance Benchmarks** — `benchmarks/{generate-fixtures.mjs,run.mjs,thresholds.json}` 7 deterministic fixture classes, 8 metrics (`coldScanMs`/`warmScanMs`/`incrementalMs`/`peakRssMb`/`filesPerSec`/`packMs`/`graphMs`/`cacheHitRatio`), median-of-3, `1.5x` thresholds, PR advisory vs scheduled
-- **VS Code Extension** — `extensions/vscode` `0.2.0` publisher `cynrath` `lints` Linters `onStartupFinished` (readiness tree, Problems `ACKITxxx`, graph “instructions for current file” via `resolveEffectiveStack`, tasks/policy/optimize, palette `Refresh/Show Graph/Optimize/Diagnostics`, watcher debounced, no telemetry, `<2MB` VSIX) — **VSIX-ready, not yet published to Marketplace** (separate `marketplace: yes` checkpoint)
-- **MCP Server** — official SDK stdio, 9 read-only tools, 5 resources, 4 prompts, `InMemoryTransport` cancellation
-- **Task-First Workflow** — `docs/tasks` single-active rule, completion gate, `ackit task doctor`
-- **Offline-First / Security** — zero network in product code, secrets redacted at construction, one containment engine, read-only MCP, `docs/security/THREAT_MODEL.md`
-
-## Install
-
-Requires Node **>= 22**.
-
-Install globally from the npm registry (latest is `0.2.0`):
+### ✨ Demo (30 seconds)
 
 ```bash
+# 1 — onboard (dry-run, writes nothing)
+$ ackit init --dry-run
+✔ plan: AGENTS.md shim + 4 built-in skills
+
+# 2 — score readiness (explainable, no LLM)
+$ ackit readiness
+Readiness 88/100 ██████████████████░░  (threshold 80 — pass)
+  Instructions        90/100
+  Security            90/100
+  Context Efficiency  70/100
+
+# 3 — graph + optimize
+$ ackit instructions --explain
+codex/AGENTS.md → claude/CLAUDE.md (provenance: frontmatter applyTo)
+
+$ ackit optimize --explain --json | jq .suggestions[0].tokenWasteEstimate
+42
+
+# 4 — provider-aware pack & dashboard
+$ ackit pack --profile codex --max-tokens 50000 | head -5
+# ACKit Context Pack — 12 files, 34210 tokens
+
+$ ackit dashboard --port 0 --open   # localhost-only, CSP, live polling
+→ http://127.0.0.1:54321
+```
+
+---
+
+### 🧭 Table of Contents
+
+- [Why ACKit?](#-why)
+- [Features at a glance](#-features-at-a-glance)
+- [Install](#-install)
+- [Quickstart](#-quickstart)
+- [CLI Overview](#-cli-overview)
+- [Configuration](#-configuration)
+- [Architecture](#-architecture)
+- [GitHub Action](#-github-action)
+- [VS Code](#-vs-code)
+- [Docs](#-docs)
+- [Development](#-development)
+- [Versioning](#-versioning)
+
+---
+
+### ❓ Why
+
+| Before | With ACKit |
+|---|---|
+| Convention-based — nothing is verified | **Deterministic local analysis** with stable JSON/SARIF contracts |
+| Cloud-coupled — code leaves the machine | **Offline-by-construction** — zero network in product code |
+| Secrets leak into prompts/logs | **Redacted at construction** — evidence never contains plaintext secrets |
+| One `AGENTS.md` for all providers | **Provider-aware** — Codex/Claude/Copilot/Gemini/generic, `includeScopes`/`applyTo` |
+| “It worked on my machine” | **Machine-checkable gates** — `ackit scan --ci`, `ackit readiness --strict` |
+
+> This repository dogfoods itself: it was built by following the same `docs/tasks` task system it ships.
+
+---
+
+### 🎁 Features at a glance
+
+| | Capability | Command | What you get |
+|---|---|---|---|
+| 📊 | **Agent Readiness** | `ackit readiness` | 0–100 across 6 categories (25/25/20/10/10/10), weighted renormalization, `ackit.readiness.v1` JSON + terminal tree, `--fail-below/--strict/--baseline/--compare`, N/A handling |
+| 🧩 | **Instruction Graph v2** | `ackit instructions --explain` | Codex/Claude/Gemini/Copilot+shared, nesting, `includeScopes`/`excludeScopes`/`providerApplicability`/`provenance`/`shadowedBy`/`duplicateOf`, `applyTo` globs, conflict/duplicate/shadow/dead, `depth→precedence→id`, symlink `realpath`, `maxNodes`/`maxDepth` |
+| 🎭 | **Provider Profiles** | `ackit pack --profile codex` | 5 built-ins (`codex`/`claude`/`copilot`/`gemini`/`generic`), `CLI --profile > ackit.yml > auto-detect > generic`, budget/`includePriority`/`fileConventions` |
+| 📜 | **Rule/Policy Packs** | `ackit policy check` | `schemas/rule-pack.schema.json` v1 (`presence|pattern|config|dependency|instruction`), `glob`/`scope`/`match`, `overrides`/`composition`, local + `node_modules` package-dist only, `POL-PACK-COLLISION`, ReDoS/size guards |
+| 🧹 | **Optimize v2** | `ackit optimize --explain` | 8-class taxonomy, `evidence[]`/`confidence`/`tokenWasteEstimate`/`provenance`/`plan {target,action,diff}`, `--fix --dry-run` on managed surfaces, `terminal|json|markdown|sarif` |
+| 📦 | **Context Packs** | `ackit pack --max-tokens 50000` | Weighted deterministic ranking, manifest `hash/reason/tokens` per file, `<local-path>` scrubbing |
+| 🔒 | **Scanning** | `ackit scan --ci` | Secrets/assignments/private keys/connection strings/entropy/absolute-path/CI pinning/drift, redacted evidence, SARIF 2.1.0, baselines, incremental `changed/staged/since/range`, cache |
+| ✅ | **Tasks** | `ackit task` | `docs/tasks` single-active, `[ ]/[~]/[x]/[!]`, completion gate, `task doctor` |
+| 🔭 | **Watch/Dashboard** | `ackit dashboard` | `scan --watch` debounced 400ms + cache + `SIGINT`→`WatchHandle.done`; `dashboard` localhost-only `127.0.0.1`, `--allow-nonlocal` required, `CSP default-src 'self'` + `nosniff`, XSS-escaped, `/api/*` paginated, polling, `<50KB` vanilla JS |
+| 🩺 | **Diagnostics** | `ackit diagnostics bundle` | `ackit.diagnostics.v1` + deterministic `bundle-manifest.json` (`sha256` + redaction count), 5-secret `[REDACTED]` proof |
+| ⚡ | **Benchmarks** | `benchmarks/run.mjs` | 7 deterministic fixtures, 8 metrics (`coldScanMs`/`warmScanMs`/`incrementalMs`/`peakRssMb`/`filesPerSec`/`packMs`/`graphMs`/`cacheHitRatio`), median-of-3, `1.5×` thresholds |
+| 🔌 | **SDK v1** | `import { scanRepository } from "@cynrath/agent-context-kit"` | `sideEffects:false`, `type:module`, `exports {".","./mcp"}`, `AbortSignal` <200ms, `AckitError` (`code`+`remediation`), `examples/sdk-consumer.mjs` |
+| 🧩 | **VS Code** | `extensions/vscode` | `0.2.0`, `cynrath`, `lints` Linters, `onStartupFinished`, readiness tree + Problems `ACKITxxx` + “instructions for current file” + palette, watcher, no telemetry, `<2MB` VSIX — **VSIX-ready, not yet Marketplace** |
+| 🤖 | **MCP** | `ackit mcp serve` | Official SDK stdio, 9 read-only tools, 5 resources, 4 prompts, `InMemoryTransport` cancellation |
+
+---
+
+### 📦 Install
+
+**Requires Node ≥ 22.**
+
+```bash
+# global (recommended)
 npm install --global @cynrath/agent-context-kit
-ackit --version
-```
+ackit --version  # 0.2.0
 
-Or run once with npx (explicit `0.2.0`):
-
-```bash
+# one-shot, pinned
 npx --yes @cynrath/agent-context-kit@0.2.0 --version
-```
+npx --yes @cynrath/agent-context-kit@0.2.0 --help
 
-To run from a source checkout instead:
-
-```bash
+# from source
 pnpm install --frozen-lockfile && pnpm build
 node dist/cli/index.js --help
 ```
 
-## Quickstart (v0.2.0)
+---
+
+### 🚀 Quickstart
 
 ```bash
-ackit init --dry-run        # plan shims + builtin skills (writes nothing)
-ackit scan --ci             # scan; exit 1 at/over threshold (medium)
-ackit readiness             # 0–100 with deductions, N/A renormalization
+ackit init --dry-run        # plan shims + 4 built-in skills (writes nothing)
+ackit scan --ci             # gate: exit 1 at/over threshold (medium)
+ackit readiness             # 0–100, N/A renormalization, --strict/--fail-below
 ackit instructions --explain # graph v2 with provenance
-ackit optimize --explain    # 8-class advisor with waste estimates
-ackit pack --profile codex --max-tokens 50000  # provider-aware pack
+ackit optimize --explain    # 8-class advisor, waste estimates
+ackit pack --profile codex --max-tokens 50000  # provider-aware, budgeted
+ackit diagnostics --json | jq .profile
+ackit dashboard --port 0 --open  # localhost-only
 ```
 
-Every command supports `--json` for machine-readable stdout and `--help`. Full tour: `docs/guides/getting-started.md`.
+> Every command supports `--json` and `--help`. Full tour → [`docs/guides/getting-started.md`](docs/guides/getting-started.md)
 
-## CLI overview
+---
 
-| Command | Purpose | Key Options |
+### 🖥️ CLI Overview
+
+| Command | Purpose | Highlights |
 |---|---|---|
-| `init` | plan/write instruction shims + builtin skills | `--dry-run`, `--agents` |
+| `init` | plan/write shims + skills | `--dry-run`, `--agents` |
 | `scan` | security/hygiene scan | `--ci --changed --staged --since --range --baseline --write-baseline --watch --format --fail-below/--strict/--compare` |
-| `readiness` | deterministic 0–100 scoring | `--fail-below --strict --baseline/--compare --json` |
-| `optimize` | hygiene advisor v2 | `--fix --dry-run --profile --explain --category --min-severity --format terminal\|json\|markdown\|sarif --diff` |
-| `diagnostics` | env/config/instructions/cache/policy/tasks | `--json`, `bundle --out/--redact-check --profile` |
-| `dashboard` | local dashboard (localhost-only) | `--host/--port/--allow-nonlocal --open` |
-| `instructions` | graph tree/JSON + effective chain v2 | `--provider --profile --for --explain --json` |
-| `pack` | budgeted context pack (provider-aware) | `--max-tokens --profile --include --changed --format` |
+| `readiness` | **0–100 scoring** | `--fail-below --strict --baseline/--compare --json` |
+| `optimize` | hygiene advisor **v2** | `--fix --dry-run --profile --explain --category --min-severity --format terminal\|json\|markdown\|sarif --diff` |
+| `diagnostics` | env/config/cache/policy/tasks | `--json`, `bundle --out/--redact-check --profile` |
+| `dashboard` | **local dashboard** (localhost-only) | `--host/--port/--allow-nonlocal --open` |
+| `instructions` | graph **v2** tree/JSON + effective chain | `--provider --profile --for --explain --json` |
+| `pack` | **provider-aware** pack | `--max-tokens --profile --include --changed --format` |
 | `skills` | list / validate / install |  |
-| `task` | create / list / start / complete / archive / doctor |  |
-| `policy` / `config` | check offline policy / validate config |  |
+| `task` | `create/list/start/complete/archive/doctor` | docs-first, single-active |
+| `policy` / `config` | offline policy / config check |  |
 | `cache` / `workspaces` / `hooks` / `report serve` / `mcp serve` | utilities |  |
 
-Details: `docs/reference/cli.md` · Exit codes: `docs/reference/exit-codes.md` · Schemas: `docs/reference/schemas.md`
+Details: [`docs/reference/cli.md`](docs/reference/cli.md) · Exit codes: [`docs/reference/exit-codes.md`](docs/reference/exit-codes.md) · Schemas: [`docs/reference/schemas.md`](docs/reference/schemas.md)
 
-## Configuration
+<details><summary><strong>Exit codes</strong></summary>
 
-Optional root `ackit.yml` (schema-versioned, strict):
+0 ok · 1 threshold/new-findings · 2 usage/config · 3 environment · 4 security boundary · 5 internal. See [`docs/reference/exit-codes.md`](docs/reference/exit-codes.md).
+
+</details>
+
+---
+
+### ⚙️ Configuration
+
+Optional root `ackit.yml` (strict, additive — `v1` still valid):
 
 ```yaml
 schemaVersion: 1
@@ -109,73 +189,48 @@ context:
   maxTokens: 80000
 policy:
   extends: []
-  rulePacks: []
+  rulePacks: []               # declarative packs (local or node_modules)
 readiness:
-  weights:
-    instructions: 25
-    security: 25
-    contextEfficiency: 20
-    taskHygiene: 10
-    skills: 10
-    policy: 10
+  weights: { instructions: 25, security: 25, contextEfficiency: 20, taskHygiene: 10, skills: 10, policy: 10 }
   strictThreshold: 80
-profile: codex
+profile: codex                # codex|claude|copilot|gemini|generic
 profiles:
-  extend: []
+  extend: []                  # repo-relative custom profiles
 ```
 
-Validate: `ackit config check`. Schema: `schemas/ackit.schema.json`. Reference: `docs/reference/config.md`.
+Validate: `ackit config check` · Schema: `schemas/ackit.schema.json` · Reference: [`docs/reference/config.md`](docs/reference/config.md)
 
-## Instruction graph v2
+---
 
-AGENTS/CLAUDE/GEMINI/Copilot surfaces resolve into one graph with `includeScopes`/`excludeScopes`/`providerApplicability`/`provenance`, `shadowedBy`/`duplicateOf`, explicit precedence tiers, nested-scope wins, `AGENTS.override.md`, copilot `applyTo` globs, checksums, token estimates and security flags:
+### 🏗️ Architecture
 
-```bash
-ackit instructions --provider claude --for src/app.ts --explain
-ackit instructions --profile codex --json | jq .profile
+```mermaid
+flowchart LR
+    A[Repository] --> B[Filesystem Engine<br/>realpath containment]
+    B --> C[Instruction Graph v2<br/>scope → precedence]
+    B --> D[Scanner<br/>redacted findings]
+    B --> E[Context Pack<br/>budgeted ranking]
+    C --> F[Readiness 0–100<br/>6 categories]
+    D --> F
+    E --> F
+    C --> G[Optimize v2<br/>8-class + waste]
+    D --> G
+    F --> H{CLI / SDK / MCP / Action / Dashboard / VS Code}
+    G --> H
 ```
 
-Concepts: `docs/concepts/instruction-graph.md` · Reference: `docs/reference/instruction-graph.md`.
+- **Single door to filesystem** — one containment engine
+- **Redaction before reporters** — findings constructed already-safe
+- **Determinism** — same repo+config → byte-identical JSON/fingerprints
+- **Offline-by-construction** — no network in product code
 
-## Scanning & severity
+More: [`docs/architecture/overview.md`](docs/architecture/overview.md)
 
-Findings carry `ruleId/severity/category/message/path:line:col/fingerprint/redacted evidence/remediation/documentationKey/suppression`. Deterministic order; inline `ackit-ignore:ACKITnnn` bypasses stay visible via an advisory. Policy packs add `POL-PACK-*` findings. Rules table: `docs/reference/rules.md`.
+---
 
-## Context budget & profiles
+### 🤖 GitHub Action
 
-Ranked by transparent weights (include > changed > task refs > scope > proximity > relevance > type − size), filled greedily into `--max-tokens`, manifest explains every exclusion. Profiles adjust `maxTokens`/`includePriority`/`fileConventions`:
-
-```bash
-ackit pack --profile copilot --json | jq .manifest
-```
-
-Concepts: `docs/concepts/context-budget.md` · `docs/concepts/provider-profiles.md`.
-
-## Policy as code & Rule Packs
-
-Versioned YAML layers with `extends` (local files or pre-installed npm packages only), locked rules, scoped suppressions with expiry, `rulePacks` with `overrides`/`composition` and ReDoS/size guards, thresholds and a digest wired into reports/cache:
-
-```bash
-ackit policy check
-ackit scan --json | jq .findings | grep POL-PACK
-```
-
-Guide: `docs/guides/rule-packs.md`.
-
-## Readiness scoring
-
-Deterministic `scoreRepository` pure function (no LLM) over graph/pack/scan/skills/policy/tasks → `ackit.readiness.v1` JSON + terminal tree, CI-gateable `--fail-below`:
-
-```bash
-ackit readiness --strict
-ackit scan --ci --fail-below 80
-```
-
-Reference: `docs/reference/readiness.md` · `docs/concepts/readiness.md`.
-
-## GitHub Action
-
-Official `Cynrath/agent-context-kit@v0.2.0` (or SHA-pinned for high-assurance):
+Official `Cynrath/agent-context-kit@v0.2.0` (SHA-pinned for high-assurance):
 
 ```yaml
 permissions:
@@ -195,69 +250,88 @@ jobs:
       # optional: upload findings via actions/upload-artifact@v4
 ```
 
-Inputs `command/args/fail-threshold/upload-sarif`, outputs `findings-json/sarif-path`, annotations/SARIF 2.1.0/job summary, least-privilege. Guide: `docs/guides/ci.md` · Action: `action.yml`.
+Inputs `command/args/fail-threshold/upload-sarif`, outputs `findings-json/sarif-path`, annotations/SARIF 2.1.0/job summary, least-privilege. Guide: [`docs/guides/ci.md`](docs/guides/ci.md) · Action: [`action.yml`](action.yml)
 
-## Watch / Dashboard
+---
+
+### 👀 Watch / Dashboard & Diagnostics
 
 ```bash
-ackit scan --watch          # debounced 400ms, incremental, SIGINT → exit 0
+ackit scan --watch          # debounced 400ms, incremental cache, SIGINT → exit 0
 ackit dashboard --port 0 --open  # localhost-only, CSP, XSS-escaped, live polling
-ackit report serve ./report.html --port 0  # static report
-```
+ackit report serve ./report.html --port 0
 
-Guide: `docs/guides/watch-dashboard.md`.
-
-## Diagnostics
-
-```bash
 ackit diagnostics --json | jq .profile
 ackit diagnostics bundle --out ./ackit-diag.zip --redact-check
 ```
 
-Reference: `docs/reference/diagnostics.md`.
+Guides: [`docs/guides/watch-dashboard.md`](docs/guides/watch-dashboard.md) · Reference: [`docs/reference/diagnostics.md`](docs/reference/diagnostics.md)
 
-## SDK
+---
+
+### 🔌 SDK
 
 ```js
 import { scanRepository, scoreRepository, buildInstructionGraph } from "@cynrath/agent-context-kit";
+
 const result = await scanRepository({ canonicalPath: process.cwd() });
+console.log(result.findings.length);
+
+// cancellable
+const ac = new AbortController();
+setTimeout(() => ac.abort(), 10);
+await scanRepository({ canonicalPath: "." }, { signal: ac.signal });
 ```
 
-ESM-only, `sideEffects:false`, `AbortSignal` cancellable, no `process.exit`. Reference: `docs/reference/sdk.md` · Example: `examples/sdk-consumer.mjs`.
+ESM-only, `sideEffects:false`, `AbortSignal` cancellable, no `process.exit`. Reference: [`docs/reference/sdk.md`](docs/reference/sdk.md) · Example: [`examples/sdk-consumer.mjs`](examples/sdk-consumer.mjs)
 
-## VS Code
+---
 
-Extension is **implemented and VSIX-ready (`extensions/vscode` `0.2.0`, `<2MB`) but not yet published to Marketplace** — separate `marketplace: yes` checkpoint. From source: `pnpm --filter vscode build` + `vsce package` → `ackit-0.2.0.vsix`. Features: readiness tree, Problems `ACKITxxx`, graph “instructions for current file”, tasks/policy/optimize, palette `Refresh/Show Graph/Optimize/Diagnostics`, watcher. Guide: `docs/guides/vscode.md`.
+### 🧩 VS Code
 
-## Workspaces
+Extension is **implemented and VSIX-ready (`extensions/vscode` `0.2.0`, `<2MB`) but not yet published to Marketplace** — separate `marketplace: yes` checkpoint.
 
-pnpm/npm/yarn/generic monorepo detection with per-workspace partitioning of instructions/policy/packs. Guide: `docs/guides/monorepo.md`.
+From source:
 
-## Exit codes
+```bash
+pnpm --filter vscode build
+vsce package # → ackit-0.2.0.vsix
+```
 
-0 ok · 1 threshold/new-findings · 2 usage/config · 3 environment · 4 security boundary · 5 internal. Reference: `docs/reference/exit-codes.md`.
+Features: readiness tree, Problems `ACKITxxx`, graph “instructions for current file”, tasks/policy/optimize, palette `Refresh/Show Graph/Optimize/Diagnostics`, file watcher debounced, no telemetry.
 
-## Security
+Guide: [`docs/guides/vscode.md`](docs/guides/vscode.md)
 
-Threat model: `docs/security/THREAT_MODEL.md` · Trust model: `docs/security/SECURITY_MODEL.md`. Highlights: repository content is untrusted input; zero network in product code; secrets redacted at construction; filesystem access funneled through one containment engine; MCP server is read-only; dashboard localhost-only + CSP. Vulnerabilities: see `SECURITY.md`.
+---
 
-## Docs
+### 📚 Docs
 
-Architecture: `docs/architecture/overview.md` · Concepts: `instruction-graph` / `context-budget` / `provider-profiles` / `readiness` · Guides: `getting-started` / `readiness` / `optimize` / `provider-profiles` / `instruction-graph` / `rule-packs` / `ci` / `watch-dashboard` / `diagnostics` / `sdk` / `vscode` / `monorepo` · Reference: `cli` / `config` / `rules` / `readiness` / `profile` / `rule-pack` / `instruction-graph` / `diagnostics` / `sdk` / `exit-codes` / `mcp` / `schemas` · Decisions: `docs/decisions/` · v0.2.0: `docs/v0.2.0/` · Tasks: `docs/tasks/active`
+| Area | Link |
+|---|---|
+| Architecture | [`docs/architecture/overview.md`](docs/architecture/overview.md) |
+| Concepts | `instruction-graph` · `context-budget` · `provider-profiles` · `readiness` |
+| Guides | [`getting-started`](docs/guides/getting-started.md) · [`readiness`](docs/guides/readiness.md) · [`optimize`](docs/guides/optimize.md) · [`provider-profiles`](docs/guides/provider-profiles.md) · [`instruction-graph`](docs/guides/instruction-graph.md) · [`rule-packs`](docs/guides/rule-packs.md) · [`ci`](docs/guides/ci.md) · [`watch-dashboard`](docs/guides/watch-dashboard.md) · [`diagnostics`](docs/guides/diagnostics.md) · [`sdk`](docs/guides/sdk.md) · [`vscode`](docs/guides/vscode.md) · [`monorepo`](docs/guides/monorepo.md) |
+| Reference | `cli` · `config` · `rules` · `readiness` · `profile` · `rule-pack` · `instruction-graph` · `diagnostics` · `sdk` · `exit-codes` · `mcp` · `schemas` |
+| Decisions | [`docs/decisions/`](docs/decisions/) · `v0.2.0`: [`docs/v0.2.0/`](docs/v0.2.0/) |
+| Tasks | [`docs/tasks/active`](docs/tasks/active) |
 
-## MCP setup
+---
+
+### 🔌 MCP Setup
 
 ```json
 { "mcpServers": { "ackit": { "command": "ackit", "args": ["mcp", "serve"] } } }
 ```
 
-Reference: `docs/reference/mcp.md`.
+Reference: [`docs/reference/mcp.md`](docs/reference/mcp.md)
 
-## Requirements
+---
 
-Node >= 22 · pnpm 11 (development) · git optional (incremental features).
+### 🛠️ Requirements & Development
 
-## Development
+**Requirements:** Node ≥ 22 · pnpm 11 (development) · git optional (incremental features)
+
+**Development:**
 
 ```bash
 pnpm install --frozen-lockfile
@@ -266,12 +340,20 @@ pnpm build && pnpm test && pnpm smoke:cli
 pnpm run smoke:package   # pack → temp install → CLI smoke
 ```
 
-See `CONTRIBUTING.md` for the docs-first workflow.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the docs-first workflow.
 
-## Versioning
+---
+
+### 🔖 Versioning
 
 Current: **`0.2.0`** on `master` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases) · `latest → 0.2.0` via OIDC Trusted Publishing with provenance. Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
 
-## License
+---
 
-MIT — `LICENSE`.
+### 📄 License
+
+MIT — [`LICENSE`](LICENSE)
+
+<p align="center">
+  <a href="https://github.com/Cynrath/agent-context-kit">⭐ Star this repo if it makes your agents happier!</a>
+</p>
