@@ -1,9 +1,17 @@
 # ACKit — AgentContextKit
 
-**Turn any repository into an agent-ready repository** — instruction graph, agent skills, security scanning, context budgeting, docs-first tasks, policy-as-code, readiness scoring, and MCP. Offline-first and deterministic.
+<p align="center">
+  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/v/@cynrath/agent-context-kit?label=npm%20v0.2.0&color=0B84FF&style=flat-square" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/dt/@cynrath/agent-context-kit?label=downloads&style=flat-square&color=00C853" alt="downloads"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit"><img src="https://img.shields.io/github/stars/Cynrath/agent-context-kit?label=stars&style=flat-square&color=FFB300" alt="stars"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="license"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Cynrath/agent-context-kit/ci.yml?branch=master&label=CI&style=flat-square" alt="CI"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit/releases/tag/v0.2.0"><img src="https://img.shields.io/badge/release-v0.2.0-9C27B0?style=flat-square" alt="release"></a>
+</p>
 
-> Status: **v0.2.0** — consolidated product-expansion release. Deterministic, offline-first agent readiness for coding agents. Requires Node >= 22.
-> See [Docs](#docs) · [Security](docs/security/THREAT_MODEL.md) · [Contributing](CONTRIBUTING.md) · License: MIT · `CHANGELOG.md` `0.2.0`.
+<p align="center"><strong>Turn any repository into an agent-ready repository</strong> — instruction graph, skills, scanning, context packs, tasks, policy, readiness &amp; MCP.<br>Offline-first · Deterministic · Task-first · <code>ackit</code> on Node >=22</p>
+
+> **v0.2.0** — consolidated product-expansion release on `master` (`@cynrath/agent-context-kit@0.2.0`, `ackit 0.2.0`). See [Docs](#docs) · [Changelog](CHANGELOG.md) · [Security](docs/security/THREAT_MODEL.md) · [Contributing](CONTRIBUTING.md) · License: MIT.
 
 ## What it does
 
@@ -260,9 +268,9 @@ pnpm run smoke:package   # pack → temp install → CLI smoke
 
 See `CONTRIBUTING.md` for the docs-first workflow.
 
-## Versioning & status
+## Versioning
 
-`0.2.0` is the current consolidated release on `master` (`@cynrath/agent-context-kit` `0.2.0`, `ackit 0.2.0`, tag `v0.2.0`, GitHub Release `v0.2.0`, npm `latest → 0.2.0`, OIDC Trusted Publishing with provenance). `0.1.1` and `0.1.0` remain as historical releases. The legacy .NET/NuGet `1.0.0-rc.1` at `258918b` is frozen and immutable. Historical v1 evidence lives in `docs/history/` and `docs/rebuild/` (preserved verbatim). Changelog: `CHANGELOG.md` (`[0.2.0] - 2026-08-27`).
+Current: **`0.2.0`** on `master` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases) · `latest → 0.2.0` via OIDC Trusted Publishing with provenance. Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
 
 ## License
 
