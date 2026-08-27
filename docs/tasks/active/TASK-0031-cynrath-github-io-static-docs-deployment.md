@@ -1,11 +1,11 @@
 ---
 id: "TASK-0031"
 title: "Cynrath.github.io static docs deployment"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: 2026-08-27
 ---
 
 
