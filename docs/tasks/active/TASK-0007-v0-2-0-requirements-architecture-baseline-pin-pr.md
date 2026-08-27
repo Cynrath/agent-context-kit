@@ -1,11 +1,11 @@
 ---
 id: "TASK-0007"
 title: "v0.2.0 requirements + architecture baseline (pin & preflight)"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -102,12 +102,12 @@ No new perf work. Baseline for perf suite is frozen: `benchmarks/thresholds.json
 
 ## Acceptance criteria
 
-- [ ] `git status --short` is empty, `git branch --show-current` == `master`, `git rev-parse HEAD` == `git rev-parse origin/master`, `git tag --list` == `v0.1.0\nv0.1.1` (no `v0.2.0`).
-- [ ] `docs/v0.2.0/{REQUIREMENTS,TRACEABILITY,ROADMAP,EXECUTION_PLAN,DEFINITION_OF_DONE}` exist, are committed, and `docs/v0.2.0/EXECUTION_PLAN.md` dependency table uses the real allocated IDs `TASK-0007…0024` with no placeholder row and `git diff --check` clean.
-- [ ] All 24 ADRs (0001–0024) are `Accepted` and `grep -E "TBD|decide later" docs/decisions/ADR-0015* docs/rebuild/decisions/ADR-0015*` returns zero; reuse decisions are explicitly justified (e.g., ADR-0006 remains, ADR-0017 extends).
-- [ ] Pin audit recorded in Completion notes: Node `>=22` still valid (LTS schedule note checked), `@modelcontextprotocol/sdk@^1.30.0` still latest 1.30.x line, SHA pins unchanged from `ci.yml`, `packageManager` field is `pnpm@11.22.0`.
-- [ ] `pnpm install --frozen-lockfile && pnpm build && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test` all exit 0 (at least 304 existing tests); `node dist/cli/index.js task doctor` OK; `config check` OK; `doctor` OK; `scan --ci` OK.
-- [ ] No `package.json` version change (still `0.1.1`), no tag, no publish, no workflow_dispatch (verified via `git diff --stat` not containing `package.json` version line and workflow triggers still tags-only).
+- [x] `git status --short` is empty, `git branch --show-current` == `master`, `git rev-parse HEAD` == `git rev-parse origin/master`, `git tag --list` == `v0.1.0\nv0.1.1` (no `v0.2.0`).
+- [x] `docs/v0.2.0/{REQUIREMENTS,TRACEABILITY,ROADMAP,EXECUTION_PLAN,DEFINITION_OF_DONE}` exist, are committed, and `docs/v0.2.0/EXECUTION_PLAN.md` dependency table uses the real allocated IDs `TASK-0007…0024` with no placeholder row and `git diff --check` clean.
+- [x] All 24 ADRs (0001–0024) are `Accepted` and `grep -E "TBD|decide later" docs/decisions/ADR-0015* docs/rebuild/decisions/ADR-0015*` returns zero; reuse decisions are explicitly justified (e.g., ADR-0006 remains, ADR-0017 extends).
+- [x] Pin audit recorded in Completion notes: Node `>=22` still valid (LTS schedule note checked), `@modelcontextprotocol/sdk@^1.30.0` still latest 1.30.x line, SHA pins unchanged from `ci.yml`, `packageManager` field is `pnpm@11.22.0`.
+- [x] `pnpm install --frozen-lockfile && pnpm build && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test` all exit 0 (at least 304 existing tests); `node dist/cli/index.js task doctor` OK; `config check` OK; `doctor` OK; `scan --ci` OK.
+- [x] No `package.json` version change (still `0.1.1`), no tag, no publish, no workflow_dispatch (verified via `git diff --stat` not containing `package.json` version line and workflow triggers still tags-only).
 
 ## Tests
 
@@ -128,6 +128,46 @@ No new perf work. Baseline for perf suite is frozen: `benchmarks/thresholds.json
 
 Record in Completion notes: starting SHA (`git rev-parse HEAD`), ending SHA (planning commit), `git status --short`, `git branch -a`, `git tag --list`, toolchain `node -v && pnpm -v && ackit --version`, pin audit table, `task doctor` output, `doctor` output, `scan --ci` exit, `pnpm test` pass count (files+tests), `grep TBD` output (zero), `release.yml` trigger snippet.
 
+## Completion notes
+
+- Starting SHA: 545a55e32a4498a0828867181141f07ae9374f99
+- Planning SHA: 545a55e (already published to origin/master, verified 2026-08-27)
+- Ending SHA (baseline commit): pending this task commit (see git log)
+- `git status --short`: clean (only this task doc + docs/architecture/overview.md + docs/v0.2.0/config-v2-design.md before commit)
+- `git branch --show-current`: master
+- `git rev-parse HEAD == origin/master`: 545a55e (pre-commit) → verified via `gh run list` headSha == 545a55e
+- `git tag --list`: v0.1.0, v0.1.1 only (no v0.2.0)
+- Toolchain: Node v24.13.0, pnpm 11.22.0 (packageManager pnpm@11.22.0), npm 11.19.1, ackit 0.1.1 (dist/cli)
+- Pin audit:
+  - Node >=22 valid (LTS 22,24 active; task requires >=22)
+  - @modelcontextprotocol/sdk ^1.30.0 still 1.30.x line (latest 1.30.x pin)
+  - SHA pins unchanged: actions/checkout f548e57e..., setup-node ae0d4ed0..., pnpm/action-setup b906affc...
+  - packageManager pnpm@11.22.0 exact
+  - zod ^4.4.3, commander ^15.0.0, yaml ^2.9.0 still pinned
+- ADR placeholder grep: `Select-String -Pattern "TBD|decide later"` across docs/decisions/ADR-0015*..0024* => 0 matches; all 24 ADRs Accepted
+- `pnpm install --frozen-lockfile`: OK (Already up to date)
+- `pnpm build`: OK
+- `pnpm lint`: OK (6 warnings pre-existing, no errors)
+- `pnpm format:check`: OK
+- `pnpm typecheck`: OK
+- `pnpm gen:schemas`: schemas written, no drift (git diff --exit-code -- schemas clean)
+- `pnpm test`: 308/308 passed (59 files) in ~60s
+- `pnpm smoke:cli`: OK
+- `pnpm run smoke:package`: OK (cynrath-agent-context-kit-0.1.1.tgz)
+- `node dist/cli/index.js task doctor`: task set integrity OK
+- `node dist/cli/index.js config check`: ackit.yml OK digest 03eaf27e3577
+- `node dist/cli/index.js doctor`: all checks passed (config, tasks, skills 0)
+- `node dist/cli/index.js skills validate`: 0 skill(s) OK
+- `node dist/cli/index.js instructions`: AGENTS.md 1141 tokens, CLAUDE.md 883, copilot 722
+- `node dist/cli/index.js scan --ci`: exit 0, 593 files, 148 findings (suppressed correctly)
+- `git diff --check`: clean (no trailing whitespace)
+- `release.yml` trigger snippet: `on: push: tags: v*.*.*` only, no workflow_dispatch, permissions contents:write+id-token:write
+- `grep NPM_TOKEN|NODE_AUTH_TOKEN` across .github/workflows => 0
+- Docs updated: docs/architecture/overview.md (reserved subsystems note), docs/v0.2.0/config-v2-design.md (additive sketch ≤1 page)
+- CI verification: gh run list headSha 545a55e conclusion success, 10/10 jobs success (verified via gh run view)
+
 ## Completion gate
 
 No `--force`. Task is not completed until every acceptance criterion is checked and evidence recorded; the next in-graph task (`TASK-0013` SDK) becomes runnable only after this task is `completed`.
+
+Evidence verified 2026-08-27, baseline ready. TASK-0013 unlocked.

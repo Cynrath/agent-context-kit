@@ -49,4 +49,18 @@ shared/           exit codes, diagnostics sanitizer, version source, tokens
 4. **Offline by construction** — resolution paths cannot reach the network.
 5. **Single identity source** — package.json feeds CLI/MCP/reports alike.
 
-Details: `docs/concepts/*.md`, ADRs under `docs/rebuild/decisions/`.
+### Reserved subsystems (v0.2.0)
+
+The following modules are reserved for v0.2.0 and not yet implemented in this baseline:
+
+- `src/core/readiness/` — deterministic readiness scoring engine (`scoreRepository`)
+- `src/core/profiles/` — provider-aware context profiles (Codex, Claude, Copilot, Gemini, generic)
+- `src/core/policy/packs/` — declarative rule packs (YAML/JSON, collision handling, ReDoS-safe)
+- `src/core/dashboard/` + `src/dashboard/ui/` — local localhost-only dashboard/report server
+- `src/core/diagnostics/` — diagnostics and sanitized bundle
+- `benchmarks/` — performance benchmark fixtures/harness (deterministic, multiplier thresholds)
+- `extensions/vscode/` — official VS Code extension (SDK consumer, VSIX)
+
+No code exists for these subsystems in this baseline commit; they are documented here to pin architecture boundaries before implementation starts. See `docs/v0.2.0/EXECUTION_PLAN.md` and ADRs 0015–0024.
+
+Details: `docs/concepts/*.md`, ADRs under `docs/rebuild/decisions/` and `docs/decisions/`.
