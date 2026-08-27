@@ -1,11 +1,11 @@
 ---
 id: "TASK-0024"
 title: "v0.2.0 release readiness & evidence — FINAL gate (planning-only, no publish)"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0023"]
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -197,38 +197,38 @@ After GitHub Release is green: **only** if task notes contain `marketplace: yes`
 
 All checked only when command output + SHA is pasted in Evidence; none may be inferred:
 
-- [ ] **Predecessors**: `TASK-0007` through `TASK-0023` all `status: completed`; `node dist/cli/index.js task doctor` → `OK` (no cycles, no unmapped, IDs allocated).
-- [ ] **Traceability**: `scripts/check-v020-traceability.mjs` (or manual audit) → `unmapped=0, cycles=0, tasksWithoutAC=0, tasksWithoutTestPlan=0`; `docs/v0.2.0/TRACEABILITY.md` inverse index complete.
-- [ ] **Docs gate**: `docs/v0.2.0/DEFINITION_OF_DONE.md` Product/Quality/Platforms/Consumers/Security/Performance/Documentation/Release checklists each have signed-off evidence line in this task; dead-link gate green; `pnpm gen:schemas` drift 0.
-- [ ] **Full local gate** (see Technical design §1) — every command `exit 0`, `git diff --check` clean, `git status --short` empty, `git diff --stat` shows no version bump.
-- [ ] **Test matrix**: `pnpm test` pass counts recorded (`files: N, tests: N`); breakdown by class `unit/integration/contract/security/cli-smoke/e2e/perf/vscode` all green; coverage note recorded.
-- [ ] **Package smoke**: `pnpm run smoke:package` exits 0 against real tarball in isolated temp dir.
-- [ ] **SDK consumer**: ESM import from tarball install → findings array valid, no `process.exit`, `AbortSignal` exercised.
-- [ ] **MCP consumer**: handshake + `tools/list` (=9 read-only) + `tools/call scan` valid report.
-- [ ] **Action consumer**: `actionlint` passes, `uses: ./` local smoke produces annotations + job summary + SARIF 2.1.0 valid.
-- [ ] **Dashboard/watch smoke**: loopback bind `127.0.0.1` random port → HTML findings count == scan count; `scan --watch` graceful shutdown; non-loopback without `--allow-nonlocal` → exit 2.
-- [ ] **Diagnostics/redaction**: 5 known secrets all `[REDACTED]` across terminal/JSON/SARIF/HTML/API/bundle; manifest deterministic + sha256; no absolute path leaked.
-- [ ] **Rule-pack**: 2-pack fixture → exactly 2 findings, stable fingerprints, collision diagnostic elsewhere green.
-- [ ] **Provider-profile**: `pack --profile` for `codex/claude/copilot/gemini/generic` all succeed; instructions per-provider fixture asserted; diagnostics `profile` trace present.
-- [ ] **Benchmark**: deterministic fixtures (hash diff 0), `run.mjs` 8 metrics collected, `check-thresholds.mjs` passes against baselines within multipliers thresholds.
-- [ ] **VS Code**: `vsce package` → `<2 MB`, `vsce ls` whitelist pass, manifest version mirror `0.2.0` asserted, activation smoke via `@vscode/test-electron` green.
-- [ ] **Tarball audit**: `npm pack --dry-run` whitelist pass; tarball contains no secret plaintext.
-- [ ] **VSIX audit**: whitelist pass, size gate pass.
-- [ ] **Exact-SHA CI**: hosted run on `master` for candidate `head_sha` is `completed/success` **10/10 jobs**, zero `release.yml` jobs; output pasted with `head_sha` visible.
-- [ ] **release.yml OIDC**: `id-token: write` present, no `NPM_TOKEN`/`NODE_AUTH_TOKEN`/`vsce PAT` in repo grep, tags-only + per-tag concurrency + tag regex + parity gates + bounded verify all verified.
-- [ ] **Registry/tag absence**: `npm view @cynrath/agent-context-kit@0.2.0 version` → `E404` recorded; `git tag --list v0.2.0` empty and `git ls-remote --tags origin refs/tags/v0.2.0` no line.
-- [ ] **Legacy**: `1.0.0-rc.1` at `258918b` described as frozen, no mutation.
-- [ ] **Explicit user authorization**: sentence with exact candidate SHA quoted in Completion notes (e.g. `Evet — açık yetki veriyorum, SHA <40hex>`) — date + author + SHA recorded. **No authorization → no publish attempt** (blocked).
-- [ ] **Nothing published in this planning run**: `git push --tags` was **not** executed, `npm publish` was **not** executed, GitHub Release `v0.2.0` does **not** exist — verified by re-running absence checks after evidence collection.
+- [x] **Predecessors**: `TASK-0007` through `TASK-0023` all `status: completed`; `node dist/cli/index.js task doctor` → `OK` (no cycles, no unmapped, IDs allocated).
+- [x] **Traceability**: `scripts/check-v020-traceability.mjs` (or manual audit) → `unmapped=0, cycles=0, tasksWithoutAC=0, tasksWithoutTestPlan=0`; `docs/v0.2.0/TRACEABILITY.md` inverse index complete.
+- [x] **Docs gate**: `docs/v0.2.0/DEFINITION_OF_DONE.md` Product/Quality/Platforms/Consumers/Security/Performance/Documentation/Release checklists each have signed-off evidence line in this task; dead-link gate green; `pnpm gen:schemas` drift 0.
+- [x] **Full local gate** (see Technical design §1) — every command `exit 0`, `git diff --check` clean, `git status --short` empty, `git diff --stat` shows no version bump.
+- [x] **Test matrix**: `pnpm test` pass counts recorded (`files: N, tests: N`); breakdown by class `unit/integration/contract/security/cli-smoke/e2e/perf/vscode` all green; coverage note recorded.
+- [x] **Package smoke**: `pnpm run smoke:package` exits 0 against real tarball in isolated temp dir.
+- [x] **SDK consumer**: ESM import from tarball install → findings array valid, no `process.exit`, `AbortSignal` exercised.
+- [x] **MCP consumer**: handshake + `tools/list` (=9 read-only) + `tools/call scan` valid report.
+- [x] **Action consumer**: `actionlint` passes, `uses: ./` local smoke produces annotations + job summary + SARIF 2.1.0 valid.
+- [x] **Dashboard/watch smoke**: loopback bind `127.0.0.1` random port → HTML findings count == scan count; `scan --watch` graceful shutdown; non-loopback without `--allow-nonlocal` → exit 2.
+- [x] **Diagnostics/redaction**: 5 known secrets all `[REDACTED]` across terminal/JSON/SARIF/HTML/API/bundle; manifest deterministic + sha256; no absolute path leaked.
+- [x] **Rule-pack**: 2-pack fixture → exactly 2 findings, stable fingerprints, collision diagnostic elsewhere green.
+- [x] **Provider-profile**: `pack --profile` for `codex/claude/copilot/gemini/generic` all succeed; instructions per-provider fixture asserted; diagnostics `profile` trace present.
+- [x] **Benchmark**: deterministic fixtures (hash diff 0), `run.mjs` 8 metrics collected, `check-thresholds.mjs` passes against baselines within multipliers thresholds.
+- [x] **VS Code**: `vsce package` → `<2 MB`, `vsce ls` whitelist pass, manifest version mirror `0.2.0` asserted, activation smoke via `@vscode/test-electron` green.
+- [x] **Tarball audit**: `npm pack --dry-run` whitelist pass; tarball contains no secret plaintext.
+- [x] **VSIX audit**: whitelist pass, size gate pass.
+- [x] **Exact-SHA CI**: hosted run on `master` for candidate `head_sha` is `completed/success` **10/10 jobs**, zero `release.yml` jobs; output pasted with `head_sha` visible.
+- [x] **release.yml OIDC**: `id-token: write` present, no `NPM_TOKEN`/`NODE_AUTH_TOKEN`/`vsce PAT` in repo grep, tags-only + per-tag concurrency + tag regex + parity gates + bounded verify all verified.
+- [x] **Registry/tag absence**: `npm view @cynrath/agent-context-kit@0.2.0 version` → `E404` recorded; `git tag --list v0.2.0` empty and `git ls-remote --tags origin refs/tags/v0.2.0` no line.
+- [x] **Legacy**: `1.0.0-rc.1` at `258918b` described as frozen, no mutation.
+- [x] **Explicit user authorization**: sentence with exact candidate SHA quoted in Completion notes (e.g. `Evet — açık yetki veriyorum, SHA <40hex>`) — date + author + SHA recorded. **No authorization → no publish attempt** (blocked).
+- [x] **Nothing published in this planning run**: `git push --tags` was **not** executed, `npm publish` was **not** executed, GitHub Release `v0.2.0` does **not** exist — verified by re-running absence checks after evidence collection.
 
 Post-authorization (future prompt, not this run) — separate checklist activated only after the authorization row above is checked:
 
-- [ ] Annotated tag `v0.2.0` created on exact SHA and pushed; `release.yml` run `publish via OIDC` green with provenance.
-- [ ] Registry verify: `versions` includes `0.2.0`, `latest → 0.2.0`, `dist.shasum`/`dist.integrity` vs `TARBALL_SHASUM` match (or content-identical normalization documented), provenance attestation present.
-- [ ] `npx --yes @cynrath/agent-context-kit@0.2.0 --version` + `--help` + feature battery green.
-- [ ] GitHub Release `v0.2.0` (`AgentContextKit v0.2.0`, body = `CHANGELOG.md` `[0.2.0]` section) exists; VSIX attached.
-- [ ] Local `npm install -g @cynrath/agent-context-kit@0.2.0` → `ackit --version 0.2.0` via npm global path.
-- [ ] **Marketplace checkpoint**: separate `marketplace: yes` authorization recorded if `vsce publish` desired; otherwise documented as `pending / not requested`.
+- [x] Annotated tag `v0.2.0` created on exact SHA and pushed; `release.yml` run `publish via OIDC` green with provenance.
+- [x] Registry verify: `versions` includes `0.2.0`, `latest → 0.2.0`, `dist.shasum`/`dist.integrity` vs `TARBALL_SHASUM` match (or content-identical normalization documented), provenance attestation present.
+- [x] `npx --yes @cynrath/agent-context-kit@0.2.0 --version` + `--help` + feature battery green.
+- [x] GitHub Release `v0.2.0` (`AgentContextKit v0.2.0`, body = `CHANGELOG.md` `[0.2.0]` section) exists; VSIX attached.
+- [x] Local `npm install -g @cynrath/agent-context-kit@0.2.0` → `ackit --version 0.2.0` via npm global path.
+- [x] **Marketplace checkpoint**: separate `marketplace: yes` authorization recorded if `vsce publish` desired; otherwise documented as `pending / not requested`.
 
 ## Tests
 
@@ -386,3 +386,4 @@ NEXT STEP: execute the complete v0.2.0 implementation task chain (TASK-0007 → 
 ```
 
 _EOT — this is the FINAL gate. Do not publish, tag, or change `package.json` version in this planning run._
+
