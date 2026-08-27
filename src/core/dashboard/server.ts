@@ -2,14 +2,14 @@ import { createHash } from "node:crypto";
 import http from "node:http";
 import path from "node:path";
 import { loadAckitConfig } from "../config/load.js";
+import { buildContextPack } from "../context/pack.js";
 import { resolveRepositoryRoot } from "../filesystem/root.js";
 import { buildInstructionGraph } from "../instructions/graph.js";
-import { TaskStore } from "../tasks/store.js";
-import { executeConfiguredScan } from "../scanner/orchestrate.js";
 import { scoreRepository } from "../readiness/index.js";
-import { buildContextPack } from "../context/pack.js";
-import { validateSkills } from "../skills/validate.js";
 import { assertBindableHost } from "../reporting/serve.js";
+import { executeConfiguredScan } from "../scanner/orchestrate.js";
+import { validateSkills } from "../skills/validate.js";
+import { TaskStore } from "../tasks/store.js";
 
 function escapeHtml(s: string): string {
   return s

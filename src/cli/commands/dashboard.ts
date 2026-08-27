@@ -1,8 +1,8 @@
-import type { ExitCodeValue } from "../../shared/exit-codes.js";
-import { EXIT_CODES } from "../../shared/exit-codes.js";
-import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { serveDashboard } from "../../core/dashboard/server.js";
 import type { PolicyError } from "../../core/policy/index.js";
+import { emitDiagnostic } from "../../shared/diagnostics.js";
+import type { ExitCodeValue } from "../../shared/exit-codes.js";
+import { EXIT_CODES } from "../../shared/exit-codes.js";
 
 export async function runDashboardCommand(options: {
   root?: string;
