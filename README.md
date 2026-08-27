@@ -92,22 +92,121 @@ $ ackit dashboard --port 0 --open   # localhost-only, CSP, live polling
 
 ### 🎁 Features at a glance
 
-| | Capability | Command | What you get |
-|---|---|---|---|
-| 📊 | **Agent Readiness** | `ackit readiness` | 0–100 across 6 categories (25/25/20/10/10/10), weighted renormalization, `ackit.readiness.v1` JSON + terminal tree, `--fail-below/--strict/--baseline/--compare`, N/A handling |
-| 🧩 | **Instruction Graph v2** | `ackit instructions --explain` | Codex/Claude/Gemini/Copilot+shared, nesting, `includeScopes`/`excludeScopes`/`providerApplicability`/`provenance`/`shadowedBy`/`duplicateOf`, `applyTo` globs, conflict/duplicate/shadow/dead, `depth→precedence→id`, symlink `realpath`, `maxNodes`/`maxDepth` |
-| 🎭 | **Provider Profiles** | `ackit pack --profile codex` | 5 built-ins (`codex`/`claude`/`copilot`/`gemini`/`generic`), `CLI --profile > ackit.yml > auto-detect > generic`, budget/`includePriority`/`fileConventions` |
-| 📜 | **Rule/Policy Packs** | `ackit policy check` | `schemas/rule-pack.schema.json` v1 (`presence|pattern|config|dependency|instruction`), `glob`/`scope`/`match`, `overrides`/`composition`, local + `node_modules` package-dist only, `POL-PACK-COLLISION`, ReDoS/size guards |
-| 🧹 | **Optimize v2** | `ackit optimize --explain` | 8-class taxonomy, `evidence[]`/`confidence`/`tokenWasteEstimate`/`provenance`/`plan {target,action,diff}`, `--fix --dry-run` on managed surfaces, `terminal|json|markdown|sarif` |
-| 📦 | **Context Packs** | `ackit pack --max-tokens 50000` | Weighted deterministic ranking, manifest `hash/reason/tokens` per file, `<local-path>` scrubbing |
-| 🔒 | **Scanning** | `ackit scan --ci` | Secrets/assignments/private keys/connection strings/entropy/absolute-path/CI pinning/drift, redacted evidence, SARIF 2.1.0, baselines, incremental `changed/staged/since/range`, cache |
-| ✅ | **Tasks** | `ackit task` | `docs/tasks` single-active, `[ ]/[~]/[x]/[!]`, completion gate, `task doctor` |
-| 🔭 | **Watch/Dashboard** | `ackit dashboard` | `scan --watch` debounced 400ms + cache + `SIGINT`→`WatchHandle.done`; `dashboard` localhost-only `127.0.0.1`, `--allow-nonlocal` required, `CSP default-src 'self'` + `nosniff`, XSS-escaped, `/api/*` paginated, polling, `<50KB` vanilla JS |
-| 🩺 | **Diagnostics** | `ackit diagnostics bundle` | `ackit.diagnostics.v1` + deterministic `bundle-manifest.json` (`sha256` + redaction count), 5-secret `[REDACTED]` proof |
-| ⚡ | **Benchmarks** | `benchmarks/run.mjs` | 7 deterministic fixtures, 8 metrics (`coldScanMs`/`warmScanMs`/`incrementalMs`/`peakRssMb`/`filesPerSec`/`packMs`/`graphMs`/`cacheHitRatio`), median-of-3, `1.5×` thresholds |
-| 🔌 | **SDK v1** | `import { scanRepository } from "@cynrath/agent-context-kit"` | `sideEffects:false`, `type:module`, `exports {".","./mcp"}`, `AbortSignal` <200ms, `AckitError` (`code`+`remediation`), `examples/sdk-consumer.mjs` |
-| 🧩 | **VS Code** | `extensions/vscode` | `0.2.0`, `cynrath`, `lints` Linters, `onStartupFinished`, readiness tree + Problems `ACKITxxx` + “instructions for current file” + palette, watcher, no telemetry, `<2MB` VSIX — **VSIX-ready, not yet Marketplace** |
-| 🤖 | **MCP** | `ackit mcp serve` | Official SDK stdio, 9 read-only tools, 5 resources, 4 prompts, `InMemoryTransport` cancellation |
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:12px;">
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**📊 Agent Readiness**<br>
+<code>ackit readiness</code><br>
+0–100 across 6 categories (25/25/20/10/10/10), weighted renormalization, `ackit.readiness.v1` JSON + terminal tree, `--fail-below`/`--strict`/`--baseline`/`--compare`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**🧩 Instruction Graph v2**<br>
+<code>ackit instructions --explain</code><br>
+Codex/Claude/Gemini/Copilot+shared, nesting, `includeScopes`/`excludeScopes`/`providerApplicability`/`provenance`/`shadowedBy`/`duplicateOf`, `applyTo` globs, conflict/duplicate/shadow/dead, `depth→precedence→id`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**🎭 Provider Profiles**<br>
+<code>ackit pack --profile codex</code><br>
+5 built-ins (`codex`/`claude`/`copilot`/`gemini`/`generic`), `CLI --profile > ackit.yml > auto-detect > generic`, budget/`includePriority`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**📜 Rule/Policy Packs**<br>
+<code>ackit policy check</code><br>
+`schemas/rule-pack.schema.json` v1 (`presence|pattern|config|dependency|instruction`), `glob`/`scope`/`match`, `overrides`/`composition`, ReDoS/size guards
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**🧹 Optimize v2**<br>
+<code>ackit optimize --explain</code><br>
+8-class taxonomy, `evidence[]`/`confidence`/`tokenWasteEstimate`/`provenance`/`plan`, `--fix --dry-run`, `terminal|json|markdown|sarif`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**📦 Context Packs**<br>
+<code>ackit pack --max-tokens 50000</code><br>
+Weighted deterministic ranking, manifest `hash/reason/tokens` per file
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**🔒 Scanning**<br>
+<code>ackit scan --ci</code><br>
+Secrets/assignments/private keys/connection strings/entropy/absolute-path/CI pinning/drift, redacted evidence, SARIF 2.1.0
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**✅ Tasks**<br>
+<code>ackit task</code><br>
+`docs/tasks` single-active, `[ ]/[~]/[x]/[!]`, completion gate, `task doctor`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**🔭 Watch/Dashboard**<br>
+<code>ackit dashboard</code><br>
+`scan --watch` debounced 400ms + cache; `dashboard` localhost-only `127.0.0.1`, `CSP` + `nosniff`, `/api/*` paginated, `<50KB` vanilla JS
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**🩺 Diagnostics**<br>
+<code>ackit diagnostics bundle</code><br>
+`ackit.diagnostics.v1` + deterministic `bundle-manifest.json` (`sha256` + redaction count), 5-secret `[REDACTED]` proof
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**⚡ Benchmarks**<br>
+<code>benchmarks/run.mjs</code><br>
+7 deterministic fixtures, 8 metrics (`coldScanMs`/`warmScanMs`/`incrementalMs`/`peakRssMb`/`filesPerSec`/`packMs`/`graphMs`/`cacheHitRatio`), median-of-3
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**🔌 SDK v1**<br>
+<code>import { scanRepository } from "@cynrath/agent-context-kit"</code><br>
+`sideEffects:false`, `type:module`, `exports {".","./mcp"}`, `AbortSignal` <200ms, `AckitError`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**🧩 VS Code**<br>
+<code>extensions/vscode</code><br>
+`0.2.0`, `cynrath`, `lints` Linters, `onStartupFinished`, readiness tree + Problems `ACKITxxx`, `<2MB` VSIX — **VSIX-ready, not yet Marketplace**
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:12px;">
+
+**🤖 MCP**<br>
+<code>ackit mcp serve</code><br>
+Official SDK stdio, 9 read-only tools, 5 resources, 4 prompts, `InMemoryTransport` cancellation
+
+</div>
+
+</div>
 
 ---
 
@@ -150,20 +249,79 @@ ackit dashboard --port 0 --open  # localhost-only
 
 ### 🖥️ CLI Overview
 
-| Command | Purpose | Highlights |
-|---|---|---|
-| `init` | plan/write shims + skills | `--dry-run`, `--agents` |
-| `scan` | security/hygiene scan | `--ci --changed --staged --since --range --baseline --write-baseline --watch --format --fail-below/--strict/--compare` |
-| `readiness` | **0–100 scoring** | `--fail-below --strict --baseline/--compare --json` |
-| `optimize` | hygiene advisor **v2** | `--fix --dry-run --profile --explain --category --min-severity --format terminal\|json\|markdown\|sarif --diff` |
-| `diagnostics` | env/config/cache/policy/tasks | `--json`, `bundle --out/--redact-check --profile` |
-| `dashboard` | **local dashboard** (localhost-only) | `--host/--port/--allow-nonlocal --open` |
-| `instructions` | graph **v2** tree/JSON + effective chain | `--provider --profile --for --explain --json` |
-| `pack` | **provider-aware** pack | `--max-tokens --profile --include --changed --format` |
-| `skills` | list / validate / install |  |
-| `task` | `create/list/start/complete/archive/doctor` | docs-first, single-active |
-| `policy` / `config` | offline policy / config check |  |
-| `cache` / `workspaces` / `hooks` / `report serve` / `mcp serve` | utilities |  |
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:10px;">
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
+
+**`init`** — plan/write shims + skills<br>
+`--dry-run` `--agents`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
+
+**`scan`** — security/hygiene scan<br>
+`--ci` `--changed` `--staged` `--since` `--range` `--baseline` `--watch` `--fail-below`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
+
+**`readiness`** — **0–100 scoring**<br>
+`--fail-below` `--strict` `--baseline`/`--compare` `--json`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
+
+**`optimize`** — hygiene advisor **v2**<br>
+`--fix` `--dry-run` `--profile` `--explain` `--category` `--min-severity` `--format`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
+
+**`diagnostics`** — env/config/cache/policy/tasks<br>
+`--json` `bundle --out` `--redact-check`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
+
+**`dashboard`** — **local dashboard** (localhost-only)<br>
+`--host` `--port` `--allow-nonlocal` `--open`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
+
+**`instructions`** — graph **v2**<br>
+`--provider` `--profile` `--for` `--explain` `--json`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
+
+**`pack`** — **provider-aware** pack<br>
+`--max-tokens` `--profile` `--include` `--changed`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
+
+**`skills` / `task` / `policy` / `config`**<br>
+`skills list/validate/install` · `task create/list/start/complete` · `policy check` · `config check`
+
+</div>
+
+<div style="border:1px solid #d0d7de; border-radius:8px; padding:10px;">
+
+**`cache` / `workspaces` / `hooks` / `report` / `mcp`**<br>
+utilities — `cache clean`, `workspaces`, `hooks`, `report serve`, `mcp serve`
+
+</div>
+
+</div>
 
 Details: [`docs/reference/cli.md`](docs/reference/cli.md) · Exit codes: [`docs/reference/exit-codes.md`](docs/reference/exit-codes.md) · Schemas: [`docs/reference/schemas.md`](docs/reference/schemas.md)
 
