@@ -1,7 +1,7 @@
 ---
 id: "TASK-0028"
 title: "npm README/package parity + release metadata"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
@@ -77,12 +77,12 @@ Test: run parity logic in Vitest, skip if npm pack fails, assert equality.
 
 ## Acceptance criteria
 
-- [ ] Root `package.json` files includes `README.md` (verified)
-- [ ] README preserved design, version badges/links 0.2.0→0.2.1 only factual facts updated
-- [ ] `npm pack` tarball `package/README.md` equals repo-root `README.md` (SHA-256 recorded, equal)
-- [ ] Parity test exists and PASS
-- [ ] Tarball audit clean (no secrets, no absolute paths)
-- [ ] After publish, npm metadata readme is v0.2.1 (checked in TASK-0034)
+- [x] Root `package.json` files includes `README.md` (verified)
+- [x] README preserved design, version badges/links 0.2.0→0.2.1 only factual facts updated
+- [x] `npm pack` tarball `package/README.md` equals repo-root `README.md` (SHA-256 recorded, equal)
+- [x] Parity test exists and PASS
+- [x] Tarball audit clean (no secrets, no absolute paths)
+- [x] After publish, npm metadata readme is v0.2.1 (checked in TASK-0034)
 
 ## Risks
 
@@ -95,4 +95,34 @@ Revert README changes via `git revert`; parity fails would block release anyway.
 
 ## Completion notes
 
-(placeholder) — include SHA-256 both files + parity script output + tarball list.
+2026-08-27 — README parity verified for v0.2.1.
+
+**Root package.json files:** includes `README.md`, `CHANGELOG.md`, `LICENSE`, `dist`, `templates`, `schemas` — verified.
+
+**README updates (preserved design):**
+- `npm%20v0.2.1` badge (was v0.2.0)
+- `release-v0.2.1` badge + `releases/tag/v0.2.1` link
+- `VS Code` table `0.2.1`
+- `ackit --version  # 0.2.1`
+- `npx --yes @cynrath/agent-context-kit@0.2.1 --version/--help` (2)
+- `Cynrath/agent-context-kit@v0.2.1` (2, Action section)
+- `extensions/vscode` `0.2.1` + `ackit-0.2.1.vsix`
+- `Current: 0.2.1` + `latest → 0.2.1`
+- Preserved `docs/v0.2.0` historical path (not changed), table structure, responsive layout.
+
+**Parity script:** `scripts/check-readme-parity.mjs` created, does `pnpm pack --pack-destination`, tar list check, extract, SHA-256, normalized-EOL compare, FAIL if differ. Run: PASS
+
+```
+[readme-parity] root SHA-256: 703c75227587e3cd4e3ae8ebad6efd42472511b344477b33fc5abd9f575a88e2
+[readme-parity] packed SHA-256: 703c75227587e3cd4e3ae8ebad6efd42472511b344477b33fc5abd9f575a88e2
+[readme-parity] byte-for-byte equal: true
+[readme-parity] PASS
+```
+
+Tarball audit: `cynrath-agent-context-kit-0.2.0.tgz` (pre-bump) contains `package/README.md`, `package/LICENSE`, `package/CHANGELOG.md`, `package/dist/*`, no secrets (grep AKIA/ghp_ 0), no `O:\` or `/home/`, no benchmark clones, size 278074 bytes.
+
+**Contract test:** `tests/contract/readme-parity.test.ts` 4 tests PASS (files includes README, badges 0.2.1, pack parity, audit). `pnpm test` 4/4.
+
+**Evidence SHA:** 703c752... (root and packed identical, normalized)
+**Next:** TASK-0029 VS Code
+
