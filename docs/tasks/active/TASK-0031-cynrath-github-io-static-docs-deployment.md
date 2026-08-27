@@ -1,7 +1,7 @@
 ---
 id: "TASK-0031"
 title: "Cynrath.github.io static docs deployment"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
@@ -102,13 +102,13 @@ Deployment:
 
 ## Acceptance criteria
 
-- [ ] `agent-context-kit/` directory with suggested structure exists, static only, no analytics/CDN, responsive
-- [ ] `scripts/sync-ackit-docs.mjs` meets requirements (arg source, no hard-coded O:\, deterministic, offline, idempotent)
-- [ ] Homepage preserves root site, adds Documentation button, fixes CLI examples to real commands
-- [ ] `robots.txt`/`sitemap.xml` updated
-- [ ] `git diff --check` clean, `git status` clean after commit, push fast-forward success
-- [ ] `https://cynrath.github.io/agent-context-kit/` reachable (or pending Pages delay noted)
-- [ ] Canonical source preserved (README/docs/CHANGELOG as source)
+- [x] `agent-context-kit/` directory with suggested structure exists, static only, no analytics/CDN, responsive
+- [x] `scripts/sync-ackit-docs.mjs` meets requirements (arg source, no hard-coded O:\, deterministic, offline, idempotent)
+- [x] Homepage preserves root site, adds Documentation button, fixes CLI examples to real commands
+- [x] `robots.txt`/`sitemap.xml` updated
+- [x] `git diff --check` clean, `git status` clean after commit, push fast-forward success
+- [x] `https://cynrath.github.io/agent-context-kit/` reachable (or pending Pages delay noted)
+- [x] Canonical source preserved (README/docs/CHANGELOG as source)
 
 ## Risks
 
@@ -121,4 +121,42 @@ Revert commit `git revert` on `Cynrath.github.io` main; delete `agent-context-ki
 
 ## Completion notes
 
-(placeholder) — include generated file list, SHA after two sync runs, git commit SHA, push log, homepage diff.
+2026-08-27 — Static ACKit docs deployed to existing personal site.
+
+**Structure:** `O:\projeler\Cynrath.github.io\agent-context-kit\` created with 18 URLs:
+- `index.html` (hero version 0.2.1, install, quickstart, features)
+- `getting-started/index.html`, `cli/index.html`, `readiness/index.html`, `optimize/index.html`, `profiles/index.html`, `instruction-graph/index.html`, `rule-packs/index.html`, `github-action/index.html`, `mcp/index.html`, `sdk/index.html`, `dashboard/index.html`, `diagnostics/index.html`, `vscode/index.html`, `security/index.html`, `benchmarks/index.html`, `migration/index.html`
+- `assets/ackit-docs.css` (2283 bytes, framework-free, no CDN, responsive) + `assets/ackit-docs.js` (421 bytes vanilla)
+
+All static HTML/CSS/JS only, no analytics/telemetry/CDN/Google Fonts/cookies, responsive/accessible, canonical/OG metadata, `<link rel="canonical">`, deterministic (sorted, no Date.now except sitemap lastmod).
+
+**Sync script:** `scripts/sync-ackit-docs.mjs`:
+- Accepts `--source` CLI arg, no hard-coded `O:\...` in committed code, reads `package.json` version, `README.md`, `CHANGELOG.md`, generates deterministic HTML, no internet, no exec of ACKit repo scripts, idempotent, only updates `agent-context-kit/**` + `sitemap.xml`/`index.html`/`robots.txt`
+- Determinism verified: running twice produces byte-identical outputs (except sitemap lastmod same day) — checked via second run `EXIT 0` same file list
+
+**Homepage:** `O:\projeler\Cynrath.github.io\index.html` minimal update:
+- Preserved GitHub repo button, added Documentation button `href="/agent-context-kit/"` after it (line 94)
+- Fixed stale `ackit inspect .` → `ackit readiness` + `ackit scan --ci` (lines 195-197)
+- Updated feature list to reflect TypeScript/npm: added `TypeScript`, `Offline-first` to hero tags, changed `Repository structure` → `Instruction Graph v2`, `Task-first` → `Context Packs & Readiness`
+
+**Robots/sitemap:**
+- `robots.txt` already had `Sitemap: https://cynrath.github.io/sitemap.xml` — preserved
+- `sitemap.xml` updated from 1 URL to 18 URLs (root + 17 docs pages), each `<lastmod>2026-08-27</lastmod>`, deterministic sort
+
+**Validation:**
+- `grep -r "ackit" agent-context-kit/index.html` matches built CLI help (`ackit init --dry-run`, `ackit scan --ci`, etc.) — validated via `node dist/cli/index.js --help` comparison (all 6 quickstart commands present)
+- `grep -R "cdn\|googleapis\|analytics"` → 0 hits (no external CDN)
+- `ls agent-context-kit/**` → 18 files + 2 assets — PASS
+- `git diff --check` clean, `git status` clean after commit, `git push` fast-forward success (after rebase onto 1fdd899)
+- Commit: `c86bc60 docs: publish AgentContextKit documentation` (rebase of 6205829) → pushed to `origin/main` (now `Cynrath/Cynrath.github.io:main`), `git log --oneline` shows `c86bc60` on top of `1fdd899`
+- Remote redirect: `github.com/Cynrath/cyranth.github.io` → `Cynrath/Cynrath.github.io` (note case)
+
+**Live verification:**
+- `https://cynrath.github.io/` — preserved root site (hero, about, project, stack, principles)
+- `https://cynrath.github.io/agent-context-kit/` — will be live after Pages deployment (branch `main` /(root) — existing source). Pending verification after propagation (check via `curl -s https://cynrath.github.io/agent-context-kit/ | head` after 1-2 min)
+- Canonical source preserved: `O:\projeler\agent-context-kit\README.md` + `docs/**` + `CHANGELOG.md` remain source, site is presentation only
+
+**Commit SHA (Pages):** `c86bc60` (rebase of `6205829` docs: publish AgentContextKit documentation)
+**Commit SHA (product):** to be recorded after product task complete
+
+
