@@ -1,0 +1,31 @@
+name: "AgentContextKit"
+description: "Offline-first agent readiness toolkit (scan/pack/graph/policy)"
+author: "Cynrath"
+branding:
+  icon: "shield"
+  color: "blue"
+inputs:
+  command:
+    description: "ackit subcommand (scan|doctor|optimize|pack|instructions|policy)"
+    required: false
+    default: "scan"
+  args:
+    description: "extra CLI args (not shell-interpolated; split safely)"
+    required: false
+    default: ""
+  fail-threshold:
+    description: "severity required to fail the job (low|medium|high|critical)"
+    required: false
+    default: "high"
+  upload-sarif:
+    description: "whether to produce SARIF"
+    required: false
+    default: "false"
+outputs:
+  findings-json:
+    description: "path to findings JSON"
+  sarif-path:
+    description: "SARIF file path when upload-sarif=true"
+runs:
+  using: "node24"
+  main: "dist/action/index.js"

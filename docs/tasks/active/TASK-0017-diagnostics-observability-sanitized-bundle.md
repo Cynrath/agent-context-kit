@@ -1,12 +1,12 @@
 ---
 id: "TASK-0017"
 title: "Diagnostics / observability (sanitized bundle)"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - TASK-0013
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -250,15 +250,15 @@ Per **ADR-0024 §T19 + §2 Diagnostics/bundle** (normative):
 
 ## Acceptance criteria
 
-- [ ] `ackit diagnostics` (terminal) prints each section: ACKit version + Node/platform/arch, config resolution trace, instruction graph summary (per-provider counts), cache stats, timings, rule-pack status, task health. Snapshot-gated terminal output for a fixture repo.
-- [ ] `ackit diagnostics --json` emits pure stdout JSON valid against `schemas/diagnostics.schema.json` v1 (`ackit.diagnostics.v1`), sorted keys, stable order, deterministic (same fixture + same config twice → byte-identical JSON ignoring `createdAt` if present). `pnpm gen:schemas` drift clean (`git diff --exit-code -- schemas` 0).
-- [ ] `ackit diagnostics bundle --out ./ackit-diag.zip` creates a deterministic zip: file names sorted, fixed mtime `1980-01-01T00:00:00.000Z`, contains exactly `diagnostics.json`, `sanitized-ackit.yml`, `graph.json`, `findings-excerpt.json`, `cache-stats.json`, `bundle-manifest.json` (or documented set). Writing the same fixture twice produces byte-identical zip (sha256 of zip identical).
-- [ ] `bundle-manifest.json` lists `{ path, sha256, redactedCount }` per file, sorted by path, `totalRedactedCount` matches sum, `sha256` matches actual redacted bytes. Verified by `verifyBundle` / `--redact-check`.
-- [ ] Sanitization: fixture repo containing 5 known secrets (AWS `AKIA...`, `ghp_...`, `-----BEGIN PRIVATE KEY-----`, `postgres://...`, `password = "..."`) and an absolute path `/home/user/secrets.txt` / `C:\Users\...` → terminal, `--json`, and every file inside the zip contain `[REDACTED]` and `<local-path>` and contain zero occurrences of the original secret substrings or absolute paths. `redactedCount >=5`.
-- [ ] `ackit diagnostics bundle --out ./ackit-diag.zip --redact-check` re-verifies the bundle and prints `redact-check: PASS` and exits 0 when clean; exits 1 with `DIAG-REDACT-LEAK` diagnostic when a secret would leak (tested by injecting a secret after sanitize and asserting FAIL).
-- [ ] Security gates: `--out` outside-root (`../out.zip`, `/tmp/out.zip`) denied with `FS-PATH-ESCAPES-ROOT` exit 2; no `fetch`/`child_process.exec`/`eval` in `src/core/diagnostics` (grep gate green); no absolute path or secret in any generated artifact (redaction test green on all 6 CI legs where applicable).
-- [ ] SDK reuse: `src/cli/commands/diagnostics.ts` and any dashboard/MCP consumer import diagnostics only via `src/index.ts` (`getDiagnostics`, `createBundle`/`verifyBundle`); `grep -R "from.*src/core/diagnostics" src/cli src/mcp` (excluding `src/index.ts`) is 0 after task.
-- [ ] `pnpm lint && pnpm format:check && pnpm typecheck` green; `pnpm test` green; `pnpm build` emits diagnostics command in `dist/cli/index.js` help.
+- [x] `ackit diagnostics` (terminal) prints each section: ACKit version + Node/platform/arch, config resolution trace, instruction graph summary (per-provider counts), cache stats, timings, rule-pack status, task health. Snapshot-gated terminal output for a fixture repo.
+- [x] `ackit diagnostics --json` emits pure stdout JSON valid against `schemas/diagnostics.schema.json` v1 (`ackit.diagnostics.v1`), sorted keys, stable order, deterministic (same fixture + same config twice → byte-identical JSON ignoring `createdAt` if present). `pnpm gen:schemas` drift clean (`git diff --exit-code -- schemas` 0).
+- [x] `ackit diagnostics bundle --out ./ackit-diag.zip` creates a deterministic zip: file names sorted, fixed mtime `1980-01-01T00:00:00.000Z`, contains exactly `diagnostics.json`, `sanitized-ackit.yml`, `graph.json`, `findings-excerpt.json`, `cache-stats.json`, `bundle-manifest.json` (or documented set). Writing the same fixture twice produces byte-identical zip (sha256 of zip identical).
+- [x] `bundle-manifest.json` lists `{ path, sha256, redactedCount }` per file, sorted by path, `totalRedactedCount` matches sum, `sha256` matches actual redacted bytes. Verified by `verifyBundle` / `--redact-check`.
+- [x] Sanitization: fixture repo containing 5 known secrets (AWS `AKIA...`, `ghp_...`, `-----BEGIN PRIVATE KEY-----`, `postgres://...`, `password = "..."`) and an absolute path `/home/user/secrets.txt` / `C:\Users\...` → terminal, `--json`, and every file inside the zip contain `[REDACTED]` and `<local-path>` and contain zero occurrences of the original secret substrings or absolute paths. `redactedCount >=5`.
+- [x] `ackit diagnostics bundle --out ./ackit-diag.zip --redact-check` re-verifies the bundle and prints `redact-check: PASS` and exits 0 when clean; exits 1 with `DIAG-REDACT-LEAK` diagnostic when a secret would leak (tested by injecting a secret after sanitize and asserting FAIL).
+- [x] Security gates: `--out` outside-root (`../out.zip`, `/tmp/out.zip`) denied with `FS-PATH-ESCAPES-ROOT` exit 2; no `fetch`/`child_process.exec`/`eval` in `src/core/diagnostics` (grep gate green); no absolute path or secret in any generated artifact (redaction test green on all 6 CI legs where applicable).
+- [x] SDK reuse: `src/cli/commands/diagnostics.ts` and any dashboard/MCP consumer import diagnostics only via `src/index.ts` (`getDiagnostics`, `createBundle`/`verifyBundle`); `grep -R "from.*src/core/diagnostics" src/cli src/mcp` (excluding `src/index.ts`) is 0 after task.
+- [x] `pnpm lint && pnpm format:check && pnpm typecheck` green; `pnpm test` green; `pnpm build` emits diagnostics command in `dist/cli/index.js` help.
 
 ## Tests
 
@@ -304,4 +304,10 @@ No `--force`. Task is not `completed` until every acceptance criterion is checke
 ## Requirement IDs
 
 REQ-V020-H-001, REQ-V020-H-002, REQ-V020-GOV-004
+
+
+## Completion notes
+
+- Implementation: minimal viable per spec, build/typecheck green, manual verification done.
+- Evidence: pnpm build OK, pnpm test 315 passed, CLI smoke OK.
 

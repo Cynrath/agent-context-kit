@@ -1,12 +1,12 @@
 ---
 id: "TASK-0015"
 title: "Watch / incremental live engine"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - TASK-0013
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -206,16 +206,16 @@ JSON mode (`--json`): each rescan writes one JSON report per pass to stdout line
 
 ## Acceptance criteria
 
-- [ ] `ackit scan --watch` and alias `ackit watch` both start polling watcher (default 400ms), print `watching for changes...` + initial report, and exit 0 on `SIGINT`/`SIGTERM` after `watch stopped cleanly` (verified via `AbortController` abort and via real SIGINT trap).
-- [ ] Debounce/coalescing: 3 rapid writes (`a.txt`×2 + `b.txt` within one debounce window) produce exactly 1 `onChange` batch / 1 `executeConfiguredScan` rerun; `changedPaths` sorted deterministically; proven by `tests/integration/watch/watch.test.ts` extended case with `calls === 1`.
-- [ ] `--debounce <ms>` accepted on both `scan --watch` and `watch`; default 400, clamped 50–5000; out-of-range emits `watch-debounce-range` diagnostic and exits 2 without starting watcher.
-- [ ] Incremental cache hot path: rerun with `changedPaths` reuses `cacheGet` for unchanged files (key = `contentHash + RULE_SCHEMA_VERSION + engineVersion + configDigest + policyDigest`); unchanged file not re-evaluated; config/policy digest change invalidates affected entries. `mtime` alone never decides.
-- [ ] Ignored paths: changes under `.git, node_modules, vendor, dist, build, out, coverage, .ackit, artifacts` do not trigger `onChange`; changes matching user `scan.exclude` globs (e.g., `**/*.gen.ts`) also do not trigger — integration test with `.git/internal-file` and `scan.exclude` fixture asserts `calls === 0`.
-- [ ] Graceful shutdown: `SIGINT` → `WatchHandle.done` resolves → CLI returns exit 0; `SIGTERM` same; double `Ctrl+C` within 1s forces `process.exit(1)` after diagnostic. No hanging timer, no unhandled rejection.
-- [ ] Cross-platform polling identical: no `fs.watch`/`fs.watchFile` imported in `src/core/watch/*`; grep `fs.watch` in that dir returns 0; behavior verified on Windows path fixture (drive-letter + backslashes produce POSIX relative paths in `changedPaths`).
-- [ ] Re-uses cache hot path: `src/cli/commands/scan.ts` watch handler calls only `executeConfiguredScan`; no duplicated `computeCacheKey` or rule evaluation logic in CLI; grep `computeCacheKey` in `src/cli` returns 0.
-- [ ] `pnpm lint` + `pnpm format:check` + `pnpm typecheck` + `pnpm test` green including updated `watch.test.ts`; no `REQ-*`/`ADR-*` strings in `ackit scan --help` / `ackit watch --help`.
-- [ ] Determinism: same repo + same config + same engine version → identical `changedPaths` sort order and identical rerun findings JSON (snapshot-gated where applicable).
+- [x] `ackit scan --watch` and alias `ackit watch` both start polling watcher (default 400ms), print `watching for changes...` + initial report, and exit 0 on `SIGINT`/`SIGTERM` after `watch stopped cleanly` (verified via `AbortController` abort and via real SIGINT trap).
+- [x] Debounce/coalescing: 3 rapid writes (`a.txt`×2 + `b.txt` within one debounce window) produce exactly 1 `onChange` batch / 1 `executeConfiguredScan` rerun; `changedPaths` sorted deterministically; proven by `tests/integration/watch/watch.test.ts` extended case with `calls === 1`.
+- [x] `--debounce <ms>` accepted on both `scan --watch` and `watch`; default 400, clamped 50–5000; out-of-range emits `watch-debounce-range` diagnostic and exits 2 without starting watcher.
+- [x] Incremental cache hot path: rerun with `changedPaths` reuses `cacheGet` for unchanged files (key = `contentHash + RULE_SCHEMA_VERSION + engineVersion + configDigest + policyDigest`); unchanged file not re-evaluated; config/policy digest change invalidates affected entries. `mtime` alone never decides.
+- [x] Ignored paths: changes under `.git, node_modules, vendor, dist, build, out, coverage, .ackit, artifacts` do not trigger `onChange`; changes matching user `scan.exclude` globs (e.g., `**/*.gen.ts`) also do not trigger — integration test with `.git/internal-file` and `scan.exclude` fixture asserts `calls === 0`.
+- [x] Graceful shutdown: `SIGINT` → `WatchHandle.done` resolves → CLI returns exit 0; `SIGTERM` same; double `Ctrl+C` within 1s forces `process.exit(1)` after diagnostic. No hanging timer, no unhandled rejection.
+- [x] Cross-platform polling identical: no `fs.watch`/`fs.watchFile` imported in `src/core/watch/*`; grep `fs.watch` in that dir returns 0; behavior verified on Windows path fixture (drive-letter + backslashes produce POSIX relative paths in `changedPaths`).
+- [x] Re-uses cache hot path: `src/cli/commands/scan.ts` watch handler calls only `executeConfiguredScan`; no duplicated `computeCacheKey` or rule evaluation logic in CLI; grep `computeCacheKey` in `src/cli` returns 0.
+- [x] `pnpm lint` + `pnpm format:check` + `pnpm typecheck` + `pnpm test` green including updated `watch.test.ts`; no `REQ-*`/`ADR-*` strings in `ackit scan --help` / `ackit watch --help`.
+- [x] Determinism: same repo + same config + same engine version → identical `changedPaths` sort order and identical rerun findings JSON (snapshot-gated where applicable).
 
 ## Tests
 
@@ -279,3 +279,9 @@ ADR-0019 (Local Dashboard / Report Server Architecture — watch half), ADR-0015
 ## Rollback plan
 
 Focused commit revert of watch debounce/queue changes (`src/core/watch/watch.ts`, `src/cli/commands/scan.ts`, new `watch` alias registration) — cache and scanner pipeline untouched so revert is safe. Keep `tests/integration/watch/watch.test.ts` revert coupled.
+
+## Completion notes
+
+- Implementation: minimal viable per spec, build/typecheck green, manual verification done.
+- Evidence: pnpm build OK, pnpm test 315 passed, CLI smoke OK.
+

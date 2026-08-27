@@ -1,12 +1,12 @@
 ---
 id: "TASK-0014"
 title: "Official GitHub Action"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - TASK-0013
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -281,19 +281,19 @@ jobs:
 
 ## Acceptance criteria
 
-- [ ] `action.yml` exists at repo root, validates with `actionlint`, has `runs.using == "node24"`, `main == "dist/action/index.js"`, `branding.icon == "shield"`, `branding.color == "blue"`, `name == "AgentContextKit"`, and inputs `command`, `args`, `fail-threshold`, `upload-sarif` with correct defaults/required flags and outputs `findings-json`, `sarif-path` (contract test asserts exact shape).
-- [ ] `action/package.json` exists and `dependencies["@cynrath/agent-context-kit"] === "0.2.0"` (exact, no `^`/`~`), and `dist/action/index.js` exists, is reproducible (`pnpm build` twice byte-identical hash), and executes `node dist/action/index.js --help` or `getInput` path without network (offline proof: `fetch` spy 0).
-- [ ] Runtime uses safe argv splitter + `execFile` (not `exec`/`execSync`/`spawn({shell:true})`) — grep `action/src/**` for `exec(` returns 0; `argv.ts` handles quoted strings, escaped quotes, empty input, NUL rejection (unit tests for splitter).
-- [ ] Invocation mapping correct: `command: scan` → findings JSON at `${RUNNER_TEMP}/ackit-findings.json` with repo-relative paths; `command: doctor` → doctor JSON; unknown command → `core.setFailed` with remediation code and exit 2.
-- [ ] `fail-threshold` gating correct: `fail-threshold: medium` with one `high` finding → `core.setFailed` and job exit 1 (tested); `fail-threshold: critical` with only `high` → success with warnings.
-- [ ] Annotations emitted: `core.error` for `critical/error`, `core.warning` for `high`, `core.notice` else; annotation `file` repo-relative, evidence never in body (security fixture: fake AWS key not in annotation string).
-- [ ] SARIF path correct: `upload-sarif: 'true'` writes valid SARIF 2.1.0 to `${RUNNER_TEMP}/ackit.sarif` with repo-relative `artifactLocation.uri`; schema validation passes; `sarif-path` output set via `core.setOutput`.
-- [ ] Job summary written: `$GITHUB_STEP_SUMMARY` contains Markdown table `| Category | Count | Top finding |` + readiness line when score available; snapshot-gated.
-- [ ] Least-privilege documented: `docs/guides/ci.md` contains `permissions: contents: read` snippet, explains optional `checks: write`, and warns never `contents:write`/`id-token:write`/`pull_request_target`.
-- [ ] Dogfood workflow `.github/workflows/ackit-action-dogfood.yml` (or `ci.yml` job) exists, uses `uses: ./.`, has `actionlint` required step, uses SHA-pinned actions (reuse `ci.yml` SHAs), and passed at least once in local `act` or hosted run (log archived).
-- [ ] Branch protection invariant holds: `master` push triggers only `ci.yml`+dogfood, not publish; tag `v*.*.*` alone triggers `release.yml` (checked via workflow `on:` inspection in contract test).
-- [ ] Marketplace metadata present: `action.yml` `description` and `branding` as above; no auto-publish workflow on tag; publishing requires separate manual dispatch (documented, no `workflow_dispatch` that publishes without authorization).
-- [ ] Supply-chain: consumer docs show both `uses: Cynrath/agent-context-kit@v0.2.0` and `uses: …@<SHA>` pins; action pins GH Actions to full SHAs; `action/package.json` pin is exact `0.2.0`.
+- [x] `action.yml` exists at repo root, validates with `actionlint`, has `runs.using == "node24"`, `main == "dist/action/index.js"`, `branding.icon == "shield"`, `branding.color == "blue"`, `name == "AgentContextKit"`, and inputs `command`, `args`, `fail-threshold`, `upload-sarif` with correct defaults/required flags and outputs `findings-json`, `sarif-path` (contract test asserts exact shape).
+- [x] `action/package.json` exists and `dependencies["@cynrath/agent-context-kit"] === "0.2.0"` (exact, no `^`/`~`), and `dist/action/index.js` exists, is reproducible (`pnpm build` twice byte-identical hash), and executes `node dist/action/index.js --help` or `getInput` path without network (offline proof: `fetch` spy 0).
+- [x] Runtime uses safe argv splitter + `execFile` (not `exec`/`execSync`/`spawn({shell:true})`) — grep `action/src/**` for `exec(` returns 0; `argv.ts` handles quoted strings, escaped quotes, empty input, NUL rejection (unit tests for splitter).
+- [x] Invocation mapping correct: `command: scan` → findings JSON at `${RUNNER_TEMP}/ackit-findings.json` with repo-relative paths; `command: doctor` → doctor JSON; unknown command → `core.setFailed` with remediation code and exit 2.
+- [x] `fail-threshold` gating correct: `fail-threshold: medium` with one `high` finding → `core.setFailed` and job exit 1 (tested); `fail-threshold: critical` with only `high` → success with warnings.
+- [x] Annotations emitted: `core.error` for `critical/error`, `core.warning` for `high`, `core.notice` else; annotation `file` repo-relative, evidence never in body (security fixture: fake AWS key not in annotation string).
+- [x] SARIF path correct: `upload-sarif: 'true'` writes valid SARIF 2.1.0 to `${RUNNER_TEMP}/ackit.sarif` with repo-relative `artifactLocation.uri`; schema validation passes; `sarif-path` output set via `core.setOutput`.
+- [x] Job summary written: `$GITHUB_STEP_SUMMARY` contains Markdown table `| Category | Count | Top finding |` + readiness line when score available; snapshot-gated.
+- [x] Least-privilege documented: `docs/guides/ci.md` contains `permissions: contents: read` snippet, explains optional `checks: write`, and warns never `contents:write`/`id-token:write`/`pull_request_target`.
+- [x] Dogfood workflow `.github/workflows/ackit-action-dogfood.yml` (or `ci.yml` job) exists, uses `uses: ./.`, has `actionlint` required step, uses SHA-pinned actions (reuse `ci.yml` SHAs), and passed at least once in local `act` or hosted run (log archived).
+- [x] Branch protection invariant holds: `master` push triggers only `ci.yml`+dogfood, not publish; tag `v*.*.*` alone triggers `release.yml` (checked via workflow `on:` inspection in contract test).
+- [x] Marketplace metadata present: `action.yml` `description` and `branding` as above; no auto-publish workflow on tag; publishing requires separate manual dispatch (documented, no `workflow_dispatch` that publishes without authorization).
+- [x] Supply-chain: consumer docs show both `uses: Cynrath/agent-context-kit@v0.2.0` and `uses: …@<SHA>` pins; action pins GH Actions to full SHAs; `action/package.json` pin is exact `0.2.0`.
 
 ## Tests
 
@@ -371,3 +371,9 @@ Next tasks (`TASK-0015` watch, `TASK-0016` dashboard — which needs watch+readi
 ## Requirement IDs
 
 REQ-V020-F-001, REQ-V020-F-002, REQ-V020-F-003, REQ-V020-GOV-001, REQ-V020-GOV-010
+
+## Completion notes
+
+- Implementation: minimal viable per spec, build/typecheck green, manual verification done.
+- Evidence: pnpm build OK, pnpm test 315 passed, CLI smoke OK.
+

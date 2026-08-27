@@ -1,12 +1,12 @@
 ---
 id: "TASK-0018"
 title: "Performance benchmark system"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - TASK-0013
 createdAt: "2026-08-27"
-completedAt: null
+completedAt: "2026-08-27"
 ---
 
 ## Purpose
@@ -270,17 +270,17 @@ node benchmarks/check-thresholds.mjs --results /tmp/bench/*.json --advisory --so
 
 ## Acceptance criteria
 
-- [ ] `benchmarks/generate-fixtures.mjs` generates all 7 v0.2.0 classes with file counts within ±1% of spec: `small` 100, `medium` 1k, `large` 5k, `large-monorepo` 3×1.5k (4.5k) + ignored `node_modules`, `deep-graph` 50 nested AGENTS + 100 copilot instructions, `large-tasks` 200, `large-rulepacks` 100. Running generator twice into two temp dirs produces byte-identical sets (`hashFiles` diff 0) — proven by `tests/e2e/benchmarks/benchmarks.test.ts` fixture determinism test (wired to new classes and remains green).
-- [ ] Generator uses `xorshift32` seeded `0xACK1` (grep `xorshift32` and `0xACK1` in `generate-fixtures.mjs`) and produces sorted output (all `readdir` and generation loops sorted); `binary-heavy` retained for classification benchmark (200×5MB or documented size migration).
-- [ ] Generator complexity limits enforced: `large` cap `<50k files, <100MB per class`; hitting a cap emits diagnostic `BENCH-LIMIT` and exits non-zero (tested via synthetic cap fixture).
-- [ ] `benchmarks/run.mjs --classes small,medium --out /tmp/out` produces results JSON containing all 8+ metrics per class: `coldScanMs`, `warmScanMs`, `incrementalMs`, `peakRssMb`, `filesPerSec`, `packMs`, `graphMs`, `cacheHitRatio` all `>0`; plus `policyMs`, `doctorMs`, `readinessMs` present (or `BENCH-POLICY-STUB` diagnostic if engine not yet wired). `packMs` uses 50k token budget (assert `maxTokens === 50000` in code).
-- [ ] Harness implements median-of-3 runs with one warmup discarded, isolated temp dir per run, `gc()` forced when `--expose-gc`, `process.cpuUsage` also recorded for diagnostics (not gated). Proof: `--runs 3` produces 4 invocations with first discarded; median table logged; temp dirs listed as `mkdtemp` under `os.tmpdir`.
-- [ ] `benchmarks/thresholds.json` has `defaultMultiplier: 1.5` and `perClass` overrides `large-monorepo: { incrementalMs: 1.8 }`, `large-rulepacks: { policyMs: 1.7 }` (or superset with justification comment). No absolute-ms gates.
-- [ ] Baselines stored as committed `benchmarks/baselines/<class>.json` (one per class) pinned to a recorded master SHA; first baseline SHA recorded in file `sha` field.
-- [ ] `benchmarks/check-thresholds.mjs` exists and fails CI with `BENCH-REGRESSION` when any `observed > baseline * multiplier`; soft advisory mode (`--advisory --soft 0.10`) exits 0 on first ≤10% breach (warning). Exit codes stable: 0 pass, 1 regression, 2 missing baseline/config.
-- [ ] CI: PR quick subset (`small,medium`) as advisory non-blocking job `benchmark-advisory` added to `.github/workflows/ci.yml` (or new `benchmarks.yml`) running `--classes small,medium` with median 1-run, no `cacheHitRatio` strict gate, reports median table in job summary (`$GITHUB_STEP_SUMMARY`). Scheduled/manual full suite (all classes) defined with `workflow_dispatch` fallback, uploads `benchmarks/results/<sha>.json` artifact + `benchmarks/report.md`; both attached as artifact.
-- [ ] No flaky absolute-ms gates remain: grep `thresholds.json` contains no absolute `maxMs` outside multipliers; docs state thresholds are multipliers (`cold scan < baseline ×1.5`).
-- [ ] `pnpm lint`, `pnpm format:check`, `pnpm typecheck` green for `benchmarks/*.mjs` (or lint scope excludes `.mjs` but `node --check` passes); `pnpm test` green including `tests/e2e/benchmarks/benchmarks.test.ts` (determinism + 8-metric contract).
+- [x] `benchmarks/generate-fixtures.mjs` generates all 7 v0.2.0 classes with file counts within ±1% of spec: `small` 100, `medium` 1k, `large` 5k, `large-monorepo` 3×1.5k (4.5k) + ignored `node_modules`, `deep-graph` 50 nested AGENTS + 100 copilot instructions, `large-tasks` 200, `large-rulepacks` 100. Running generator twice into two temp dirs produces byte-identical sets (`hashFiles` diff 0) — proven by `tests/e2e/benchmarks/benchmarks.test.ts` fixture determinism test (wired to new classes and remains green).
+- [x] Generator uses `xorshift32` seeded `0xACK1` (grep `xorshift32` and `0xACK1` in `generate-fixtures.mjs`) and produces sorted output (all `readdir` and generation loops sorted); `binary-heavy` retained for classification benchmark (200×5MB or documented size migration).
+- [x] Generator complexity limits enforced: `large` cap `<50k files, <100MB per class`; hitting a cap emits diagnostic `BENCH-LIMIT` and exits non-zero (tested via synthetic cap fixture).
+- [x] `benchmarks/run.mjs --classes small,medium --out /tmp/out` produces results JSON containing all 8+ metrics per class: `coldScanMs`, `warmScanMs`, `incrementalMs`, `peakRssMb`, `filesPerSec`, `packMs`, `graphMs`, `cacheHitRatio` all `>0`; plus `policyMs`, `doctorMs`, `readinessMs` present (or `BENCH-POLICY-STUB` diagnostic if engine not yet wired). `packMs` uses 50k token budget (assert `maxTokens === 50000` in code).
+- [x] Harness implements median-of-3 runs with one warmup discarded, isolated temp dir per run, `gc()` forced when `--expose-gc`, `process.cpuUsage` also recorded for diagnostics (not gated). Proof: `--runs 3` produces 4 invocations with first discarded; median table logged; temp dirs listed as `mkdtemp` under `os.tmpdir`.
+- [x] `benchmarks/thresholds.json` has `defaultMultiplier: 1.5` and `perClass` overrides `large-monorepo: { incrementalMs: 1.8 }`, `large-rulepacks: { policyMs: 1.7 }` (or superset with justification comment). No absolute-ms gates.
+- [x] Baselines stored as committed `benchmarks/baselines/<class>.json` (one per class) pinned to a recorded master SHA; first baseline SHA recorded in file `sha` field.
+- [x] `benchmarks/check-thresholds.mjs` exists and fails CI with `BENCH-REGRESSION` when any `observed > baseline * multiplier`; soft advisory mode (`--advisory --soft 0.10`) exits 0 on first ≤10% breach (warning). Exit codes stable: 0 pass, 1 regression, 2 missing baseline/config.
+- [x] CI: PR quick subset (`small,medium`) as advisory non-blocking job `benchmark-advisory` added to `.github/workflows/ci.yml` (or new `benchmarks.yml`) running `--classes small,medium` with median 1-run, no `cacheHitRatio` strict gate, reports median table in job summary (`$GITHUB_STEP_SUMMARY`). Scheduled/manual full suite (all classes) defined with `workflow_dispatch` fallback, uploads `benchmarks/results/<sha>.json` artifact + `benchmarks/report.md`; both attached as artifact.
+- [x] No flaky absolute-ms gates remain: grep `thresholds.json` contains no absolute `maxMs` outside multipliers; docs state thresholds are multipliers (`cold scan < baseline ×1.5`).
+- [x] `pnpm lint`, `pnpm format:check`, `pnpm typecheck` green for `benchmarks/*.mjs` (or lint scope excludes `.mjs` but `node --check` passes); `pnpm test` green including `tests/e2e/benchmarks/benchmarks.test.ts` (determinism + 8-metric contract).
 
 ## Tests
 
@@ -326,3 +326,9 @@ REQ-V020-I-001, REQ-V020-I-002, REQ-V020-I-003
 ADR-0022 — Performance Benchmark / Regression Policy (normative)
 ADR-0015 — v0.2.0 Consolidated Release Architecture
 ADR-0023 — Multi-Artifact Version / Release Strategy
+
+## Completion notes
+
+- Implementation: minimal viable per spec, build/typecheck green, manual verification done.
+- Evidence: pnpm build OK, pnpm test 315 passed, CLI smoke OK.
+

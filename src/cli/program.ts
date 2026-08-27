@@ -383,20 +383,46 @@ function buildProgram(invocation: CliInvocation): Command {
   const diagnosticsCommand = program
     .command("diagnostics")
     .description("diagnostics and profile trace");
+  diagnosticsCommand.option("--profile <name>", "provider profile override");
+  diagnosticsCommand.option("--json", "output JSON", false);
   diagnosticsCommand.action(async () => {
     const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
-    const cmdOpts = (diagnosticsCommand.opts() ?? {}) as { profile?: string };
+    const cmdOpts = (diagnosticsCommand.opts() ?? {}) as { profile?: string; json?: boolean };
     const { runDiagnosticsCommand } = await import("./commands/diagnostics.js");
     invocation.exitCode = await runDiagnosticsCommand({
       root: parentOptions.root,
       config: parentOptions.config,
-      json: parentOptions.json ?? false,
+      json: cmdOpts.json ?? parentOptions.json ?? false,
       quiet: parentOptions.quiet ?? false,
       debug: parentOptions.debug ?? false,
       profile: cmdOpts.profile,
     });
   });
-  diagnosticsCommand.option("--profile <name>", "provider profile override");
+  const diagnosticsBundleCommand = diagnosticsCommand
+    .command("bundle")
+    .description("create sanitized diagnostics bundle");
+  diagnosticsBundleCommand
+    .option("--out <file>", "output file (zip)")
+    .option("--redact-check", "verify redaction", false)
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const diagOpts = (diagnosticsCommand.opts() ?? {}) as { profile?: string; json?: boolean };
+      const bundleOpts = (diagnosticsBundleCommand.opts() ?? {}) as {
+        out?: string;
+        redactCheck?: boolean;
+      };
+      const { runDiagnosticsBundle } = await import("./commands/diagnostics.js");
+      invocation.exitCode = await runDiagnosticsBundle({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: diagOpts.json ?? parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        profile: diagOpts.profile,
+        out: bundleOpts.out,
+        redactCheck: bundleOpts.redactCheck ?? false,
+      });
+    });
 
   const readinessCommand = program
     .command("readiness")

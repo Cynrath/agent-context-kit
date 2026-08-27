@@ -1,0 +1,37 @@
+name: ACKit Action Dogfood
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+permissions:
+  contents: read
+
+jobs:
+  action-smoke:
+    name: action smoke (uses ./)
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout@v4 (f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a)
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
+      # actions/setup-node@v4 (ae0d4ed08881f17d1511386f5be3e62356acd4a6)
+      - uses: actions/setup-node@ae0d4ed08881f17d1511386f5be3e62356acd4a6
+        with:
+          node-version: "24"
+      # pnpm/action-setup@v4 (b906affcce14559ad1aafd4ab0e942779e9f58b1)
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          package_json_file: package.json
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Run ACKit via local action (scan)
+        uses: ./
+        with:
+          command: scan
+          args: "--json"
+          fail-threshold: low
+          upload-sarif: "false"
+      - name: Verify findings JSON exists
+        run: test -f "${RUNNER_TEMP}/ackit-findings.json" && echo "findings JSON present" && cat "${RUNNER_TEMP}/ackit-findings.json" | head -20

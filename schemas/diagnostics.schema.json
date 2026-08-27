@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cynrath.github.io/agent-context-kit/schemas/diagnostics.schema.json",
+  "title": "Diagnostics",
+  "description": "ACKit diagnostics (ackit.diagnostics.v1)",
+  "type": "object",
+  "required": ["schemaVersion", "tool", "command", "version", "environment", "config", "profile", "instructions", "cache", "policy", "tasks"],
+  "properties": {
+    "schemaVersion": { "const": "ackit.diagnostics.v1" },
+    "tool": { "const": "ackit" },
+    "command": { "const": "diagnostics" },
+    "version": { "type": "string" },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "node": { "type": "string" },
+        "platform": { "type": "string" },
+        "arch": { "type": "string" }
+      },
+      "required": ["node", "platform", "arch"]
+    },
+    "config": { "type": "object" },
+    "profile": { "type": "object" },
+    "instructions": { "type": "object" },
+    "cache": { "type": "object" },
+    "policy": { "type": "object" },
+    "tasks": { "type": "object" }
+  }
+}
