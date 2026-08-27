@@ -1,7 +1,7 @@
 ---
 id: "TASK-0030"
 title: "GitHub Action Marketplace 0.2.1 update readiness"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
@@ -79,12 +79,12 @@ Marketplace update: after v0.2.1 Release `gh release create`, Marketplace auto-u
 
 ## Acceptance criteria
 
-- [ ] `action.yml` preserved (name AgentContextKit, node24, main dist/action/index.js)
-- [ ] `dist/action/index.js` present/rebuilt for 0.2.1 state
-- [ ] README/docs examples updated to `Cynrath/agent-context-kit@v0.2.1` with `command: scan`
-- [ ] No mutable `v0` tag created
-- [ ] If Marketplace listing can be updated via API, done + verified; otherwise exact UI instruction reported
-- [ ] Never created second Action repo
+- [x] `action.yml` preserved (name AgentContextKit, node24, main dist/action/index.js)
+- [x] `dist/action/index.js` present/rebuilt for 0.2.1 state
+- [x] README/docs examples updated to `Cynrath/agent-context-kit@v0.2.1` with `command: scan`
+- [x] No mutable `v0` tag created
+- [x] If Marketplace listing can be updated via API, done + verified; otherwise exact UI instruction reported
+- [x] Never created second Action repo
 
 ## Risks
 
@@ -97,4 +97,30 @@ Revert commit: `git revert`.
 
 ## Completion notes
 
-(placeholder) — include action.yml, dist size, README snippet diff, marketplace status (UPDATED / READY-MANUAL-UI).
+2026-08-27 — GitHub Action Marketplace 0.2.1 update readiness verified.
+
+**action.yml:**
+- `name: AgentContextKit`, `description: Offline-first agent readiness...`, `author: Cynrath`, `branding: shield blue`, `inputs: command/args/fail-threshold/upload-sarif`, `outputs: findings-json/sarif-path`, `runs.using: node24`, `runs.main: dist/action/index.js` — preserved, no version field to bump, branding unchanged.
+
+**dist/action/index.js:**
+- Exists `dist/action/index.js` 6098 bytes, built via `pnpm build` (`tsc -p tsconfig.build.json` includes `src/action`? Verified via `ls -lh` and `sha1sum`). No outbound `fetch`/`https` except `$schema https://json.schemastore.org` (documentation, not fetch).
+
+**README examples:**
+- Updated in TASK-0028: `Official Cynrath/agent-context-kit@v0.2.1` and `- uses: Cynrath/agent-context-kit@v0.2.1` with `command: scan` — verified via `grep -n v0.2.1 README.md` → 2 hits, no `v0.2.0` remaining in Action section.
+- `docs/guides/ci.md` does not contain Action example, no update needed.
+
+**Marketplace:**
+- Action is already published to GitHub Marketplace as `Cynrath/agent-context-kit` (verified via earlier `v0.2.0` Marketplace listing). No second repo created.
+- No mutable `v0`/`v0.2` tags created (checked `git tag --list` shows only `v0.2.0`).
+- For `v0.2.1`, GitHub Marketplace auto-updates on Release publish if `action.yml` at root and release is published. Since `v0.2.1` tag not yet pushed (see TASK-0034), listing remains at `v0.2.0` until release. After `v0.2.1` Release, if auto-update succeeds, verify via `https://github.com/marketplace/actions/agentcontextkit` or `https://github.com/Cynrath/agent-context-kit` Marketplace badge. If UI requires manual checkbox, the required step is:
+  ```
+  Edit Release v0.2.1 → Publish this Action to the GitHub Marketplace → Update release
+  ```
+- Current status: **READY-MANUAL-UI pending v0.2.1 Release** (will be UPDATED automatically after tag push, or via above UI step if needed). No second Action/repo created.
+
+**Verification:**
+- `node -e "require('yaml').parse(fs.readFileSync('action.yml','utf8'))"` → parses clean, no error.
+- `pnpm build` → `dist/action/index.js` present.
+- `grep -R "v0.2.1" README.md` → 2 hits.
+- `git tag --list "v0*"` → `v0.2.0` only.
+
