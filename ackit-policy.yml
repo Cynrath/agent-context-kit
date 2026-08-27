@@ -49,3 +49,11 @@ suppressions:
     pathGlobs: ["src/cli/commands/diagnostics.ts", "src/core/dashboard/server.ts"]
     reason: "diagnostics redaction logic contains credential-like assignment for testing"
     expiresAt: 2027-12-31
+  - ruleId: ACKIT003
+    pathGlobs: ["examples/**"]
+    reason: "demo fixtures contain synthetic credentials for documentation"
+    expiresAt: 2027-12-31
+  - ruleId: ACKIT004
+    pathGlobs: ["examples/**"]
+    reason: "demo connection-string fixtures for documentation"
+    expiresAt: 2027-12-31
