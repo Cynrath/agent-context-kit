@@ -154,35 +154,22 @@ ackit dashboard --port 0 --open  # localhost-only
 
 ### 🖥️ CLI Overview
 
-**`init`** — plan/write shims + skills<br>
-`--dry-run` `--agents`
-
-**`scan`** — security/hygiene scan<br>
-`--ci` `--changed` `--staged` `--since` `--range` `--baseline` `--watch` `--fail-below`
-
-**`readiness`** — 0–100 scoring<br>
-`--fail-below` `--strict` `--baseline`/`--compare` `--json`
-
-**`optimize`** — hygiene advisor v2<br>
-`--fix` `--dry-run` `--profile` `--explain` `--category` `--min-severity` `--format`
-
-**`diagnostics`** — env/config/cache/policy/tasks<br>
-`--json` `bundle --out` `--redact-check`
-
-**`dashboard`** — local dashboard (localhost-only)<br>
-`--host` `--port` `--allow-nonlocal` `--open`
-
-**`instructions`** — graph v2<br>
-`--provider` `--profile` `--for` `--explain` `--json`
-
-**`pack`** — provider-aware pack<br>
-`--max-tokens` `--profile` `--include` `--changed`
-
-**`skills` / `task` / `policy` / `config`**<br>
-`skills list/validate/install` · `task create/list/start/complete` · `policy check` · `config check`
-
-**`cache` / `workspaces` / `hooks` / `report` / `mcp`**<br>
-utilities — `cache clean`, `workspaces`, `hooks`, `report serve`, `mcp serve`
+<table style="width:100%; table-layout:fixed; border-collapse:collapse; word-break:break-word; overflow-wrap:anywhere;">
+<colgroup><col style="width:40px"><col style="width:190px"><col style="width:240px"><col></colgroup>
+<thead><tr><th style="border:1px solid #d0d7de; padding:8px; text-align:left;"></th><th style="border:1px solid #d0d7de; padding:8px; text-align:left;">Command</th><th style="border:1px solid #d0d7de; padding:8px; text-align:left;">Purpose</th><th style="border:1px solid #d0d7de; padding:8px; text-align:left;">Key options / subcommands</th></tr></thead>
+<tbody>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🚀</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit init</code></td><td style="border:1px solid #d0d7de; padding:8px;">Plan/write shims + skills</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--dry-run</code> <code>--agents</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🔒</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit scan</code></td><td style="border:1px solid #d0d7de; padding:8px;">Security / hygiene scan</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--ci</code> <code>--changed</code> <code>--staged</code> <code>--since</code> <code>--range</code> <code>--baseline</code> <code>--watch</code> <code>--fail-below</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">📊</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit readiness</code></td><td style="border:1px solid #d0d7de; padding:8px;">0–100 readiness scoring</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--fail-below</code> <code>--strict</code> <code>--baseline</code> / <code>--compare</code> <code>--json</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧹</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit optimize</code></td><td style="border:1px solid #d0d7de; padding:8px;">Hygiene advisor v2</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--fix</code> <code>--dry-run</code> <code>--profile</code> <code>--explain</code> <code>--category</code> <code>--min-severity</code> <code>--format</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🩺</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit diagnostics</code></td><td style="border:1px solid #d0d7de; padding:8px;">Environment / config / cache / policy / task diagnostics</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--json</code> <code>bundle --out</code> <code>--redact-check</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🔭</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit dashboard</code></td><td style="border:1px solid #d0d7de; padding:8px;">Local dashboard (localhost-only by default)</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--host</code> <code>--port</code> <code>--allow-nonlocal</code> <code>--open</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit instructions</code></td><td style="border:1px solid #d0d7de; padding:8px;">Instruction graph v2</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--provider</code> <code>--profile</code> <code>--for</code> <code>--explain</code> <code>--json</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">📦</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit pack</code></td><td style="border:1px solid #d0d7de; padding:8px;">Provider-aware context pack</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--max-tokens</code> <code>--profile</code> <code>--include</code> <code>--changed</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🛠️</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit skills</code> / <code>task</code> / <code>policy</code> / <code>config</code></td><td style="border:1px solid #d0d7de; padding:8px;">Skills, task workflow, policy and configuration</td><td style="border:1px solid #d0d7de; padding:8px;"><code>skills list/validate/install</code> · <code>task create/list/start/complete</code> · <code>policy check</code> · <code>config check</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🔧</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit cache</code> / <code>workspaces</code> / <code>hooks</code> / <code>report</code> / <code>mcp</code></td><td style="border:1px solid #d0d7de; padding:8px;">Utility commands</td><td style="border:1px solid #d0d7de; padding:8px;"><code>cache clean</code> · <code>workspaces</code> · <code>hooks</code> · <code>report serve</code> · <code>mcp serve</code></td></tr>
+</tbody>
+</table>
 
 Details: [`docs/reference/cli.md`](docs/reference/cli.md) · Exit codes: [`docs/reference/exit-codes.md`](docs/reference/exit-codes.md) · Schemas: [`docs/reference/schemas.md`](docs/reference/schemas.md)
 
