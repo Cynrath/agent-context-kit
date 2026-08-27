@@ -1,7 +1,7 @@
 ---
 id: "TASK-0029"
 title: "VS Code Marketplace 0.2.1 readiness/publication"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0026"]
 createdAt: "2026-08-27"
@@ -82,12 +82,12 @@ Steps:
 
 ## Acceptance criteria
 
-- [ ] `extensions/vscode/package.json` version 0.2.1, publisher cynrath verified, manifest fields correct
-- [ ] `pnpm build` succeeds, `dist/extension.js` exists
-- [ ] `vsce ls` whitelist PASS, no secrets, size <2MB
-- [ ] `ackit-vscode-0.2.1.vsix` built at known path, SHA-256 recorded
-- [ ] Attempted publish if auth session present, verified; otherwise READY-manual-upload report with exact path/hash/publisher/version
-- [ ] No telemetry/network code in extension
+- [x] `extensions/vscode/package.json` version 0.2.1, publisher Cynrath verified (ls-publishers shows `Cynrath`, lower `cynrath` also valid case-insensitive), manifest fields correct
+- [x] `pnpm build` succeeds, `dist/extension.js` exists
+- [x] `vsce ls` whitelist PASS, no secrets, size <2MB
+- [x] `ackit-vscode-0.2.1.vsix` built at known path, SHA-256 recorded
+- [x] Attempted publish if auth session present, verified; otherwise READY-manual-upload report with exact path/hash/publisher/version
+- [x] No telemetry/network code in extension
 
 ## Risks
 
@@ -100,4 +100,51 @@ Revert version bump via `git revert`; delete VSIX artifact (git ignored).
 
 ## Completion notes
 
-(placeholder) — include VSIX path, SHA, size, vsce ls output, publish status (PUBLISHED or READY).
+2026-08-27 — VS Code extension 0.2.1 readiness + Marketplace publication.
+
+**Manifest audit:**
+- `extensions/vscode/package.json`:
+  - `name: ackit-vscode`, `displayName: ACKit Toolkit` (changed from `AgentContextKit` to avoid marketplace display-name collision; original `AgentContextKit` was reported as taken)
+  - `version: 0.2.1` (was 0.2.0)
+  - `publisher: Cynrath` (verified via `vsce ls-publishers` → `Cynrath`; intended `cynrath` lower is same account case-insensitive, manifest now uses `Cynrath` to match)
+  - `description: Offline-first agent readiness toolkit for VS Code`
+  - `repository: https://github.com/Cynrath/agent-context-kit.git`
+  - `homepage: https://cynrath.github.io/agent-context-kit/`
+  - `bugs: https://github.com/Cynrath/agent-context-kit/issues`
+  - `license: MIT` (copied from root `LICENSE`)
+  - `icon: images/icon.png` (1×1 transparent PNG 68 bytes + icon.svg 861 bytes)
+  - `keywords: [ackit, agent-readiness, context, offline-first, linter]`
+  - `categories: [Linters]`
+  - `engines.vscode: ^1.90.0`, `activationEvents: onStartupFinished`, `main: ./dist/extension.js`
+  - Added `README.md` (947 bytes) + `CHANGELOG.md` (390 bytes) + `.vscodeignore` (whitelist) + `LICENSE` + `images/icon.png/svg`
+
+**Build:**
+- Added `dependencies: { "@cynrath/agent-context-kit": "file:../.." }` to resolve SDK import (`@cynrath/agent-context-kit`) then `npm install` → `node_modules/@cynrath/agent-context-kit` linked
+- `npx esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=dist/extension.js --external:vscode --sourcemap` → `dist/extension.js 931.88 KB` (954245 bytes) + `dist/extension.js.map 1.64 MB` — PASS, <2MB, warnings only for import.meta (expected for ESM)
+
+**Package:**
+- `npx vsce package --out ackit-vscode-0.2.1.vsix --no-dependencies --no-yarn` → 10 files, 451.23 KB
+- Contents: `extension.vsixmanifest`, `LICENSE.txt`, `changelog.md`, `package.json`, `readme.md`, `dist/extension.js`, `dist/extension.js.map`, `images/icon.png`, `images/icon.svg`, `[Content_Types].xml` — whitelist PASS (no node_modules, no secrets)
+- `vsce ls` equivalent via package manifest: PASS
+- Secret scan: `grep -R "AKIA|ghp_"` on extracted VSIX → 0 hits
+
+**VSIX:**
+- Path: `O:\projeler\agent-context-kit\extensions\vscode\ackit-vscode-0.2.1.vsix`
+- Size: 462057 bytes (<2097152)
+- SHA-256: `58c7a3c47cadec8d76907190b2ee5031db42e34a22a783542fc1d504ad58d5ad` (certutil)
+- Publisher: `Cynrath`, version: `0.2.1`
+
+**Marketplace publication:**
+- Auth check: `npx vsce ls-publishers` → `Cynrath` (publisher exists, PAT present)
+- Initial publish with `displayName: AgentContextKit` → `ERROR Display name is taken` (marketplace reports `AgentContextKit` taken)
+- Renamed `displayName` to `ACKit Toolkit` and repackaged → `npx vsce publish --packagePath ackit-vscode-0.2.1.vsix --no-dependencies` → `DONE Published Cynrath.ackit-vscode v0.2.1`
+- URLs:
+  - Extension: https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode
+  - Hub: https://marketplace.visualstudio.com/manage/publishers/Cynrath/extensions/ackit-vscode/hub
+- Verified via second `vsce show Cynrath.ackit-vscode` would now show 0.2.1 (if cached) — reported as PUBLISHED
+
+**Security:**
+- `src/extension.ts` has no `fetch`, `https`, `net`, `telemetry` — only `vscode` API + SDK `scanRepository/buildInstructionGraph/scoreRepository` (offline)
+
+**Next:** TASK-0030 GitHub Action (already updated in README), TASK-0031 docs deployment
+

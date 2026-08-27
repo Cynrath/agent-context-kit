@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Cyranth mark</title>
+  <desc id="desc">A geometric C shaped developer mark.</desc>
+  <defs>
+    <linearGradient id="g" x1="16" y1="14" x2="82" y2="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2dd4bf"/>
+      <stop offset="0.45" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#g)" d="M48 8 84 28v15L48 23 24 36.5v23L48 73l36-20v15L48 88 12 68V28L48 8Z"/>
+  <path fill="#07111f" opacity=".88" d="M48 30 70 42.5v11L48 66 26 53.5v-11L48 30Z"/>
+  <path fill="url(#g)" d="M48 31.5 70 44 57.5 51 48 45.5 36.5 52 48 58.5 57.5 53 70 60 48 72.5 26 60V36L48 23.5l22 12.5-12.5 7L48 37.5l-9.5 5.5L48 48.5 36.5 55 26 49V36l22-12.5Z" opacity=".9"/>
+</svg>
