@@ -1,5 +1,7 @@
 # Code of Conduct
 
+For community discussion, see [GitHub Discussions](https://github.com/Cynrath/agent-context-kit/discussions) (General, Q&A, Ideas, Show and tell). For sensitive reports, see `SECURITY.md`.
+
 ## Our Standard
 Participants are expected to be respectful, constructive, and focused on improving the project.
 

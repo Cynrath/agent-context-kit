@@ -1,8 +1,14 @@
 blank_issues_enabled: false
 contact_links:
+  - name: GitHub Discussions (Q&A, Ideas, Show and tell)
+    url: https://github.com/Cynrath/agent-context-kit/discussions
+    about: Open community conversation, support questions, and feature proposals. Security reports stay in SECURITY.md, not Discussions.
   - name: Security vulnerability disclosure
     url: https://github.com/Cynrath/agent-context-kit/security/policy
     about: Please follow SECURITY.md for vulnerability reports. Do not disclose sensitive details in public issues.
   - name: General documentation
     url: https://github.com/Cynrath/agent-context-kit/blob/master/docs/DOCUMENTATION_INDEX.md
     about: Start here for usage, release, support, and maintainer documentation.
+  - name: Sponsor Cynrath
+    url: https://github.com/sponsors/Cynrath
+    about: Support the maintainer via GitHub Sponsors (see .github/FUNDING.yml).

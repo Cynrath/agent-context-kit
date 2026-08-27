@@ -3,6 +3,9 @@
 This repository is built with its own product discipline (docs-first,
 task-first). The workflow below is enforced by the shipped `ackit` CLI.
 
+> **Community:** For Q&A, ideas, and show-and-tell, use [GitHub Discussions](https://github.com/Cynrath/agent-context-kit/discussions). Security reports use `SECURITY.md`, not Discussions. Sponsors: [Cynrath on GitHub Sponsors](https://github.com/sponsors/Cynrath) (see `.github/FUNDING.yml`).
+
+
 ## Workflow
 
 1. **Task first.** Every change needs a task under `docs/tasks/active/` created

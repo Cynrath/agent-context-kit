@@ -17,6 +17,13 @@ Private GitHub vulnerability reporting was enabled and verified on 2026-06-14. S
 - Existing files are not overwritten by default.
 - Redaction checks are report-only.
 
+## Community Channels
+
+- **Discussions:** https://github.com/Cynrath/agent-context-kit/discussions (Q&A, Ideas, Show and tell, General, Announcements) — **never** for security reports.
+- **Sponsors:** https://github.com/sponsors/Cynrath (active)
+
+Security reports must use the private vulnerability reporting flow described above, never Discussions or public issues.
+
 ## Known Limitations
 - Secret detection is pattern-based and may produce false positives or false negatives.
 - Brand/PII detection depends on configured keywords and simple patterns.

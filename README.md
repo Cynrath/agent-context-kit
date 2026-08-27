@@ -13,6 +13,8 @@
   <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/badge/node-%3E%3D22-339933?style=flat-square&logo=node.js" alt="node"></a>
   <img src="https://img.shields.io/badge/offline--first-yes-00ACC1?style=flat-square" alt="offline">
   <img src="https://img.shields.io/badge/deterministic-yes-FF6F00?style=flat-square" alt="deterministic">
+  <a href="https://github.com/sponsors/Cynrath"><img src="https://img.shields.io/badge/sponsors-Cynrath-ea4aaa?style=flat-square" alt="sponsors"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit/discussions"><img src="https://img.shields.io/badge/discussions-enabled-1da1f2?style=flat-square" alt="discussions"></a>
 </p>
 
 <h3 align="center">Turn any repository into an <em>agent-ready</em> repository.</h3>
@@ -23,6 +25,8 @@
   <a href="docs/guides/getting-started.md">Getting Started</a> ·
   <a href="CHANGELOG.md">Changelog</a> ·
   <a href="docs/security/THREAT_MODEL.md">Security</a> ·
+  <a href="https://github.com/Cynrath/agent-context-kit/discussions">Discussions</a> ·
+  <a href="https://github.com/sponsors/Cynrath">Sponsors</a> ·
   <a href="#-github-action">GitHub Action</a>
 </p>
 
