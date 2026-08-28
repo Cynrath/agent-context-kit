@@ -22,12 +22,16 @@ import { executeConfiguredScan } from "../../src/core/scanner/orchestrate.js";
 
 let egressAttempts: string[] = [];
 
+/** Typed helper to monkey-patch Node globals without ts-ignore. */
+function patchObject(target: object, key: PropertyKey, value: unknown): void {
+  (target as Record<PropertyKey, unknown>)[key] = value;
+}
+
 function patchEgress() {
   egressAttempts = [];
 
   const originalFetch = globalThis.fetch;
-  // @ts-ignore
-  globalThis.fetch = (...args: unknown[]) => {
+  patchObject(globalThis as unknown as object, "fetch", (...args: unknown[]) => {
     const url = String(args[0] ?? "");
     if (url.startsWith("/api/") || url === "/") {
       return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
@@ -44,78 +48,66 @@ function patchEgress() {
     return originalFetch
       ? (originalFetch as typeof fetch)(...(args as Parameters<typeof fetch>))
       : Promise.reject(new Error("fetch not available"));
-  };
+  });
 
   const origHttpRequest = http.request;
   const origHttpGet = http.get;
-  // @ts-ignore
-  http.request = (...args: unknown[]) => {
+  patchObject(http as unknown as object, "request", (...args: unknown[]) => {
     egressAttempts.push(`http.request:${String(args[0]).slice(0, 40)}`);
     throw new Error("EGRESS BLOCKED: http.request");
-  };
-  // @ts-ignore
-  http.get = (...args: unknown[]) => {
+  });
+  patchObject(http as unknown as object, "get", (...args: unknown[]) => {
     egressAttempts.push(`http.get:${String(args[0]).slice(0, 40)}`);
     throw new Error("EGRESS BLOCKED: http.get");
-  };
+  });
 
   const origHttpsRequest = https.request;
   const origHttpsGet = https.get;
-  // @ts-ignore
-  https.request = (...args: unknown[]) => {
+  patchObject(https as unknown as object, "request", (...args: unknown[]) => {
     egressAttempts.push(`https.request:${String(args[0]).slice(0, 40)}`);
     throw new Error("EGRESS BLOCKED: https.request");
-  };
-  // @ts-ignore
-  https.get = (...args: unknown[]) => {
+  });
+  patchObject(https as unknown as object, "get", (...args: unknown[]) => {
     egressAttempts.push(`https.get:${String(args[0]).slice(0, 40)}`);
     throw new Error("EGRESS BLOCKED: https.get");
-  };
+  });
 
   const origNetConnect = net.connect;
   const origSocketConnect = net.Socket.prototype.connect as unknown as (
     ...args: unknown[]
   ) => unknown;
-  // @ts-ignore
-  net.connect = (...args: unknown[]) => {
+  patchObject(net as unknown as object, "connect", (...args: unknown[]) => {
     egressAttempts.push(`net.connect:${String(args[0]).slice(0, 40)}`);
     throw new Error("EGRESS BLOCKED: net.connect");
-  };
-  // @ts-ignore
-  net.Socket.prototype.connect = (...args: unknown[]) => {
+  });
+  patchObject(net.Socket.prototype as unknown as object, "connect", (...args: unknown[]) => {
     egressAttempts.push(`Socket.connect:${String(args[0]).slice(0, 40)}`);
     throw new Error("EGRESS BLOCKED: Socket.connect");
-  };
+  });
 
   const origTlsConnect = tls.connect;
-  // @ts-ignore
-  tls.connect = (...args: unknown[]) => {
+  patchObject(tls as unknown as object, "connect", (...args: unknown[]) => {
     egressAttempts.push(`tls.connect:${String(args[0]).slice(0, 40)}`);
     throw new Error("EGRESS BLOCKED: tls.connect");
-  };
+  });
 
   const origDgramCreate = dgram.createSocket;
-  // @ts-ignore
-  dgram.createSocket = (...args: unknown[]) => {
+  patchObject(dgram as unknown as object, "createSocket", (...args: unknown[]) => {
     const socket = origDgramCreate(...(args as Parameters<typeof dgram.createSocket>));
-    const _origSend = socket.send.bind(socket);
-    // @ts-ignore
-    socket.send = (...sargs: unknown[]) => {
+    patchObject(socket as unknown as object, "send", (...sargs: unknown[]) => {
       egressAttempts.push(`dgram.send:${String(sargs[0]).slice(0, 40)}`);
       throw new Error("EGRESS BLOCKED: dgram.send");
-    };
+    });
     return socket;
-  };
+  });
 
   const origDnsResolve = dns.resolve;
   const origDnsLookup = dns.lookup;
-  // @ts-ignore
-  dns.resolve = (...args: unknown[]) => {
+  patchObject(dns as unknown as object, "resolve", (...args: unknown[]) => {
     egressAttempts.push(`dns.resolve:${String(args[0])}`);
     throw new Error("EGRESS BLOCKED: dns.resolve");
-  };
-  // @ts-ignore
-  dns.lookup = (...args: unknown[]) => {
+  });
+  patchObject(dns as unknown as object, "lookup", (...args: unknown[]) => {
     const host = String(args[0] ?? "");
     // Allow loopback hosts — needed for http.createServer listen(0, '127.0.0.1')
     if (host === "127.0.0.1" || host === "localhost" || host === "::1") {
@@ -124,48 +116,36 @@ function patchEgress() {
     }
     egressAttempts.push(`dns.lookup:${host}`);
     throw new Error("EGRESS BLOCKED: dns.lookup");
-  };
+  });
 
   const origWebSocket = (globalThis as unknown as { WebSocket?: unknown }).WebSocket;
-  // @ts-ignore
-  (globalThis as unknown as { WebSocket: unknown }).WebSocket = (...args: unknown[]) => {
+  patchObject(globalThis as unknown as object, "WebSocket", (...args: unknown[]) => {
     egressAttempts.push(`WebSocket:${String(args[0])}`);
     throw new Error("EGRESS BLOCKED: WebSocket");
-  };
+  });
 
   const origEventSource = (globalThis as unknown as { EventSource?: unknown }).EventSource;
-  // @ts-ignore
-  (globalThis as unknown as { EventSource: unknown }).EventSource = (...args: unknown[]) => {
+  patchObject(globalThis as unknown as object, "EventSource", (...args: unknown[]) => {
     egressAttempts.push(`EventSource:${String(args[0])}`);
     throw new Error("EGRESS BLOCKED: EventSource");
-  };
+  });
 
   return () => {
-    globalThis.fetch = originalFetch;
-    // @ts-ignore restore
-    http.request = origHttpRequest;
-    // @ts-ignore restore
-    http.get = origHttpGet;
-    // @ts-ignore restore
-    https.request = origHttpsRequest;
-    // @ts-ignore restore
-    https.get = origHttpsGet;
-    // @ts-ignore restore
-    net.connect = origNetConnect;
-    // @ts-ignore restore
-    net.Socket.prototype.connect = origSocketConnect;
-    // @ts-ignore restore
-    tls.connect = origTlsConnect;
-    // @ts-ignore restore
-    dgram.createSocket = origDgramCreate;
-    // @ts-ignore restore
-    dns.resolve = origDnsResolve;
-    // @ts-ignore restore
-    dns.lookup = origDnsLookup;
-    if (origWebSocket) (globalThis as unknown as { WebSocket: unknown }).WebSocket = origWebSocket;
+    patchObject(globalThis as unknown as object, "fetch", originalFetch);
+    patchObject(http as unknown as object, "request", origHttpRequest);
+    patchObject(http as unknown as object, "get", origHttpGet);
+    patchObject(https as unknown as object, "request", origHttpsRequest);
+    patchObject(https as unknown as object, "get", origHttpsGet);
+    patchObject(net as unknown as object, "connect", origNetConnect);
+    patchObject(net.Socket.prototype as unknown as object, "connect", origSocketConnect);
+    patchObject(tls as unknown as object, "connect", origTlsConnect);
+    patchObject(dgram as unknown as object, "createSocket", origDgramCreate);
+    patchObject(dns as unknown as object, "resolve", origDnsResolve);
+    patchObject(dns as unknown as object, "lookup", origDnsLookup);
+    if (origWebSocket) patchObject(globalThis as unknown as object, "WebSocket", origWebSocket);
     else delete (globalThis as unknown as { WebSocket?: unknown }).WebSocket;
     if (origEventSource)
-      (globalThis as unknown as { EventSource: unknown }).EventSource = origEventSource;
+      patchObject(globalThis as unknown as object, "EventSource", origEventSource);
     else delete (globalThis as unknown as { EventSource?: unknown }).EventSource;
   };
 }

@@ -30,14 +30,16 @@ export function collectAllDeductions(inputs: ReadinessInputs): Deduction[] {
         (a, b) => severityRank(b.severity) - severityRank(a.severity) || a.id.localeCompare(b.id),
       );
       capped.push(...sorted.slice(0, 500));
+      const first = arr[0];
+      if (!first) continue;
       capped.push({
         id: "READINESS-TRUNCATED-001",
-        category: arr[0]!.category as import("../types.js").CategoryId,
+        category: first.category as import("../types.js").CategoryId,
         points: 0,
         severity: "info",
         reason: `Truncated ${arr.length - 500} deductions`,
         evidence: {
-          relativePath: arr[0]!.evidence.relativePath,
+          relativePath: first.evidence.relativePath,
           excerpt: redactExcerpt("truncated"),
         },
         fingerprint: "READINESS-TRUNCATED-001",

@@ -118,7 +118,8 @@ export async function runInstructionsCommand(
     const forLabel = options.forPath ?? "(repo-wide)";
     process.stdout.write(`${provider} chain for ${forLabel} (weakest → strongest):\n`);
     for (let i = 0; i < detailed.chain.length; i += 1) {
-      const id = detailed.chain[i]!;
+      const id = detailed.chain[i];
+      if (!id) continue;
       const info = detailed.perNode[id];
       const node = graph.nodes.find((n) => n.id === id);
       const prec = node?.precedence ?? "?";

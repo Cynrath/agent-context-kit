@@ -23,7 +23,9 @@ function templatesDir(): string {
     }
   }
   // fallback to 3-ups (packaged dist) – the caller will throw with clear ENOENT if missing
-  return path.join(candidates[0]!, "templates", "profiles");
+  const fallback = candidates[0];
+  if (!fallback) throw new Error("invariant: no candidate template root");
+  return path.join(fallback, "templates", "profiles");
 }
 
 export function loadBuiltInProfiles(): Map<string, Profile> {

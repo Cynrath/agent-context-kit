@@ -49,8 +49,9 @@ export function detectConflicts(
   for (const [key, valMap] of keyValues) {
     if (valMap.size < 2) continue;
     const entries = [...valMap.entries()].sort(([a], [b]) => (a < b ? -1 : 1));
-    const first = entries[0]!;
-    const second = entries[1]!;
+    const first = entries[0];
+    const second = entries[1];
+    if (!first || !second) continue;
     out.push({ nodeId: first[1], ruleId: "INSTR-CONFLICT", key, values: [first[0], second[0]] });
   }
   return out;
@@ -107,8 +108,9 @@ export function detectDuplicates(
   const instructions = nodes.filter((n) => n.kind === "instruction");
   for (let i = 0; i < instructions.length; i++) {
     for (let j = i + 1; j < instructions.length; j++) {
-      const a = instructions[i]!;
-      const b = instructions[j]!;
+      const a = instructions[i];
+      const b = instructions[j];
+      if (!a || !b) continue;
       const ca = contents.get(a.id);
       const cb = contents.get(b.id);
       if (!ca || !cb) continue;

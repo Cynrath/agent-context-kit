@@ -104,9 +104,11 @@ describe("release workflow hardening", () => {
 
   it("gates on an anchored exact-tag regex, checkout identity, and package/version parity", () => {
     expect(raw).not.toContain("v[0-9]*.[0-9]*.[0-9]*)");
-    expect(raw).toContain('if [[ ! "${TAG_NAME}" =~ ^v[0-9]+\\.[0-9]+\\.[0-9]+$ ]]; then');
-    expect(raw).toContain('"${TAG_COMMIT}" != "${HEAD_COMMIT}"');
-    expect(raw).toContain("'${PKG_VERSION}' does not match tag");
+    expect(raw).toContain(
+      'if [[ ! "' + "$" + "{TAG_NAME}" + '" =~ ^v[0-9]+\\.[0-9]+\\.[0-9]+$ ]]; then',
+    );
+    expect(raw).toContain('"' + "$" + "{TAG_COMMIT}" + '" != "' + "$" + "{HEAD_COMMIT}" + '"');
+    expect(raw).toContain("'" + "$" + "{PKG_VERSION}" + "' does not match tag");
     expect(raw).toContain("@cynrath/agent-context-kit");
   });
 
@@ -135,14 +137,16 @@ describe("release workflow hardening", () => {
     const tests = order("run: pnpm test");
     const smoke = order("run: pnpm run smoke:package");
     const absence = order("Confirm exact version is absent from the npm registry");
-    const publish = order('run: npm publish "${TARBALL_PATH}" --access public');
+    const publish = order('run: npm publish "' + "$" + "{TARBALL_PATH}" + '" --access public');
     expect(tests).toBeLessThan(publish);
     expect(smoke).toBeLessThan(publish);
     expect(absence).toBeLessThan(publish);
   });
 
   it("creates the GitHub Release only AFTER publish + registry + npx verification", () => {
-    const publish = raw.indexOf('run: npm publish "${TARBALL_PATH}" --access public');
+    const publish = raw.indexOf(
+      'run: npm publish "' + "$" + "{TARBALL_PATH}" + '" --access public',
+    );
     const verify = raw.indexOf("Verify registry metadata, shasum, and dist-tag");
     const npxSmoke = raw.indexOf("npx consumer smoke");
     const release = raw.indexOf("gh release create");
@@ -154,7 +158,7 @@ describe("release workflow hardening", () => {
   });
 
   it("publishes the recorded tarball and parses registry metadata safely", () => {
-    expect(raw).toContain('npm publish "${TARBALL_PATH}"');
+    expect(raw).toContain('npm publish "' + "$" + "{TARBALL_PATH}" + '"');
     expect(raw).toContain("dist.shasum --json");
     expect(raw).toContain("JSON.parse(require('fs').readFileSync(0,'utf8'))");
     expect(raw).toMatch(/seq 1 30/);
@@ -196,10 +200,10 @@ describe("release workflow hardening", () => {
     expect(raw).toContain("Fresh isolated registry consumer");
     expect(raw).toContain("mktemp -d");
     expect(raw).toContain("npm_config_cache");
-    expect(raw).toContain('npm install --prefix "${CONSUMER_TMP}"');
-    expect(raw).toContain("@cynrath/agent-context-kit@${RELEASE_VERSION}");
+    expect(raw).toContain('npm install --prefix "' + "$" + "{CONSUMER_TMP}" + '"');
+    expect(raw).toContain("@cynrath/agent-context-kit@" + "$" + "{RELEASE_VERSION}");
     expect(raw).toContain('node_modules/.bin/ackit" --version');
-    expect(raw).toContain('grep -qx "${RELEASE_VERSION}"');
+    expect(raw).toContain('grep -qx "' + "$" + "{RELEASE_VERSION}" + '"');
     expect(raw).toContain("--help");
     // No direct global install step (echo in release notes is fine, but no `run: npm install --global`)
     expect(raw).not.toMatch(/\n\s*run:\s*npm install --global/);
@@ -216,7 +220,7 @@ describe("release workflow hardening", () => {
 
   it("keeps release summary version-neutral (no hard-coded v0.2.0)", () => {
     expect(raw).not.toContain("v0.2.0");
-    expect(raw).toContain("v${RELEASE_VERSION}");
-    expect(raw).toContain("AgentContextKit v${RELEASE_VERSION} release");
+    expect(raw).toContain("v" + "$" + "{RELEASE_VERSION}");
+    expect(raw).toContain("AgentContextKit v" + "$" + "{RELEASE_VERSION}" + " release");
   });
 });

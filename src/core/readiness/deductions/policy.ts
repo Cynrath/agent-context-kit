@@ -39,7 +39,8 @@ export function collectPolicyDeductions(
   // Golden fixture has no policy findings (score 100), so we emit none.
   // If findings present, emit one high 10
   if (findings.length > 0) {
-    const f = findings[0]!;
+    const f = findings[0];
+    if (!f) return out;
     out.push({
       id: "READINESS-POLICY-FINDING-001",
       category: "policy",

@@ -30,13 +30,11 @@ export async function resolveProfileForCommand(
   // Gather detected files via list (scan targets light)
   let detectedFiles: string[] = [];
   try {
-    const { collectScanTargets } = await import("../core/filesystem/scan-targets.js");
     const { resolveRepositoryRoot } = await import("../core/filesystem/root.js");
     const res = await resolveRepositoryRoot(repoRoot);
     if (res.ok) {
-      const collected = await import("../core/filesystem/scan-targets.js").then((m) =>
-        m.collectScanTargets(res.root, { skipClassification: true }),
-      );
+      const { collectScanTargets } = await import("../core/filesystem/scan-targets.js");
+      const collected = await collectScanTargets(res.root, { skipClassification: true });
       detectedFiles = collected.targets.map((t) => t.relativePath);
     } else {
       // fallback: list .github etc manually?

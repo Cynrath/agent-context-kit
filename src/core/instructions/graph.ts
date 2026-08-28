@@ -668,8 +668,9 @@ function detectDuplicatesPure(
   const instructionNodes = nodes.filter((n) => n.kind === "instruction");
   for (let i = 0; i < instructionNodes.length; i += 1) {
     for (let j = i + 1; j < instructionNodes.length; j += 1) {
-      const a = instructionNodes[i]!;
-      const b = instructionNodes[j]!;
+      const a = instructionNodes[i];
+      const b = instructionNodes[j];
+      if (!a || !b) continue;
       const ca = contents.get(a.id);
       const cb = contents.get(b.id);
       if (ca === undefined || cb === undefined) continue;
@@ -802,8 +803,9 @@ function detectConflictsPure(
   for (const [key, valMap] of keyValues) {
     if (valMap.size < 2) continue;
     const entries = [...valMap.entries()].sort(([a], [b]) => (a < b ? -1 : 1));
-    const first = entries[0]!;
-    const second = entries[1]!;
+    const first = entries[0];
+    const second = entries[1];
+    if (!first || !second) continue;
     out.push({
       ruleId: "INSTR-CONFLICT",
       message: `conflicting '${key}': '${first[0]}' (${first[1]}) vs '${second[0]}' (${second[1]})`,
