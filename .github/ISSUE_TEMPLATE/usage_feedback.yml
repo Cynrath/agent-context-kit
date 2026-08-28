@@ -1,0 +1,72 @@
+name: Real-world usage feedback
+description: Share how ACKit behaves in a real repository so maintainers can prioritize evidence-backed improvements.
+title: "[Usage]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for using ACKit. This form is for concrete experience from a real repository. Please remove secrets, private URLs, absolute local paths, and proprietary source content.
+  - type: input
+    id: version
+    attributes:
+      label: ACKit version
+      description: Output of `ackit --version`.
+      placeholder: 0.2.2
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface used
+      multiple: true
+      options:
+        - CLI
+        - VS Code extension
+        - GitHub Action
+        - MCP
+        - TypeScript/Node SDK
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node version, and repository ecosystem. Do not include usernames or absolute paths.
+      placeholder: Windows 11, Node 24, TypeScript monorepo
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: What were you trying to do?
+      description: Describe the workflow and expected outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened?
+      description: Include commands, sanitized output, readiness/scan summaries, or observed behavior when useful.
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: What was useful or not useful?
+      description: Tell us which findings, views, reports, or workflows saved time or created noise.
+    validations:
+      required: true
+  - type: textarea
+    id: improvement
+    attributes:
+      label: Smallest improvement that would matter
+      description: Prefer the concrete problem over a proposed implementation.
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed secrets, credentials, private repository content, private URLs, and machine-specific absolute paths.
+          required: true
