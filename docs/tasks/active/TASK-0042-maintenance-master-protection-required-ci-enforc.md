@@ -1,11 +1,11 @@
 ---
 id: "TASK-0042"
 title: "maintenance: master protection / required CI enforcement"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0041"]
 createdAt: "2026-08-28"
-completedAt: null
+completedAt: "2026-08-28"
 ---
 
 ## Purpose
@@ -37,14 +37,14 @@ Configure `master` so accidental unsafe changes cannot bypass quality gates: enf
 
 ## Acceptance criteria
 
-- [ ] Exact present protection/ruleset state documented before change
-- [ ] No contradictory duplicate rules (single coherent source)
-- [ ] `master` targeted, enforcement ACTIVE, force-push BLOCKED, deletion BLOCKED
-- [ ] Required status checks present with exact check names from green SHA (no impossible/missing contexts)
-- [ ] `Require branches to be up-to-date` enabled if workflow-compatible, otherwise documented
-- [ ] PR-before-merge policy decided and documented; bypass policy safe (maintainer not locked out)
-- [ ] `Require signed commits` NOT enabled
-- [ ] Read-back verification after mutation confirms effective state
+- [x] Exact present protection/ruleset state documented before change
+- [x] No contradictory duplicate rules (single coherent source)
+- [x] `master` targeted, enforcement ACTIVE, force-push BLOCKED, deletion BLOCKED
+- [x] Required status checks present with exact check names from green SHA (no impossible/missing contexts)
+- [x] `Require branches to be up-to-date` enabled if workflow-compatible, otherwise documented
+- [x] PR-before-merge policy decided and documented; bypass policy safe (maintainer not locked out)
+- [x] `Require signed commits` NOT enabled
+- [x] Read-back verification after mutation confirms effective state
 
 ## Test steps
 
@@ -65,4 +65,4 @@ Restore ruleset via `gh api` to prior state (rules: deletion, non_fast_forward, 
 
 ## Completion notes
 
-(pending)
+2026-08-28 — Preflight: `GET /branches/master/protection` 404, `GET /rulesets` single ACTIVE `protect-master` id 17913688 targeting `~DEFAULT_BRANCH` with rules `deletion` + `non_fast_forward` + `required_linear_history`, no status checks, `bypass_actors:[]`, `enforcement:active`, `can_bypass:never`. Lint-cleanup SHA `6b146b4aab9a97d490164c473495cbe174f08b0f` pushed; waited for CI green; collected exact check names from that SHA via `gh api .../commits/6b146b4.../check-runs` (12): `verify ubuntu-latest / node-22`, `verify ubuntu-latest / node-24`, `verify windows-latest / node-22`, `verify windows-latest / node-24`, `verify macos-latest / node-22`, `verify macos-latest / node-24`, `self-scan (dogfood)`, `package-smoke ubuntu-latest`, `package-smoke windows-latest`, `package-smoke macos-latest`, `extension / node-22 (vsce + Electron)`, `action smoke (uses ./)` — all also emitted on PR (both workflows trigger on push+PR to master, so no deadlock). Updated existing ruleset 17913688 via `PUT` with payload adding `required_status_checks` (12 contexts, `strict_required_status_checks_policy:true`, `do_not_enforce_on_create:false`) while preserving `deletion`, `non_fast_forward`, `required_linear_history` — single coherent source, no duplicate. Read-back confirms: `enforcement:active`, `target:branch`, `conditions:{ref_name:{include:["~DEFAULT_BRANCH"]}}`, `rules:[deletion, non_fast_forward, required_linear_history, required_status_checks{12 contexts, strict:true}]`, `bypass_actors:[]`, `id:17913688`, `node_id:RRS_lACqUmVwb3NpdG9yec5K8Tf7zgERV1g`, `updated_at:2026-08-28T11:21:45Z`. Force-push BLOCKED (non_fast_forward), deletion BLOCKED (deletion), required checks present with exact names, strict up-to-date YES, PR requirement NOT added — deliberate to preserve historic direct maintainer fast-forward pushes; documented: direct pushes remain allowed but must be linear (required_linear_history) and fast-forward (non_fast_forward) and will still be subject to status checks on PR path; adding `pull_request` rule would require bypass actor for owner — evaluated but deferred as it would complicate maintainer workflow without clear benefit; prioritized required checks + force/deletion as per spec. `Require signed commits` NOT enabled (commits unsigned). Verification: CI run 33154861210 SUCCESS, Dogfood 33154861134 SUCCESS, all 12 checks SUCCESS on final SHA, so required checks satisfied. No workflow/config file change, so already-green SHA remains acceptable.
