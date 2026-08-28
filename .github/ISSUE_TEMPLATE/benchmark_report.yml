@@ -1,0 +1,78 @@
+name: Benchmark or performance report
+description: Submit reproducible ACKit benchmark/performance evidence from a real repository or sanitized fixture.
+title: "[Benchmark]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ACKit benchmark reports should be reproducible and privacy-safe. Do not upload repository source, secrets, raw secret findings, or absolute local paths. Prefer aggregate metrics and a public repository + exact commit SHA when possible.
+  - type: input
+    id: version
+    attributes:
+      label: ACKit version
+      placeholder: 0.2.2
+    validations:
+      required: true
+  - type: input
+    id: repository
+    attributes:
+      label: Repository or fixture
+      description: Public `owner/repo@SHA`, or a short description such as `private TypeScript monorepo (sanitized aggregate only)`.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node version, CPU class, RAM, and repository ecosystem if relevant.
+      placeholder: Ubuntu 24.04, Node 24, 8 vCPU, 16 GB RAM, TypeScript
+    validations:
+      required: true
+  - type: dropdown
+    id: metric
+    attributes:
+      label: Primary metric
+      multiple: true
+      options:
+        - Cold scan time
+        - Warm scan time
+        - Incremental scan time
+        - Files per second
+        - Peak RSS memory
+        - Context pack time
+        - Instruction graph time
+        - Cache hit ratio
+        - Other deterministic metric
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Reproduction command and setup
+      description: Include enough sanitized detail to repeat the run. Pin repository SHA/config where possible.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: Results
+      description: Prefer median-of-3 or more, with units and run count. Include comparison data only if measured under the same conditions.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Why is this result notable?
+      description: Regression, improvement, scale limit, cross-platform difference, or reproducibility concern.
+    validations:
+      required: true
+  - type: checkboxes
+    id: methodology
+    attributes:
+      label: Methodology and privacy
+      options:
+        - label: I did not include secrets, private source content, raw secret findings, or absolute local paths.
+          required: true
+        - label: Any comparison numbers were collected under equivalent conditions or are clearly marked otherwise.
+          required: true
