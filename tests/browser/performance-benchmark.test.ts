@@ -92,11 +92,31 @@ class FakeElement {
     walk(this);
     return out;
   }
-  getBoundingClientRect(): { width: number; height: number; top: number; left: number; right: number; bottom: number; x: number; y: number; toJSON: () => object } {
+  getBoundingClientRect(): {
+    width: number;
+    height: number;
+    top: number;
+    left: number;
+    right: number;
+    bottom: number;
+    x: number;
+    y: number;
+    toJSON: () => object;
+  } {
     // For media heuristic: treat as large if inside recent turns fixture we set attribute
     const w = this.tagName === "IMG" ? 500 : 100;
     const h = this.tagName === "IMG" ? 400 : 100;
-    return { width: w, height: h, top: 0, left: 0, right: w, bottom: h, x: 0, y: 0, toJSON: () => ({}) };
+    return {
+      width: w,
+      height: h,
+      top: 0,
+      left: 0,
+      right: w,
+      bottom: h,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    };
   }
   dispatchEvent(_e: unknown): boolean {
     return true;
@@ -113,31 +133,49 @@ function matchesSelector(el: FakeElement, selector: string): boolean {
   // #thread
   if (selector === "#thread") return el.getAttribute("id") === "thread";
   // [data-turn-id-container]
-  if (selector === "[data-turn-id-container]") return el.getAttribute("data-turn-id-container") !== null;
+  if (selector === "[data-turn-id-container]")
+    return el.getAttribute("data-turn-id-container") !== null;
   // section[data-testid^="conversation-turn-"]
   if (selector === 'section[data-testid^="conversation-turn-"]') {
-    return el.tagName === "SECTION" && (el.getAttribute("data-testid")?.startsWith("conversation-turn-") ?? false);
+    return (
+      el.tagName === "SECTION" &&
+      (el.getAttribute("data-testid")?.startsWith("conversation-turn-") ?? false)
+    );
   }
   if (selector === 'section[data-testid^="conversation-turn-"][data-turn]') {
-    return el.tagName === "SECTION" && (el.getAttribute("data-testid")?.startsWith("conversation-turn-") ?? false) && el.getAttribute("data-turn") !== null;
+    return (
+      el.tagName === "SECTION" &&
+      (el.getAttribute("data-testid")?.startsWith("conversation-turn-") ?? false) &&
+      el.getAttribute("data-turn") !== null
+    );
   }
-  if (selector === "[data-message-author-role]") return el.getAttribute("data-message-author-role") !== null;
+  if (selector === "[data-message-author-role]")
+    return el.getAttribute("data-message-author-role") !== null;
   if (selector === 'div[contenteditable="true"][data-testid="composer"]') return false;
-  if (selector === 'div[contenteditable="true"]') return el.getAttribute("contenteditable") === "true";
+  if (selector === 'div[contenteditable="true"]')
+    return el.getAttribute("contenteditable") === "true";
   if (selector === "textarea") return el.tagName === "TEXTAREA";
-  if (selector === 'button[data-testid="stop-button"]') return el.tagName === "BUTTON" && el.getAttribute("data-testid") === "stop-button";
-  if (selector === '[data-testid="generating"]') return el.getAttribute("data-testid") === "generating";
-  if (selector === ".result-streaming, [data-streaming=\"true\"]") return false;
+  if (selector === 'button[data-testid="stop-button"]')
+    return el.tagName === "BUTTON" && el.getAttribute("data-testid") === "stop-button";
+  if (selector === '[data-testid="generating"]')
+    return el.getAttribute("data-testid") === "generating";
+  if (selector === '.result-streaming, [data-streaming="true"]') return false;
   if (selector === "pre") return el.tagName === "PRE";
-  if (selector === "img, video, iframe, canvas, embed") return ["IMG", "VIDEO", "IFRAME", "CANVAS", "EMBED"].includes(el.tagName);
+  if (selector === "img, video, iframe, canvas, embed")
+    return ["IMG", "VIDEO", "IFRAME", "CANVAS", "EMBED"].includes(el.tagName);
   if (selector === ".ackit-placeholder") return el.className === "ackit-placeholder";
   if (selector === ".ackit-placeholder-code") return el.className === "ackit-placeholder-code";
   if (selector === ".ackit-placeholder-media") return el.className === "ackit-placeholder-media";
-  if (selector === '[data-ackit-collapsed="true"]') return el.getAttribute("data-ackit-collapsed") === "true";
-  if (selector === 'section[data-ackit-collapsed="true"]') return el.tagName === "SECTION" && el.getAttribute("data-ackit-collapsed") === "true";
-  if (selector === "[data-ackit-pinned=\"true\"]" || selector === "[data-ackit-pinned='true']") return el.getAttribute("data-ackit-pinned") === "true";
+  if (selector === '[data-ackit-collapsed="true"]')
+    return el.getAttribute("data-ackit-collapsed") === "true";
+  if (selector === 'section[data-ackit-collapsed="true"]')
+    return el.tagName === "SECTION" && el.getAttribute("data-ackit-collapsed") === "true";
+  if (selector === '[data-ackit-pinned="true"]' || selector === "[data-ackit-pinned='true']")
+    return el.getAttribute("data-ackit-pinned") === "true";
   if (selector === ".ackit-placeholder, .ackit-placeholder-code, .ackit-placeholder-media") {
-    return ["ackit-placeholder", "ackit-placeholder-code", "ackit-placeholder-media"].includes(el.className);
+    return ["ackit-placeholder", "ackit-placeholder-code", "ackit-placeholder-media"].includes(
+      el.className,
+    );
   }
   if (selector === "[data-ackit-style]") return el.getAttribute("data-ackit-style") !== null;
   // fallback: simple attribute equality
@@ -155,7 +193,6 @@ function matchesSelector(el: FakeElement, selector: string): boolean {
 class FakeDocument {
   body: FakeElement = new FakeElement("body");
   documentElement: FakeElement = new FakeElement("html");
-  private idMap: Map<string, FakeElement> = new Map();
   activeElement: FakeElement | null = null;
   createElement(tag: string): FakeElement {
     return new FakeElement(tag);
@@ -197,12 +234,17 @@ let originalHTMLElement: unknown;
 function installFakeDom(): void {
   originalDocument = (globalThis as unknown as { document: unknown }).document;
   originalWindow = (globalThis as unknown as { window: unknown }).window;
-  originalMutationObserver = (globalThis as unknown as { MutationObserver: unknown }).MutationObserver;
+  originalMutationObserver = (globalThis as unknown as { MutationObserver: unknown })
+    .MutationObserver;
   originalHTMLElement = (globalThis as unknown as { HTMLElement: unknown }).HTMLElement;
 
   fakeDoc = new FakeDocument();
   // Wire documentElement scrollHeight
-  Object.defineProperty(fakeDoc.documentElement, "scrollHeight", { value: 10000, writable: true, configurable: true });
+  Object.defineProperty(fakeDoc.documentElement, "scrollHeight", {
+    value: 10000,
+    writable: true,
+    configurable: true,
+  });
 
   (globalThis as unknown as { document: FakeDocument }).document = fakeDoc as unknown as Document;
   (globalThis as unknown as { window: unknown }).window = {
@@ -217,7 +259,8 @@ function installFakeDom(): void {
     observe(): void {}
     disconnect(): void {}
   } as unknown as typeof MutationObserver;
-  (globalThis as unknown as { HTMLElement: unknown }).HTMLElement = FakeElement as unknown as typeof HTMLElement;
+  (globalThis as unknown as { HTMLElement: unknown }).HTMLElement =
+    FakeElement as unknown as typeof HTMLElement;
 
   Object.defineProperty(globalThis, "location", {
     value: { hostname: "chatgpt.com", href: "https://chatgpt.com/c/123" },
@@ -229,8 +272,10 @@ function installFakeDom(): void {
 function uninstallFakeDom(): void {
   (globalThis as unknown as { document: unknown }).document = originalDocument as Document;
   (globalThis as unknown as { window: unknown }).window = originalWindow as Window;
-  (globalThis as unknown as { MutationObserver: unknown }).MutationObserver = originalMutationObserver as typeof MutationObserver;
-  (globalThis as unknown as { HTMLElement: unknown }).HTMLElement = originalHTMLElement as typeof HTMLElement;
+  (globalThis as unknown as { MutationObserver: unknown }).MutationObserver =
+    originalMutationObserver as typeof MutationObserver;
+  (globalThis as unknown as { HTMLElement: unknown }).HTMLElement =
+    originalHTMLElement as typeof HTMLElement;
 }
 
 function buildFixture(totalTurns = TURN_COUNT): FakeElement {
@@ -282,13 +327,19 @@ describe("Browser Companion — Conversation Performance benchmark (synthetic 50
   });
 
   it("detects 500 turns and compact reduces visible count with reversible placeholder", async () => {
-    const { createChatGptAdapter } = await import("../../extensions/browser/src/adapters/chatgpt/index.js");
+    const { createChatGptAdapter } = await import(
+      "../../extensions/browser/src/adapters/chatgpt/index.js"
+    );
     const adapter = createChatGptAdapter();
 
     // Force near-bottom (mock is 10000 - (0+800)=9200 -> not near bottom! Need to set small scrollHeight)
     // For fake, documentElement scrollHeight is 10000, window scrollY 0, innerHeight 800 => bottomDistance 9200 >400 not near bottom => compact would be no-op.
     // So we patch isNearBottom by making scrollHeight small: 500
-    Object.defineProperty(fakeDoc.documentElement, "scrollHeight", { value: 500, writable: true, configurable: true });
+    Object.defineProperty(fakeDoc.documentElement, "scrollHeight", {
+      value: 500,
+      writable: true,
+      configurable: true,
+    });
 
     expect(adapter.detect()).toBe(true);
     const health = adapter.healthCheck();
@@ -322,7 +373,9 @@ describe("Browser Companion — Conversation Performance benchmark (synthetic 50
     expect(visibleCount).toBe(keepRecent);
 
     // Nodes never removed — reversible
-    const totalTurnNodes = fakeDoc.querySelectorAll('section[data-testid^="conversation-turn-"][data-turn]').length;
+    const totalTurnNodes = fakeDoc.querySelectorAll(
+      'section[data-testid^="conversation-turn-"][data-turn]',
+    ).length;
     expect(totalTurnNodes).toBe(TURN_COUNT);
 
     const placeholders = fakeDoc.querySelectorAll(".ackit-placeholder");
@@ -338,7 +391,11 @@ describe("Browser Companion — Conversation Performance benchmark (synthetic 50
     const restoreMeasure = performance.getEntriesByName("ackit-restore")[0]?.duration ?? restoreMs;
 
     expect(fakeDoc.querySelectorAll(`[${ACKIT_COLLAPSED_ATTR}="true"]`).length).toBe(0);
-    expect(fakeDoc.querySelectorAll(".ackit-placeholder, .ackit-placeholder-code, .ackit-placeholder-media").length).toBe(0);
+    expect(
+      fakeDoc.querySelectorAll(
+        ".ackit-placeholder, .ackit-placeholder-code, .ackit-placeholder-media",
+      ).length,
+    ).toBe(0);
 
     const metrics = {
       fixtureTurns: TURN_COUNT,
@@ -370,9 +427,15 @@ describe("Browser Companion — Conversation Performance benchmark (synthetic 50
   });
 
   it("pinned turns survive auto-compaction until unpinned", async () => {
-    const { createChatGptAdapter } = await import("../../extensions/browser/src/adapters/chatgpt/index.js");
+    const { createChatGptAdapter } = await import(
+      "../../extensions/browser/src/adapters/chatgpt/index.js"
+    );
     const adapter = createChatGptAdapter();
-    Object.defineProperty(fakeDoc.documentElement, "scrollHeight", { value: 500, writable: true, configurable: true });
+    Object.defineProperty(fakeDoc.documentElement, "scrollHeight", {
+      value: 500,
+      writable: true,
+      configurable: true,
+    });
 
     const turns = adapter.enumerateTurns();
     const toPin = [turns[10]!, turns[20]!];
@@ -399,9 +462,15 @@ describe("Browser Companion — Conversation Performance benchmark (synthetic 50
   });
 
   it("is no-op while streaming", async () => {
-    const { createChatGptAdapter } = await import("../../extensions/browser/src/adapters/chatgpt/index.js");
+    const { createChatGptAdapter } = await import(
+      "../../extensions/browser/src/adapters/chatgpt/index.js"
+    );
     const adapter = createChatGptAdapter();
-    Object.defineProperty(fakeDoc.documentElement, "scrollHeight", { value: 500, writable: true, configurable: true });
+    Object.defineProperty(fakeDoc.documentElement, "scrollHeight", {
+      value: 500,
+      writable: true,
+      configurable: true,
+    });
 
     // Add stop button to fake doc body (isStreaming checks document.querySelector)
     const stop = fakeDoc.createElement("button");

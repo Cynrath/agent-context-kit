@@ -1,7 +1,7 @@
 ---
 id: "TASK-0055"
 title: "Browser Companion v0.3 — final integration, full quality matrix and GO-NO-GO"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0053", "TASK-0054"]
 createdAt: "2026-08-29"

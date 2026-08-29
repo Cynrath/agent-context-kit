@@ -1,11 +1,11 @@
 ---
 id: "TASK-0054"
 title: "Browser Companion v0.3 — real Chrome E2E, provider validation and performance evidence"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0053"]
 createdAt: "2026-08-29"
-completedAt: null
+completedAt: 2026-08-29
 ---
 
 ## Purpose
