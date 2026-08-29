@@ -45,10 +45,22 @@ jobs:
         run: node scripts/check-offline-egress.mjs
       - name: Browser Companion — strict typecheck
         run: |
-          cat extensions/browser/tsconfig.json
+          echo "=== root tsconfig.json ==="; cat tsconfig.json
+          echo "=== browser tsconfig.json ==="; cat extensions/browser/tsconfig.json
+          echo "=== browser-tests tsconfig.browser.json ==="; cat tsconfig.browser.json
           npx tsc --version
+          echo "--- root listFiles head ---"
+          npx tsc -p tsconfig.json --noEmit --listFiles | head -20
+          echo "--- browser src listFiles head ---"
           npx tsc -p extensions/browser/tsconfig.json --noEmit --listFiles | head -20
+          echo "--- browser+tests listFiles head ---"
+          npx tsc -p tsconfig.browser.json --noEmit --listFiles | head -20
+          echo "--- typecheck root ---"
+          npx tsc -p tsconfig.json --noEmit
+          echo "--- typecheck browser src strict ---"
           npx tsc -p extensions/browser/tsconfig.json --noEmit
+          echo "--- typecheck browser src + tests/browser strict ---"
+          npx tsc -p tsconfig.browser.json --noEmit
       - name: Browser Companion — build
         run: node extensions/browser/scripts/build.mjs
       - name: Tests (unit/integration/contract/security)

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "strict": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "types": ["node"]
+  },
+  "include": ["extensions/browser/src/**/*", "tests/browser/**/*"],
+  "exclude": ["extensions/browser/dist", "node_modules", "dist"]
+}

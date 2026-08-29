@@ -246,7 +246,7 @@ function installFakeDom(): void {
     configurable: true,
   });
 
-  (globalThis as unknown as { document: FakeDocument }).document = fakeDoc as unknown as Document;
+  (globalThis as unknown as { document: unknown }).document = fakeDoc as unknown as Document;
   (globalThis as unknown as { window: unknown }).window = {
     scrollY: 0,
     innerHeight: 800,

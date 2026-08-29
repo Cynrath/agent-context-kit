@@ -19,5 +19,13 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "extensions/browser",
+    "tests/browser",
+    "extensions/browser/dist"
+  ]
 }
