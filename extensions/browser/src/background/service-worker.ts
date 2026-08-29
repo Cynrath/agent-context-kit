@@ -1,15 +1,18 @@
 // ACKit Browser Companion — service worker (MV3, ephemeral)
 // Stores state in chrome.storage (not variables), uses chrome.alarms, never eval.
 
-import { clearBridgeSession, getBridgeSession, isSiteDisabled, setDisabledSite } from "../lib/storage.js";
 import { postStop } from "../lib/bridge-client.js";
+import {
+  clearBridgeSession,
+  getBridgeSession,
+  isSiteDisabled,
+  setDisabledSite,
+} from "../lib/storage.js";
 
 // Side Panel open on action click — mandatory per chrome-extensions skill rule #2
-chrome.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch(() => {
-    // Fallback for Chrome < 114
-  });
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {
+  // Fallback for Chrome < 114
+});
 
 chrome.action.onClicked.addListener(async (tab) => {
   if (!tab.windowId) return;
@@ -21,7 +24,13 @@ chrome.action.onClicked.addListener(async (tab) => {
 });
 
 // Keep host permission + side panel enabled for all providers
-const HOSTS = ["https://chat.openai.com/*", "https://chatgpt.com/*", "https://claude.ai/*", "https://gemini.google.com/*", "https://github.com/*"];
+const HOSTS = [
+  "https://chat.openai.com/*",
+  "https://chatgpt.com/*",
+  "https://claude.ai/*",
+  "https://gemini.google.com/*",
+  "https://github.com/*",
+];
 
 chrome.runtime.onInstalled.addListener(async () => {
   // Health alarm every 30s
@@ -106,7 +115,8 @@ async function handleEmergencyDisconnect(host: string | null): Promise<void> {
     } catch {}
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tab?.id) await chrome.tabs.sendMessage(tab.id, { type: "ackit:emergency-disconnect", host });
+      if (tab?.id)
+        await chrome.tabs.sendMessage(tab.id, { type: "ackit:emergency-disconnect", host });
     } catch {}
   } else {
     // No host specified: broadcast to active tab

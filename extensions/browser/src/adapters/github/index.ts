@@ -7,7 +7,9 @@ export function createGithubAdapter(): SiteAdapter {
 
   function findTurns(): TurnInfo[] {
     // GitHub: PR timeline items, issue comments, code blocks — not a chat, so turns are timeline entries
-    const nodes = document.querySelectorAll<HTMLElement>(".js-timeline-item, .TimelineItem, [data-testid='timeline-comment']");
+    const nodes = document.querySelectorAll<HTMLElement>(
+      ".js-timeline-item, .TimelineItem, [data-testid='timeline-comment']",
+    );
     return [...nodes].map((el, idx) => ({ id: String(idx), index: idx, element: el, role: null }));
   }
 
@@ -22,7 +24,9 @@ export function createGithubAdapter(): SiteAdapter {
       return { ok: true };
     },
     findComposer(): HTMLElement | null {
-      const ta = document.querySelector<HTMLElement>("textarea[name='comment[body]'], textarea.js-comment-field");
+      const ta = document.querySelector<HTMLElement>(
+        "textarea[name='comment[body]'], textarea.js-comment-field",
+      );
       if (ta) return ta;
       const ce = document.querySelector<HTMLElement>("div[contenteditable='true']");
       return ce;
@@ -58,7 +62,8 @@ export function createGithubAdapter(): SiteAdapter {
     compact(opts: { keepRecent: number }): CompactResult {
       if (paused) return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
       const turns = findTurns();
-      if (turns.length <= opts.keepRecent) return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
+      if (turns.length <= opts.keepRecent)
+        return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
       let compacted = 0;
       for (let i = 0; i < turns.length - opts.keepRecent; i++) {
         const t = turns[i];
@@ -70,7 +75,8 @@ export function createGithubAdapter(): SiteAdapter {
         const ph = document.createElement("div");
         ph.className = PH;
         ph.textContent = `— ACKit collapsed GitHub #${t.index + 1} —`;
-        ph.style.cssText = "padding:8px;border:1px dashed #999;margin:4px 0;font-size:12px;opacity:0.7";
+        ph.style.cssText =
+          "padding:8px;border:1px dashed #999;margin:4px 0;font-size:12px;opacity:0.7";
         t.element.parentElement?.insertBefore(ph, t.element.nextSibling);
         compacted++;
       }
@@ -84,7 +90,12 @@ export function createGithubAdapter(): SiteAdapter {
       }
     },
     navigator(): NavItem[] {
-      return findTurns().map((t) => ({ id: t.id, index: t.index, label: `Item ${t.index + 1}`, role: t.role }));
+      return findTurns().map((t) => ({
+        id: t.id,
+        index: t.index,
+        label: `Item ${t.index + 1}`,
+        role: t.role,
+      }));
     },
     pause(): void {
       paused = true;

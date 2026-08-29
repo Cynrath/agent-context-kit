@@ -7,11 +7,18 @@ export function createClaudeAdapter(): SiteAdapter {
 
   function findTurns(): TurnInfo[] {
     // Claude selector — discovered via DevTools, not assumed from ChatGPT
-    const nodes = document.querySelectorAll<HTMLElement>("[data-testid='chat-message'], .message, [data-is-streaming]");
+    const nodes = document.querySelectorAll<HTMLElement>(
+      "[data-testid='chat-message'], .message, [data-is-streaming]",
+    );
     // Fallback: elements with role article
     if (nodes.length === 0) {
       const fallback = document.querySelectorAll<HTMLElement>("div[data-test-render-count]");
-      return [...fallback].map((el, idx) => ({ id: String(idx), index: idx, element: el, role: null }));
+      return [...fallback].map((el, idx) => ({
+        id: String(idx),
+        index: idx,
+        element: el,
+        role: null,
+      }));
     }
     return [...nodes].map((el, idx) => ({ id: String(idx), index: idx, element: el, role: null }));
   }
@@ -24,7 +31,8 @@ export function createClaudeAdapter(): SiteAdapter {
     healthCheck(): AdapterHealth {
       if (!this.detect()) return { ok: false, reason: "not on claude.ai" };
       const turns = findTurns();
-      if (turns.length === 0) return { ok: false, reason: "no turns detected (DOM drift — fail closed)" };
+      if (turns.length === 0)
+        return { ok: false, reason: "no turns detected (DOM drift — fail closed)" };
       return { ok: true };
     },
     findComposer(): HTMLElement | null {
@@ -59,9 +67,11 @@ export function createClaudeAdapter(): SiteAdapter {
       return findTurns();
     },
     compact(opts: { keepRecent: number }): CompactResult {
-      if (isPaused || this.isStreaming()) return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
+      if (isPaused || this.isStreaming())
+        return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
       const turns = findTurns();
-      if (turns.length <= opts.keepRecent) return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
+      if (turns.length <= opts.keepRecent)
+        return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
       let compacted = 0;
       for (let i = 0; i < turns.length - opts.keepRecent; i++) {
         const t = turns[i];
@@ -73,7 +83,8 @@ export function createClaudeAdapter(): SiteAdapter {
         const ph = document.createElement("div");
         ph.className = ACKIT_PLACEHOLDER_CLASS;
         ph.textContent = `— ACKit collapsed Claude #${t.index + 1} —`;
-        ph.style.cssText = "padding:8px;border:1px dashed #999;margin:4px 0;font-size:12px;opacity:0.7";
+        ph.style.cssText =
+          "padding:8px;border:1px dashed #999;margin:4px 0;font-size:12px;opacity:0.7";
         t.element.parentElement?.insertBefore(ph, t.element.nextSibling);
         compacted++;
       }
@@ -87,7 +98,12 @@ export function createClaudeAdapter(): SiteAdapter {
       }
     },
     navigator(): NavItem[] {
-      return findTurns().map((t) => ({ id: t.id, index: t.index, label: `Turn ${t.index + 1}`, role: t.role }));
+      return findTurns().map((t) => ({
+        id: t.id,
+        index: t.index,
+        label: `Turn ${t.index + 1}`,
+        role: t.role,
+      }));
     },
     pause(): void {
       isPaused = true;

@@ -71,12 +71,19 @@ function setupListeners(): void {
           sendResponse({ ok: false, error: "no adapter" });
           return;
         }
-        const keepRecent = typeof (m as { keepRecent?: number }).keepRecent === "number" ? (m as { keepRecent: number }).keepRecent : 10;
+        const keepRecent =
+          typeof (m as { keepRecent?: number }).keepRecent === "number"
+            ? (m as { keepRecent: number }).keepRecent
+            : 10;
         const result = activeAdapter.compact({ keepRecent });
         sendResponse({ ok: true, result });
         return;
       }
-      if (m.type === "ackit:restore" || m.type === "ackit:emergency-disconnect" || m.type === "ackit:site-disabled") {
+      if (
+        m.type === "ackit:restore" ||
+        m.type === "ackit:emergency-disconnect" ||
+        m.type === "ackit:site-disabled"
+      ) {
         try {
           activeAdapter?.restore();
           activeAdapter?.disconnect();

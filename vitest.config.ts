@@ -11,6 +11,7 @@ export default defineConfig({
       "tests/contract/**/*.test.ts",
       "tests/security/**/*.test.ts",
       "tests/e2e/**/*.test.ts",
+      "tests/browser/**/*.test.ts",
     ],
     coverage: {
       provider: "v8",

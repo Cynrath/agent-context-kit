@@ -1,5 +1,5 @@
-import type { AdapterHealth, CompactResult, NavItem, SiteAdapter, TurnInfo } from "../types.js";
 import { CircuitBreaker, LifecycleTracker } from "../../lib/emergency.js";
+import type { AdapterHealth, CompactResult, NavItem, SiteAdapter, TurnInfo } from "../types.js";
 
 // ChatGPT adapter — re-discovers DOM on each call, fails closed, never removes React nodes in balanced mode.
 // Selector hints from PoC are verified at runtime: #thread, [data-turn-id-container], section[data-testid^="conversation-turn-"], [data-message-author-role]
@@ -12,7 +12,6 @@ export function createChatGptAdapter(): SiteAdapter {
   const tracker = new LifecycleTracker();
   const breaker = new CircuitBreaker(5, 30_000);
   let observer: MutationObserver | null = null;
-  let root: HTMLElement | null = null;
   let isPaused = false;
 
   function findRoot(): HTMLElement | null {
@@ -22,19 +21,26 @@ export function createChatGptAdapter(): SiteAdapter {
     const byTurnContainer = document.querySelector<HTMLElement>("[data-turn-id-container]");
     if (byTurnContainer) return byTurnContainer.parentElement as HTMLElement | null;
     // Fallback: first section with conversation-turn test id
-    const section = document.querySelector<HTMLElement>('section[data-testid^="conversation-turn-"]');
+    const section = document.querySelector<HTMLElement>(
+      'section[data-testid^="conversation-turn-"]',
+    );
     if (section) return section.parentElement as HTMLElement | null;
     return null;
   }
 
   function findTurns(): TurnInfo[] {
-    const nodes = document.querySelectorAll<HTMLElement>('section[data-testid^="conversation-turn-"][data-turn]');
+    const nodes = document.querySelectorAll<HTMLElement>(
+      'section[data-testid^="conversation-turn-"][data-turn]',
+    );
     if (nodes.length > 0) {
       return [...nodes].map((el, idx) => ({
         id: el.getAttribute("data-turn") ?? String(idx),
         index: idx,
         element: el,
-        role: el.querySelector<HTMLElement>("[data-message-author-role]")?.getAttribute("data-message-author-role") ?? null,
+        role:
+          el
+            .querySelector<HTMLElement>("[data-message-author-role]")
+            ?.getAttribute("data-message-author-role") ?? null,
       }));
     }
     // Fallback: [data-message-author-role] containers
@@ -42,7 +48,7 @@ export function createChatGptAdapter(): SiteAdapter {
     return [...roles].map((el, idx) => ({
       id: String(idx),
       index: idx,
-      element: el.closest("section") as HTMLElement ?? el,
+      element: (el.closest("section") as HTMLElement) ?? el,
       role: el.getAttribute("data-message-author-role"),
     }));
   }
@@ -56,6 +62,36 @@ export function createChatGptAdapter(): SiteAdapter {
     const active = document.activeElement;
     if (!active || active === document.body) return false;
     return element.contains(active);
+  }
+
+  // Narrow MutationObserver (childList:true, subtree:false) on the conversation wrapper only, debounced.
+  let debounceTimer: number | undefined;
+  function ensureObserver(): void {
+    if (observer !== null) return;
+    const wrapper = findRoot();
+    if (!wrapper) return;
+    // Do not observe every token streaming mutation; only wrapper childList
+    observer = new MutationObserver(() => {
+      if (isPaused) return;
+      if (observer === null) return;
+      // Debounce & coalesce (150ms)
+      window.clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(() => {
+        // Incremental index is maintained via findTurns() lazily; no full rescan on every mutation here.
+        // We just ensure breaker doesn't trip on observer itself.
+        tracker.trackObserver(observer as MutationObserver);
+      }, 150);
+    });
+    try {
+      observer.observe(wrapper, { childList: true, subtree: false });
+      tracker.trackObserver(observer);
+    } catch {
+      try {
+        observer.disconnect();
+      } catch {}
+      observer = null;
+      breaker.recordError();
+    }
   }
 
   return {
@@ -74,14 +110,17 @@ export function createChatGptAdapter(): SiteAdapter {
       const turns = findTurns();
       if (turns.length === 0) return { ok: false, reason: "no conversation turns detected" };
       // If breaker tripped, fail closed
-      if (breaker.shouldTrip()) return { ok: false, reason: "circuit breaker tripped (repeated adapter errors)" };
+      if (breaker.shouldTrip())
+        return { ok: false, reason: "circuit breaker tripped (repeated adapter errors)" };
       return { ok: true };
     },
     findComposer(): HTMLElement | null {
       // ChatGPT composer is contenteditable div with id prompt-textarea or similar, plus fallback textarea
       const byId = document.getElementById("prompt-textarea");
       if (byId) return byId as HTMLElement;
-      const byRole = document.querySelector<HTMLElement>('div[contenteditable="true"][data-testid="composer"]');
+      const byRole = document.querySelector<HTMLElement>(
+        'div[contenteditable="true"][data-testid="composer"]',
+      );
       if (byRole) return byRole;
       const generic = document.querySelector<HTMLElement>('div[contenteditable="true"]');
       if (generic) return generic;
@@ -134,7 +173,7 @@ export function createChatGptAdapter(): SiteAdapter {
       if (generating) return true;
       // If last turn contains a streaming cursor
       const last = findTurns().at(-1);
-      if (last && last.element.querySelector('.result-streaming, [data-streaming="true"]')) return true;
+      if (last?.element.querySelector('.result-streaming, [data-streaming="true"]')) return true;
       return false;
     },
     enumerateTurns(): TurnInfo[] {
@@ -148,13 +187,18 @@ export function createChatGptAdapter(): SiteAdapter {
       if (!isNearBottom()) return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
 
       const turns = findTurns();
-      if (turns.length <= opts.keepRecent) return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
+      if (turns.length <= opts.keepRecent)
+        return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
 
-      // Anchor scroll distance before mutation
-      const bottomDistance = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+      // Anchor scroll distance before mutation (scroll anchoring, PoC lesson 8)
+      const bottomDistance =
+        document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
       let compacted = 0;
       let already = 0;
       let skippedFocused = 0;
+
+      // Narrow observer safety: ensure observer is set up lazily with correct scope
+      ensureObserver();
 
       // Never touch React nodes via remove(); use content-visibility + reversible collapse
       for (let i = 0; i < turns.length - opts.keepRecent; i++) {
@@ -184,9 +228,61 @@ export function createChatGptAdapter(): SiteAdapter {
         compacted++;
       }
 
+      // Code block / media compact for still-visible recent turns (balanced, reversible)
+      // Large code blocks (>30 lines) are collapsed via content-visibility + placeholder, not detached.
+      for (let i = turns.length - opts.keepRecent; i < turns.length; i++) {
+        const turn = turns[i];
+        if (!turn) continue;
+        if (hasFocusedControlInside(turn.element)) continue;
+        // Code blocks: pre (optionally with code inside)
+        const pres = turn.element.querySelectorAll<HTMLElement>("pre");
+        for (const pre of pres) {
+          if (pre.getAttribute(ACKIT_COLLAPSED_ATTR) === "true") continue;
+          const lines = (pre.textContent ?? "").split("\n").length;
+          if (lines < 30) continue;
+          // Skip if already compacted or contains focused control
+          if (hasFocusedControlInside(pre)) continue;
+          pre.setAttribute(ACKIT_COLLAPSED_ATTR, "true");
+          pre.style.contentVisibility = "auto";
+          pre.style.containIntrinsicSize = "auto 120px";
+          const ph = document.createElement("div");
+          ph.className = `${ACKIT_PLACEHOLDER_CLASS}-code`;
+          ph.textContent = `— ACKit collapsed code block (${lines} lines) — click Restore all —`;
+          ph.dataset["ackitCode"] = "1";
+          ph.style.cssText =
+            "padding:6px 10px;margin:6px 0;border:1px dashed #8aa;border-radius:6px;font-size:11px;opacity:0.7";
+          pre.style.display = "none";
+          pre.parentElement?.insertBefore(ph, pre.nextSibling);
+          compacted++;
+        }
+        // Media: img, video, iframe, canvas (old embeds) — collapse if large or many
+        const media = turn.element.querySelectorAll<HTMLElement>(
+          "img, video, iframe, canvas, embed",
+        );
+        for (const m of media) {
+          if (m.getAttribute(ACKIT_COLLAPSED_ATTR) === "true") continue;
+          // Heuristic: collapse media in recent turns only if it is large (>300px) or there are >3 media items in the turn
+          const rect = m.getBoundingClientRect();
+          const isLarge = rect.width > 400 || rect.height > 300;
+          const many = media.length > 3;
+          if (!isLarge && !many) continue;
+          if (hasFocusedControlInside(m)) continue;
+          m.setAttribute(ACKIT_COLLAPSED_ATTR, "true");
+          (m as HTMLElement).style.display = "none";
+          const ph = document.createElement("div");
+          ph.className = `${ACKIT_PLACEHOLDER_CLASS}-media`;
+          ph.textContent = "— ACKit collapsed media —";
+          ph.style.cssText =
+            "padding:6px 10px;margin:6px 0;border:1px dashed #a8a;border-radius:6px;font-size:11px;opacity:0.7";
+          m.parentElement?.insertBefore(ph, m.nextSibling);
+          compacted++;
+        }
+      }
+
       // Restore scroll anchoring
       try {
-        const newBottom = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+        const newBottom =
+          document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
         const delta = newBottom - bottomDistance;
         if (Math.abs(delta) > 20) {
           window.scrollBy(0, delta);
@@ -199,7 +295,9 @@ export function createChatGptAdapter(): SiteAdapter {
       return { compacted, alreadyCompacted: already, skippedFocused };
     },
     restore(): void {
-      const placeholders = document.querySelectorAll<HTMLElement>(`.${ACKIT_PLACEHOLDER_CLASS}`);
+      const placeholders = document.querySelectorAll<HTMLElement>(
+        `.${ACKIT_PLACEHOLDER_CLASS}, .${ACKIT_PLACEHOLDER_CLASS}-code, .${ACKIT_PLACEHOLDER_CLASS}-media`,
+      );
       for (const ph of placeholders) ph.remove();
       const collapsed = document.querySelectorAll<HTMLElement>(`[${ACKIT_COLLAPSED_ATTR}="true"]`);
       for (const el of collapsed) {
@@ -226,15 +324,20 @@ export function createChatGptAdapter(): SiteAdapter {
         observer?.disconnect();
       } catch {}
       observer = null;
+      if (debounceTimer !== undefined) {
+        window.clearTimeout(debounceTimer);
+        debounceTimer = undefined;
+      }
       tracker.disconnect();
     },
     destroy(): void {
       this.restore();
       this.disconnect();
-      root = null;
       breaker.reset();
       // Remove any injected style leftovers
-      document.querySelectorAll<HTMLElement>("[data-ackit-style]").forEach((el) => el.remove());
+      document.querySelectorAll<HTMLElement>("[data-ackit-style]").forEach((el) => {
+        el.remove();
+      });
     },
   };
 }

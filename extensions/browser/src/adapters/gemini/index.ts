@@ -6,7 +6,9 @@ export function createGeminiAdapter(): SiteAdapter {
   let paused = false;
 
   function findTurns(): TurnInfo[] {
-    const nodes = document.querySelectorAll<HTMLElement>("[data-message-id], .conversation-turn, .response-container");
+    const nodes = document.querySelectorAll<HTMLElement>(
+      "[data-message-id], .conversation-turn, .response-container",
+    );
     if (nodes.length === 0) return [];
     return [...nodes].map((el, idx) => ({ id: String(idx), index: idx, element: el, role: null }));
   }
@@ -53,9 +55,11 @@ export function createGeminiAdapter(): SiteAdapter {
       return findTurns();
     },
     compact(opts: { keepRecent: number }): CompactResult {
-      if (paused || this.isStreaming()) return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
+      if (paused || this.isStreaming())
+        return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
       const turns = findTurns();
-      if (turns.length <= opts.keepRecent) return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
+      if (turns.length <= opts.keepRecent)
+        return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
       let compacted = 0;
       for (let i = 0; i < turns.length - opts.keepRecent; i++) {
         const t = turns[i];
@@ -67,7 +71,8 @@ export function createGeminiAdapter(): SiteAdapter {
         const ph = document.createElement("div");
         ph.className = PH;
         ph.textContent = `— ACKit collapsed Gemini #${t.index + 1} —`;
-        ph.style.cssText = "padding:8px;border:1px dashed #999;margin:4px 0;font-size:12px;opacity:0.7";
+        ph.style.cssText =
+          "padding:8px;border:1px dashed #999;margin:4px 0;font-size:12px;opacity:0.7";
         t.element.parentElement?.insertBefore(ph, t.element.nextSibling);
         compacted++;
       }
@@ -81,7 +86,12 @@ export function createGeminiAdapter(): SiteAdapter {
       }
     },
     navigator(): NavItem[] {
-      return findTurns().map((t) => ({ id: t.id, index: t.index, label: `Turn ${t.index + 1}`, role: t.role }));
+      return findTurns().map((t) => ({
+        id: t.id,
+        index: t.index,
+        label: `Turn ${t.index + 1}`,
+        role: t.role,
+      }));
     },
     pause(): void {
       paused = true;

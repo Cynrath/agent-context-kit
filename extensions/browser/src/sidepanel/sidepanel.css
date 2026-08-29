@@ -1,22 +1,140 @@
-:root { --bg:#0f1115; --fg:#e6e6e6; --muted:#9aa; --accent:#4f9cf9; --danger:#d44; --border:#2a2e39; --card:#1a1d24; }
-* { box-sizing:border-box; }
-body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--fg); font-size:13px; line-height:1.4; }
-.header { display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg); }
-.header h1 { font-size:14px; margin:0; flex:1; }
-.dot { width:10px; height:10px; border-radius:50%; background:#555; display:inline-block; }
-.dot.ok { background:#2d9a4a; }
-.dot.bad { background:var(--danger); }
-.panel-section { padding:10px 12px; border-bottom:1px solid var(--border); }
-.panel-section h2 { font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin:0 0 8px; }
-.panel-section.emergency { background:#1a1212; }
-.btn { padding:6px 10px; border-radius:6px; border:1px solid var(--border); background:var(--card); color:var(--fg); cursor:pointer; font-size:12px; }
-.btn:hover { border-color:#3a3f4f; }
-.btn-primary { background:var(--accent); color:white; border-color:var(--accent); }
-.btn-danger { background:var(--danger); color:white; border-color:var(--danger); width:100%; font-weight:700; letter-spacing:0.04em; }
-.btn-secondary { background:transparent; }
-.row { display:flex; gap:8px; flex-wrap:wrap; margin:6px 0; align-items:center; }
-.hint { color:var(--muted); font-size:11px; margin:4px 0; }
-input[type="text"], input[type="password"], input[type="number"], textarea { width:100%; background:#0b0d11; color:var(--fg); border:1px solid var(--border); border-radius:6px; padding:6px 8px; font-size:12px; }
-textarea { resize:vertical; }
-.health, #diag { background:#0b0d11; border:1px solid var(--border); border-radius:6px; padding:8px; min-height:32px; overflow:auto; white-space:pre-wrap; word-break:break-word; }
-.navigator { max-height:160px; overflow:auto; border:1px solid var(--border); border-radius:6px; padding:4px; }
+:root {
+  --bg: #0f1115;
+  --fg: #e6e6e6;
+  --muted: #9aa;
+  --accent: #4f9cf9;
+  --danger: #d44;
+  --border: #2a2e39;
+  --card: #1a1d24;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+}
+.header h1 {
+  font-size: 14px;
+  margin: 0;
+  flex: 1;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #555;
+  display: inline-block;
+}
+.dot.ok {
+  background: #2d9a4a;
+}
+.dot.bad {
+  background: var(--danger);
+}
+.panel-section {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-section h2 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+.panel-section.emergency {
+  background: #1a1212;
+}
+.btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--fg);
+  cursor: pointer;
+  font-size: 12px;
+}
+.btn:hover {
+  border-color: #3a3f4f;
+}
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.btn-danger {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+  width: 100%;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.btn-secondary {
+  background: transparent;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 6px 0;
+  align-items: center;
+}
+.hint {
+  color: var(--muted);
+  font-size: 11px;
+  margin: 4px 0;
+}
+input[type="text"],
+input[type="password"],
+input[type="number"],
+textarea {
+  width: 100%;
+  background: #0b0d11;
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+textarea {
+  resize: vertical;
+}
+.health,
+#diag {
+  background: #0b0d11;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  min-height: 32px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.navigator {
+  max-height: 160px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px;
+}
