@@ -102,6 +102,18 @@ Revert CI workflow change + this task doc in one commit if GO not achieved.
 
 ## Completion notes
 
+> **CORRECTIVE AMENDMENT 2026-08-29 — BUG CONFIRMED, GO → NO-GO**
+>
+> Real user test with bridge NOT running (expected Disconnected) revealed **release blocker**: ChatGPT shows `0 turns detected` and Compact does nothing, even with bridge disconnected (which is expected to work offline). Root causes confirmed:
+>
+> - **ROOT CAUSE 1** — `content.ts` only assigned `activeAdapter` and installed `setupListeners`/`setupSpaObserver` after `healthCheck()` succeeded. On zero-state/delayed DOM, `healthCheck → no turns → return` left `activeAdapter=null`, SPA observer never installed, retry stopped after 10s → opening another conversation later never recovered. Fixed in `ea16de8` to lifecycle `DETECTED → WAITING_FOR_DOM → HEALTHY → ACTIVE` with persistent health watcher (800ms interval + MutationObserver on `body`, indefinite, no 10s window), `candidateAdapter` kept while waiting, listeners/SPA installed immediately after detect, `evaluateHealth()` transitions to active when turns appear, `visibilitychange`/`focus` re-eval.
+> - **ROOT CAUSE 2** — `isNearBottom()` used `document.documentElement/window.scrollY` only. Reintroduced PoC-derived `findScroller()` that walks from `findRoot()` up checking `getComputedStyle overflowY auto/scroll` and `scrollHeight>clientHeight`, fallback to `main` or `documentElement`; `getBottomDistance()`/`scrollByDelta()` now operate on real ChatGPT scroller.
+> - **ROOT CAUSE 3** — Prior live validation injected synthetic `#thread` nodes. Re-verified real ChatGPT production DOM via MCP with extension installed, bridge NOT running: `chatgpt.com` zero-state `→ #thread false, data-turn-id-container false, conversation-turn 0, data-turn 0, role 0, main true` (expected, fail-closed correct). Synthetic delayed injection after 1.5s now correctly transitions `ackit:health` from `waiting_for_dom (candidate chatgpt)` to `active (ok:true)` without reload, proving fix.
+>
+> **Required real test (1-23) not yet fully PASS with real long conversation** — synthetic delayed injection proves lifecycle/scroller fixes, but real ChatGPT long conversation (signed-in, >2 turns, pin, SPA navigation, scroll, streaming, emergency) still requires manual verification with signed-in account. Until that real test shows `turn count >0`, `Keep recent=2 → Compact → old turns collapsed, last 2 visible, placeholders present, pin survives, SPA recovers, scroller preserved, streaming no-op, emergency leaves native intact`, this task's final decision is **NO-GO**.
+>
+> Previous GO (8732a01) is therefore **withdrawn**; this amendment records honest NO-GO per Rule 4/5/8/12/15. Code fixes `ea16de8` are committed and built (content.js 39kb, typechecks PASS, browser tests 20/20), but live validation must be repeated with real conversation before GO can be restored. See `TASK-0054` corrective update for same evidence.
+
 2026-08-29 — TASK-0055 completed. Full quality matrix, CI green, and real Chrome E2E evidence for Browser Companion v0.3.
 
 ### Dependency gate
@@ -210,9 +222,9 @@ No absolute local paths in evidence: all paths redacted to <local-path> via brid
 
 ### GO/NO-GO decision
 
-**GO** — with explicit conditions and follow-up.
+**NO-GO** — release blocker: Conversation Performance shows `0 turns detected` and Compact does nothing on real ChatGPT, even though bridge disconnected is expected offline behavior.
 
-**Why GO:**
+**Why NO-GO (updated 2026-08-29, bug confirmed):**
 
 - Strict TypeScript restored and proven: `strict:true`, `noImplicitAny:true`, `no @ts-nocheck`, `DOM types` via `dom+dom.iterable`, browser tests and build covered, CI green on all matrices.
 - Browser Companion validation not bypassed: the fix separates Node vs Browser graphs and retains explicit strict checks for both, rather than blindly excluding files to make CI green.
@@ -226,8 +238,6 @@ No absolute local paths in evidence: all paths redacted to <local-path> via brid
 - ChatGPT live compact on synthetic 15-turn fixture was no-op due to content script `init()` timing (healthCheck before synthetic DOM, retry window) and `isNearBottom` guard — the engine is proven via Node fake-DOM benchmark and code review, but a follow-up should test on a signed-in account with real history where `activeAdapter` is correctly initialized and `keepRecent` trimming visibly collapses older turns with `data-ackit-collapsed` and placeholder.
 - Provider virtualization on ChatGPT with real long history not observed in zero state (0 turns) — documented as pending signed-in trace; synthetic uses `contentVisibility` not `remove()` to coexist with React virtualization.
 
-These are **advisory** and do not violate Rule 15 (no missing acceptance evidence for the defined synthetic benchmark, no disabled gates, no failed live verification where required — the live verification that was required (extension install, shell, emergency, context, adapter isolation) has been performed).
+Previous GO (8732a01) is **withdrawn** per this amendment. The code fixes for lifecycle (`ea16de8`) and scroller are committed and proven via synthetic delayed injection (waiting_for_dom → active without reload, isNearBottom on real scroller, compact 3/2 with pin, streaming no-op, SPA recovery), but **real ChatGPT long conversation validation (steps 1-23 in bug report) still requires signed-in manual test** with `turn count >0`, `Keep recent=2 → Compact → old turns collapsed with placeholders, last 2 visible, pin survives, SPA recovers, scroller preserved, streaming no-op, emergency leaves native intact`. Until that real test passes and task docs are updated with live evidence, Rule 15 blocks GO.
 
-**Do NOT merge PR #5, publish, or move tags** — per DO NOT list. This GO is for the corrective work completion only.
-
-Next: push updated task docs, clean up temp extension copy and bridge, and keep branch ready for user-authorized merge.
+**Do NOT merge PR #5, publish, or move tags** — per DO NOT list. This NO-GO is honest per Rule 4/5/13; next is to run the real ChatGPT long conversation test (bridge NOT running) and restore GO when it passes.

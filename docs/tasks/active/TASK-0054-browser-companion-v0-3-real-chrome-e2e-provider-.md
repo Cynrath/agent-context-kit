@@ -118,6 +118,10 @@ Revert pin + benchmark + MCP evidence files + adapter changes in one commit; pri
 
 ## Completion notes
 
+> **CORRECTIVE AMENDMENT 2026-08-29 — BUG CONFIRMED, GO → NO-GO**
+>
+> Real user test with bridge NOT running (expected Disconnected) revealed Conversation Performance shows `0 turns detected` and Compact does nothing. Root causes: content.ts lifecycle required healthCheck before installing SPA observer (fixed in `ea16de8` to WAITING_FOR_DOM with persistent watcher), ChatGPT isNearBottom used documentElement not real scroller (fixed to findScroller). Synthetic delayed injection now proves `waiting_for_dom → active` without reload and `compact 3 with pin` works offline, but **real ChatGPT long conversation (signed-in, >2 turns) still needs manual verification (steps 1-23)**. Until that passes, this task's evidence is synthetic + zero-state only; honest status is **NO-GO** per Rule 4/5/8. Previous completion remains but GO is withdrawn.
+
 2026-08-29 — TASK-0054 completed (synthetic + pin + live selector re-inspect; extension install pending MCP tool availability).
 
 ### CORRECTIVE UPDATE 2026-08-29 (df36e49) — Real Extension Install Success
