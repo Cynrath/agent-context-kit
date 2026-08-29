@@ -42,11 +42,13 @@ suppressions:
     reason: "planning task docs and ADRs exceed token heuristic but are not instruction files scanned for context budget; informational"
     expiresAt: 2027-12-31
   - ruleId: ACKIT002
-    pathGlobs: ["src/cli/commands/diagnostics.ts", "src/core/dashboard/server.ts"]
+    pathGlobs:
+      ["src/cli/commands/diagnostics.ts", "src/core/dashboard/server.ts", "src/core/browser-bridge/redact.ts"]
     reason: "redaction logic contains synthetic private key block for testing sanitization (not real secret)"
     expiresAt: 2027-12-31
   - ruleId: ACKIT003
-    pathGlobs: ["src/cli/commands/diagnostics.ts", "src/core/dashboard/server.ts"]
+    pathGlobs:
+      ["src/cli/commands/diagnostics.ts", "src/core/dashboard/server.ts", "src/core/browser-bridge/redact.ts"]
     reason: "diagnostics redaction logic contains credential-like assignment for testing"
     expiresAt: 2027-12-31
   - ruleId: ACKIT003

@@ -22,6 +22,10 @@ const SECRET_PATTERNS: Array<{ re: RegExp; replacement: string }> = [
     re: /\/home\/[^\s"'`)\]]*/g,
     replacement: "<local-path>",
   },
+  {
+    re: /\/Users\/[^\s"'`)\]]*/g,
+    replacement: "<local-path>",
+  },
 ];
 
 export function redactForBridge(input: string): string {
