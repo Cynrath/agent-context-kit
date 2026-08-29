@@ -81,6 +81,168 @@ git diff --check
 - User files are never overwritten without explicit intent flags (REQ-GOV-008).
 - Out-of-scope list is binding: no LLM APIs, vector DB, RAG, untrusted plugin execution, cloud services (REQ-GOV-009).
 
+## Browser Companion v0.3 — Corrective Hard Rules (mandatory; violation = NO-GO)
+
+These rules exist because `feat/browser-companion-v0.3` round 1 violated task-first discipline and falsely completed work. They are binding for every agent working on Browser Companion or any multi-task feature.
+
+### Rule 1 — TASK-FIRST IS MANDATORY
+
+For any non-trivial feature, bug fix, migration, architecture change, security change, release work, or multi-file implementation: **no implementation code may be written before the corresponding ACKit task file exists and is fully planned.**
+
+The task must contain, before implementation begins:
+
+- Purpose
+- Scope
+- Out of scope
+- Dependencies
+- Affected files / expected areas
+- Acceptance criteria
+- Test steps
+- Security considerations where applicable
+- Risks
+- Rollback plan
+
+A title-only or placeholder task does **not** satisfy this rule. Creating the task and filling it after implementation has already begun is a violation.
+
+### Rule 2 — PLAN THE COMPLETE TASK CHAIN FIRST
+
+When a request clearly requires multiple dependent tasks:
+
+1. inspect the repository,
+2. determine the entire task breakdown,
+3. create every planned task,
+4. fully populate every task,
+5. verify dependencies,
+6. run task validation/doctor,
+7. only then begin implementation.
+
+Do not create only TASK-1/TASK-2, start coding, and invent TASK-3..N later unless genuinely new information appears. If scope changes during implementation, update/create the relevant task **before implementing the newly discovered work**.
+
+### Rule 3 — TASK PLAN MUST PRECEDE IMPLEMENTATION IN GIT HISTORY
+
+For substantial feature work, the task plan must be committed before the implementation it governs.
+
+Preferred sequence:
+
+```text
+commit 1
+docs/tasks + ADR/spec/threat model required before implementation
+
+commit 2+
+implementation
+
+later commit
+tests/evidence/task completion
+```
+
+Do not create implementation files first and task documentation afterward in the same or later commit merely to make the history appear task-driven.
+
+### Rule 4 — NEVER FALSELY COMPLETE A TASK
+
+A task may only be marked `completed` when **every required acceptance criterion has actually passed**.
+
+The following phrases indicate that the task is NOT complete:
+
+```text
+pending
+deferred
+next round
+not tested
+not verified
+could not run
+blocked
+TODO
+manual test required
+MCP unavailable
+will add later
+```
+
+unless that item was explicitly out of scope **before implementation began**.
+
+If a mandatory validation is blocked: `status != completed`. Keep the task in progress/blocked or create the correct supported task state. Never write `completed (deterministic portion; live verification pending)` — that is not completed.
+
+### Rule 5 — EVIDENCE MUST MATCH REALITY
+
+Do not tick an acceptance checkbox merely because code appears to implement the requirement. Evidence must come from the required validation mechanism.
+
+- unit behavior → unit/contract test
+- real Chrome behavior → real Chrome verification
+- CI requirement → successful CI run
+- performance claim → benchmark/trace
+- cross-platform requirement → actual required platform matrix
+
+Static source inspection is not equivalent to runtime proof.
+
+### Rule 6 — NO QUALITY-GATE BYPASS
+
+Do not make tests/typecheck/lint pass by weakening the gate. Prohibited unless explicitly approved and technically justified:
+
+```text
+// @ts-nocheck
+// @ts-ignore
+broad @ts-expect-error
+strict: false
+noImplicitAny: false
+eslint disable everything
+Biome global ignore
+skip tests
+remove assertions
+turn failures into warnings
+```
+
+Fix the underlying defect. A green gate obtained by disabling the gate is not evidence.
+
+### Rule 7 — STRICT TYPESCRIPT
+
+New TypeScript subsystems must preserve strict typing unless an accepted ADR explicitly states otherwise. Browser Companion must target `strict = true` and `noImplicitAny = true`. Use actual Chrome API types. Avoid global `declare const chrome: any` when `@types/chrome` can provide the contract. Keep unavoidable third-party boundaries narrow and documented.
+
+### Rule 8 — BROWSER WORK REQUIRES REAL BROWSER EVIDENCE
+
+When implementing or modifying Chrome/Edge extension behavior and Chrome DevTools MCP is available: real Chrome verification is mandatory before final completion. At minimum verify relevant changes through: extension install/load, extension reload, service worker, Side Panel, console errors, runtime messages, network behavior, target-site adapter behavior. Static unit tests are complementary, not a replacement.
+
+### Rule 9 — PROVIDER ADAPTERS ARE INDEPENDENT
+
+Do not infer that an adapter works because another provider works. ChatGPT, Claude, Gemini and GitHub require independent DOM discovery and evidence. Provider-specific selectors remain isolated under provider-specific adapter modules. A broken provider adapter must fail closed and must not affect ACKit core, bridge, or other provider adapters.
+
+### Rule 10 — DOM OPTIMIZATION MUST BE REVERSIBLE
+
+Conversation Performance functionality must never destroy provider conversation state. Default stable mode must not: remove React-managed turn nodes, monkey-patch React/Vue internals, modify provider API traffic, alter conversation history, change model context. Every ACKit DOM optimization must be reversible. `Restore all` and `Emergency Disconnect` must remove ACKit-added attributes, classes, placeholders, observers, timers, listeners, injected UI.
+
+### Rule 11 — EMERGENCY DISCONNECT IS RELEASE-BLOCKING
+
+Browser Companion cannot be considered releasable unless Emergency Disconnect works in real Chrome. It must: (1) abort active bridge requests, (2) clear active session credentials, (3) revoke/stop the bridge session, (4) stop observers/timers/listeners, (5) restore reversible page mutations, (6) disable the affected integration, (7) require explicit reconnect. Failures inside one cleanup step must not prevent remaining cleanup steps.
+
+### Rule 12 — PERFORMANCE CLAIMS REQUIRE MEASUREMENTS
+
+Do not claim `faster`, `less DOM pressure`, `lower layout cost`, `better responsiveness` without measured evidence. For Conversation Performance changes record, where available: detected turn count, visible turn count, compacted turn count, DOM node impact, scripting duration, style/layout duration, paint duration, long tasks, heap/memory indicators, input/scroll responsiveness, trace configuration, browser/version, fixture size. Synthetic measurements and live-site measurements must be distinguished.
+
+### Rule 13 — DO NOT HIDE PROCESS VIOLATIONS
+
+If task-first or evidence rules were violated: document the violation, create corrective work, fix the process, continue forward. Do not rewrite git history merely to make it appear that the correct process happened.
+
+### Rule 14 — COMPLETION ORDER
+
+Before a task is marked complete:
+
+```text
+implementation
+→ focused tests
+→ full affected test suite
+→ lint/format/typecheck/build
+→ security/offline gates
+→ required runtime/manual/MCP checks
+→ evidence recorded
+→ acceptance criteria checked
+→ task completion notes
+→ status completed
+```
+
+Never reverse this sequence.
+
+### Rule 15 — FINAL FEATURE GO GATE
+
+A multi-task feature cannot receive final GO while any child task has: missing acceptance evidence, pending tests, deferred mandatory scope, TODOs, disabled quality gates, unresolved security findings, failed live verification, missing CI evidence.
+
 ## Legacy v1 notes
 
 The C#/.NET implementation was removed from this branch (TASK-0267). Historical v1 evidence lives in git history and `docs/tasks/archive/`; the published v1 NuGet line (`1.0.0-rc.1`) is immutable legacy. Do not reference deleted v1 scripts (`scripts/check-package-metadata.ps1`, `verify-release.ps1`, `.codex/*`) — they no longer exist.
