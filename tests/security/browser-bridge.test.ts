@@ -240,7 +240,9 @@ describe("Browser Bridge protocol — security", () => {
     expect(res.body).toContain("<local-path>");
   });
 
-  it("payload cap: context returns JSON within 512KB, Content-Length guarded", { timeout: 15000 }, async () => {
+  it("payload cap: context returns JSON within 512KB, Content-Length guarded", {
+    timeout: 15000,
+  }, async () => {
     const res = await httpRequest(handle as BrowserBridgeHandle, "/v1/context?maxTokens=20000", {
       headers: { Authorization: `Bearer ${(handle as BrowserBridgeHandle).token}` },
     });

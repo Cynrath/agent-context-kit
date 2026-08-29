@@ -1,11 +1,11 @@
 ---
 id: "TASK-0053"
 title: "Browser Companion v0.3 — corrective audit, task traceability and strict type safety remediation"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-08-29"
-completedAt: null
+completedAt: 2026-08-29
 ---
 
 ## Purpose
@@ -53,15 +53,15 @@ Repair the Browser Companion v0.3 development process and TypeScript safety. Aud
 
 ## Acceptance criteria
 
-- [ ] Traceability audit table for TASK-0044..0052 exists in this Completion notes and lists every acceptance criterion with real evidence vs claim; task-first violation explicitly recorded; invalid TASK-0052 completion explicitly annotated.
-- [ ] TASK-0052 state corrected via supported workflow OR explicitly documented as historically invalid with remaining scope transferred to TASK-0053..0055.
-- [ ] `extensions/browser/tsconfig.json` has `strict:true` and `noImplicitAny:true`.
-- [ ] `// @ts-nocheck` absent from `extensions/browser/src/**` (grep 0 hits).
-- [ ] No new broad `any`/`@ts-ignore`/global `declare const chrome:any` introduced; any remaining narrow boundary has comment + justification and is covered by grep guard test.
-- [ ] `pnpm typecheck` (root) PASS and `npx tsc -p extensions/browser/tsconfig.json --noEmit` PASS with strict true.
-- [ ] `pnpm lint` + `pnpm format:check` + `pnpm build` PASS.
-- [ ] `node dist/cli/index.js task doctor` PASS and `node dist/cli/index.js doctor` PASS.
-- [ ] No history rewrite, no tag move, no publish.
+- [x] Traceability audit table for TASK-0044..0052 exists in this Completion notes and lists every acceptance criterion with real evidence vs claim; task-first violation explicitly recorded; invalid TASK-0052 completion explicitly annotated.
+- [x] TASK-0052 state corrected via supported workflow OR explicitly documented as historically invalid with remaining scope transferred to TASK-0053..0055.
+- [x] `extensions/browser/tsconfig.json` has `strict:true` and `noImplicitAny:true`.
+- [x] `// @ts-nocheck` absent from `extensions/browser/src/**` (grep 0 hits).
+- [x] No new broad `any`/`@ts-ignore`/global `declare const chrome:any` introduced; any remaining narrow boundary has comment + justification and is covered by grep guard test.
+- [x] `pnpm typecheck` (root) PASS and `npx tsc -p extensions/browser/tsconfig.json --noEmit` PASS with strict true.
+- [x] `pnpm lint` + `pnpm format:check` + `pnpm build` PASS.
+- [x] `node dist/cli/index.js task doctor` PASS and `node dist/cli/index.js doctor` PASS.
+- [x] No history rewrite, no tag move, no publish.
 
 ## Test steps
 
@@ -90,4 +90,52 @@ Revert this task's commit(s): `git revert <sha>` for AGENTS.md + tsconfig + side
 
 ## Completion notes
 
-(pending — to be filled with traceability table, TASK-0052 action taken, strict deltas, grep/typecheck evidence, and commit SHA)
+2026-08-29 — TASK-0053 completed. Traceability audit + strict remediation green.
+
+### Process violation recorded
+
+Round 1 violated AGENTS.md Rules 1-3 (task-first): `git log` shows `feat/browser-companion-v0.3` commits `e684b9c` (MV3 shell + emergency), `e6df90c` (hardening), `9e5bb09` (tests) — all before the full task chain TASK-0044..0052 was fully populated. Some task files were created as placeholders then filled after implementation (evidence: TASK-0052 still deferred scope at completion). No history was rewritten to hide this; corrective commit `48246bc` adds hard rules before further code (Rule 13). This task is the committed planning gate required by Rule 3.
+
+### Traceability audit TASK-0044..0052
+
+| Task | Key acceptance criteria | Implementation present | Automated evidence | Live evidence | Validity | Action |
+|------|------------------------|----------------------|-------------------|--------------|----------|--------|
+| TASK-0044 architecture & threat | ADR-0025, THREAT T21-33, CHROMEWEBSTORE, preflight | `docs/decisions/ADR-0025*`, `docs/security/THREAT_MODEL_BROWSER_COMPANION.md`, `CHROMEWEBSTORE.md` present | doc review PASS, `scan --ci` PASS | N/A docs only | VALID | none |
+| TASK-0045 bridge protocol | protocol doc 14 sections, 9 routes, security order | `docs/architecture/browser-bridge-protocol.md` 14 sections | grep GET /v1/* PASS | N/A spec | VALID | none |
+| TASK-0046 MV3 shell | manifest MV3 minimal, sidePanel, service worker, 4 adapters, content, storage, bridge client, build | `extensions/browser/manifest.json`, `src/*` present, `dist` built 7.4/17.6/25.8kb | `tsc` PASS *but* with `strict:false` + `// @ts-nocheck` (weak gate), `build` PASS, grep `no <all_urls>` PASS | MCP install NOT proven (deferred) | WEAKENED GATE — strict bypass | Fixed in this task (strict + nocheck removal) |
+| TASK-0047 emergency & Safe Mode | Emergency Disconnect, per-site Safe Mode, CLI stop, circuit breaker, reversible restore | `sidepanel.ts` emergency, `service-worker.ts` handleEmergency, `emergency.ts` breaker, `content.ts` restore | `cli browser stop` 200→401 manual, `biome` 0, `tsc` PASS (weak) | Real Chrome emergency NOT traced | VALID but gate weakened | Fixed strict |
+| TASK-0048 bridge impl | Host/Origin/CORS/token/rate/payload/redaction 9 routes, CLI | `src/core/browser-bridge/*`, `src/cli/commands/browser.ts` present | `offline-egress` PASS, `vitest offline-egress 8/8` PASS, `lboost` | N/A | VALID | none |
+| TASK-0049 conversation perf | Balanced hierarchy contentVisibility → placeholder → code/media, safety guards | `adapters/chatgpt/index.ts` 80-line compact, sidepanel performance | `adapter-contract 1 test` PASS, `tsc weak` | Synthetic 500-turn trace MISSING (deferred) | VALID with deferred trace | Transfer trace to TASK-0054 |
+| TASK-0050 adapters | 4 adapters isolated, healthCheck fail-closed, no core selectors | 4 adapter dirs + `content.ts` resolve | `adapter-contract 9/9` PASS, grep no core selectors PASS | Live DOM drift not re-checked | VALID but needs live re-inspect | Transfer to TASK-0054 |
+| TASK-0051 context features | fetchAndPreview 4 kinds, restoreProjectContext 7 fetches, no auto-submit | `sidepanel.ts` preview, `bridge-client.ts`, `no-auto-submit 3/3` | `no-auto-submit 3/3` PASS, `adapter-contract storage 1` PASS | MCP network panel NOT verified | VALID but `// @ts-nocheck` weak | Fixed strict |
+| TASK-0052 tests & MCP + Web Store | 12 bridge +5 manifest +9 adapter +3 no-auto-submit =29 tests, MCP live, Web Store, benchmark | 4 test files 29/29 PASS (3.77s), `CHROMEWEBSTORE.md`, `tsconfig` weak, benchmark placeholder only | 29/29 PASS automated | `list_pages/list_extensions` PASS, `install_extension` **Access denied: workspace roots** → **PENDING**, benchmark DEFERRED | **INVALID COMPLETION** — claims completed while evidence lists `pending/deferred/next round` (Rule 4 violation) | Annotated as invalid; scope transferred to TASK-0053..0055 |
+
+### TASK-0052 state repair
+
+`ackit task start TASK-0052` returns `cannot start a completed task` — CLI does not support reopening. History left intact. File `TASK-0052` now has **CORRECTIVE AMENDMENT 2026-08-29** noting invalid completion per Rules 4/5/8/12/15, listing `Access denied → pending`, `synthetic benchmark deferred`, `trace deferred`, `GO/NO-GO deferred`, `strict:false + ts-nocheck`. Remaining acceptance explicitly owned by TASK-0053 (strict), TASK-0054 (MCP + pin + benchmark), TASK-0055 (GO).
+
+### Strict remediation deltas
+
+- `extensions/browser/tsconfig.json`: `strict:false→true`, `noImplicitAny:false→true`, `types:[]` kept narrow (was `[]` empty, now typed via `global.d.ts` not `any`).
+- `extensions/browser/src/sidepanel/sidepanel.ts`: removed `// @ts-nocheck` line 1; no new `any`/`@ts-ignore`/`@ts-expect-error` introduced.
+- `extensions/browser/src/global.d.ts`: replaced `declare const chrome:any` with narrow MV3 namespace (storage, tabs, runtime, sidePanel, action, alarms) — 77 lines, biome-formatted, no `any` escape except documented comment.
+- Verified: `rg -n "ts-nocheck|@ts-ignore|@ts-expect-error" extensions/browser/src` → 0 hits; `rg -n "declare const chrome: any"` → 0 (only comment); `npx tsc -p extensions/browser/tsconfig.json --noEmit` exit 0; `npx tsc -p tsconfig.build.json --noEmit` exit 0.
+- `npx @biomejs/biome check extensions/browser/src` PASS (14 files), `npx @biomejs/biome check src tests scripts schemas examples` PASS (218 files), `npx @biomejs/biome check` root PASS, `node dist/cli/index.js task doctor` OK, `node dist/cli/index.js doctor` OK, `git diff --check` clean (after formatting fix in `global.d.ts` + `tests/security/browser-bridge.test.ts` formatting fix).
+- `node extensions/browser/scripts/build.mjs` PASS: background 7.7kb, sidepanel 19.8kb, content 29.3kb (strict bundle still succeeds).
+
+### Hard rules verification
+
+`AGENTS.md` commit `48246bc` already adds Rules 1-15 verbatim before any runtime code in this task, satisfying checkpoint “planning docs committed before implementation”.
+
+### Evidence
+
+- `cat extensions/browser/tsconfig.json` → strict true, noImplicitAny true
+- `npx tsc -p tsconfig.build.json --noEmit` exit 0 2026-08-29
+- `npx tsc -p extensions/browser/tsconfig.json --noEmit` exit 0 2026-08-29 (strict)
+- `npx vitest run tests/browser/ tests/security/browser-bridge.test.ts` 29/29 PASS 3.86s
+- `npx @biomejs/biome check` 0 errors (extension 14 files, root 218 files)
+- `node dist/cli/index.js task doctor` OK, `doctor` OK
+- `node extensions/browser/scripts/build.mjs` 3 bundles OK
+- No rebase/force-push/tag-move/publish; `git log` preserved `e684b9c`, `e6df90c`, `9e5bb09` then `48246bc`.
+
+Next: TASK-0054 owns Pin/benchmark/real Chrome E2E.

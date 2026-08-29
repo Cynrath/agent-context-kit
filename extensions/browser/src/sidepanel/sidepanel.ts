@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Side Panel — primary UI for Browser Companion
 // No auto-submit: Preview → Insert → user presses Send.
 
