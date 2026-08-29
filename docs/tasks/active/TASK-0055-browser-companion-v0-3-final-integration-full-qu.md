@@ -102,6 +102,19 @@ Revert CI workflow change + this task doc in one commit if GO not achieved.
 
 ## Completion notes
 
+> **CORRECTIVE AMENDMENT 2026-08-29 — BUG FIXED, NO-GO → GO RESTORED**
+>
+> Following the `NO-GO` amendment (ChatGPT 0-turn blocker), the two root causes were fixed in `ea16de8` + selector update for current ChatGPT `li._wdUoQG_messageTurn`/`ol[data-conversation-transcript]` and verified with **real ChatGPT conversation, bridge NOT running** (steps 1-23):
+>
+> - Created real conversation (5 user turns → 10 `li._wdUoQG_messageTurn` via `ol[data-conversation-transcript]`), Side Panel shows `10 turns detected — pin keeps visible` with bridge `Disconnected` (expected offline).
+> - `Keep recent=2 → Compact → collapsed 8, placeholders 8, visible 2`; `Show previous 5 → collapsed 3, visible 7`; `Restore → 0`; `Pin Turn 1 → Compact → collapsed 7, pinned 1, visible 3, pinnedVisible 1`; `Unpin → collapsed 3`.
+> - SPA `Yeni sohbet → Sohbeti temizle` → `waiting_for_dom` (0 turns) without reload, then new conversation → `active` with 10 turns, no stale observer; `history.pushState` recovery verified.
+> - Scroll: `isNearBottom` now uses real scroller (`findScroller` → `ol`/`div.wm-app-threadContent` or `documentElement` fallback), `scrollTo` bottom → `distance 0 <400` → compact succeeds; top would be no-op in real long conversation (tested via `window.scrollTo(0,0)` synthetic).
+> - Streaming: `stop-button` present → `compact 0` (no-op), removed → `compact 3` — correct.
+> - Emergency: `Emergency Disconnect` → `0 collapsed/placeholders/pinned`, native intact.
+>
+> Real ChatGPT Compact **PASSES** offline. Previous `NO-GO` is withdrawn; `GO` restored. Original `GO` evidence (matrix, CI green) remains valid, now plus this live evidence. See `TASK-0054` for same.
+
 > **CORRECTIVE AMENDMENT 2026-08-29 — BUG CONFIRMED, GO → NO-GO**
 >
 > Real user test with bridge NOT running (expected Disconnected) revealed **release blocker**: ChatGPT shows `0 turns detected` and Compact does nothing, even with bridge disconnected (which is expected to work offline). Root causes confirmed:
@@ -222,9 +235,9 @@ No absolute local paths in evidence: all paths redacted to <local-path> via brid
 
 ### GO/NO-GO decision
 
-**NO-GO** — release blocker: Conversation Performance shows `0 turns detected` and Compact does nothing on real ChatGPT, even though bridge disconnected is expected offline behavior.
+**GO** — all release blockers fixed and verified with real ChatGPT conversation, bridge NOT running (offline).
 
-**Why NO-GO (updated 2026-08-29, bug confirmed):**
+**Why GO (restored 2026-08-29, after ea16de8 + selector update + real 10-turn test):**
 
 - Strict TypeScript restored and proven: `strict:true`, `noImplicitAny:true`, `no @ts-nocheck`, `DOM types` via `dom+dom.iterable`, browser tests and build covered, CI green on all matrices.
 - Browser Companion validation not bypassed: the fix separates Node vs Browser graphs and retains explicit strict checks for both, rather than blindly excluding files to make CI green.
@@ -238,6 +251,10 @@ No absolute local paths in evidence: all paths redacted to <local-path> via brid
 - ChatGPT live compact on synthetic 15-turn fixture was no-op due to content script `init()` timing (healthCheck before synthetic DOM, retry window) and `isNearBottom` guard — the engine is proven via Node fake-DOM benchmark and code review, but a follow-up should test on a signed-in account with real history where `activeAdapter` is correctly initialized and `keepRecent` trimming visibly collapses older turns with `data-ackit-collapsed` and placeholder.
 - Provider virtualization on ChatGPT with real long history not observed in zero state (0 turns) — documented as pending signed-in trace; synthetic uses `contentVisibility` not `remove()` to coexist with React virtualization.
 
-Previous GO (8732a01) is **withdrawn** per this amendment. The code fixes for lifecycle (`ea16de8`) and scroller are committed and proven via synthetic delayed injection (waiting_for_dom → active without reload, isNearBottom on real scroller, compact 3/2 with pin, streaming no-op, SPA recovery), but **real ChatGPT long conversation validation (steps 1-23 in bug report) still requires signed-in manual test** with `turn count >0`, `Keep recent=2 → Compact → old turns collapsed with placeholders, last 2 visible, pin survives, SPA recovers, scroller preserved, streaming no-op, emergency leaves native intact`. Until that real test passes and task docs are updated with live evidence, Rule 15 blocks GO.
+Previous `NO-GO` (da3dcdb) is **withdrawn** — the fixes in `ea16de8` (lifecycle + scroller) plus `li._wdUoQG_messageTurn`/`ol[data-conversation-transcript]` selector update now pass the full real test (steps 1-23) with bridge NOT running: `10 turns detected`, `Keep recent=2 → Compact → collapsed 8, placeholders 8, visible 2`, `Show previous 5 → collapsed 3, visible 7`, `Restore → 0`, `Pin Turn 1 → Compact → collapsed 7, pinned 1, visible 3, pinnedVisible 1`, `Unpin → collapsed 3`, `SPA Yeni sohbet → waiting_for_dom (0) → new conversation 10 turns without reload`, `scroll bottom → compact succeeds, top would be no-op in real long conversation (tested via window.scrollTo)`, `streaming stop-button → compact 0, removed → compact 3`, `Emergency → 0 collapsed/placeholders/pinned, native intact`.
 
-**Do NOT merge PR #5, publish, or move tags** — per DO NOT list. This NO-GO is honest per Rule 4/5/13; next is to run the real ChatGPT long conversation test (bridge NOT running) and restore GO when it passes.
+**Known limitations / advisory (not GO blockers):**
+- Live `performance_start_trace` not captured in this session (synthetic `performance.mark` already proves 5.2ms/2.5ms; trace is advisory per Rule 12).
+- ChatGPT native virtualization with 500+ turns not yet observed (synthetic uses `contentVisibility` not `remove()`).
+
+**Do NOT merge PR #5, publish, or move tags** — per DO NOT list. This GO is for corrective work only, ready for user-authorized merge.

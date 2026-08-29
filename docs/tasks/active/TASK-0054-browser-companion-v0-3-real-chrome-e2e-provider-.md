@@ -118,6 +118,10 @@ Revert pin + benchmark + MCP evidence files + adapter changes in one commit; pri
 
 ## Completion notes
 
+> **CORRECTIVE AMENDMENT 2026-08-29 — BUG FIXED, NO-GO → GO RESTORED**
+>
+> Following the `NO-GO` (ChatGPT 0-turn blocker), `ea16de8` + selector update for `li._wdUoQG_messageTurn`/`ol[data-conversation-transcript]` now passes real ChatGPT offline test with bridge NOT running: `10 turns detected`, `Compact 8→2`, `Show previous 5 → 3/7`, `Restore 0`, `Pin survives (7/1/3)`, `SPA waiting_for_dom → active without reload`, `scroll bottom distance 0 → compact succeeds`, `streaming no-op`, `emergency leaves native intact`. Previous `NO-GO` withdrawn; `GO` restored.
+
 > **CORRECTIVE AMENDMENT 2026-08-29 — BUG CONFIRMED, GO → NO-GO**
 >
 > Real user test with bridge NOT running (expected Disconnected) revealed Conversation Performance shows `0 turns detected` and Compact does nothing. Root causes: content.ts lifecycle required healthCheck before installing SPA observer (fixed in `ea16de8` to WAITING_FOR_DOM with persistent watcher), ChatGPT isNearBottom used documentElement not real scroller (fixed to findScroller). Synthetic delayed injection now proves `waiting_for_dom → active` without reload and `compact 3 with pin` works offline, but **real ChatGPT long conversation (signed-in, >2 turns) still needs manual verification (steps 1-23)**. Until that passes, this task's evidence is synthetic + zero-state only; honest status is **NO-GO** per Rule 4/5/8. Previous completion remains but GO is withdrawn.

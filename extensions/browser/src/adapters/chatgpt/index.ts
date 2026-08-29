@@ -17,11 +17,23 @@ export function createChatGptAdapter(): SiteAdapter {
 
   function findRoot(): HTMLElement | null {
     // Prefer semantic, stable selectors; never Tailwind hashed classes.
+    // Current ChatGPT (2026) uses ol[data-conversation-transcript] → li._wdUoQG_messageTurn
     const thread = document.querySelector<HTMLElement>("#thread");
     if (thread) return thread;
     const byTurnContainer = document.querySelector<HTMLElement>("[data-turn-id-container]");
     if (byTurnContainer) return byTurnContainer.parentElement as HTMLElement | null;
-    // Fallback: first section with conversation-turn test id
+    const olTranscript = document.querySelector<HTMLElement>("ol[data-conversation-transcript]");
+    if (olTranscript) return olTranscript;
+    const wmContent = document.querySelector<HTMLElement>("div.wm-app-threadContent");
+    if (wmContent) {
+      // Prefer the ol inside, but return wrapper if ol not yet present
+      const innerOl = wmContent.querySelector<HTMLElement>("ol[data-conversation-transcript]");
+      if (innerOl) return innerOl;
+      return wmContent;
+    }
+    const newLi = document.querySelector<HTMLElement>("li._wdUoQG_messageTurn");
+    if (newLi) return (newLi.parentElement as HTMLElement | null) ?? newLi;
+    // Fallback: old section with conversation-turn test id
     const section = document.querySelector<HTMLElement>(
       'section[data-testid^="conversation-turn-"]',
     );
@@ -30,6 +42,16 @@ export function createChatGptAdapter(): SiteAdapter {
   }
 
   function findTurns(): TurnInfo[] {
+    // New ChatGPT DOM (2026): li._wdUoQG_messageTurn with data-message-role + id
+    const newLis = document.querySelectorAll<HTMLElement>("li._wdUoQG_messageTurn");
+    if (newLis.length > 0) {
+      return [...newLis].map((el, idx) => ({
+        id: el.id || el.getAttribute("data-message-id") || String(idx),
+        index: idx,
+        element: el,
+        role: el.getAttribute("data-message-role") ?? null,
+      }));
+    }
     const nodes = document.querySelectorAll<HTMLElement>(
       'section[data-testid^="conversation-turn-"][data-turn]',
     );
@@ -44,12 +66,15 @@ export function createChatGptAdapter(): SiteAdapter {
             ?.getAttribute("data-message-author-role") ?? null,
       }));
     }
-    // Fallback: [data-message-author-role] containers
+    // Fallback: [data-message-author-role] containers (old) — also try closest li for new
     const roles = document.querySelectorAll<HTMLElement>("[data-message-author-role]");
     return [...roles].map((el, idx) => ({
       id: String(idx),
       index: idx,
-      element: (el.closest("section") as HTMLElement) ?? el,
+      element:
+        (el.closest("section") as HTMLElement) ??
+        (el.closest("li._wdUoQG_messageTurn") as HTMLElement) ??
+        el,
       role: el.getAttribute("data-message-author-role"),
     }));
   }
@@ -170,7 +195,10 @@ export function createChatGptAdapter(): SiteAdapter {
         location.hostname.includes("chat.openai.com") ||
         location.hostname.includes("chatgpt.com") ||
         document.querySelector("#thread") !== null ||
-        document.querySelector('[data-testid^="conversation-turn-"]') !== null
+        document.querySelector('[data-testid^="conversation-turn-"]') !== null ||
+        document.querySelector("li._wdUoQG_messageTurn") !== null ||
+        document.querySelector("ol[data-conversation-transcript]") !== null ||
+        document.querySelector("div.wm-app-threadContent") !== null
       );
     },
     healthCheck(): AdapterHealth {
