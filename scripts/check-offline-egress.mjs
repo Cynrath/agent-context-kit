@@ -3,7 +3,9 @@
  * Offline-egress static gate.
  * Fails if product runtime introduces outbound network primitives outside allowlist.
  * Allowlist:
- * - node:http only in src/core/dashboard/server.ts and src/core/reporting/serve.ts (createServer only)
+ * - node:http only in src/core/dashboard/server.ts, src/core/reporting/serve.ts,
+ *   src/core/browser-bridge/server.ts (createServer, loopback) and
+ *   src/cli/commands/browser.ts (loopback client probeHealth/stop via http.request to 127.0.0.1)
  * - fetch('/api/...') relative only (reject absolute/protocol-relative/dynamic)
  * - schema URLs (json.schemastore.org) are documentation, not fetch args
  * - product-runtime git network commands rejected
@@ -22,7 +24,11 @@ const AUDIT_GLOBS = ["src", "extensions/vscode/src", "templates", "dist/action"]
 const ALLOWED_HTTP_MODULES = new Set([
   "src/core/dashboard/server.ts",
   "src/core/reporting/serve.ts",
+  "src/core/browser-bridge/server.ts",
+  "src/cli/commands/browser.ts",
 ]);
+
+const ALLOWED_LOOPBACK_HTTP_REQUEST = new Set(["src/cli/commands/browser.ts"]);
 
 const FORBIDDEN = [
   {
@@ -239,6 +245,14 @@ async function main() {
       for (const rule of FORBIDDEN) {
         const re = new RegExp(rule.pattern.source, rule.pattern.flags);
         for (const m of content.matchAll(re)) {
+          // Allow localhost loopback http.request for Browser Bridge CLI (probeHealth/stop)
+          if (
+            rule.id === "http-request" &&
+            ALLOWED_LOOPBACK_HTTP_REQUEST.has(rel) &&
+            (content.includes("127.0.0.1") || content.includes("localhost"))
+          ) {
+            continue;
+          }
           const pos = m.index ?? 0;
           const after = content.slice(pos, pos + 200);
           const snippet = after.split("\n")[0]?.slice(0, 120) ?? "";

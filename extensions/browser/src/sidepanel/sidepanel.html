@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ACKit Browser Companion</title>
+<link rel="stylesheet" href="./sidepanel.css">
+</head>
+<body>
+<header class="header">
+  <h1>ACKit Companion</h1>
+  <span id="status-dot" class="dot" aria-label="status"></span>
+  <span id="status-text">Disconnected</span>
+</header>
+
+<section class="panel-section emergency">
+  <button id="btn-emergency" class="btn btn-danger" type="button">EMERGENCY DISCONNECT</button>
+  <p class="hint">Stops bridge requests, clears token, restores page. No confirmation.</p>
+  <div class="row">
+    <button id="btn-disable-site" class="btn btn-secondary" type="button">Disable ACKit on this site</button>
+    <button id="btn-restore" class="btn btn-secondary" type="button">Restore page</button>
+    <button id="btn-reconnect" class="btn btn-primary" type="button">Reconnect</button>
+  </div>
+</section>
+
+<section class="panel-section" id="connect-section">
+  <h2>Bridge</h2>
+  <label for="inp-endpoint">Endpoint</label>
+  <input id="inp-endpoint" type="text" placeholder="http://127.0.0.1:PORT">
+  <label for="inp-token">Token</label>
+  <input id="inp-token" type="password" placeholder="paste token from ackit browser start">
+  <button id="btn-connect" class="btn btn-primary" type="button">Connect</button>
+  <button id="btn-disconnect" class="btn btn-secondary" type="button">Disconnect</button>
+  <pre id="health" class="health"></pre>
+</section>
+
+<section class="panel-section">
+  <h2>Context</h2>
+  <div class="row">
+    <button id="btn-task" class="btn" type="button">Attach Active Task</button>
+    <button id="btn-instructions" class="btn" type="button">Attach Instructions</button>
+  </div>
+  <div class="row">
+    <button id="btn-preview-context" class="btn" type="button">Preview Context Pack</button>
+    <button id="btn-insert-context" class="btn btn-primary" type="button">Insert Context Pack</button>
+  </div>
+  <div class="row">
+    <button id="btn-evidence" class="btn" type="button">Insert Evidence</button>
+    <button id="btn-restore-context" class="btn" type="button">Restore Project Context</button>
+  </div>
+  <label for="inp-composer">Preview (editable before Insert)</label>
+  <textarea id="inp-composer" rows="8" placeholder="Preview will appear here — Insert copies to page composer, you press Send. No auto-submit."></textarea>
+  <button id="btn-insert-preview" class="btn btn-primary" type="button">Insert Preview into Page Composer</button>
+  <p class="hint">ACKit never auto-submits. You always press Send on the website.</p>
+</section>
+
+<section class="panel-section">
+  <h2>Conversation Performance</h2>
+  <p class="hint">Balanced mode uses content-visibility and reversible collapse. No DOM detach. Fail-closed on DOM drift. Pauses while streaming.</p>
+  <div class="row">
+    <label for="inp-keep">Keep recent</label>
+    <input id="inp-keep" type="number" min="1" max="100" value="10">
+    <button id="btn-compact" class="btn" type="button">Compact older messages</button>
+    <button id="btn-restore-perf" class="btn" type="button">Restore all</button>
+  </div>
+  <div class="row">
+    <button id="btn-show-prev" class="btn" type="button">Show previous 5</button>
+    <span id="perf-counts"></span>
+  </div>
+  <div id="navigator" class="navigator"></div>
+</section>
+
+<section class="panel-section">
+  <h2>Diagnostics</h2>
+  <pre id="diag"></pre>
+</section>
+
+<script type="module" src="./sidepanel.js"></script>
+</body>
+</html>

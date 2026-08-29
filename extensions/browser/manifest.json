@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "ACKit Browser Companion",
+  "version": "0.3.0",
+  "description": "Bring your ACKit repository context, tasks and evidence into ChatGPT, Claude, Gemini and GitHub — with safe, reversible page-performance help.",
+  "permissions": ["storage", "sidePanel", "alarms"],
+  "host_permissions": [
+    "https://chat.openai.com/*",
+    "https://chatgpt.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://github.com/*",
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "dist/background/service-worker.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "dist/sidepanel/sidepanel.html"
+  },
+  "action": {},
+  "content_scripts": [
+    {
+      "matches": ["https://chat.openai.com/*", "https://chatgpt.com/*"],
+      "js": ["dist/content/content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://claude.ai/*"],
+      "js": ["dist/content/content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://gemini.google.com/*"],
+      "js": ["dist/content/content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://github.com/*"],
+      "js": ["dist/content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "minimum_chrome_version": "114",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  }
+}

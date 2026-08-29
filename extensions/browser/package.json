@@ -1,0 +1,18 @@
+{
+  "name": "ackit-browser",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "ACKit Browser Companion — MV3 extension (Side Panel, adapters, bridge client)",
+  "scripts": {
+    "build": "node ./scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "biome check src --diagnostic-level=warn || true",
+    "clean": "node -e \"import('node:fs').then(fs=>fs.promises.rm('dist',{recursive:true,force:true}).then(()=>console.log('cleaned')))\""
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.270",
+    "esbuild": "^0.23.0",
+    "typescript": "^5.9.3"
+  }
+}

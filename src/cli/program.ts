@@ -486,6 +486,72 @@ function buildProgram(invocation: CliInvocation): Command {
       });
     });
 
+  const browserCommand = program
+    .command("browser")
+    .alias("bridge")
+    .description("local Browser Companion bridge (localhost-only, read-only)");
+  const browserStartCommand = browserCommand
+    .command("start")
+    .description("start the Browser Bridge on 127.0.0.1 (read-only, token-auth)")
+    .option("--host <host>", "bind host (default 127.0.0.1)", "127.0.0.1")
+    .option("--port <n>", "port (0 = random)", (v) => Number.parseInt(v, 10))
+    .option("--ttl <ms>", "session TTL in ms (default 12h)", (v) => Number.parseInt(v, 10))
+    .option("--extension-id <id>", "expected chrome-extension id to pin Origin")
+    .option("--allow-nonlocal", "allow non-loopback bind (not recommended)", false);
+  browserStartCommand.action(async () => {
+    const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+    const opts = (browserStartCommand.opts() ?? {}) as {
+      host?: string;
+      port?: number;
+      ttl?: number;
+      extensionId?: string;
+      allowNonlocal?: boolean;
+    };
+    const { runBrowserStartCommand } = await import("./commands/browser.js");
+    invocation.exitCode = await runBrowserStartCommand({
+      host: opts.host ?? "127.0.0.1",
+      port: opts.port,
+      ttlMs: opts.ttl,
+      extensionId: opts.extensionId,
+      root: parentOptions.root,
+      json: parentOptions.json ?? false,
+      quiet: parentOptions.quiet ?? false,
+      allowNonLocal: opts.allowNonlocal ?? false,
+    });
+  });
+  const browserStatusCommand = browserCommand
+    .command("status")
+    .description("probe the Browser Bridge liveness")
+    .option("--host <host>", "host", "127.0.0.1")
+    .option("--port <n>", "port", (v) => Number.parseInt(v, 10));
+  browserStatusCommand.action(async () => {
+    const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+    const opts = (browserStatusCommand.opts() ?? {}) as { host?: string; port?: number };
+    const { runBrowserStatusCommand } = await import("./commands/browser.js");
+    invocation.exitCode = await runBrowserStatusCommand({
+      host: opts.host ?? "127.0.0.1",
+      port: opts.port,
+      json: parentOptions.json ?? false,
+      quiet: parentOptions.quiet ?? false,
+    });
+  });
+  const browserStopCommand = browserCommand
+    .command("stop")
+    .description("revoke the Browser Bridge session")
+    .option("--host <host>", "host", "127.0.0.1")
+    .option("--port <n>", "port", (v) => Number.parseInt(v, 10));
+  browserStopCommand.action(async () => {
+    const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+    const opts = (browserStopCommand.opts() ?? {}) as { host?: string; port?: number };
+    const { runBrowserStopCommand } = await import("./commands/browser.js");
+    invocation.exitCode = await runBrowserStopCommand({
+      host: opts.host ?? "127.0.0.1",
+      port: opts.port,
+      json: parentOptions.json ?? false,
+      quiet: parentOptions.quiet ?? false,
+    });
+  });
+
   program.addHelpText("after", `\n${HELP_TEXT_SUFFIX}`);
   return program;
 }

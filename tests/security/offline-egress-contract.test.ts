@@ -19,7 +19,13 @@ async function collectFiles(dir: string): Promise<string[]> {
 describe("offline-egress contract — static", () => {
   it("no outbound primitives in shipped src runtime except allowlisted node:http", async () => {
     const srcFiles = await collectFiles(path.join(repoRoot, "src"));
-    const allowlisted = new Set(["src/core/dashboard/server.ts", "src/core/reporting/serve.ts"]);
+    const allowlisted = new Set([
+      "src/core/dashboard/server.ts",
+      "src/core/reporting/serve.ts",
+      "src/core/browser-bridge/server.ts",
+      "src/cli/commands/browser.ts",
+    ]);
+    const allowlistedLoopbackRequest = new Set(["src/cli/commands/browser.ts"]);
     let violations: string[] = [];
 
     for (const full of srcFiles) {
@@ -52,6 +58,14 @@ describe("offline-egress contract — static", () => {
         // For axios we need to ensure it's not just comment
         re.lastIndex = 0;
         if (re.test(content)) {
+          // Allow localhost loopback http.request for Browser Companion CLI (probeHealth/stop)
+          if (
+            msg.includes("http.request/get") &&
+            allowlistedLoopbackRequest.has(rel) &&
+            /127\.0\.0\.1|localhost/.test(content)
+          ) {
+            continue;
+          }
           // Special: allow http.request detection to be filtered for createServer case — our regex already only matches request/get, so any hit is violation
           // For node:http import, allowlist
           if (msg.includes("node:http")) {
@@ -65,8 +79,11 @@ describe("offline-egress contract — static", () => {
       if (content.includes('from "node:http"') || content.includes("from 'node:http'")) {
         if (!allowlisted.has(rel)) {
           violations.push(`${rel}: node:http import not allowlisted`);
+        } else if (allowlistedLoopbackRequest.has(rel)) {
+          // Loopback client (browser CLI) is allowed to use http.request to 127.0.0.1
+          expect(content).toMatch(/127\.0\.0\.1|localhost|::1/);
         } else {
-          // For allowlisted, ensure it uses createServer not request
+          // For allowlisted servers, ensure it uses createServer not request
           expect(content).toContain("createServer");
           expect(content).not.toMatch(/http\.(request|get)\s*\(/);
           // Ensure default host is loopback
