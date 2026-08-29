@@ -1,4 +1,5 @@
 // Content script — runs isolated per provider, loads the correct adapter, wires bridge client via messaging.
+// Lifecycle: DETECTED → WAITING_FOR_DOM → HEALTHY → ACTIVE, with persistent SPA/health watchers.
 // All page mutations are reversible and fail closed; no eval, no inline script.
 
 import { createChatGptAdapter } from "../adapters/chatgpt/index.js";
@@ -8,9 +9,14 @@ import { createGithubAdapter } from "../adapters/github/index.js";
 import type { SiteAdapter } from "../adapters/types.js";
 import { getPinnedMap, isSiteDisabled, setPinned } from "../lib/storage.js";
 
+let candidateAdapter: SiteAdapter | null = null;
 let activeAdapter: SiteAdapter | null = null;
 let disabledForHost = false;
 let currentHost = location.hostname;
+let healthInterval: number | undefined;
+let domObserver: MutationObserver | null = null;
+let spaInstalled = false;
+let listenersInstalled = false;
 
 function resolveAdapter(): SiteAdapter | null {
   const candidates: SiteAdapter[] = [
@@ -37,7 +43,6 @@ async function applyPinnedState(): Promise<void> {
     for (const t of turns) {
       if (pinned[t.id] === true) {
         t.element.setAttribute("data-ackit-pinned", "true");
-        // Visual marker for pinned
         t.element.style.outline = "2px dashed #4a8";
         t.element.style.outlineOffset = "2px";
       } else {
@@ -51,24 +56,132 @@ async function applyPinnedState(): Promise<void> {
   } catch {}
 }
 
+function evaluateHealth(): void {
+  if (disabledForHost) {
+    if (activeAdapter) {
+      try {
+        activeAdapter.disconnect();
+      } catch {}
+      activeAdapter = null;
+    }
+    return;
+  }
+  if (!candidateAdapter) {
+    const next = resolveAdapter();
+    if (!next) {
+      if (activeAdapter) {
+        try {
+          activeAdapter.disconnect();
+        } catch {}
+        activeAdapter = null;
+      }
+      return;
+    }
+    candidateAdapter = next;
+    // Candidate found but health not yet known — will be evaluated below
+  }
+  const health = candidateAdapter.healthCheck();
+  if (!health.ok) {
+    // WAITING_FOR_DOM — keep candidate, clear active, keep watchers alive
+    if (activeAdapter) {
+      try {
+        activeAdapter.disconnect();
+      } catch {}
+      activeAdapter = null;
+    }
+    // Do not clear candidate; keep waiting
+    return;
+  }
+  // HEALTHY → ACTIVE
+  if (activeAdapter !== candidateAdapter) {
+    if (activeAdapter) {
+      try {
+        activeAdapter.disconnect();
+      } catch {}
+    }
+    activeAdapter = candidateAdapter;
+    void applyPinnedState();
+  }
+}
+
+function startHealthWatcher(): void {
+  if (healthInterval !== undefined) return;
+  // Poll health every 800ms — covers delayed conversation DOM without fixed 10s window
+  healthInterval = window.setInterval(() => {
+    evaluateHealth();
+  }, 800);
+
+  // Also watch DOM for changes — any childList mutation in body may indicate conversation loaded
+  if (domObserver) {
+    try {
+      domObserver.disconnect();
+    } catch {}
+    domObserver = null;
+  }
+  try {
+    domObserver = new MutationObserver(() => {
+      // Debounce: evaluate on next tick
+      window.setTimeout(() => evaluateHealth(), 150);
+    });
+    // Observe body for subtree childList — covers SPA-added #thread and turns
+    // Use document.documentElement as fallback if body not yet present
+    const target = document.body ?? document.documentElement;
+    domObserver.observe(target as Node, { childList: true, subtree: true });
+  } catch {
+    domObserver = null;
+  }
+}
+
+function stopHealthWatcher(): void {
+  if (healthInterval !== undefined) {
+    window.clearInterval(healthInterval);
+    healthInterval = undefined;
+  }
+  if (domObserver) {
+    try {
+      domObserver.disconnect();
+    } catch {}
+    domObserver = null;
+  }
+}
+
 async function init(): Promise<void> {
   const disabled = await isSiteDisabled(currentHost).catch(() => false);
   disabledForHost = disabled;
-  if (disabledForHost) return;
-
-  const adapter = resolveAdapter();
-  if (!adapter) return;
-  const health = adapter.healthCheck();
-  if (!health.ok) {
-    // Fail closed — do not mutate, report via console for debugging
-    console.warn(`[ACKit] adapter ${adapter.id} healthCheck failed: ${health.reason}`);
-    // Optionally notify side panel via messaging (circuit breaker)
+  if (disabledForHost) {
+    // Still install listeners/SPA so user can re-enable without reload
+    ensureListenersAndSpa();
+    startHealthWatcher();
     return;
   }
-  activeAdapter = adapter;
-  setupListeners();
-  setupSpaObserver();
-  await applyPinnedState();
+
+  const adapter = resolveAdapter();
+  if (adapter) {
+    candidateAdapter = adapter;
+  }
+  ensureListenersAndSpa();
+  startHealthWatcher();
+  // Immediate health evaluation
+  evaluateHealth();
+  if (activeAdapter) {
+    await applyPinnedState();
+  } else if (candidateAdapter) {
+    const h = candidateAdapter.healthCheck();
+    if (!h.ok) {
+      console.warn(`[ACKit] adapter ${candidateAdapter.id} healthCheck failed: ${h.reason} — waiting for DOM`);
+    }
+  }
+}
+
+function ensureListenersAndSpa(): void {
+  if (!listenersInstalled) {
+    setupListeners();
+    listenersInstalled = true;
+  }
+  if (!spaInstalled) {
+    setupSpaObserver();
+    spaInstalled = true;
+  }
 }
 
 function setupListeners(): void {
@@ -83,9 +196,14 @@ function setupListeners(): void {
       };
       if (m.type === "ackit:insert") {
         const text = m.text ?? "";
+        // Insert needs active (healthy) adapter; candidate not enough
         if (!activeAdapter) {
-          sendResponse({ ok: false, error: "no adapter" });
-          return;
+          // Try to evaluate health once more before failing — user may have just loaded conversation
+          evaluateHealth();
+          if (!activeAdapter) {
+            sendResponse({ ok: false, error: "no adapter" });
+            return;
+          }
         }
         if (disabledForHost) {
           sendResponse({ ok: false, error: "site disabled" });
@@ -96,11 +214,16 @@ function setupListeners(): void {
         return;
       }
       if (m.type === "ackit:compact") {
+        // Compact requires active; if only candidate exists, try health eval first
         if (!activeAdapter) {
-          sendResponse({ ok: false, error: "no adapter" });
-          return;
+          evaluateHealth();
+          if (!activeAdapter) {
+            // Return health reason for diagnostics
+            const health = candidateAdapter?.healthCheck() ?? { ok: false, reason: "no adapter" };
+            sendResponse({ ok: false, error: health.reason ?? "no adapter", health });
+            return;
+          }
         }
-        // Ensure pinned state is current before compact
         await applyPinnedState();
         const keepRecent =
           typeof (m as { keepRecent?: number }).keepRecent === "number"
@@ -116,24 +239,32 @@ function setupListeners(): void {
         m.type === "ackit:site-disabled"
       ) {
         try {
-          activeAdapter?.restore();
-          // Emergency should also clear pending pinned visuals but keep storage for next init?
-          // For emergency, we clear pinned outlines visually but storage remains until explicit clear.
-          // Restore keeps pinned attributes (user wants them after restore) — so we re-apply pinned after restore.
+          // Restore should work even if only candidate exists — try active first, then candidate
+          const target = activeAdapter ?? candidateAdapter;
+          target?.restore();
           if (m.type === "ackit:restore") {
             await applyPinnedState();
           } else {
-            // Emergency/site-disabled: remove pinned outlines as part of cleanup
             for (const el of document.querySelectorAll<HTMLElement>("[data-ackit-pinned='true']")) {
               el.removeAttribute("data-ackit-pinned");
               el.style.outline = "";
               el.style.outlineOffset = "";
             }
           }
-          if (m.type !== "ackit:restore") activeAdapter?.disconnect();
+          if (m.type !== "ackit:restore") {
+            activeAdapter?.disconnect();
+            // Keep candidate for potential re-enable, but clear active
+            if (m.type === "ackit:emergency-disconnect" || m.type === "ackit:site-disabled") {
+              activeAdapter = null;
+            }
+          }
         } catch {}
         if (m.type === "ackit:emergency-disconnect" || m.type === "ackit:site-disabled") {
           disabledForHost = true;
+        }
+        if (m.type === "ackit:site-disabled" && (m as { host?: string }).host) {
+          // Allow re-enable flow to re-evaluate
+          evaluateHealth();
         }
         sendResponse({ ok: true });
         return;
@@ -141,13 +272,15 @@ function setupListeners(): void {
       if (m.type === "ackit:pin") {
         const id = m.id ?? "";
         const pinned = m.pinned ?? false;
-        if (!id || !activeAdapter) {
-          sendResponse({ ok: false, error: "missing id or adapter" });
+        if (!id) {
+          sendResponse({ ok: false, error: "missing id" });
           return;
         }
+        // Pin needs at least candidate to know turn ids, but we store per-host regardless
         try {
           await setPinned(currentHost, id, pinned);
-          await applyPinnedState();
+          // If active, apply visual; if only candidate/waiting, still store for next health
+          if (activeAdapter) await applyPinnedState();
           sendResponse({ ok: true });
         } catch (error) {
           const msg = error instanceof Error ? error.message : String(error);
@@ -166,19 +299,29 @@ function setupListeners(): void {
         return;
       }
       if (m.type === "ackit:health") {
-        const health = activeAdapter?.healthCheck() ?? { ok: false, reason: "no adapter" };
-        sendResponse(health);
+        // Always evaluate fresh health for diagnostics
+        evaluateHealth();
+        const health = activeAdapter?.healthCheck() ??
+          candidateAdapter?.healthCheck() ?? { ok: false, reason: "no adapter" };
+        const state = disabledForHost
+          ? "disabled"
+          : activeAdapter
+            ? "active"
+            : candidateAdapter
+              ? "waiting_for_dom"
+              : "no_adapter";
+        sendResponse({ ...health, state, candidate: candidateAdapter?.id ?? null, active: activeAdapter?.id ?? null });
         return;
       }
       if (m.type === "ackit:navigate") {
-        const items = activeAdapter?.navigator() ?? [];
-        // Enrich with pinned state
+        evaluateHealth();
+        const items = activeAdapter?.navigator() ?? candidateAdapter?.navigator() ?? [];
         let pinned: Record<string, boolean> = {};
         try {
           pinned = await getPinnedMap(currentHost);
         } catch {}
         const enriched = items.map((it) => ({ ...it, pinned: pinned[it.id] === true }));
-        sendResponse({ ok: true, items: enriched });
+        sendResponse({ ok: true, items: enriched, state: activeAdapter ? "active" : candidateAdapter ? "waiting_for_dom" : "no_adapter" });
         return;
       }
       sendResponse({ ok: false, error: "unknown content message" });
@@ -188,27 +331,55 @@ function setupListeners(): void {
 }
 
 function setupSpaObserver(): void {
-  // SPA lifecycle: conversation change → disconnect old, re-init
+  // SPA lifecycle: conversation change → re-evaluate health, keep candidate
   let lastHref = location.href;
   let debounce: number | undefined;
   const check = async () => {
-    if (location.href === lastHref) return;
-    lastHref = location.href;
-    currentHost = location.hostname;
-    const disabled = await isSiteDisabled(currentHost).catch(() => false);
-    disabledForHost = disabled;
-    try {
-      activeAdapter?.disconnect();
-      activeAdapter?.restore();
-    } catch {}
-    activeAdapter = null;
-    if (disabledForHost) return;
+    if (location.href === lastHref && document.hasFocus() && candidateAdapter) {
+      // Still same href but DOM may have changed (ChatGPT SPA without href change) — still re-evaluate
+    }
+    const hrefChanged = location.href !== lastHref;
+    if (hrefChanged) {
+      lastHref = location.href;
+      currentHost = location.hostname;
+      const disabled = await isSiteDisabled(currentHost).catch(() => false);
+      disabledForHost = disabled;
+      if (disabledForHost) {
+        try {
+          activeAdapter?.disconnect();
+        } catch {}
+        activeAdapter = null;
+        return;
+      }
+    }
+    // Re-resolve candidate on every SPA navigation — ChatGPT may switch conversation without full reload
     const next = resolveAdapter();
-    if (!next) return;
-    const health = next.healthCheck();
-    if (!health.ok) return;
-    activeAdapter = next;
-    await applyPinnedState();
+    if (next) {
+      if (!candidateAdapter || candidateAdapter.id !== next.id) {
+        // New provider or same but fresh instance
+        try {
+          activeAdapter?.disconnect();
+        } catch {}
+        activeAdapter = null;
+        candidateAdapter = next;
+      }
+    } else {
+      // No adapter detected — keep previous candidate? Clear to allow re-detect
+      // For ChatGPT, detect is hostname-based, so it should still be candidate; only clear if truly no candidate
+      if (!next) {
+        // Keep candidate for waiting, but active must be cleared
+        if (activeAdapter) {
+          try {
+            activeAdapter.disconnect();
+          } catch {}
+          activeAdapter = null;
+        }
+      }
+    }
+    evaluateHealth();
+    if (activeAdapter) {
+      await applyPinnedState();
+    }
   };
 
   // patch pushState/replaceState
@@ -237,18 +408,19 @@ function setupSpaObserver(): void {
     window.clearTimeout(debounce);
     debounce = window.setTimeout(() => void check(), 300);
   });
+
+  // Also observe DOM for SPA that doesn't change href (ChatGPT sometimes)
+  // The health watcher's domObserver already covers this, but keep explicit
 }
 
-// Initialize immediately; also on SPA delayed root appearance
+// Initialize immediately
 void init();
-let retry = 0;
-const retryTimer = window.setInterval(() => {
-  if (activeAdapter || retry >= 10) {
-    window.clearInterval(retryTimer);
-    return;
+
+// No fixed 10s window — health watcher runs indefinitely via interval + MutationObserver
+// Also handle visibility change — when tab becomes visible, re-evaluate
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    evaluateHealth();
   }
-  retry++;
-  void init().then(() => {
-    if (activeAdapter) window.clearInterval(retryTimer);
-  });
-}, 1000);
+});
+window.addEventListener("focus", () => evaluateHealth());

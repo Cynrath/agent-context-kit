@@ -54,9 +54,77 @@ export function createChatGptAdapter(): SiteAdapter {
     }));
   }
 
+  function findScroller(): HTMLElement | null {
+    // PoC-derived: dynamically discover the actual ChatGPT scrollable ancestor.
+    // ChatGPT's conversation scroller is not always documentElement — it is often a div with overflow-y-auto.
+    const root = findRoot();
+    let el: HTMLElement | null = root;
+    // Walk up from root to find scrollable ancestor
+    while (el) {
+      try {
+        const style = getComputedStyle(el);
+        const overflowY = style.overflowY;
+        const isScrollableStyle = overflowY === "auto" || overflowY === "scroll" || overflowY === "overlay";
+        // scrollHeight > clientHeight indicates scrollable content (with small tolerance)
+        if (isScrollableStyle && el.scrollHeight > el.clientHeight + 20) {
+          return el;
+        }
+        // Also consider elements that are scrollable even without explicit overflow (ChatGPT sometimes uses flex)
+        // Check if element can scroll: scrollHeight > clientHeight and element is not body
+        if (el.scrollHeight > el.clientHeight + 40 && el !== document.body) {
+          // Ensure it has a defined height and can actually scroll
+          if (el.clientHeight < window.innerHeight * 0.95) {
+            return el;
+          }
+        }
+      } catch {}
+      el = el.parentElement;
+    }
+    // Fallback: try main element or document scrolling element
+    const main = document.querySelector<HTMLElement>("main");
+    if (main) {
+      try {
+        if (main.scrollHeight > main.clientHeight + 20) return main;
+        const style = getComputedStyle(main);
+        if ((style.overflowY === "auto" || style.overflowY === "scroll") && main.scrollHeight > main.clientHeight) {
+          return main;
+        }
+      } catch {}
+    }
+    // Final fallback: documentElement (window scrolling)
+    return document.documentElement as unknown as HTMLElement;
+  }
+
+  function getScroller(): HTMLElement {
+    return findScroller() ?? (document.documentElement as unknown as HTMLElement);
+  }
+
   function isNearBottom(): boolean {
-    const distance = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+    const scroller = getScroller();
+    // If scroller is documentElement, use window metrics (more reliable for window scrolling)
+    if (scroller === document.documentElement) {
+      const distance = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+      return distance < 400;
+    }
+    const distance = scroller.scrollHeight - (scroller.scrollTop + scroller.clientHeight);
     return distance < 400;
+  }
+
+  function getBottomDistance(): number {
+    const scroller = getScroller();
+    if (scroller === document.documentElement) {
+      return document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+    }
+    return scroller.scrollHeight - (scroller.scrollTop + scroller.clientHeight);
+  }
+
+  function scrollByDelta(delta: number): void {
+    const scroller = getScroller();
+    if (scroller === document.documentElement) {
+      window.scrollBy(0, delta);
+    } else {
+      scroller.scrollTop += delta;
+    }
   }
 
   function hasFocusedControlInside(element: HTMLElement): boolean {
@@ -191,9 +259,8 @@ export function createChatGptAdapter(): SiteAdapter {
       if (turns.length <= opts.keepRecent)
         return { compacted: 0, alreadyCompacted: 0, skippedFocused: 0 };
 
-      // Anchor scroll distance before mutation (scroll anchoring, PoC lesson 8)
-      const bottomDistance =
-        document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+      // Anchor scroll distance before mutation (scroll anchoring, PoC lesson 8) — uses real scroller
+      const bottomDistance = getBottomDistance();
       let compacted = 0;
       let already = 0;
       let skippedFocused = 0;
@@ -285,13 +352,12 @@ export function createChatGptAdapter(): SiteAdapter {
         }
       }
 
-      // Restore scroll anchoring
+      // Restore scroll anchoring — against real scroller
       try {
-        const newBottom =
-          document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+        const newBottom = getBottomDistance();
         const delta = newBottom - bottomDistance;
         if (Math.abs(delta) > 20) {
-          window.scrollBy(0, delta);
+          scrollByDelta(delta);
         }
       } catch {
         // no-op
