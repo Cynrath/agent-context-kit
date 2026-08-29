@@ -1,6 +1,6 @@
 packages:
   - "."
-  - "extensions/*"
+  - "extensions/vscode"
 
 allowBuilds:
   esbuild: true
