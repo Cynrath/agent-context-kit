@@ -43,6 +43,10 @@ jobs:
         run: pnpm build
       - name: Offline-egress static gate
         run: node scripts/check-offline-egress.mjs
+      - name: Browser Companion — strict typecheck
+        run: npx tsc -p extensions/browser/tsconfig.json --noEmit
+      - name: Browser Companion — build
+        run: node extensions/browser/scripts/build.mjs
       - name: Tests (unit/integration/contract/security)
         run: pnpm test
 

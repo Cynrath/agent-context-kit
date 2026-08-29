@@ -354,6 +354,8 @@ async function restoreProjectContext(): Promise<void> {
   updateCounts();
 }
 
+type NavItemWithPin = { id: string; label?: string; pinned?: boolean; index?: number };
+
 async function updateCounts(): Promise<void> {
   const txt = ($("inp-composer") as HTMLTextAreaElement).value;
   previewContent = txt;
@@ -368,16 +370,55 @@ async function updateCounts(): Promise<void> {
     }
     const nav = (await chrome.tabs
       .sendMessage(tab.id, { type: "ackit:navigate" })
-      .catch(() => null)) as { items?: Array<{ label?: string }> } | null;
+      .catch(() => null)) as { items?: NavItemWithPin[] } | null;
     const items = nav?.items ?? [];
-    // Try to get compact counts via content health? placeholder
-    counts.textContent = `${items.length} turns detected`;
+    counts.textContent = `${items.length} turns detected — pin keeps visible during compact`;
     navigatorEl.innerHTML = "";
-    for (const it of items.slice(0, 30)) {
-      const div = document.createElement("div");
-      div.textContent = (it as { label?: string }).label ?? String(it);
-      div.style.padding = "2px 0";
-      navigatorEl.appendChild(div);
+    for (const it of items.slice(0, 40)) {
+      const row = document.createElement("div");
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.gap = "6px";
+      row.style.padding = "2px 0";
+      const label = document.createElement("span");
+      label.textContent = it.label ?? `Turn ${String(it.index ?? "?")}`;
+      label.style.flex = "1";
+      if (it.pinned) {
+        label.style.fontWeight = "600";
+        label.textContent = `📌 ${label.textContent}`;
+      }
+      const btn = document.createElement("button");
+      btn.textContent = it.pinned ? "Unpin" : "Pin";
+      btn.title = it.pinned ? "Keep visible: will survive compaction" : "Pin to keep visible";
+      btn.style.fontSize = "11px";
+      btn.style.padding = "2px 6px";
+      // Use narrow closure with correct types
+      const turnId: string = it.id;
+      const nextPinned: boolean = !it.pinned;
+      btn.addEventListener("click", () => {
+        void (async () => {
+          try {
+            const [t] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (!t?.id) return;
+            await chrome.tabs.sendMessage(t.id, {
+              type: "ackit:pin",
+              id: turnId,
+              pinned: nextPinned,
+            });
+            await updateCounts();
+          } catch {}
+        })();
+      });
+      row.appendChild(label);
+      row.appendChild(btn);
+      navigatorEl.appendChild(row);
+    }
+    if (items.length > 40) {
+      const more = document.createElement("div");
+      more.textContent = `… and ${items.length - 40} more`;
+      more.style.opacity = "0.7";
+      more.style.fontSize = "11px";
+      navigatorEl.appendChild(more);
     }
   } catch {
     counts.textContent = "";

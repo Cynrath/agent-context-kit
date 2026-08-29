@@ -14,6 +14,7 @@ export type BridgeSession = {
 
 const DISABLED_SITES_KEY = "ackit:browser:disabledSites";
 const SITE_PREFS_PREFIX = "ackit:browser:site:";
+const PINNED_PREFIX = "ackit:browser:pinned:";
 const SESSION_KEY = "ackit:browser:session";
 const ENDPOINT_KEY = "ackit:browser:endpoint";
 
@@ -89,4 +90,32 @@ export async function clearBridgeSession(): Promise<void> {
 export async function getBridgeEndpoint(): Promise<string | null> {
   const obj = await chrome.storage.local.get(ENDPOINT_KEY);
   return (obj[ENDPOINT_KEY] as string | undefined) ?? null;
+}
+
+export function pinnedKey(host: string): string {
+  return `${PINNED_PREFIX}${host}`;
+}
+
+export async function getPinnedMap(host: string): Promise<Record<string, boolean>> {
+  const key = pinnedKey(host);
+  const obj = await chrome.storage.local.get(key);
+  const val = obj[key] as Record<string, boolean> | undefined;
+  return val ?? {};
+}
+
+export async function isPinned(host: string, turnId: string): Promise<boolean> {
+  const map = await getPinnedMap(host);
+  return map[turnId] === true;
+}
+
+export async function setPinned(host: string, turnId: string, pinned: boolean): Promise<void> {
+  const key = pinnedKey(host);
+  const map = await getPinnedMap(host);
+  if (pinned) map[turnId] = true;
+  else delete map[turnId];
+  await chrome.storage.local.set({ [key]: map });
+}
+
+export async function clearPinned(host: string): Promise<void> {
+  await chrome.storage.local.remove(pinnedKey(host));
 }

@@ -6,6 +6,7 @@ import type { AdapterHealth, CompactResult, NavItem, SiteAdapter, TurnInfo } fro
 // No hashed class names are used.
 
 const ACKIT_COLLAPSED_ATTR = "data-ackit-collapsed";
+const ACKIT_PINNED_ATTR = "data-ackit-pinned";
 const ACKIT_PLACEHOLDER_CLASS = "ackit-placeholder";
 
 export function createChatGptAdapter(): SiteAdapter {
@@ -204,6 +205,11 @@ export function createChatGptAdapter(): SiteAdapter {
       for (let i = 0; i < turns.length - opts.keepRecent; i++) {
         const turn = turns[i];
         if (!turn) continue;
+        // Pinned turns survive auto-compaction until explicitly unpinned
+        if (turn.element.getAttribute(ACKIT_PINNED_ATTR) === "true") {
+          already++;
+          continue;
+        }
         if (turn.element.getAttribute(ACKIT_COLLAPSED_ATTR) === "true") {
           already++;
           continue;

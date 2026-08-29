@@ -6,7 +6,7 @@ import { createClaudeAdapter } from "../adapters/claude/index.js";
 import { createGeminiAdapter } from "../adapters/gemini/index.js";
 import { createGithubAdapter } from "../adapters/github/index.js";
 import type { SiteAdapter } from "../adapters/types.js";
-import { isSiteDisabled } from "../lib/storage.js";
+import { getPinnedMap, isSiteDisabled, setPinned } from "../lib/storage.js";
 
 let activeAdapter: SiteAdapter | null = null;
 let disabledForHost = false;
@@ -29,6 +29,28 @@ function resolveAdapter(): SiteAdapter | null {
   return null;
 }
 
+async function applyPinnedState(): Promise<void> {
+  if (!activeAdapter) return;
+  try {
+    const pinned = await getPinnedMap(currentHost);
+    const turns = activeAdapter.enumerateTurns();
+    for (const t of turns) {
+      if (pinned[t.id] === true) {
+        t.element.setAttribute("data-ackit-pinned", "true");
+        // Visual marker for pinned
+        t.element.style.outline = "2px dashed #4a8";
+        t.element.style.outlineOffset = "2px";
+      } else {
+        if (t.element.getAttribute("data-ackit-pinned") === "true") {
+          t.element.removeAttribute("data-ackit-pinned");
+          t.element.style.outline = "";
+          t.element.style.outlineOffset = "";
+        }
+      }
+    }
+  } catch {}
+}
+
 async function init(): Promise<void> {
   const disabled = await isSiteDisabled(currentHost).catch(() => false);
   disabledForHost = disabled;
@@ -46,12 +68,19 @@ async function init(): Promise<void> {
   activeAdapter = adapter;
   setupListeners();
   setupSpaObserver();
+  await applyPinnedState();
 }
 
 function setupListeners(): void {
   chrome.runtime.onMessage.addListener((msg: unknown, _sender, sendResponse) => {
     (async () => {
-      const m = msg as { type?: string; text?: string; host?: string };
+      const m = msg as {
+        type?: string;
+        text?: string;
+        host?: string;
+        id?: string;
+        pinned?: boolean;
+      };
       if (m.type === "ackit:insert") {
         const text = m.text ?? "";
         if (!activeAdapter) {
@@ -71,6 +100,8 @@ function setupListeners(): void {
           sendResponse({ ok: false, error: "no adapter" });
           return;
         }
+        // Ensure pinned state is current before compact
+        await applyPinnedState();
         const keepRecent =
           typeof (m as { keepRecent?: number }).keepRecent === "number"
             ? (m as { keepRecent: number }).keepRecent
@@ -86,12 +117,52 @@ function setupListeners(): void {
       ) {
         try {
           activeAdapter?.restore();
-          activeAdapter?.disconnect();
+          // Emergency should also clear pending pinned visuals but keep storage for next init?
+          // For emergency, we clear pinned outlines visually but storage remains until explicit clear.
+          // Restore keeps pinned attributes (user wants them after restore) — so we re-apply pinned after restore.
+          if (m.type === "ackit:restore") {
+            await applyPinnedState();
+          } else {
+            // Emergency/site-disabled: remove pinned outlines as part of cleanup
+            for (const el of document.querySelectorAll<HTMLElement>("[data-ackit-pinned='true']")) {
+              el.removeAttribute("data-ackit-pinned");
+              el.style.outline = "";
+              el.style.outlineOffset = "";
+            }
+          }
+          if (m.type !== "ackit:restore") activeAdapter?.disconnect();
         } catch {}
         if (m.type === "ackit:emergency-disconnect" || m.type === "ackit:site-disabled") {
           disabledForHost = true;
         }
         sendResponse({ ok: true });
+        return;
+      }
+      if (m.type === "ackit:pin") {
+        const id = m.id ?? "";
+        const pinned = m.pinned ?? false;
+        if (!id || !activeAdapter) {
+          sendResponse({ ok: false, error: "missing id or adapter" });
+          return;
+        }
+        try {
+          await setPinned(currentHost, id, pinned);
+          await applyPinnedState();
+          sendResponse({ ok: true });
+        } catch (error) {
+          const msg = error instanceof Error ? error.message : String(error);
+          sendResponse({ ok: false, error: msg });
+        }
+        return;
+      }
+      if (m.type === "ackit:get-pinned") {
+        try {
+          const map = await getPinnedMap(currentHost);
+          sendResponse({ ok: true, pinned: map });
+        } catch (error) {
+          const msg = error instanceof Error ? error.message : String(error);
+          sendResponse({ ok: false, error: msg });
+        }
         return;
       }
       if (m.type === "ackit:health") {
@@ -101,7 +172,13 @@ function setupListeners(): void {
       }
       if (m.type === "ackit:navigate") {
         const items = activeAdapter?.navigator() ?? [];
-        sendResponse({ ok: true, items });
+        // Enrich with pinned state
+        let pinned: Record<string, boolean> = {};
+        try {
+          pinned = await getPinnedMap(currentHost);
+        } catch {}
+        const enriched = items.map((it) => ({ ...it, pinned: pinned[it.id] === true }));
+        sendResponse({ ok: true, items: enriched });
         return;
       }
       sendResponse({ ok: false, error: "unknown content message" });
@@ -131,6 +208,7 @@ function setupSpaObserver(): void {
     const health = next.healthCheck();
     if (!health.ok) return;
     activeAdapter = next;
+    await applyPinnedState();
   };
 
   // patch pushState/replaceState

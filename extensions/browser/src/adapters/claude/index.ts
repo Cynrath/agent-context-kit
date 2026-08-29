@@ -2,6 +2,7 @@ import type { AdapterHealth, CompactResult, NavItem, SiteAdapter, TurnInfo } fro
 
 export function createClaudeAdapter(): SiteAdapter {
   const ACKIT_COLLAPSED_ATTR = "data-ackit-collapsed";
+  const ACKIT_PINNED_ATTR = "data-ackit-pinned";
   const ACKIT_PLACEHOLDER_CLASS = "ackit-placeholder";
   let isPaused = false;
 
@@ -76,6 +77,7 @@ export function createClaudeAdapter(): SiteAdapter {
       for (let i = 0; i < turns.length - opts.keepRecent; i++) {
         const t = turns[i];
         if (!t) continue;
+        if (t.element.getAttribute(ACKIT_PINNED_ATTR) === "true") continue;
         if (t.element.getAttribute(ACKIT_COLLAPSED_ATTR) === "true") continue;
         if (t.element.contains(document.activeElement)) continue;
         t.element.setAttribute(ACKIT_COLLAPSED_ATTR, "true");

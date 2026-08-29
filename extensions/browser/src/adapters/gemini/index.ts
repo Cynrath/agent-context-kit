@@ -2,6 +2,7 @@ import type { AdapterHealth, CompactResult, NavItem, SiteAdapter, TurnInfo } fro
 
 export function createGeminiAdapter(): SiteAdapter {
   const ATTR = "data-ackit-collapsed";
+  const PINNED = "data-ackit-pinned";
   const PH = "ackit-placeholder";
   let paused = false;
 
@@ -64,6 +65,7 @@ export function createGeminiAdapter(): SiteAdapter {
       for (let i = 0; i < turns.length - opts.keepRecent; i++) {
         const t = turns[i];
         if (!t) continue;
+        if (t.element.getAttribute(PINNED) === "true") continue;
         if (t.element.getAttribute(ATTR) === "true") continue;
         if (t.element.contains(document.activeElement)) continue;
         t.element.setAttribute(ATTR, "true");
