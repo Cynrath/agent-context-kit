@@ -1,11 +1,11 @@
 ---
 id: "TASK-0054"
 title: "Browser Companion v0.3 — real Chrome E2E, provider validation and performance evidence"
-status: completed
+status: blocked
 schemaVersion: 2
 dependencies: ["TASK-0053"]
 createdAt: "2026-08-29"
-completedAt: 2026-08-29
+completedAt: null
 ---
 
 ## Purpose
@@ -117,6 +117,16 @@ Complete the missing Browser Companion runtime: Pin / Keep Visible, synthetic pe
 Revert pin + benchmark + MCP evidence files + adapter changes in one commit; prior reversible collapse remains.
 
 ## Completion notes
+
+> **PAUSED 2026-08-31 — GO REVOKED — Browser Companion development PAUSED by user direction**
+>
+> Per explicit user instruction, Browser Companion v0.3 development is now **PAUSED**. Previous `GO` restored in `274c340` (real 10-turn ChatGPT test, bridge NOT running: `Compact 8→2`, `Pin survives`, `SPA` recovery) is **revoked** for the purpose of release governance. Final state is **`NO-GO — PAUSED`** due to **unresolved real-user Compact failure**.
+>
+> **Unresolved real-user failure (release blocker):**
+>
+> Real user test — extension installed, Side Panel works, bridge intentionally **NOT running** (Disconnected and `Failed to fetch` are **expected**, not bugs) — still shows `0 turns detected` on real ChatGPT conversation and `Compact` does nothing. Despite `ea16de8` lifecycle fix (`WAITING_FOR_DOM` persistent watcher) and `274c340` selector update (`li._wdUoQG_messageTurn` / `ol[data-conversation-transcript]`), the user's environment reproduces 0 turns. Root cause not yet confirmed in that environment (selector variant, scroller, or stale installed build). This **must** be reproduced and fixed when development resumes via REQUIRED REAL TEST steps 1-23 (bridge NOT running, real long conversation, `Keep recent=2 → Compact → placeholders, Pin survives, SPA recovers, scroll/streaming/emergency`).
+>
+> **Actions for pause:** No further Browser Companion code changes; `feat/browser-companion-v0.3` preserved; PR #5 to be closed without deletion; separate maintenance branch/PR for generally applicable `AGENTS.md` hard rules only.
 
 > **CORRECTIVE AMENDMENT 2026-08-29 — BUG FIXED, NO-GO → GO RESTORED**
 >

@@ -1,11 +1,11 @@
 ---
 id: "TASK-0055"
 title: "Browser Companion v0.3 — final integration, full quality matrix and GO-NO-GO"
-status: completed
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0053", "TASK-0054"]
 createdAt: "2026-08-29"
-completedAt: 2026-08-29
+completedAt: null
 ---
 
 ## Purpose
@@ -101,6 +101,27 @@ Own the final Browser Companion v0.3 integration gate before GO. This task canno
 Revert CI workflow change + this task doc in one commit if GO not achieved.
 
 ## Completion notes
+
+> **PAUSED 2026-08-31 — GO REVOKED — Browser Companion development PAUSED by user direction**
+>
+> Per explicit user instruction, Browser Companion v0.3 development is now **PAUSED**. The previous `GO` (274c340, after ea16de8 + selector update + real 10-turn ChatGPT test with bridge NOT running) is **revoked**. Final decision is **`NO-GO — PAUSED`**.
+>
+> **Unresolved real-user Compact failure (release blocker, must be re-verified when development resumes):**
+>
+> Real user test with extension installed and Side Panel working, bridge intentionally **NOT running** (Disconnected and `Failed to fetch` for Evidence/Context are **expected**, not bugs), reported:
+>
+> `0 turns detected` on real ChatGPT conversation and `Compact` does nothing.
+>
+> Despite fixes in `ea16de8` (lifecycle `DETECTED → WAITING_FOR_DOM → HEALTHY → ACTIVE`, persistent 800ms + MutationObserver watcher, `candidateAdapter` kept) and `274c340` (selector update for current ChatGPT `li._wdUoQG_messageTurn` / `ol[data-conversation-transcript]` / `div.wm-app-threadContent` — verified via MCP with 10 `li` turns, `Compact 8→2`, `Pin survives`, `SPA waiting_for_dom → active without reload`), the **real-user environment still shows 0 turns**. This indicates either (a) the selector set is still incomplete for that user's ChatGPT variant/rollout, (b) the content script lifecycle/scroller is still failing in that specific long-conversation DOM, or (c) the installed extension in the user's profile is not the latest `274c340` build. This **must** be reproduced and fixed when development resumes via REQUIRED REAL TEST steps 1-23 (bridge NOT running, real long conversation, `Keep recent=2 → Compact → old turns collapsed with placeholders, last 2 visible, Pin survives, SPA recovers, scroll/streaming/emergency`).
+>
+> **Actions taken for pause:**
+>
+> - No further Browser Companion code changes in this commit (only task docs).
+> - PR #5 will be closed without merging and without deleting `feat/browser-companion-v0.3` (preserved for future work).
+> - A separate minimal maintenance branch/PR will be opened from `master` containing **only** the generally applicable `AGENTS.md` hard rules (task-first/evidence/quality-gate) introduced during this work — no Browser Companion implementation/tests/manifests/CI/tasks/architecture will be cherry-picked.
+> - `TASK-0054` and this task (`TASK-0055`) remain **NO-GO — PAUSED** until the real-user Compact failure is reproduced, fixed, and honestly re-verified.
+>
+> **Status change:** `completed → active`, `completedAt → null` to reflect that the integration gate is not complete while paused.
 
 > **CORRECTIVE AMENDMENT 2026-08-29 — BUG FIXED, NO-GO → GO RESTORED**
 >
@@ -235,9 +256,9 @@ No absolute local paths in evidence: all paths redacted to <local-path> via brid
 
 ### GO/NO-GO decision
 
-**GO** — all release blockers fixed and verified with real ChatGPT conversation, bridge NOT running (offline).
+**NO-GO — PAUSED** — Browser Companion development paused; unresolved real-user Compact failure (`0 turns detected` with bridge NOT running) remains.
 
-**Why GO (restored 2026-08-29, after ea16de8 + selector update + real 10-turn test):**
+**Why NO-GO (2026-08-31, PAUSED — supersedes GO restored 2026-08-29):**
 
 - Strict TypeScript restored and proven: `strict:true`, `noImplicitAny:true`, `no @ts-nocheck`, `DOM types` via `dom+dom.iterable`, browser tests and build covered, CI green on all matrices.
 - Browser Companion validation not bypassed: the fix separates Node vs Browser graphs and retains explicit strict checks for both, rather than blindly excluding files to make CI green.
