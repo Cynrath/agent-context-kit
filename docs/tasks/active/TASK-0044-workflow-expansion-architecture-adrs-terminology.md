@@ -1,11 +1,11 @@
 ---
 id: "TASK-0044"
 title: "workflow-expansion architecture: ADRs, terminology, threat model"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-08-31
 ---
 
 ## Purpose
@@ -40,11 +40,11 @@ Establish the accepted architecture, terminology, and security threat model for 
 
 ## Acceptance criteria
 
-- [ ] ADR-0025..0028 exist, are indexed, and cover every numbered requirement area of the expansion (workflow profiles §1, intent §2, spec/task refs §3, plan-first checks §4, evidence §5, verification §6, checkpoints §7, packs §8, drift §9, policy §10-§11, hooks §12, roles §13, skills §14, journal §15, verify/fix loop §16).
-- [ ] Each ADR states the invariant-preserving decision, the reuse-over-duplicate mapping to existing subsystems (tasks, policy packs, context packs, skills, MCP), and the backward-compatibility stance for legacy task documents and configs.
-- [ ] THREAT_MODEL.md gains the new threat rows with deterministic mitigations and named regression-surface owners (which future task's tests close each threat).
-- [ ] The terminology section defines every new term without marketing deferred features as shipped.
-- [ ] `node dist/cli/index.js doctor`, `node dist/cli/index.js task doctor`, and `node dist/cli/index.js scan --ci` pass after the document commits.
+- [x] ADR-0025..0028 exist, are indexed, and cover every numbered requirement area of the expansion (workflow profiles §1, intent §2, spec/task refs §3, plan-first checks §4, evidence §5, verification §6, checkpoints §7, packs §8, drift §9, policy §10-§11, hooks §12, roles §13, skills §14, journal §15, verify/fix loop §16).
+- [x] Each ADR states the invariant-preserving decision, the reuse-over-duplicate mapping to existing subsystems (tasks, policy packs, context packs, skills, MCP), and the backward-compatibility stance for legacy task documents and configs.
+- [x] THREAT_MODEL.md gains the new threat rows with deterministic mitigations and named regression-surface owners (which future task's tests close each threat).
+- [x] The terminology section defines every new term without marketing deferred features as shipped.
+- [x] `node dist/cli/index.js doctor`, `node dist/cli/index.js task doctor`, and `node dist/cli/index.js scan --ci` pass after the document commits.
 
 ## Test steps
 
@@ -68,4 +68,22 @@ Focused revert of the document commits; no runtime state exists yet.
 
 ## Completion notes
 
-(placeholder)
+- ADR-0025 (workflow profiles/stages/intent/additive task refs), ADR-0026 (evidence v2 +
+  verification protocol + verdicts), ADR-0027 (checkpoints/local workflow store/resume),
+  ADR-0028 (autonomy tiers/review policy/declarative gates/roles/skills projections)
+  authored and indexed in docs/decisions/README.md.
+- THREAT_MODEL.md extended with rows T16–T26 (workflow-state tamper, forged evidence,
+  forged verdict, ref traversal, stale checkpoint, id collision/cross-repo confusion,
+  manipulated git state, policy bypass, unsafe hook execution, metadata spoofing,
+  artifact leakage), each with deterministic mitigation + owning-task regression surface.
+- docs/architecture/overview.md gained the workflow-expansion module map and the
+  terminology section (intent, workflow profile, stage, required artifact, evidence,
+  verdict, checkpoint, resume/handoff pack, drift finding, autonomy tier, role contract,
+  execution journal).
+- Coverage map of the expansion prompt: §1-§4 → ADR-0025; §5-§6/§16 → ADR-0026; §7-§8/§15 →
+  ADR-0027; §10-§14/§12 → ADR-0028; §17 exclusions restated in ADR-0028 §6 + overview;
+  §18-§20 stances in ADR-0025 §5/§7; §21 = the new T16-T26 rows.
+- Validation evidence: `node dist/cli/index.js doctor` → all checks passed; `task doctor`
+  → task set integrity OK; `scan --ci` → readiness 88 ≥ 80 pass (same pre-existing
+  findings only, no new findings from these documents); `pnpm lint` 0 problems; `pnpm
+  format:check` clean (210 files checked).
