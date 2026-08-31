@@ -17,6 +17,7 @@ import { runScanCommand } from "./commands/scan.js";
 import { registerSkillsCommands } from "./commands/skills.js";
 import { runSummary } from "./commands/summary.js";
 import { registerTaskCommands } from "./commands/task.js";
+import { registerWorkflowCommands } from "./commands/workflow.js";
 import { runWorkspacesCommand } from "./commands/workspaces.js";
 import type { CliInvocation, GlobalOptions } from "./context.js";
 import { isUsageError } from "./errors.js";
@@ -144,6 +145,8 @@ function buildProgram(invocation: CliInvocation): Command {
   registerSkillsCommands(program, invocation);
 
   registerTaskCommands(program, invocation);
+
+  registerWorkflowCommands(program, invocation);
 
   const initCommand = program
     .command("init")

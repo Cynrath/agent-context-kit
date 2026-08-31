@@ -9,6 +9,7 @@ import { ackitConfigJsonSchema } from "../dist/core/config/json-schema.js";
 import { InstructionNodeSchema } from "../dist/core/instructions/types.js";
 import { POLICY_SCHEMA_VERSION, PolicyDocumentSchema } from "../dist/core/policy/index.js";
 import { TASK_SCHEMA_VERSION, TaskMetaSchema } from "../dist/core/tasks/index.js";
+import { WORKFLOW_SCHEMA_ID, WorkflowStateSchema } from "../dist/core/workflow/index.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const schemasDir = path.join(repoRoot, "schemas");
@@ -33,6 +34,18 @@ writeFileSync(
 writeFileSync(
   path.join(schemasDir, "policy.schema.json"),
   `${JSON.stringify(policySchema, null, 2)}\n`,
+  "utf8",
+);
+
+// workflow state (ackit.workflow.v1, ADR-0025)
+const workflowSchema = z.toJSONSchema(WorkflowStateSchema, {
+  io: "input",
+  unrepresentable: "any",
+});
+workflowSchema.$comment = `ACKit workflow state schema (${WORKFLOW_SCHEMA_ID}).`;
+writeFileSync(
+  path.join(schemasDir, "workflow.schema.json"),
+  `${JSON.stringify(workflowSchema, null, 2)}\n`,
   "utf8",
 );
 

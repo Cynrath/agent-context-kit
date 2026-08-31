@@ -94,6 +94,23 @@ export const AckitConfigSchema = z.object({
     })
     .strict()
     .optional(),
+  workflow: z
+    .object({
+      /** Default profile applied by `ackit workflow set` without --profile. */
+      defaultProfile: z.enum(["quick", "standard", "high-risk"]).optional(),
+      /** Require an independent verifier verdict for standard/high-risk. */
+      requireVerifier: z.boolean().optional(),
+      /** Per-profile requirement tuning (additive; stage orders stay fixed). */
+      profiles: z
+        .object({
+          requireEvidence: z.boolean().optional(),
+          requireVerdict: z.boolean().optional(),
+        })
+        .strict()
+        .optional(),
+    })
+    .strict()
+    .optional(),
 });
 
 export type AckitConfig = z.infer<typeof AckitConfigSchema>;

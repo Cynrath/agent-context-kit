@@ -248,6 +248,35 @@
         }
       },
       "additionalProperties": false
+    },
+    "workflow": {
+      "type": "object",
+      "properties": {
+        "defaultProfile": {
+          "type": "string",
+          "enum": [
+            "quick",
+            "standard",
+            "high-risk"
+          ]
+        },
+        "requireVerifier": {
+          "type": "boolean"
+        },
+        "profiles": {
+          "type": "object",
+          "properties": {
+            "requireEvidence": {
+              "type": "boolean"
+            },
+            "requireVerdict": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
     }
   },
   "required": [

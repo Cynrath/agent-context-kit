@@ -1,11 +1,11 @@
 ---
 id: "TASK-0045"
 title: "workflow core: profiles, stage machine, state store"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0044"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-08-31
 ---
 
 ## Purpose
@@ -44,12 +44,12 @@ Implement the first-class workflow engine core (ADR-0025): the three built-in pr
 
 ## Acceptance criteria
 
-- [ ] `ackit workflow set/show/advance/verify` work end-to-end on a fixture repository; state YAML is deterministic and strict-validated.
-- [ ] Stage transitions are validated: skipping stages or moving backwards without the explicit verify-fail rewind is rejected with `WORKFLOW_STAGE_INVALID`.
-- [ ] Required artifacts per profile resolve deterministically from the catalog + config overrides; missing artifacts block advancement with a structured finding.
-- [ ] Legacy configs and task documents without workflow state are unaffected (existing test suite green, no behavior change for `task` commands).
-- [ ] `schemas/workflow.schema.json` and regenerated `schemas/ackit.schema.json` committed and current (`pnpm gen:schemas` produces no diff).
-- [ ] Focused test suite passes with recorded pass counts (unit + integration).
+- [x] `ackit workflow set/show/advance/verify` work end-to-end on a fixture repository; state YAML is deterministic and strict-validated.
+- [x] Stage transitions are validated: skipping stages or moving backwards without the explicit verify-fail rewind is rejected with `WORKFLOW_STAGE_INVALID`.
+- [x] Required artifacts per profile resolve deterministically from the catalog + config overrides; missing artifacts block advancement with a structured finding.
+- [x] Legacy configs and task documents without workflow state are unaffected (existing test suite green, no behavior change for `task` commands).
+- [x] `schemas/workflow.schema.json` and regenerated `schemas/ackit.schema.json` committed and current (`pnpm gen:schemas` produces no diff).
+- [x] Focused test suite passes with recorded pass counts (unit + integration).
 
 ## Test steps
 
@@ -75,4 +75,27 @@ Focused revert of the workflow module + config/CLI commits; no migration needed 
 
 ## Completion notes
 
-(placeholder)
+- Implemented `src/core/workflow/` (types/profiles/store/validate/index): `ackit.workflow.v1`
+  strict state schema, three built-in profiles with canonical stage orders and per-stage
+  required artifacts, forward-only stage machine with the sanctioned verify-fail rewind,
+  per-task YAML state store under `.ackit/workflow/TASK-####/state.yaml` (task-id regex
+  validation before path construction, strict unknown-field rejection on load).
+- `ackit.yml` gained optional strict `workflow:` section (`defaultProfile`,
+  `requireVerifier`, `profiles.requireEvidence/requireVerdict`); `schemas/ackit.schema.json`
+  regenerated (+29 lines) and `schemas/workflow.schema.json` emitted via `pnpm gen:schemas`;
+  post-commit regeneration is diff-clean.
+- CLI: `ackit workflow show|set|advance|verify` registered in program.ts; advancement gates
+  on planning artifacts (task/intent/spec/plan presence); missing artifacts block with exit 1
+  and the `missing-required-artifact` diagnostic; evidence/verdict artifact presence is
+  deferred to the completion gate (TASK-0053) per ADR-0026 — stage advancement checks
+  planning artifacts only (documented in code).
+- Tests: `tests/unit/workflow/workflow.test.ts` 16/16 passed (catalog, transitions, tamper
+  rejection T16, traversal-safe ids, resolver wiring); `tests/integration/tasks/workflow-cli.test.ts`
+  4/4 passed (full CLI flow incl. verify-fail rewind + JSON output, unknown profile/task
+  refusals, quick-profile free advancement, legacy notice). Full suite: 69 files / 381
+  tests passed (no regressions; pre-task baseline was 381 across 69 files including the
+  new suites).
+- Gates: `pnpm typecheck` clean; `pnpm lint` 0 problems (219 files checked); `pnpm
+  format:check` clean; `pnpm build` ok; `pnpm gen:schemas` idempotent; `node dist/cli/index.js
+  doctor` all checks passed; `task doctor` integrity OK; `scan --ci` readiness 88 pass;
+  `git diff --check` clean.
