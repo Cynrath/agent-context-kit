@@ -81,6 +81,122 @@ git diff --check
 - User files are never overwritten without explicit intent flags (REQ-GOV-008).
 - Out-of-scope list is binding: no LLM APIs, vector DB, RAG, untrusted plugin execution, cloud services (REQ-GOV-009).
 
+## Hard Rules — Task-first, Evidence, and Quality Gates (generalized from corrective work; violation = NO-GO)
+
+These rules generalize durable lessons from multi-task corrective work. They apply to any non-trivial feature, bug fix, migration, architecture change, security change, or release work — not only browser work.
+
+### Rule 1 — TASK-FIRST IS MANDATORY
+
+For any non-trivial change: **no implementation code may be written before the corresponding ACKit task file exists and is fully planned.**
+
+The task must contain, before implementation begins:
+
+- Purpose
+- Scope
+- Out of scope
+- Dependencies
+- Affected files / expected areas
+- Acceptance criteria
+- Test steps
+- Security considerations where applicable
+- Risks
+- Rollback plan
+
+A title-only or placeholder task does **not** satisfy this rule.
+
+### Rule 2 — PLAN THE COMPLETE TASK CHAIN FIRST
+
+When a request clearly requires multiple dependent tasks:
+
+1. inspect the repository,
+2. determine the entire task breakdown,
+3. create every planned task,
+4. fully populate every task,
+5. verify dependencies,
+6. run task validation/doctor,
+7. only then begin implementation.
+
+### Rule 3 — TASK PLAN MUST PRECEDE IMPLEMENTATION IN GIT HISTORY
+
+For substantial feature work, the task plan must be committed before the implementation it governs.
+
+Preferred sequence:
+
+```text
+commit 1 — docs/tasks + ADR/spec/threat model required before implementation
+commit 2+ — implementation
+later commit — tests/evidence/task completion
+```
+
+### Rule 4 — NEVER FALSELY COMPLETE A TASK
+
+A task may only be marked `completed` when **every required acceptance criterion has actually passed**.
+
+Phrases that indicate NOT complete: `pending`, `deferred`, `next round`, `not tested`, `not verified`, `blocked`, `TODO`, `manual test required`, `will add later` — unless explicitly out of scope **before** implementation began.
+
+If mandatory validation is blocked: `status != completed`.
+
+### Rule 5 — EVIDENCE MUST MATCH REALITY
+
+Do not tick acceptance criteria because code appears to implement the requirement. Evidence must come from the required validation mechanism:
+
+- unit behavior → unit/contract test
+- browser/platform behavior → real browser/platform verification (not static inspection)
+- CI requirement → successful CI run
+- performance claim → benchmark/trace
+- cross-platform requirement → actual required platform matrix
+
+### Rule 6 — NO QUALITY-GATE BYPASS
+
+Do not make tests/typecheck/lint pass by weakening the gate. Prohibited unless explicitly approved and technically justified:
+
+```text
+// @ts-nocheck
+// @ts-ignore
+broad @ts-expect-error
+strict: false
+noImplicitAny: false
+eslint/biome global ignore disabling
+skip tests / remove assertions / turn failures into warnings
+```
+
+Fix the underlying defect. A green gate obtained by disabling the gate is not evidence.
+
+### Rule 7 — STRICT TYPESCRIPT WHERE APPLICABLE
+
+New TypeScript subsystems should preserve `strict: true` and `noImplicitAny: true` unless an accepted ADR explicitly states otherwise. Prefer real API types (e.g., `@types/chrome`, `@types/node`) over `any` and keep unavoidable boundaries narrow and documented.
+
+### Rule 8 — PERFORMANCE CLAIMS REQUIRE MEASUREMENTS
+
+Do not claim `faster`, `less DOM pressure`, `lower layout cost`, `better responsiveness` without measured evidence. Record where available: input counts, output counts, timing breakdown (scripting/style/layout/paint), heap/memory, trace config, browser/version, fixture size. Distinguish synthetic vs live-site measurements.
+
+### Rule 9 — DO NOT HIDE PROCESS VIOLATIONS
+
+If task-first or evidence rules were violated: document the violation, create corrective work, fix the process, continue forward. Do not rewrite git history merely to make it appear that the correct process happened.
+
+### Rule 10 — COMPLETION ORDER
+
+Before a task is marked complete:
+
+```text
+implementation
+→ focused tests
+→ full affected test suite
+→ lint/format/typecheck/build
+→ security/offline gates
+→ required runtime/manual checks
+→ evidence recorded
+→ acceptance criteria checked
+→ task completion notes
+→ status completed
+```
+
+Never reverse this sequence.
+
+### Rule 11 — FINAL FEATURE GO GATE
+
+A multi-task feature cannot receive final GO while any child task has: missing acceptance evidence, pending tests, deferred mandatory scope, TODOs, disabled quality gates, unresolved security findings, failed live verification, or missing CI evidence.
+
 ## Legacy v1 notes
 
 The C#/.NET implementation was removed from this branch (TASK-0267). Historical v1 evidence lives in git history and `docs/tasks/archive/`; the published v1 NuGet line (`1.0.0-rc.1`) is immutable legacy. Do not reference deleted v1 scripts (`scripts/check-package-metadata.ps1`, `verify-release.ps1`, `.codex/*`) — they no longer exist.
