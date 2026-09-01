@@ -5,6 +5,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
+import { CHECKPOINT_SCHEMA_ID, CheckpointSchema } from "../dist/core/checkpoint/index.js";
 import { ackitConfigJsonSchema } from "../dist/core/config/json-schema.js";
 import { InstructionNodeSchema } from "../dist/core/instructions/types.js";
 import { INTENT_SCHEMA_ID, IntentMetaSchema } from "../dist/core/intent/index.js";
@@ -93,6 +94,18 @@ const instructionGraphSchema = {
 writeFileSync(
   path.join(schemasDir, "instruction-graph.schema.json"),
   `${JSON.stringify(instructionGraphSchema, null, 2)}\n`,
+  "utf8",
+);
+
+// checkpoint (ackit.checkpoint.v1, ADR-0027)
+const checkpointSchema = z.toJSONSchema(CheckpointSchema, {
+  io: "input",
+  unrepresentable: "any",
+});
+checkpointSchema.$comment = `ACKit checkpoint schema (${CHECKPOINT_SCHEMA_ID}).`;
+writeFileSync(
+  path.join(schemasDir, "checkpoint.schema.json"),
+  `${JSON.stringify(checkpointSchema, null, 2)}\n`,
   "utf8",
 );
 console.log("schemas/ackit+task+policy+instruction-graph schemas written");

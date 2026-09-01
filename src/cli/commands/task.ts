@@ -233,6 +233,22 @@ export function registerTaskCommands(program: Command, invocation: CliInvocation
         );
       });
   }
+  taskCommand
+    .command("resume")
+    .description("print the deterministic resume context for a checkpointed task")
+    .argument("<id>")
+    .action(async (id: string) => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const { runTaskResume } = await import("./checkpoint.js");
+      invocation.exitCode = await runTaskResume(
+        {
+          root: parentOptions.root,
+          json: parentOptions.json ?? false,
+          quiet: parentOptions.quiet ?? false,
+        },
+        id,
+      );
+    });
   for (const sub of ["start", "complete", "archive"] as const) {
     taskCommand
       .command(sub)

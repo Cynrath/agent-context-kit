@@ -4,6 +4,7 @@ import { emitDiagnostic } from "../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../shared/exit-codes.js";
 import { getPackageIdentity } from "../shared/version.js";
 import { runCacheCleanCommand } from "./commands/cache.js";
+import { registerCheckpointCommands } from "./commands/checkpoint.js";
 import { runConfigCheck } from "./commands/config.js";
 import { runDoctorCommand } from "./commands/doctor.js";
 import { runHooksCommand } from "./commands/hooks.js";
@@ -150,6 +151,8 @@ function buildProgram(invocation: CliInvocation): Command {
   registerWorkflowCommands(program, invocation);
 
   registerIntentCommands(program, invocation);
+
+  registerCheckpointCommands(program, invocation);
 
   const initCommand = program
     .command("init")

@@ -1,11 +1,11 @@
 ---
 id: "TASK-0048"
 title: "checkpoint model and resume/handoff"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0045", "TASK-0047"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -36,11 +36,11 @@ Implement deterministic task checkpoints and resumability (ADR-0027, §7): long-
 
 ## Acceptance criteria
 
-- [ ] Checkpoint create/show/validate/export work end-to-end; files are strict-validated, deterministic, and contained under `.ackit/workflow/`.
-- [ ] Resume context renders completed vs pending work correctly from real task bodies and states the exact recorded next action; output is stable across processes with no conversation dependence (provider-switch scenario test passes).
-- [ ] `STALE_CHECKPOINT` detection works when git state moved past the recorded head/changed set; git-unavailable is an explicit advisory, never a fabricated state.
-- [ ] No secret-shaped values or absolute machine paths in any checkpoint/resume/handoff output (secret gate + scrubber applied).
-- [ ] `schemas/checkpoint.schema.json` committed and current; mandated resume + provider-switch scenario tests pass with recorded counts.
+- [x] Checkpoint create/show/validate/export work end-to-end; files are strict-validated, deterministic, and contained under `.ackit/workflow/`.
+- [x] Resume context renders completed vs pending work correctly from real task bodies and states the exact recorded next action; output is stable across processes with no conversation dependence (provider-switch scenario test passes).
+- [x] `STALE_CHECKPOINT` detection works when git state moved past the recorded head/changed set; git-unavailable is an explicit advisory, never a fabricated state.
+- [x] No secret-shaped values or absolute machine paths in any checkpoint/resume/handoff output (secret gate + scrubber applied).
+- [x] `schemas/checkpoint.schema.json` committed and current; mandated resume + provider-switch scenario tests pass with recorded counts.
 
 ## Test steps
 
@@ -65,4 +65,30 @@ Focused revert; additive module (`.ackit/` state is disposable by design).
 
 ## Completion notes
 
-(placeholder)
+- Implemented `src/core/checkpoint/` (types/store/extract/validate/resume/index):
+  `ackit.checkpoint.v1` strict schema; per-task store under
+  `.ackit/workflow/TASK-####/checkpoints/CP-####.yaml` (sequential ids, atomic writes,
+  task-id regex before path construction, strict validation on read); deterministic
+  extraction of completed/pending work from checkbox sections and decisions/failures/
+  blockers from task-doc sections; git snapshot (short HEAD + changed areas) with explicit
+  `gitUnavailable` marker when git is missing (never fabricated).
+- Staleness detection: `STALE_CHECKPOINT` when the recorded head is unreachable from current
+  HEAD (merge-base check) or a recorded changed-set next-action path vanished from the
+  current working state (prefix-aware: git porcelain collapses untracked dirs). Future
+  target paths (not yet in the changed set) are correctly NOT stale — tested both ways.
+  Git-unavailable → `CHECKPOINT-GIT-UNAVAILABLE` advisory.
+- Renderers: `renderResumeContext` (concise deterministic resume block) and
+  `renderHandoffPack` (self-contained pack incl. full task doc); both run the canonical
+  secret gate over their output; byte-determinism asserted by test.
+- CLI: `ackit checkpoint create|show|validate|export` + `ackit task resume <id>`
+  (registered in program.ts). Export `--out` rejects traversal/absolute/backslash paths
+  with exit 4 (`securityBoundary`) — reject-not-sanitize semantics; stdout mode prints the
+  pack. JSON report shape `ackit.checkpoint-report.v1`.
+- `schemas/checkpoint.schema.json` emitted and committed; `pnpm gen:schemas` idempotent.
+- Mandated scenario tests both green: RESUME (partial work → checkpoint → fresh
+  process/render → exact recorded next action incl. path/command/expected result) and
+  PROVIDER SWITCH (agent A checkpoint → fresh store instances → identical state, no
+  conversation dependence). Unit 10/10 + CLI integration 2/2.
+- Full suite: 74 files / 415 tests passed. Gates: typecheck clean; lint 0 problems
+  (239 files); format:check clean; doctor + task doctor OK; offline-egress unaffected
+  (no new egress primitives — checkpoint module is pure fs/git).
