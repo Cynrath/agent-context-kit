@@ -1,11 +1,11 @@
 ---
 id: "TASK-0046"
 title: "intent first-class artifact: schema, store, CLI"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0044", "TASK-0045"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -38,10 +38,10 @@ Implement the normalized, provider-independent Intent contract (ADR-0025/0027): 
 
 ## Acceptance criteria
 
-- [ ] `ackit intent new/list/show/validate/fingerprint` work on a fixture repository; documents are strict-validated with unknown-field rejection.
+- [x] `ackit intent new/list/show/validate/fingerprint` work on a fixture repository; documents are strict-validated with unknown-field rejection.
 - [x] Fingerprint is byte-stable across directory renames (machine-path independence) and normalizes identical content with formatting differences to the same value.
 - [x] Secret-shaped intent content is rejected at validation and never enters emitted surfaces.
-- [ ] `schemas/intent.schema.json` committed and current.
+- [x] `schemas/intent.schema.json` committed and current.
 - [x] No intent document is required for quick-profile tasks (no behavior change without opt-in).
 
 ## Test steps
