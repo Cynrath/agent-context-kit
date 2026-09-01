@@ -218,6 +218,10 @@ const SECTION_KEYS: Record<string, readonly string[]> = {
   workspaces: ["enabled"],
   profiles: ["extend"],
   readiness: ["weights", "strictThreshold"],
+  // Workflow expansion (ADR-0025/0028): additive section keys.
+  workflow: ["defaultProfile", "requireVerifier", "profiles"],
+  autonomy: ["tier0", "tier1", "tier2", "tier3", "tier4"],
+  review: ["required", "blockingSeverity"],
 };
 
 const ROOT_KEYS = [
@@ -235,6 +239,10 @@ const ROOT_KEYS = [
   "profile",
   "profiles",
   "readiness",
+  // Workflow expansion (ADR-0025/0028): additive root sections.
+  "workflow",
+  "autonomy",
+  "review",
 ];
 
 /**

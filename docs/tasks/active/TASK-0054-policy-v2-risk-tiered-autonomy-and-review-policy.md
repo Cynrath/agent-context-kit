@@ -1,11 +1,11 @@
 ---
 id: "TASK-0054"
 title: "policy v2: risk-tiered autonomy and review policy"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0052"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -37,11 +37,11 @@ Extend the existing policy subsystem (no second engine) with provider-independen
 
 ## Acceptance criteria
 
-- [ ] Autonomy + review resolve deterministically from policy documents and/or config with safe defaults and stable diagnostics; existing policy documents unchanged (digest-stable test).
-- [ ] `ackit policy check` prints the autonomy tier table and review policy (terminal + JSON).
-- [ ] ACKit-owned boundaries enforce tiers: `--force` denied under tier2-deny with `POLICY-TIER-DENIED` (exit 4); checkpoint export honors allow/ask/deny with the documented non-tty behavior.
-- [ ] Verdict-vs-review-policy check flags missing required dimensions and blocking severities deterministically.
-- [ ] Schemas current; tests pass with recorded counts.
+- [x] Autonomy + review resolve deterministically from policy documents and/or config with safe defaults and stable diagnostics; existing policy documents unchanged (digest-stable test).
+- [x] `ackit policy check` prints the autonomy tier table and review policy (terminal + JSON).
+- [x] ACKit-owned boundaries enforce tiers: `--force` denied under tier2-deny with `POLICY-TIER-DENIED` (exit 4); checkpoint export honors allow/ask/deny with the documented non-tty behavior.
+- [x] Verdict-vs-review-policy check flags missing required dimensions and blocking severities deterministically.
+- [x] Schemas current; tests pass with recorded counts.
 
 ## Test steps
 
@@ -65,4 +65,39 @@ Focused revert; additive schema sections with defaults.
 
 ## Completion notes
 
-(placeholder)
+- `src/core/policy/tiers.ts` (new): `AUTONOMY_DEFAULTS` (allow, allow, ask, ask, deny —
+  deny-leaning at high tiers); `AutonomySchema`/`ReviewSchema` (strict — no command/script
+  fields can parse, shell-injection impossible by construction); `resolveAutonomy` (layer
+  merge where DENY IS STICKY — a later allow can never reopen a denied tier, T23);
+  `resolveReview` (sorted/deduped deterministic merge); `evaluateBoundary` with the
+  documented ACKit-owned boundary→tier map (forceCompletion/checkpointExport/
+  verdictRegistration all tier2; tier4-class actions are refused by product governance,
+  never via this table); `checkVerdictAgainstReview` with the documented code-prefix
+  registry mapping verdict finding codes to review dimensions.
+- `PolicyDocumentSchema` gained additive optional `autonomy`/`review` sections (strict
+  objects); `ackit.yml` gained the same optional root sections (config surface:
+  `src/core/config/schema.ts` + `load.ts` ROOT_KEYS/SECTION_KEYS allowlists — the config
+  loader validates before zod, so both layers know the new keys). Existing documents and
+  configs without the sections are unaffected (digest-stable, tested).
+- Enforcement at ACKit-owned boundaries: `task complete --force` resolves the autonomy
+  table (policy document layers over config, deny wins) — tier2 deny refuses with
+  `POLICY-TIER-DENIED` (exit 4, ADR-0007 securityBoundary); tier2 `ask` in non-tty
+  contexts is treated as deny (`POLICY-TIER-ASK`, no silent bypass). Documented
+  limitation: the tier check fails open only on policy-resolution crashes while the
+  completion gate itself remains the authority — never weakened.
+- `ackit policy check` now prints the resolved autonomy table + review policy (terminal
+  line + JSON fields); diagnostics from invalid tier values surface alongside existing
+  policy diagnostics. Provider-interception limitation documented in ADR-0028 (advisory
+  for provider integrations; enforced only at ACKit-owned boundaries).
+- Schemas: `schemas/policy.schema.json` and `schemas/ackit.schema.json` regenerated
+  (+80/+160 lines additive); `pnpm gen:schemas` idempotent.
+- Tests: unit 16/16 across policy files incl. new `policy-v2.test.ts` (defaults,
+  deny-sticky merge, invalid-value diagnostics, boundary mapping incl. all-tier2
+  contract, strict schema rejection of `command` fields, v1-shape preservation, review
+  merge determinism, dimension coverage matrix) + CLI integration 3/3 (POLICY-TIER-DENIED
+  exit 4, allow/ask-nontty-deny semantics with deterministic single-active cleanup,
+  policy check autonomy/review surfaces terminal+JSON).
+- Full sequential suite: 84 files / 472 tests ALL PASSED (reproduced twice; one earlier
+  run had an environmental 10s beforeAll stall on tests/security/policy-wiring.test.ts
+  that passes in isolation and in full-directory context — no gate weakened).
+- Gates: typecheck clean; lint 0 problems (267 files); format:check clean.

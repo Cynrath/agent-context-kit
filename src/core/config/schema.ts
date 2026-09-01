@@ -111,6 +111,40 @@ export const AckitConfigSchema = z.object({
     })
     .strict()
     .optional(),
+  // Policy v2 (ADR-0028 §1/§2): risk-tiered autonomy + review policy as
+  // optional config sections — repositories can express them without a full
+  // policy document. Additive; existing configs unaffected.
+  autonomy: z
+    .strictObject({
+      tier0: z.enum(["allow", "ask", "deny"]).optional(),
+      tier1: z.enum(["allow", "ask", "deny"]).optional(),
+      tier2: z.enum(["allow", "ask", "deny"]).optional(),
+      tier3: z.enum(["allow", "ask", "deny"]).optional(),
+      tier4: z.enum(["allow", "ask", "deny"]).optional(),
+    })
+    .optional(),
+  review: z
+    .strictObject({
+      required: z
+        .array(
+          z.enum([
+            "correctness",
+            "regression",
+            "security",
+            "tests",
+            "architecture",
+            "plan-compliance",
+            "documentation",
+          ]),
+        )
+        .max(7)
+        .optional(),
+      blockingSeverity: z
+        .array(z.enum(["critical", "high", "medium"]))
+        .max(3)
+        .optional(),
+    })
+    .optional(),
 });
 
 export type AckitConfig = z.infer<typeof AckitConfigSchema>;

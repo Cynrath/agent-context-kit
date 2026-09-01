@@ -121,6 +121,14 @@ export async function runTaskCommand(
         const { id } = args as { id: string };
         let warnings: string[] = [];
         if (subcommand === "complete") {
+          // Policy v2 (ADR-0028 §1): --force is an ACKit-owned tier2 boundary
+          // (controlled state change past the gate). A resolved tier2 deny
+          // refuses the override outright (exit 4, POLICY-TIER-DENIED); ask in
+          // a non-tty context is treated as deny (no silent bypass).
+          if (base.force === true) {
+            const tierCheck = await checkForceCompletionTier(base);
+            if (tierCheck !== null) return tierCheck;
+          }
           const result = await store.complete(id, { force: base.force });
           warnings = result.warnings;
           if (!base.quiet && warnings.length > 0) {
@@ -164,6 +172,69 @@ function emitTaskJson(command: string, payload: Record<string, unknown>): void {
   process.stdout.write(
     `${JSON.stringify({ schemaVersion: TASK_REPORT_SCHEMA_VERSION, tool: "ackit", command: `task ${command}`, ...payload }, null, 2)}\n`,
   );
+}
+
+/**
+ * Policy v2 tier enforcement for `task complete --force` (ADR-0028 §1):
+ * resolves the autonomy table from policy documents + config (deny wins) and
+ * refuses the override under tier2 deny. `ask` in a non-tty context is treated
+ * as deny — no silent bypass. Returns an exit code to emit, or null to
+ * continue with the force attempt.
+ */
+async function checkForceCompletionTier(base: {
+  root?: string | undefined;
+  config?: string | undefined;
+  quiet: boolean;
+  debug?: boolean | undefined;
+}): Promise<ExitCodeValue | null> {
+  try {
+    const rootPath = path.resolve(base.root ?? process.cwd());
+    const { loadAckitConfig } = await import("../../core/config/index.js");
+    const { resolveAutonomy, evaluateBoundary, resolvePolicy } = await import(
+      "../../core/policy/index.js"
+    );
+    const configResult = await loadAckitConfig(rootPath, { configPath: base.config });
+    const layers: unknown[] = [];
+    if (configResult.ok) {
+      const resolvedPolicy = await resolvePolicy(
+        { canonicalPath: rootPath },
+        { entryFiles: configResult.config.policy.extends },
+      );
+      for (const document of resolvedPolicy.documents) {
+        const doc = document as { autonomy?: unknown };
+        layers.push(doc.autonomy);
+      }
+      layers.push(configResult.config.autonomy);
+    }
+    const { autonomy } = resolveAutonomy(layers);
+    const evaluation = evaluateBoundary("forceCompletion", autonomy);
+    if (evaluation.decision === "deny") {
+      emitDiagnostic(
+        {
+          code: "POLICY-TIER-DENIED",
+          message: `--force refused: ${evaluation.reason} (POLICY-TIER-DENIED)`,
+        },
+        { quiet: base.quiet, debug: base.debug ?? false },
+      );
+      return EXIT_CODES.securityBoundary;
+    }
+    if (evaluation.decision === "ask" && process.stdout.isTTY !== true) {
+      emitDiagnostic(
+        {
+          code: "POLICY-TIER-ASK",
+          message: `--force requires interactive confirmation: ${evaluation.reason}; non-interactive contexts treat ask as deny`,
+        },
+        { quiet: base.quiet, debug: base.debug ?? false },
+      );
+      return EXIT_CODES.securityBoundary;
+    }
+    return null;
+  } catch {
+    // Policy resolution failures never crash the completion path; the gate
+    // itself remains the authority (fail-open on the TIER CHECK only, never on
+    // the completion gate — documented limitation).
+    return null;
+  }
 }
 
 /**
