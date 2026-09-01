@@ -141,9 +141,13 @@ export class TaskStore {
   }
 
   /**
-   * Completion gate (REQ-TASKS-004): unchecked acceptance items, placeholder
-   * completion notes, or non-completed dependencies block completion.
-   * --force overrides with an explicit warning banner in CLI output.
+   * Completion gate (REQ-TASKS-004 + ADR-0026 §5/§16): unchecked acceptance
+   * items, placeholder completion notes, or non-completed dependencies block
+   * completion. WORKFLOW-ENABLED tasks (state file present) additionally gate
+   * on evidence completeness, verdict requirements, stage, verification
+   * attempts, and blocking drift — `VERIFY failed → completed` is structurally
+   * impossible for them. --force overrides with an explicit warning banner;
+   * legacy tasks keep the exact pre-expansion behavior.
    */
   async complete(
     id: string,
@@ -166,6 +170,10 @@ export class TaskStore {
       else if (depFound.doc.meta.status !== "completed")
         blockers.push(`dependency '${dep}' is not completed`);
     }
+    // Workflow gate (ADR-0026 §5/§16): ONLY for workflow-enabled tasks —
+    // legacy tasks are untouched. Blockers compose deterministically.
+    const workflowBlockers = await this.workflowCompletionBlockers(id, found.doc);
+    blockers.push(...workflowBlockers);
     if (blockers.length > 0) {
       if (options.force !== true) {
         throw new Error(`completion gate blocked: ${blockers.join("; ")}`);
@@ -174,6 +182,158 @@ export class TaskStore {
     }
     await this.writeStatus(found.doc, "completed", new Date().toISOString().slice(0, 10));
     return { forced: options.force === true, warnings };
+  }
+
+  /**
+   * Deterministic workflow completion blockers for a workflow-enabled task
+   * (ADR-0026 §5/§16). Empty for legacy tasks (no state file). Never throws
+   * for reportable cases.
+   */
+  private async workflowCompletionBlockers(id: string, doc: TaskDoc): Promise<string[]> {
+    const blockers: string[] = [];
+    const { WorkflowStore } = await import("../workflow/index.js");
+    const { resolveRepositoryRoot } = await import("../filesystem/root.js");
+    const resolved = await resolveRepositoryRoot(this.repositoryRoot);
+    if (!resolved.ok) return blockers;
+    const workflowStore = new WorkflowStore(resolved.root);
+    const wf = await workflowStore.load(id);
+    if (wf === null) return blockers; // legacy task — no workflow gate
+    const { getProfile } = await import("../workflow/index.js");
+    const profile = getProfile(wf.profile);
+
+    // 1. Evidence completeness (ADR-0026 §5): every criterion verified with
+    //    qualifying evidence when the profile requires evidence.
+    if (profile.requiresEvidence) {
+      const { EvidenceStore, validateEvidence } = await import("../evidence/index.js");
+      const evidenceStore = new EvidenceStore(resolved.root);
+      const registry = await evidenceStore.load(id);
+      if (registry === null) {
+        blockers.push(
+          "MISSING_REQUIRED_ARTIFACT: no evidence registry (run 'ackit evidence sync')",
+        );
+      } else {
+        for (const problem of validateEvidence(registry).problems) {
+          blockers.push(`${problem.code}: ${problem.message}`);
+        }
+      }
+    }
+
+    // 2. Verifier verdict (ADR-0026 §4): profile requires an independent
+    //    verdict; latest must be PASS-family with zero blocking findings.
+    if (profile.requiresVerdict) {
+      const { VerdictStore } = await import("../verification/index.js");
+      const verdicts = new VerdictStore(this.repositoryRoot);
+      const latest = await verdicts.latest(id);
+      if (latest === null) {
+        blockers.push(
+          "MISSING_VERIFIER_VERDICT: profile '" +
+            wf.profile +
+            "' requires an independent verdict (run 'ackit verification bundle' + record)",
+        );
+      } else if (
+        latest.verdict === "REWORK_REQUIRED" ||
+        latest.verdict === "BLOCKED" ||
+        latest.findings.some((f) => f.severity === "blocking")
+      ) {
+        blockers.push(
+          `VERDICT_BLOCKING: latest verdict ${latest.id} is ${latest.verdict} with blocking findings`,
+        );
+      }
+    }
+
+    // 3. Stage (ADR-0025 §3): completion requires the profile's completion
+    //    stage or later (verify/fix loop may have rewound to implement).
+    const stageIndex = profile.stages.indexOf(wf.stage);
+    const completionIndex = profile.stages.indexOf(profile.completionStage);
+    if (stageIndex < completionIndex) {
+      blockers.push(
+        `WORKFLOW_STAGE_INVALID: stage '${wf.stage}' is before completion stage '${profile.completionStage}'`,
+      );
+    }
+
+    // 4. Verification attempts (ADR-0026 §16): the latest recorded attempt
+    //    must not be an unresolved failure.
+    const latestAttempt = wf.verificationAttempts[wf.verificationAttempts.length - 1];
+    if (latestAttempt !== undefined && latestAttempt.outcome === "fail") {
+      blockers.push(
+        "VERIFICATION_ATTEMPT_FAILED: latest verification attempt failed; record a pass after fixing",
+      );
+    }
+
+    // 5. Blocking drift findings (ADR-0026 §5): unplanned high-risk scope
+    //    changes and unmet dependencies block completion. Composed from the
+    //    same deterministic drift core (`detectWorkflowDrift`) — no second
+    //    engine.
+    try {
+      const { detectWorkflowDrift } = await import("../drift/index.js");
+      const { BUILTIN_PROFILES } = await import("../workflow/index.js");
+      const { EvidenceStore } = await import("../evidence/index.js");
+      const { VerdictStore } = await import("../verification/index.js");
+      const { CheckpointStore } = await import("../checkpoint/index.js");
+      const { changedFiles } = await import("../git/git.js");
+      const evidence = await new EvidenceStore(resolved.root).load(id);
+      const verdicts = new VerdictStore(this.repositoryRoot);
+      const latest = await verdicts.latest(id);
+      const checkpoints = new CheckpointStore(resolved.root, this.repositoryRoot);
+      const checkpoint = await checkpoints.latest(id);
+      const metaExtra = doc.meta as {
+        specRefs?: string[] | undefined;
+        decisionRefs?: string[] | undefined;
+        planRef?: string | undefined;
+      };
+      const refPaths = [
+        ...(metaExtra.specRefs ?? []),
+        ...(metaExtra.decisionRefs ?? []),
+        ...(metaExtra.planRef !== undefined ? [metaExtra.planRef] : []),
+      ];
+      const referencePathsExist: string[] = [];
+      for (const ref of refPaths) {
+        try {
+          await fsp.access(path.resolve(this.repositoryRoot, ...ref.split("/")));
+          referencePathsExist.push(ref);
+        } catch {
+          // absent — drift flags it
+        }
+      }
+      const dependencies: { id: string; completed: boolean }[] = [];
+      for (const dep of doc.meta.dependencies) {
+        const depFound = await this.find(dep);
+        dependencies.push({ id: dep, completed: depFound?.doc.meta.status === "completed" });
+      }
+      let gitChanged: string[] = [];
+      try {
+        gitChanged = changedFiles(this.repositoryRoot);
+      } catch {
+        gitChanged = [];
+      }
+      const requiredForStage =
+        BUILTIN_PROFILES[wf.profile].requiredArtifactsByStage[wf.stage] ?? [];
+      const findings = detectWorkflowDrift({
+        taskId: id,
+        taskDoc: doc,
+        workflow: { profile: wf.profile, stage: wf.stage },
+        requiredArtifacts: requiredForStage,
+        existingArtifacts: ["task", ...(evidence !== null ? ["evidence"] : [])],
+        referencePathsExist,
+        evidence,
+        latestVerdict: latest !== null ? { verdict: latest.verdict } : null,
+        checkpoint,
+        checkpointProblems: [],
+        changedFiles: gitChanged,
+        dependencies,
+      });
+      for (const finding of findings) {
+        if (finding.severity === "blocking") {
+          blockers.push(`${finding.code}: ${finding.detail}`);
+        }
+      }
+    } catch {
+      // Drift composition is best-effort in the completion path: a failure to
+      // assemble inputs never blocks completion by accident (the dedicated
+      // `ackit drift check` command reports the full picture).
+    }
+    void doc;
+    return blockers;
   }
 
   async archive(id: string): Promise<string> {

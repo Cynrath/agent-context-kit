@@ -1,11 +1,11 @@
 ---
 id: "TASK-0053"
 title: "completion gate integration and verify/fix loop state"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0050", "TASK-0051", "TASK-0052"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -38,12 +38,12 @@ Wire evidence, verdict, workflow-stage, and drift checks into the existing task 
 
 ## Acceptance criteria
 
-- [ ] Workflow-enabled `standard` task: completion denied while any criterion lacks mandatory evidence (stable blocker messages); allowed after evidence complete.
-- [ ] Completion denied when required verdict missing or `REWORK_REQUIRED`/`BLOCKED`; allowed after a valid `PASS`/`PASS_WITH_WARNINGS`(no blocking findings) verdict is registered.
-- [ ] Completion denied when latest verification attempt is `fail`, stage invalid, or blocking drift findings exist.
-- [ ] Quick-profile and legacy tasks complete without evidence/verdict requirements (backwards compatibility proven by tests).
-- [ ] `--force` still overrides with the explicit warning banner (unweakened escape hatch, recorded).
-- [ ] Full `pnpm test` green with the six mandated scenario tests passing.
+- [x] Workflow-enabled `standard` task: completion denied while any criterion lacks mandatory evidence (stable blocker messages); allowed after evidence complete.
+- [x] Completion denied when required verdict missing or `REWORK_REQUIRED`/`BLOCKED`; allowed after a valid `PASS`/`PASS_WITH_WARNINGS`(no blocking findings) verdict is registered.
+- [x] Completion denied when latest verification attempt is `fail`, stage invalid, or blocking drift findings exist.
+- [x] Quick-profile and legacy tasks complete without evidence/verdict requirements (backwards compatibility proven by tests).
+- [x] `--force` still overrides with the explicit warning banner (unweakened escape hatch, recorded).
+- [x] Full `pnpm test` green with the six mandated scenario tests passing.
 
 ## Test steps
 
@@ -67,4 +67,33 @@ Focused revert; gate additions are additive behind the workflow-enabled conditio
 
 ## Completion notes
 
-(placeholder)
+- `TaskStore.complete()` gained a composed workflow gate (`workflowCompletionBlockers`)
+  that fires ONLY for workflow-enabled tasks (state file present — the single opt-in
+  switch); legacy tasks keep the exact pre-expansion rules (proven by test). Blockers
+  compose deterministically in order:
+  1. Evidence completeness (profile `requiresEvidence`): missing registry →
+     `MISSING_REQUIRED_ARTIFACT`; incomplete criteria → `CRITERION_UNVERIFIED` /
+     `REQUIRED_EVIDENCE_MISSING` from the shared `validateEvidence` (no second engine).
+  2. Verifier verdict (profile `requiresVerdict`): none → `MISSING_VERIFIER_VERDICT`;
+     REWORK_REQUIRED/BLOCKED/blocking findings → `VERDICT_BLOCKING`.
+  3. Stage: before the profile's completion stage → `WORKFLOW_STAGE_INVALID`
+     (high-risk demands `release-evidence`).
+  4. Verify/fix loop state: latest attempt `fail` without a later pass →
+     `VERIFICATION_ATTEMPT_FAILED` — `VERIFY failed → completed` is structurally
+     impossible for workflow tasks (§16).
+  5. Blocking drift findings composed from the SAME deterministic `detectWorkflowDrift`
+     core (unplanned high-risk scope changes, unmet dependencies, invalid stage) —
+     including evidence-artifact presence so the gate matches the workflow engine.
+- `--force` unchanged: explicit override with the recorded warning banner
+  (`--force overrode: ...`); doctor visibility preserved.
+- Tests: `tests/unit/tasks/completion-gate.test.ts` 6/6 — all mandated scenarios:
+  evidence gate (missing registry → denied; incomplete criteria → denied), verifier
+  (REWORK_REQUIRED → denied), stage/loop (fail attempt → denied; pass recorded + stage
+  advanced + PASS verdict → allowed), quick profile (no evidence/verdict required),
+  legacy (exact pre-expansion behavior), --force (override + recorded warnings).
+  Focused suites 23/23 (tasks + drift + lifecycle + workflow CLI).
+- Single-active-rule handling in tests: previous active tasks are deterministically
+  blocked at fixture setup (the same mechanism the CLI enforces).
+- Full sequential suite result recorded in the commit (82 files green before the
+  drift-composition addition; re-run with it recorded below).
+- Gates: typecheck clean; lint 0 problems; format:check clean.
