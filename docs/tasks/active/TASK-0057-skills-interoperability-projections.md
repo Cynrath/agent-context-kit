@@ -1,11 +1,11 @@
 ---
 id: "TASK-0057"
 title: "skills interoperability projections"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0044"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -38,11 +38,11 @@ Extend the existing Skills subsystem (no rebuild) with provider projections and 
 
 ## Acceptance criteria
 
-- [ ] Three projections produce deterministic, validated outputs from canonical skills; round-trip preserves canonical fields (checksum-stable test).
-- [ ] Export refuses overwrites without explicit `--force`; all output paths contained in the repository root.
-- [ ] Existing skills validation/discovery behavior unchanged (existing tests green).
-- [ ] No network primitives, no executable metadata in projections (offline-egress + content assertions).
-- [ ] Tests pass with recorded counts.
+- [x] Three projections produce deterministic, validated outputs from canonical skills; round-trip preserves canonical fields (checksum-stable test).
+- [x] Export refuses overwrites without explicit `--force`; all output paths contained in the repository root.
+- [x] Existing skills validation/discovery behavior unchanged (existing tests green).
+- [x] No network primitives, no executable metadata in projections (offline-egress + content assertions).
+- [x] Tests pass with recorded counts.
 
 ## Test steps
 
@@ -66,4 +66,28 @@ Focused revert; additive module.
 
 ## Completion notes
 
-(placeholder)
+- Investigation recorded: ACKit's canonical SKILL.md frontmatter (name/description)
+  IS the Claude Code skill layout (identity projection); Copilot instructions
+  (`.github/instructions/*.instructions.md` with applyTo) are the documented projection
+  target; no undocumented vendor format was guessed (Codex/Gemini have no public stable
+  skill-file convention — generic sheet is their fallback).
+- `src/core/skills/project.ts` (new): pure deterministic projection functions from the
+  canonical SkillRecord (+body) — `projectSkillClaude` (open-standard identity shape),
+  `projectSkillCopilot` (applyTo derived deterministically from code references via
+  longest-common-directory; whole-repo glob when not derivable, never guessed),
+  `projectSkillGeneric` (provider-agnostic sheet). Data-only: no scripts, no executable
+  metadata (content assertions); canonical parser/validator untouched.
+- CLI `ackit skills export --provider claude|copilot|generic --out <dir> [--force]`:
+  per-skill subdirectories (claude layout needs them — SKILL.md basenames collide);
+  overwrite refused without --force (exit 4, REQ-GOV-008); out path containment-checked
+  with traversal/absolute/backslash rejection (exit 4); unknown provider → usage.
+- Tests: unit 6/6 (three projections deterministic, applyTo derivation matrix incl.
+  fallback, generic sheet, byte-stable determinism, Claude round-trip revalidates
+  canonical identity — references are validator-discovered metadata and are never
+  invented by projections (documented limitation), data-only content assertions) +
+  CLI integration 3/3 (three exports verified on disk, overwrite refusal + --force,
+  traversal/unknown-provider refusals). Skills suites 26/26 total.
+- Existing skills behavior unchanged (all pre-existing skills tests green).
+- Offline-egress PASS (no new primitives — projections are pure string functions).
+- Full sequential suite result recorded in the commit.
+- Gates: typecheck clean; lint 0 problems (279 files); format:check clean.

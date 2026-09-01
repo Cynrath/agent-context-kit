@@ -189,6 +189,115 @@ export async function runSkillsScaffoldCommand(
 }
 
 /**
+ * `ackit skills export --provider <p> --out <dir>` (TASK-0057 / ADR-0028 §5):
+ * deterministic projections of canonical skills to documented provider
+ * layouts. Data-only outputs; overwrite refused without --force (REQ-GOV-008);
+ * out path containment-checked.
+ */
+export async function runSkillsExportCommand(
+  options: SkillsCommandOptions & {
+    provider: string;
+    out: string;
+    force: boolean;
+  },
+): Promise<ExitCodeValue> {
+  const { SKILL_PROJECTION_PROVIDERS, projectSkill } = await import("../../core/skills/project.js");
+  const provider = options.provider as (typeof SKILL_PROJECTION_PROVIDERS)[number];
+  if (!(SKILL_PROJECTION_PROVIDERS as readonly string[]).includes(options.provider)) {
+    emitDiagnostic(
+      {
+        code: "skill-export-provider",
+        message: `unknown provider '${options.provider}' (expected: ${SKILL_PROJECTION_PROVIDERS.join("|")})`,
+      },
+      { quiet: options.quiet, debug: options.debug },
+    );
+    return EXIT_CODES.usage;
+  }
+  const loaded = await loadValidatedSkills(options);
+  if (!loaded.ok) return loaded.exitCode;
+  const { skills } = loaded.result;
+  if (skills.length === 0) {
+    if (!options.quiet) process.stdout.write("no skills discovered; nothing exported\n");
+    return EXIT_CODES.ok;
+  }
+  const rootResolution = await resolveCliRoot(options.root);
+  if (!rootResolution.ok) {
+    emitDiagnostic(
+      { code: "environment-error", message: rootResolution.message },
+      { quiet: options.quiet, debug: options.debug },
+    );
+    return EXIT_CODES.environment;
+  }
+  const rootPath = rootResolution.root.canonicalPath;
+  // Out path: repository-relative POSIX, containment-checked, reject traversal.
+  const outArg = options.out.split("\\").join("/");
+  const escapes =
+    outArg.startsWith("/") ||
+    /^[a-zA-Z]:/.test(outArg) ||
+    outArg.split("/").some((segment) => segment === "..");
+  const outDir = path.resolve(rootPath, outArg);
+  if (escapes || !outDir.startsWith(rootPath)) {
+    emitDiagnostic(
+      { code: "skill-export-out", message: "export path escapes repository root" },
+      { quiet: options.quiet, debug: options.debug },
+    );
+    return EXIT_CODES.securityBoundary;
+  }
+  await mkdir(outDir, { recursive: true });
+  const { readFile } = await import("node:fs/promises");
+  let exported = 0;
+  for (const record of skills) {
+    // Read the canonical body for projection input.
+    let body = "";
+    try {
+      const raw = await readFile(path.join(rootPath, record.relativePath), "utf8");
+      const { extractFrontmatter } = await import("../../core/instructions/frontmatter.js");
+      body = extractFrontmatter(raw).body.trim();
+    } catch {
+      body = record.description;
+    }
+    const projection = projectSkill(provider, { ...record, body });
+    // Per-skill subdirectory: claude-layout skills all use SKILL.md, so a
+    // flat layout would collide; the skill-name directory matches the
+    // canonical .agents/skills/<name>/ convention.
+    const skillOutDir = path.join(outDir, record.name);
+    await mkdir(skillOutDir, { recursive: true });
+    const target = path.join(skillOutDir, projection.fileName);
+    if (existsSync(target) && options.force !== true) {
+      emitDiagnostic(
+        {
+          code: "skill-export-exists",
+          message: `refusing to overwrite existing '${options.out}/${record.name}/${projection.fileName}' (use --force)`,
+        },
+        { quiet: options.quiet, debug: options.debug },
+      );
+      return EXIT_CODES.securityBoundary;
+    }
+    await writeFile(target, projection.content, "utf8");
+    exported += 1;
+  }
+  if (options.json) {
+    process.stdout.write(
+      `${JSON.stringify(
+        {
+          schemaVersion: SKILLS_REPORT_SCHEMA_VERSION,
+          tool: "ackit",
+          command: "skills export",
+          provider,
+          out: options.out,
+          exported,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+  } else if (!options.quiet) {
+    process.stdout.write(`exported ${exported} skill(s) to ${options.out} (${provider})\n`);
+  }
+  return EXIT_CODES.ok;
+}
+
+/**
  * Registers the full `ackit skills` command family on the program.
  */
 export function registerSkillsCommands(program: Command, invocation: CliInvocation): void {
@@ -294,6 +403,26 @@ export function registerSkillsCommands(program: Command, invocation: CliInvocati
         quiet: parentOptions.quiet ?? false,
         debug: parentOptions.debug ?? false,
         force: commandOptions.force ?? false,
+      });
+    });
+
+  skillsCommand
+    .command("export")
+    .description("project canonical skills to a provider layout (claude|copilot|generic)")
+    .requiredOption("--provider <id>", "claude | copilot | generic")
+    .requiredOption("--out <dir>", "repository-relative output directory")
+    .option("--force", "allow overwriting existing files (explicit user intent)", false)
+    .action(async (opts: { provider: string; out: string; force?: boolean }) => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runSkillsExportCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        provider: opts.provider,
+        out: opts.out,
+        force: opts.force ?? false,
       });
     });
 }
