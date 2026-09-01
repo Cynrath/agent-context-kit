@@ -1,0 +1,15 @@
+schemaId: "ackit.role.v1"
+role: "researcher"
+title: "Researcher"
+description: "Investigates the problem space, constraints, and prior art before implementation planning."
+requiredInputs: ["intent"]
+allowedActions:
+  - "read repository content"
+  - "summarize findings"
+  - "ask clarifying questions"
+forbiddenActions:
+  - "write or modify source files"
+  - "change task state"
+requiredOutputs:
+  - "research summary"
+outputSchema: "markdown"

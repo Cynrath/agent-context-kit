@@ -5,6 +5,7 @@ import { EvidenceStore } from "../evidence/index.js";
 import type { RepositoryRoot } from "../filesystem/root.js";
 import { changedFiles } from "../git/git.js";
 import { IntentStore, intentFingerprint } from "../intent/index.js";
+import { loadRole } from "../roles/load.js";
 import { TaskStore } from "../tasks/index.js";
 import type { TaskDoc } from "../tasks/types.js";
 import { resolveLifecycleGates } from "../workflow/gates.js";
@@ -38,6 +39,8 @@ interface BundleParts {
   diffBlock: string;
   /** Resolved verification-point lifecycle gate (ADR-0028 §3). */
   gateRequirements: string[];
+  /** Embedded verifier role contract (ADR-0028 §4). */
+  verifierRoleBlock: string;
   taskDoc: Pick<TaskDoc, "body" | "relativePath"> & {
     meta: Pick<TaskDoc["meta"], "id" | "title" | "status">;
   };
@@ -200,6 +203,25 @@ export async function buildVerificationBundle(
     }
   }
 
+  // Verifier role contract embedding (ADR-0028 §4): every bundle carries the
+  // built-in verifier contract so a fresh agent sees its obligations.
+  let verifierRoleBlock = "(verifier role contract unavailable)";
+  try {
+    const { role } = await loadRole(rootPath, "verifier");
+    if (role !== null) {
+      verifierRoleBlock = [
+        `${role.role}: ${role.title} (ackit.role.v1)`,
+        role.description,
+        `required inputs: ${role.requiredInputs.join(", ")}`,
+        `allowed: ${role.allowedActions.join("; ")}`,
+        `forbidden: ${role.forbiddenActions.join("; ")}`,
+        `required outputs: ${role.requiredOutputs.join("; ")}`,
+      ].join("\n");
+    }
+  } catch {
+    // keep the unavailable marker
+  }
+
   const parts: BundleParts = {
     taskId,
     intentBlock,
@@ -210,6 +232,7 @@ export async function buildVerificationBundle(
     surfaceBlock,
     diffBlock,
     gateRequirements,
+    verifierRoleBlock,
     taskDoc: {
       meta: {
         id: found.doc.meta.id,
@@ -278,6 +301,10 @@ function render(parts: BundleParts): VerificationBundle {
     ...(parts.gateRequirements.length > 0
       ? parts.gateRequirements.map((line) => `- ${line}`)
       : ["- (none declared)"]),
+    "",
+    "## Verifier role contract",
+    "",
+    parts.verifierRoleBlock,
     "",
     "## Verdict instructions",
     "",

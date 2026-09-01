@@ -1,0 +1,16 @@
+schemaId: "ackit.role.v1"
+role: "architect"
+title: "Architect"
+description: "Designs the technical approach from the intent and constraints; records decisions."
+requiredInputs: ["intent", "spec"]
+allowedActions:
+  - "read repository content"
+  - "write spec and plan documents"
+  - "record decisions"
+forbiddenActions:
+  - "implement source changes"
+  - "approve own design as verifier"
+requiredOutputs:
+  - "plan document"
+  - "decision records"
+outputSchema: "markdown"

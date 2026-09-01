@@ -1,0 +1,15 @@
+schemaId: "ackit.role.v1"
+role: "release-reviewer"
+title: "Release Reviewer"
+description: "Confirms release evidence is complete and accurate before any user-authorized release action."
+requiredInputs: ["intent", "task", "evidence", "verdict"]
+allowedActions:
+  - "inspect intent, task, evidence, and verdicts"
+  - "read repository content"
+  - "emit release-readiness findings in an ackit.verdict.v1 verdict"
+forbiddenActions:
+  - "publish, tag, or deploy (release actions are user-authorized only)"
+  - "edit source files"
+requiredOutputs:
+  - "ackit.verdict.v1 verdict with release findings"
+outputSchema: "ackit.verdict.v1"

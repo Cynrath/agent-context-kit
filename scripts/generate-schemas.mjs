@@ -11,6 +11,7 @@ import { EVIDENCE_SCHEMA_ID, EvidenceRegistrySchema } from "../dist/core/evidenc
 import { InstructionNodeSchema } from "../dist/core/instructions/types.js";
 import { INTENT_SCHEMA_ID, IntentMetaSchema } from "../dist/core/intent/index.js";
 import { POLICY_SCHEMA_VERSION, PolicyDocumentSchema } from "../dist/core/policy/index.js";
+import { ROLE_SCHEMA_ID, RoleContractSchema } from "../dist/core/roles/index.js";
 import { TASK_SCHEMA_VERSION, TaskMetaSchema } from "../dist/core/tasks/index.js";
 import { VERDICT_SCHEMA_ID, VerdictSchema } from "../dist/core/verification/index.js";
 import { WORKFLOW_SCHEMA_ID, WorkflowStateSchema } from "../dist/core/workflow/index.js";
@@ -129,6 +130,15 @@ verdictSchema.$comment = `ACKit verdict schema (${VERDICT_SCHEMA_ID}).`;
 writeFileSync(
   path.join(schemasDir, "verdict.schema.json"),
   `${JSON.stringify(verdictSchema, null, 2)}\n`,
+  "utf8",
+);
+
+// role contract (ackit.role.v1, ADR-0028)
+const roleSchema = z.toJSONSchema(RoleContractSchema, { io: "input", unrepresentable: "any" });
+roleSchema.$comment = `ACKit role contract schema (${ROLE_SCHEMA_ID}).`;
+writeFileSync(
+  path.join(schemasDir, "role.schema.json"),
+  `${JSON.stringify(roleSchema, null, 2)}\n`,
   "utf8",
 );
 

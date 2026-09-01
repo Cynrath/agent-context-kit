@@ -1,0 +1,15 @@
+schemaId: "ackit.role.v1"
+role: "documentation-reviewer"
+title: "Documentation Reviewer"
+description: "Reviews documentation accuracy against shipped behavior with a fresh context."
+requiredInputs: ["intent", "task", "diff", "evidence"]
+allowedActions:
+  - "inspect docs, intent, diff, and evidence"
+  - "read repository content"
+  - "emit documentation findings in an ackit.verdict.v1 verdict"
+forbiddenActions:
+  - "implement or modify the feature under review"
+  - "edit source files"
+requiredOutputs:
+  - "ackit.verdict.v1 verdict with documentation findings"
+outputSchema: "ackit.verdict.v1"

@@ -1,11 +1,11 @@
 ---
 id: "TASK-0056"
 title: "provider-independent role contracts"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0052"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -38,11 +38,11 @@ Define portable, provider-independent role contracts (§13) that any agent (Code
 
 ## Acceptance criteria
 
-- [ ] Seven built-in roles ship, strict-validate, and list deterministically; `ackit role show verifier` prints the mandated verifier rules.
-- [ ] Repository-defined roles validate with the same schema and cannot shadow built-in ids (refusal covered by test).
-- [ ] Verification bundle embeds the verifier role contract.
-- [ ] `schemas/role.schema.json` committed and current; tests pass with recorded counts.
-- [ ] No runtime/spawner/orchestrator code introduced anywhere (review + test surface).
+- [x] Seven built-in roles ship, strict-validate, and list deterministically; `ackit role show verifier` prints the mandated verifier rules.
+- [x] Repository-defined roles validate with the same schema and cannot shadow built-in ids (refusal covered by test).
+- [x] Verification bundle embeds the verifier role contract.
+- [x] `schemas/role.schema.json` committed and current; tests pass with recorded counts.
+- [x] No runtime/spawner/orchestrator code introduced anywhere (review + test surface).
 
 ## Test steps
 
@@ -66,4 +66,29 @@ Focused revert; additive module + data files.
 
 ## Completion notes
 
-(placeholder)
+- `src/core/roles/` (types/load/index): `ackit.role.v1` strict contract
+  (role/title/description/requiredInputs[8 kinds]/allowedActions/forbiddenActions/
+  requiredOutputs/outputSchema — all bounded, unknown fields rejected, no executable
+  metadata possible). Data ONLY — validated, never executed; no spawner/router/
+  orchestrator exists anywhere (verified by review: only load/validate/print code).
+- Seven built-in roles shipped in `templates/roles/` (packaged via the existing
+  `files` list): researcher, architect, implementer, verifier, security-reviewer,
+  documentation-reviewer, release-reviewer — deterministic id ordering on list. The
+  verifier role encodes the mandated rules (inspect intent/spec/plan/task/diff/tests/
+  evidence; must not implement what it judges; must emit ackit.verdict.v1).
+- `listRoles`/`loadRole`: built-ins resolve from the packaged templates directory via
+  import.meta.url (src+dist layouts both correct, Windows-safe fileURLToPath);
+  repository roles under `docs/roles/*.yaml` validate with the same schema and CANNOT
+  shadow built-in ids (ROLE-SHADOW-REFUSED — the built-in stays authoritative, T25);
+  invalid/broken YAML produce stable diagnostics (ROLE-INVALID), never crash listing.
+- Verification bundle now embeds a "Verifier role contract" section (bundle.ts) so
+  every fresh verifier sees its obligations inline.
+- CLI `ackit role list|show|validate` registered (JSON shape `ackit.role-report.v1`);
+  smoke-verified: `role list` prints the seven; `role show verifier` prints the
+  mandated rules.
+- `schemas/role.schema.json` emitted and committed; `pnpm gen:schemas` idempotent.
+- Tests: unit 7/7 (strict schema + executable-metadata rejection, seven-role catalog,
+  verifier-rule encoding, repository-role validation + listing, shadow refusal with
+  built-in intact, invalid-role diagnostics, ROLE-NOT-FOUND). Focused roles+verification
+  suites 15/15. Full sequential suite result recorded in the commit.
+- Gates: typecheck clean; lint 0 problems (276 files); format:check clean.

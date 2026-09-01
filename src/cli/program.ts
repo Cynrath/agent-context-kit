@@ -17,6 +17,7 @@ import { runOptimizeCommand } from "./commands/optimize.js";
 import { runPackCommand } from "./commands/pack.js";
 import { runPolicyCheckCommand } from "./commands/policy.js";
 import { runReportServeCommand } from "./commands/report.js";
+import { registerRoleCommands } from "./commands/role.js";
 import { runScanCommand } from "./commands/scan.js";
 import { registerSkillsCommands } from "./commands/skills.js";
 import { runSummary } from "./commands/summary.js";
@@ -162,6 +163,8 @@ function buildProgram(invocation: CliInvocation): Command {
   registerDriftCommands(program, invocation);
 
   registerVerificationCommands(program, invocation);
+
+  registerRoleCommands(program, invocation);
 
   const initCommand = program
     .command("init")
