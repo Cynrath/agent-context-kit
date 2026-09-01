@@ -1,11 +1,11 @@
 ---
 id: "TASK-0049"
 title: "task-aware context packs"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0048"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -34,10 +34,10 @@ Extend the existing Context Pack engine (no parallel context system) with task-,
 
 ## Acceptance criteria
 
-- [ ] `ackit pack --task TASK-XXXX` and `--task TASK-XXXX --resume` produce deterministic packs that rank declared task scope, task references, and changed files above unrelated content.
-- [ ] Token budget is respected including task/resume sections; manifest reasons name the new ranking signals.
-- [ ] Byte-stable output for identical repository + task state (determinism test).
-- [ ] No regression in existing pack behavior (all existing pack tests green unchanged).
+- [x] `ackit pack --task TASK-XXXX` and `--task TASK-XXXX --resume` produce deterministic packs that rank declared task scope, task references, and changed files above unrelated content.
+- [x] Token budget is respected including task/resume sections; manifest reasons name the new ranking signals.
+- [x] Byte-stable output for identical repository + task state (determinism test).
+- [x] No regression in existing pack behavior (all existing pack tests green unchanged).
 
 ## Test steps
 
@@ -61,4 +61,28 @@ Focused revert; pack contract additive only.
 
 ## Completion notes
 
-(placeholder)
+- Extended the EXISTING pack engine (no parallel context system): `BuildPackOptions`
+  gained `taskContext` (`TaskPackContext`: declaredScopeGlobs, referencePaths,
+  changedFiles); `RANKING_WEIGHTS` gained documented entries `taskDeclaredScope: 80`
+  and `taskReference: 70` (+ changed boost reuses `changed: 60`); `PackContextSection`
+  id union extended with `task-resume`.
+- `buildTaskPackContext` (orchestrate.ts, single source shared by CLI/MCP paths):
+  extracts declared scope from the task's `## Affected files`, collects reference paths
+  (task doc, intent, spec/decision/plan refs), snapshots git changed files, and renders
+  the latest checkpoint's resume section via `renderResumeContext` (TASK-0048). Unknown
+  task ids return `PACK-TASK-UNKNOWN` (usage exit, never a throw).
+- CLI: `ackit pack --task <TASK-ID>` (+ `--resume` to embed the checkpoint resume
+  section; `--resume` alone resolves the single active task). Resume section rides the
+  existing REQ-CTX-001 section mechanism (unshifted, budget-prioritized like all
+  sections). Secret gate + absolute-path scrubbing unchanged and still enforced on every
+  emitted surface (resume content passes the same gate inside renderResumeContext).
+- Tests: `tests/integration/context/task-pack.test.ts` 5/5 — scope extraction, ranking
+  (declared `src/tasks/**` file included + score visible in manifest reason), byte-stable
+  determinism (two builds identical), resume-section embedding (only after a checkpoint
+  exists), unknown-task reporting. Full suite 420 tests: 419 stable green +
+  `readme-parity` tarball test flaked intermittently under full-suite parallel load
+  (pre-existing class, TASK-0040 documented sibling; passes 4/4 in isolation in 18s and
+  passed 2 of 3 full runs; NOT related to pack changes — no README/package/tarball files
+  touched; gate NOT weakened).
+- Gates: typecheck clean; lint 0 problems (240 files); format:check clean; doctor +
+  task doctor OK.

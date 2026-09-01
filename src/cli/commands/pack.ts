@@ -22,6 +22,8 @@ export async function runPackCommand(
     include?: string[] | undefined;
     changed: boolean;
     profile?: string | undefined;
+    task?: string | undefined;
+    resume?: boolean | undefined;
   },
 ): Promise<ExitCodeValue> {
   const rootRequested = path.resolve(options.root ?? process.cwd());
@@ -70,6 +72,44 @@ export async function runPackCommand(
   }
   // Canonical orchestration shared with the MCP `ackit_pack` tool.
   const sections = await buildCanonicalContextSections(rootResolution.root);
+  // Task-aware pack context (TASK-0049 / ADR-0027 §5): --task TASK-#### ranks
+  // declared scope + references + changed files; --resume additionally embeds
+  // the latest checkpoint's resume section (and may omit --task when exactly
+  // one task is active). Unknown tasks fail with usage.
+  let taskContext: import("../../core/context/pack.js").TaskPackContext | undefined;
+  if (options.task !== undefined || options.resume === true) {
+    const { buildTaskPackContext } = await import("../../core/context/orchestrate.js");
+    let taskId = options.task;
+    if (taskId === undefined) {
+      const { TaskStore } = await import("../../core/tasks/index.js");
+      const active = (await new TaskStore(rootResolution.root.canonicalPath).list(false)).filter(
+        (doc) => doc.meta.status === "active",
+      );
+      if (active.length === 1) taskId = active[0]?.meta.id;
+    }
+    if (taskId === undefined) {
+      emitDiagnostic(
+        {
+          code: "pack-error",
+          message: "--task <TASK-ID> required (or exactly one active task for --resume)",
+        },
+        { quiet: options.quiet, debug: options.debug },
+      );
+      return EXIT_CODES.usage;
+    }
+    const taskPack = await buildTaskPackContext(rootResolution.root, taskId);
+    if (!taskPack.ok) {
+      emitDiagnostic(
+        { code: "pack-error", message: taskPack.diagnostic.message },
+        { quiet: options.quiet, debug: options.debug },
+      );
+      return EXIT_CODES.usage;
+    }
+    taskContext = taskPack.taskContext;
+    if (taskPack.resumeSection !== null) {
+      sections.unshift(taskPack.resumeSection);
+    }
+  }
   const effectiveMaxTokens =
     options.maxTokens ??
     (profileRes.resolved.source !== "fallback"
@@ -82,6 +122,7 @@ export async function runPackCommand(
     restrictToFiles,
     contextSections: sections,
     profile: profileRes.resolved,
+    taskContext,
   });
 
   if (options.json || options.format === "json") {

@@ -95,3 +95,99 @@ export async function buildCanonicalContextSections(
     { id: "repository-metadata", title: "Repository Metadata", body: pkgMeta },
   ];
 }
+
+/**
+ * Task-aware pack context (TASK-0049 / ADR-0027 §5): deterministic ranking
+ * inputs computed from the task document (declared scope + reference paths),
+ * the referenced intent, the latest checkpoint, and the git changed set.
+ * Shared by the CLI `ackit pack --task` and `--resume` so no parallel
+ * implementation can drift.
+ */
+export async function buildTaskPackContext(
+  root: RepositoryRoot,
+  taskId: string,
+): Promise<
+  | {
+      ok: true;
+      taskId: string;
+      taskContext: import("./pack.js").TaskPackContext;
+      resumeSection: PackContextSection | null;
+      taskDoc: { id: string; title: string; body: string; relativePath: string };
+    }
+  | { ok: false; diagnostic: { code: string; message: string } }
+> {
+  const repositoryRoot = root.canonicalPath;
+  const store = new TaskStore(repositoryRoot);
+  const found = await store.find(taskId);
+  if (found === null) {
+    return {
+      ok: false,
+      diagnostic: { code: "PACK-TASK-UNKNOWN", message: `unknown task '${taskId}'` },
+    };
+  }
+
+  const { extractSection } = await import("../tasks/types.js");
+  const affected = extractSection(found.doc.body, "Affected files") ?? "";
+  const declaredScopeGlobs = affected
+    .split("\n")
+    .map((line) => line.replace(/^[-*]\s*/, "").trim())
+    .filter((line) => line.length > 0 && !line.startsWith("("));
+
+  const referencePaths: string[] = [found.doc.relativePath];
+  const metaExtra = found.doc.meta as {
+    intentRef?: string | undefined;
+    specRefs?: string[] | undefined;
+    decisionRefs?: string[] | undefined;
+    planRef?: string | undefined;
+  };
+  if (metaExtra.intentRef !== undefined) {
+    const { IntentStore } = await import("../intent/store.js");
+    const intent = await new IntentStore(repositoryRoot).find(metaExtra.intentRef);
+    if (intent !== null) referencePaths.push(intent.doc.relativePath);
+  }
+  for (const ref of [
+    ...(metaExtra.specRefs ?? []),
+    ...(metaExtra.decisionRefs ?? []),
+    ...(metaExtra.planRef !== undefined ? [metaExtra.planRef] : []),
+  ]) {
+    referencePaths.push(ref);
+  }
+
+  let changedFiles: string[] = [];
+  try {
+    const { changedFiles: gitChanged } = await import("../git/git.js");
+    changedFiles = gitChanged(repositoryRoot);
+  } catch {
+    changedFiles = [];
+  }
+
+  let resumeSection: PackContextSection | null = null;
+  try {
+    const { CheckpointStore, renderResumeContext } = await import("../checkpoint/index.js");
+    const checkpoints = new CheckpointStore(root, repositoryRoot);
+    const latest = await checkpoints.latest(taskId);
+    if (latest !== null) {
+      const resume = renderResumeContext(
+        latest,
+        { id: found.doc.meta.id, title: found.doc.meta.title, status: found.doc.meta.status },
+        null,
+      );
+      resumeSection = { id: "task-resume", title: "Task Resume", body: resume };
+    }
+  } catch {
+    resumeSection = null;
+  }
+
+  return {
+    ok: true,
+    taskId,
+    taskContext: { declaredScopeGlobs, referencePaths, changedFiles },
+    resumeSection,
+    taskDoc: {
+      id: found.doc.meta.id,
+      title: found.doc.meta.title,
+      body: found.doc.body,
+      relativePath: found.doc.relativePath,
+    },
+  };
+}

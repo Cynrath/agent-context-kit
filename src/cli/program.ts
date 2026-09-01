@@ -186,6 +186,12 @@ function buildProgram(invocation: CliInvocation): Command {
     .option("--include <globs...>", "explicit include globs (highest ranking signal)")
     .option("--changed", "boost/limit candidates to git-changed files", false)
     .option("--profile <name>", "provider profile (codex|claude|copilot|gemini|generic)")
+    .option("--task <id>", "task-aware pack: rank declared scope, refs, and changed files")
+    .option(
+      "--resume",
+      "embed the latest checkpoint resume section (uses the single active task when --task is omitted)",
+      false,
+    )
     .action(async () => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
       const commandOptions = (packCommand.opts() ?? {}) as {
@@ -194,6 +200,8 @@ function buildProgram(invocation: CliInvocation): Command {
         include?: string[];
         changed?: boolean;
         profile?: string;
+        task?: string;
+        resume?: boolean;
       };
       invocation.exitCode = await runPackCommand({
         root: parentOptions.root,
@@ -206,6 +214,8 @@ function buildProgram(invocation: CliInvocation): Command {
         include: commandOptions.include,
         changed: commandOptions.changed ?? false,
         profile: commandOptions.profile,
+        task: commandOptions.task,
+        resume: commandOptions.resume ?? false,
       });
     });
 
