@@ -1,7 +1,7 @@
 ---
 id: "TASK-0046"
 title: "intent first-class artifact: schema, store, CLI"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0044", "TASK-0045"]
 createdAt: "2026-08-31"
@@ -39,10 +39,10 @@ Implement the normalized, provider-independent Intent contract (ADR-0025/0027): 
 ## Acceptance criteria
 
 - [ ] `ackit intent new/list/show/validate/fingerprint` work on a fixture repository; documents are strict-validated with unknown-field rejection.
-- [ ] Fingerprint is byte-stable across directory renames (machine-path independence) and normalizes identical content with formatting differences to the same value.
-- [ ] Secret-shaped intent content is rejected at validation and never enters emitted surfaces.
+- [x] Fingerprint is byte-stable across directory renames (machine-path independence) and normalizes identical content with formatting differences to the same value.
+- [x] Secret-shaped intent content is rejected at validation and never enters emitted surfaces.
 - [ ] `schemas/intent.schema.json` committed and current.
-- [ ] No intent document is required for quick-profile tasks (no behavior change without opt-in).
+- [x] No intent document is required for quick-profile tasks (no behavior change without opt-in).
 
 ## Test steps
 
@@ -67,4 +67,28 @@ Focused revert; additive module, no existing-surface impact.
 
 ## Completion notes
 
-(placeholder)
+- Implemented `src/core/intent/` (types/store/normalize/gate/index): `ackit.intent.v1`
+  strict frontmatter schema (unknown fields rejected), docs-first store under
+  `docs/intent/INTENT-####-slug.md` with tool-allocated ids (mirrors TaskStore), scaffold
+  creation (`intent new`), deterministic normalization (whitespace collapse, dedupe+sort,
+  criterion id ordering), and a machine-path-independent sha256 fingerprint over canonical
+  sorted-key JSON.
+- Secret gate: `src/core/intent/gate.ts` reuses the CANONICAL catalog rules
+  (`PACK_SECRET_GATE_RULES`) — single detection source with scan/packs; `intent validate`
+  rejects secret-shaped frontmatter/body with `INTENT-SECRET-CONTENT` (exit 1). CLI error
+  paths run messages through `assertNoSecretShapes` defensively.
+- Real-calendar-date refinement on `createdAt` (rejects e.g. 2026-13-45) — stronger than
+  the legacy loose pattern; documented behavior.
+- CLI `ackit intent new|list|show|validate|fingerprint` registered; JSON report shape
+  `ackit.intent-report.v1`; exit codes follow ADR-0007 (usage 2 for unknown ids,
+  thresholdExceeded 1 for failed validation).
+- `schemas/intent.schema.json` emitted and committed; `pnpm gen:schemas` idempotent.
+- Tests: unit 11/11 (schema strictness, malformed ids/dates, normalization determinism,
+  fingerprint stability/change, store round-trip, traversal refusal, duplicate criterion,
+  secret-gate rejection) + integration 3/3 (CLI round-trip incl. JSON, unknown-id exits,
+  empty-title rejection). Full suite: 71 files / 395 tests passed.
+- Gates: typecheck clean; lint 0 problems (228 files); format:check clean; doctor all
+  checks passed; task doctor OK; `git diff --check` clean; offline-egress PASS
+  (`node scripts/check-offline-egress.mjs` — no new egress primitives).
+- Quick-profile tasks require no intent: verified in workflow tests (quick profile
+  advances and completes without any intent artifact).

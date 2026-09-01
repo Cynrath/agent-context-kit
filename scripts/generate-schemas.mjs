@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { ackitConfigJsonSchema } from "../dist/core/config/json-schema.js";
 import { InstructionNodeSchema } from "../dist/core/instructions/types.js";
+import { INTENT_SCHEMA_ID, IntentMetaSchema } from "../dist/core/intent/index.js";
 import { POLICY_SCHEMA_VERSION, PolicyDocumentSchema } from "../dist/core/policy/index.js";
 import { TASK_SCHEMA_VERSION, TaskMetaSchema } from "../dist/core/tasks/index.js";
 import { WORKFLOW_SCHEMA_ID, WorkflowStateSchema } from "../dist/core/workflow/index.js";
@@ -46,6 +47,15 @@ workflowSchema.$comment = `ACKit workflow state schema (${WORKFLOW_SCHEMA_ID}).`
 writeFileSync(
   path.join(schemasDir, "workflow.schema.json"),
   `${JSON.stringify(workflowSchema, null, 2)}\n`,
+  "utf8",
+);
+
+// intent (ackit.intent.v1, ADR-0025)
+const intentSchema = z.toJSONSchema(IntentMetaSchema, { io: "input", unrepresentable: "any" });
+intentSchema.$comment = `ACKit intent document schema (${INTENT_SCHEMA_ID}).`;
+writeFileSync(
+  path.join(schemasDir, "intent.schema.json"),
+  `${JSON.stringify(intentSchema, null, 2)}\n`,
   "utf8",
 );
 

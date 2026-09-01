@@ -9,6 +9,7 @@ import { runDoctorCommand } from "./commands/doctor.js";
 import { runHooksCommand } from "./commands/hooks.js";
 import { runInitCommand } from "./commands/init.js";
 import { runInstructionsCommand } from "./commands/instructions.js";
+import { registerIntentCommands } from "./commands/intent.js";
 import { runOptimizeCommand } from "./commands/optimize.js";
 import { runPackCommand } from "./commands/pack.js";
 import { runPolicyCheckCommand } from "./commands/policy.js";
@@ -147,6 +148,8 @@ function buildProgram(invocation: CliInvocation): Command {
   registerTaskCommands(program, invocation);
 
   registerWorkflowCommands(program, invocation);
+
+  registerIntentCommands(program, invocation);
 
   const initCommand = program
     .command("init")
