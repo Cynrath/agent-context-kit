@@ -36,62 +36,63 @@ const HIGH_RISK_STAGES = [
   "release-evidence",
 ] as const;
 
-export const BUILTIN_PROFILES: Readonly<Record<WorkflowProfileId, WorkflowProfileDefinition>> = {
-  quick: {
-    id: "quick",
-    title: "Quick",
-    description: "Small, low-risk fixes: task → implement → verify.",
-    stages: QUICK_STAGES,
-    entryStage: "task",
-    requiredArtifactsByStage: {
-      task: ["task"],
-      implement: [],
-      verify: [],
+export const BUILTIN_PROFILES: Readonly<Record<WorkflowProfileId, WorkflowProfileDefinition>> =
+  Object.freeze({
+    quick: {
+      id: "quick",
+      title: "Quick",
+      description: "Small, low-risk fixes: task → implement → verify.",
+      stages: QUICK_STAGES,
+      entryStage: "task",
+      requiredArtifactsByStage: {
+        task: ["task"],
+        implement: [],
+        verify: [],
+      },
+      requiresVerdict: false,
+      requiresEvidence: false,
+      completionStage: "verify",
     },
-    requiresVerdict: false,
-    requiresEvidence: false,
-    completionStage: "verify",
-  },
-  standard: {
-    id: "standard",
-    title: "Standard",
-    description: "Normal feature work: intent → plan → tasks → implement → verify → review.",
-    stages: STANDARD_STAGES,
-    entryStage: "intent",
-    requiredArtifactsByStage: {
-      intent: ["intent", "task"],
-      plan: ["plan"],
-      tasks: [],
-      implement: [],
-      verify: ["evidence"],
-      review: [],
+    standard: {
+      id: "standard",
+      title: "Standard",
+      description: "Normal feature work: intent → plan → tasks → implement → verify → review.",
+      stages: STANDARD_STAGES,
+      entryStage: "intent",
+      requiredArtifactsByStage: {
+        intent: ["intent", "task"],
+        plan: ["plan"],
+        tasks: [],
+        implement: [],
+        verify: ["evidence"],
+        review: [],
+      },
+      requiresVerdict: true,
+      requiresEvidence: true,
+      completionStage: "verify",
     },
-    requiresVerdict: true,
-    requiresEvidence: true,
-    completionStage: "verify",
-  },
-  "high-risk": {
-    id: "high-risk",
-    title: "High-risk",
-    description:
-      "Architecture/security/migration/release-sensitive work: intent → spec → plan → tasks → implement → verify → independent-review → release-evidence.",
-    stages: HIGH_RISK_STAGES,
-    entryStage: "intent",
-    requiredArtifactsByStage: {
-      intent: ["intent", "task"],
-      spec: ["spec"],
-      plan: ["plan"],
-      tasks: [],
-      implement: [],
-      verify: ["evidence"],
-      "independent-review": ["verdict"],
-      "release-evidence": [],
+    "high-risk": {
+      id: "high-risk",
+      title: "High-risk",
+      description:
+        "Architecture/security/migration/release-sensitive work: intent → spec → plan → tasks → implement → verify → independent-review → release-evidence.",
+      stages: HIGH_RISK_STAGES,
+      entryStage: "intent",
+      requiredArtifactsByStage: {
+        intent: ["intent", "task"],
+        spec: ["spec"],
+        plan: ["plan"],
+        tasks: [],
+        implement: [],
+        verify: ["evidence"],
+        "independent-review": ["verdict"],
+        "release-evidence": [],
+      },
+      requiresVerdict: true,
+      requiresEvidence: true,
+      completionStage: "release-evidence",
     },
-    requiresVerdict: true,
-    requiresEvidence: true,
-    completionStage: "release-evidence",
-  },
-} as const;
+  });
 
 /** All built-in profile ids in catalog order (deterministic). */
 export function listWorkflowProfiles(): WorkflowProfileId[] {

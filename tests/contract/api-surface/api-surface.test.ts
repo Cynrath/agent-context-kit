@@ -5,20 +5,40 @@ import * as ackit from "../../../src/index.js";
 /** Documented public allowlist (REQ-API-001, REQ-V020-J-001). Any diff = contract change. */
 const ALLOWLIST = [
   "AckitError",
+  "BUILTIN_PROFILES",
+  "CheckpointStore",
+  "EvidenceStore",
+  "IntentStore",
   "ProfileSchema",
   "READINESS_ENGINE_VERSION",
+  "TaskStore",
+  "VerdictStore",
+  "WorkflowStore",
   "analyzeOptimize",
   "buildContextPack",
   "buildInstructionGraph",
+  "buildVerificationBundle",
   "detectProfiles",
+  "detectWorkflowDrift",
   "evaluateRulePacks",
+  "intentFingerprint",
+  "listRoles",
+  "listWorkflowProfiles",
   "loadAckitConfig",
   "loadBuiltInProfiles",
+  "loadRole",
   "loadRulePacks",
+  "normalizeIntent",
+  "renderHandoffPack",
+  "renderResumeContext",
+  "requiredArtifacts",
+  "resolveAutonomy",
   "resolveEffectiveStack",
   "resolveProfile",
+  "resolveReview",
   "scanRepository",
   "scoreRepository",
+  "validateEvidence",
   "validateSkills",
 ].sort();
 
@@ -26,6 +46,9 @@ const ALLOWLIST = [
 // - scoreRepository (TASK-0008)
 // - evaluateRulePack (TASK-0012)
 // New SDK surface since v0.1.1: AckitError (typed error model, REQ-V020-J-002)
+// Workflow expansion (TASK-0059, ADR-0025..0028): typed workflow/intent/
+// checkpoint/evidence/verdict/drift/policy/role additions — classes count as
+// non-function values and are checked for existence below.
 
 describe("public API surface (REQ-API-001)", () => {
   it("exports exactly the documented allowlist — no deep/internal leaks", () => {
@@ -35,10 +58,16 @@ describe("public API surface (REQ-API-001)", () => {
 
   it("exposes functions/classes, not mutable state", () => {
     const nonFunctions = new Set(["ProfileSchema", "READINESS_ENGINE_VERSION"]);
+    // BUILTIN_PROFILES is a frozen catalog constant (documented, read-only).
+    const frozenConstants = new Set(["BUILTIN_PROFILES"]);
     for (const name of ALLOWLIST) {
       const value = (ackit as Record<string, unknown>)[name];
       if (nonFunctions.has(name)) {
         expect(value).toBeDefined();
+        continue;
+      }
+      if (frozenConstants.has(name)) {
+        expect(Object.isFrozen(value)).toBe(true);
         continue;
       }
       expect(typeof value).toBe("function");

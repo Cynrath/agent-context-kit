@@ -1,11 +1,11 @@
 ---
 id: "TASK-0059"
 title: "CLI/SDK/MCP parity for workflow capabilities"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0048", "TASK-0052", "TASK-0054", "TASK-0056"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -43,11 +43,11 @@ Expose the new workflow capability families across the three public surfaces int
 
 ## Acceptance criteria
 
-- [ ] SDK allowlist test updated and passing; every new export is a function/class with documented stable signature; no internal module leaks.
-- [ ] MCP tools/list is exactly the old nine plus the six new read-only tools; write tools remain absent; conformance test updated and green.
-- [ ] CLI reference docs cover every new command family; readme/docs parity tests green.
-- [ ] CHANGELOG `Unreleased` section records the additive public-surface change.
-- [ ] Full `pnpm test` green with recorded counts.
+- [x] SDK allowlist test updated and passing; every new export is a function/class with documented stable signature; no internal module leaks.
+- [x] MCP tools/list is exactly the old nine plus the six new read-only tools; write tools remain absent; conformance test updated and green.
+- [x] CLI reference docs cover every new command family; readme/docs parity tests green.
+- [x] CHANGELOG `Unreleased` section records the additive public-surface change.
+- [x] Full `pnpm test` green with recorded counts.
 
 ## Test steps
 
@@ -70,4 +70,30 @@ Focused revert; allowlist and MCP list revert with it.
 
 ## Completion notes
 
-(placeholder)
+- SDK: focused typed additions to `src/index.ts` (the ONLY public surface): TaskStore,
+  IntentStore (+fingerprint/normalize), CheckpointStore (+resume/handoff renderers),
+  EvidenceStore (+validateEvidence), VerdictStore (+buildVerificationBundle),
+  detectWorkflowDrift, resolveAutonomy/resolveReview, listRoles/loadRole, WorkflowStore +
+  BUILTIN_PROFILES (Object.freeze — asserted by the frozen-constant check) +
+  listWorkflowProfiles/requiredArtifacts. Allowlist contract test updated (36 exports);
+  no internal module leaks; package exports remain `.`/`./mcp`.
+- MCP: six new READ-ONLY tools — ackit_workflow_status, ackit_get_intent,
+  ackit_get_checkpoint, ackit_verification_bundle, ackit_drift_check, ackit_list_roles —
+  all root-confined at construction, no root parameter, mutation absent (boundary
+  preserved per ADR-0028 §6; documented in code + reference). Conformance test now
+  asserts the exact 15-tool list (write tools absent) and a functional test drives the
+  new tools on a real fixture (workflow status, drift, bundle contents, legacy-task
+  note).
+- Docs: `docs/reference/cli.md` covers every new family (workflow/intent/task refs/
+  resume/checkpoint/evidence/verification/drift/role/journal/skills-export + updated
+  task/policy/hooks rows); `docs/reference/sdk.md` gained the workflow-expansion
+  additions table; `docs/reference/mcp.md` table extended with the six tools and the
+  explicit write-tool boundary statement. Docs-gate, readme-current, readme-parity and
+  cli-help contract tests all green (25/25).
+- CHANGELOG `[Unreleased]` section records the full additive public-surface change.
+- VS Code: evaluated and deferred (documented in ADR-0028 §6 — the extension keeps
+  consuming stable SDK surfaces; workflow UI is future work).
+- Tests: api-surface 4/4, MCP conformance 8/8, docs/help contracts 25/25, workflow
+  22/22; full `pnpm test` (parallel) 90 files green; contract directory 16 files /
+  86 tests green. Offline-egress PASS (MCP tools reuse core read-only modules).
+- Gates: typecheck clean; lint 0 problems (285 files); format:check clean.

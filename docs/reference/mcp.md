@@ -20,9 +20,16 @@ truth).
 | ackit_list_tasks | all?, root? | task rows (id/status/title) |
 | ackit_get_task | id, root? | full task doc or unknown-task error |
 | ackit_policy_check | root? | policy chain + digest + diagnostics |
+| ackit_workflow_status | taskId | workflow profile/stage/required artifacts (null for legacy tasks) |
+| ackit_get_intent | id | intent document + fingerprint |
+| ackit_get_checkpoint | taskId | latest checkpoint + resume context |
+| ackit_verification_bundle | taskId | deterministic verification bundle (markdown) |
+| ackit_drift_check | taskId | deterministic drift findings |
+| ackit_list_roles | — | portable role contracts |
 
-Write tools are intentionally absent. Any future write tool requires a new
-ADR with an explicit capability/permission gate design before registration.
+Write tools are intentionally absent (state mutation stays CLI-only by
+explicit decision). Any future write tool requires a new ADR with an explicit
+capability/permission gate design before registration.
 
 ## Resources
 

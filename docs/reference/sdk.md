@@ -23,6 +23,20 @@ The programmatic SDK is the single supported import for embedding ACKit in Node.
 | `PackResult`, `PackManifestEntry` | types | Pack model (`ackit.pack.v0`). |
 | `SkillRecord`, `SkillIssue` | types | Skills model. |
 
+
+**Workflow expansion additions (feat/workflow-expansion):**
+
+| Symbol | Kind | Description |
+|---|---|---|
+| `TaskStore`, `TaskDoc`, `TaskMeta` | class/types | Docs-first task store (create/list/find/start/complete/archive/doctor); additive reference fields (`intentRef`, `specRefs`, `decisionRefs`, `planRef`). |
+| `IntentStore`, `intentFingerprint`, `normalizeIntent` | class/functions | Intent artifacts (`docs/intent/`, `ackit.intent.v1`); machine-path-independent fingerprints. |
+| `CheckpointStore`, `renderResumeContext`, `renderHandoffPack` | class/functions | Checkpoints (`ackit.checkpoint.v1`) + deterministic resume/handoff renderers. |
+| `EvidenceStore`, `validateEvidence` | class/function | Evidence registry (`ackit.evidence.v2`) + completeness validation. |
+| `VerdictStore`, `buildVerificationBundle` | class/function | Append-only verdicts (`ackit.verdict.v1`) + deterministic verification bundles. |
+| `detectWorkflowDrift` | function | Deterministic drift findings (eight frozen codes). |
+| `resolveAutonomy`, `resolveReview` | functions | Policy v2 risk-tiered autonomy + review resolution (deny wins). |
+| `listRoles`, `loadRole` | functions | Portable role contracts (`ackit.role.v1`). |
+| `WorkflowStore`, `BUILTIN_PROFILES`, `listWorkflowProfiles`, `requiredArtifacts` | class/constants | Workflow engine (`ackit.workflow.v1`); profiles are frozen catalogs. |
 **Reserved v0.2.0 additions (not yet exported):**
 
 - `scoreRepository` (readiness, TASK-0008)
