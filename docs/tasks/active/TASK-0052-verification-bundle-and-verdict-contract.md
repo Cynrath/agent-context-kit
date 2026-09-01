@@ -1,11 +1,11 @@
 ---
 id: "TASK-0052"
 title: "verification bundle and verdict contract"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0049", "TASK-0050", "TASK-0051"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -36,11 +36,11 @@ Implement the independent verification protocol (ADR-0026, §6): a deterministic
 
 ## Acceptance criteria
 
-- [ ] `ackit verification bundle TASK-XXXX` emits a deterministic, bounded bundle containing exactly the mandated material; JSON variant content-identical.
-- [ ] Verdict registration validates structure strictly and rejects: wrong schemaId, unknown task, unknown criterion ids, blocking findings on PASS, unknown fields — each with a stable error code.
-- [ ] Append-only verdict history with latest-verdict-governs semantics, deterministic file naming.
-- [ ] Secret gate + absolute-path scrubbing verified over bundle and verdict outputs.
-- [ ] Schemas committed and current; tests pass with recorded counts.
+- [x] `ackit verification bundle TASK-XXXX` emits a deterministic, bounded bundle containing exactly the mandated material; JSON variant content-identical.
+- [x] Verdict registration validates structure strictly and rejects: wrong schemaId, unknown task, unknown criterion ids, blocking findings on PASS, unknown fields — each with a stable error code.
+- [x] Append-only verdict history with latest-verdict-governs semantics, deterministic file naming.
+- [x] Secret gate + absolute-path scrubbing verified over bundle and verdict outputs.
+- [x] Schemas committed and current; tests pass with recorded counts.
 
 ## Test steps
 
@@ -65,4 +65,33 @@ Focused revert; additive module.
 
 ## Completion notes
 
-(placeholder)
+- Implemented `src/core/verification/` (verdict/store/bundle/index):
+  - `ackit.verdict.v1` strict schema: PASS | PASS_WITH_WARNINGS | REWORK_REQUIRED |
+    BLOCKED; verifier {agent (bounded label), context fresh|same, issuedAt (calendar
+    date)}; findings[] with severity blocking|warning|info + criterion + stable
+    upper-snake code + bounded message; checkedCriteria[]; bounded summary.
+  - `VerdictStore` at `.ackit/workflow/TASK-####/verdicts/VR-####.yaml`: append-only,
+    sequential ids, latest governs; registration validates structure (strict, unknown
+    fields rejected), task existence (`VERDICT-TASK-UNKNOWN` — cross-repo refused, T21),
+    criterion references against the evidence registry (`VERDICT-CRITERION-UNKNOWN` —
+    forged criteria refused, T18), and PASS-family/blocking consistency
+    (`VERDICT-BLOCKING-ON-PASS`); tampered files rejected on read; traversal ids refused.
+  - `buildVerificationBundle`: deterministic bounded markdown+json bundle with the
+    mandated material — intent summary + fingerprint, workflow profile/stage, full task
+    document, criteria+evidence, registered verdicts, latest checkpoint, implementation
+    surface (declared scope vs changed files), capped optional diff (`--diff`, 32 KiB
+    default), and explicit fresh-verifier instructions. Secret gate (canonical rules)
+    runs over both emitted surfaces; `--out` paths reject traversal (exit 4).
+- CLI `ackit verification bundle|record|show` registered; drift + workflow gates now
+  resolve verdict presence via the real `VerdictStore` (replacing the TASK-0051
+  placeholder — documented in TASK-0051 notes).
+- Schemas: `schemas/verdict.schema.json` (from zod) +
+  `schemas/verification-bundle.schema.json` (header contract) emitted and committed;
+  `pnpm gen:schemas` idempotent.
+- Tests: unit 8/8 (PASS registration, mandated REWORK_REQUIRED→superseded-by-PASS
+  append-only flow, wrong-schemaId/unknown-fields/blocking-on-PASS rejections with stable
+  codes, forged-criteria rejection, unknown-task/traversal refusal, tamper rejection,
+  bundle determinism/content/JSON, unknown-task reporting) + CLI integration 2/2
+  (bundle→record→show round-trip incl. --out traversal exit 4, blocking-on-PASS refusal,
+  forged criteria refusal). Full sequential suite result recorded in the commit.
+- Gates: typecheck clean; lint 0 problems (263 files); format:check clean.

@@ -21,6 +21,7 @@ import { runScanCommand } from "./commands/scan.js";
 import { registerSkillsCommands } from "./commands/skills.js";
 import { runSummary } from "./commands/summary.js";
 import { registerTaskCommands } from "./commands/task.js";
+import { registerVerificationCommands } from "./commands/verification.js";
 import { registerWorkflowCommands } from "./commands/workflow.js";
 import { runWorkspacesCommand } from "./commands/workspaces.js";
 import type { CliInvocation, GlobalOptions } from "./context.js";
@@ -159,6 +160,8 @@ function buildProgram(invocation: CliInvocation): Command {
   registerEvidenceCommands(program, invocation);
 
   registerDriftCommands(program, invocation);
+
+  registerVerificationCommands(program, invocation);
 
   const initCommand = program
     .command("init")

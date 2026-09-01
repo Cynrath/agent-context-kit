@@ -123,11 +123,13 @@ export async function runDriftCheckCommand(
     evidence = null;
   }
   let latestVerdict: { verdict: string } | null = null;
-  // The verdict store ships with TASK-0052; until it exists, no verdicts CAN
-  // exist and null is the truthful state (MISSING_VERIFIER_VERDICT fires
-  // correctly for verdict-requiring profiles). TASK-0052 wires the real
-  // resolver here without changing this file's contract.
-  latestVerdict = null;
+  try {
+    const { VerdictStore } = await import("../../core/verification/index.js");
+    latestVerdict = await new VerdictStore(rootPath).latestVerdictSummary(taskId);
+    if (latestVerdict !== null) existingArtifacts.push("verdict");
+  } catch {
+    latestVerdict = null;
+  }
 
   const checkpoints = new CheckpointStore(root, rootPath);
   const checkpoint = await checkpoints.latest(taskId);

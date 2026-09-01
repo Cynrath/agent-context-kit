@@ -80,14 +80,22 @@ async function artifactsExist(
   if (Array.isArray(metaExtra.specRefs) && metaExtra.specRefs.length > 0) existing.add("spec");
   if (typeof metaExtra.planRef === "string" && metaExtra.planRef.length > 0) existing.add("plan");
   // Evidence registry presence (ackit.evidence.v2, ADR-0026): stages that
-  // require evidence gate on registry existence via the canonical loader;
-  // verdict presence is enforced by the completion gate (TASK-0053).
+  // require evidence gate on registry existence via the canonical loader.
   try {
     const { loadEvidenceRegistry } = await import("../../core/evidence/index.js");
     const registry = await loadEvidenceRegistry(rootPath, taskId);
     if (registry !== null) existing.add("evidence");
   } catch {
     // registry absent — treated as missing artifact
+  }
+  // Verdict presence (ackit.verdict.v1, ADR-0026): high-risk advancement past
+  // independent-review requires a registered verdict.
+  try {
+    const { VerdictStore } = await import("../../core/verification/index.js");
+    const verdicts = await new VerdictStore(rootPath).list(taskId);
+    if (verdicts.length > 0) existing.add("verdict");
+  } catch {
+    // no verdicts — treated as missing artifact
   }
   return existing;
 }

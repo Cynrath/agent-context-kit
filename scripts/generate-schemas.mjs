@@ -12,6 +12,7 @@ import { InstructionNodeSchema } from "../dist/core/instructions/types.js";
 import { INTENT_SCHEMA_ID, IntentMetaSchema } from "../dist/core/intent/index.js";
 import { POLICY_SCHEMA_VERSION, PolicyDocumentSchema } from "../dist/core/policy/index.js";
 import { TASK_SCHEMA_VERSION, TaskMetaSchema } from "../dist/core/tasks/index.js";
+import { VERDICT_SCHEMA_ID, VerdictSchema } from "../dist/core/verification/index.js";
 import { WORKFLOW_SCHEMA_ID, WorkflowStateSchema } from "../dist/core/workflow/index.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -119,6 +120,37 @@ evidenceSchema.$comment = `ACKit evidence registry schema (${EVIDENCE_SCHEMA_ID}
 writeFileSync(
   path.join(schemasDir, "evidence.schema.json"),
   `${JSON.stringify(evidenceSchema, null, 2)}\n`,
+  "utf8",
+);
+
+// verdict (ackit.verdict.v1, ADR-0026)
+const verdictSchema = z.toJSONSchema(VerdictSchema, { io: "input", unrepresentable: "any" });
+verdictSchema.$comment = `ACKit verdict schema (${VERDICT_SCHEMA_ID}).`;
+writeFileSync(
+  path.join(schemasDir, "verdict.schema.json"),
+  `${JSON.stringify(verdictSchema, null, 2)}\n`,
+  "utf8",
+);
+
+// verification bundle header contract (ackit.verification-bundle.v1, ADR-0026)
+const bundleSchema = {
+  $schema: "https://json-schema.org/draft/2020-12/schema",
+  $id: "https://cynrath.github.io/agent-context-kit/schemas/verification-bundle.schema.json",
+  title: "Verification Bundle Header",
+  description:
+    "Bounded verification bundle header (ackit.verification-bundle.v1) consumed by a fresh-context verifier.",
+  type: "object",
+  properties: {
+    schemaVersion: { const: "ackit.verification-bundle.v1", type: "string" },
+    tool: { const: "ackit", type: "string" },
+    task: { type: "string", pattern: "^TASK-\\d{4}$" },
+  },
+  required: ["schemaVersion", "tool", "task"],
+  additionalProperties: true,
+};
+writeFileSync(
+  path.join(schemasDir, "verification-bundle.schema.json"),
+  `${JSON.stringify(bundleSchema, null, 2)}\n`,
   "utf8",
 );
 console.log("schemas/ackit+task+policy+instruction-graph schemas written");

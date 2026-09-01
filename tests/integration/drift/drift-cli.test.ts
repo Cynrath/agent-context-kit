@@ -63,8 +63,7 @@ describe("ackit drift check CLI integration (§9)", () => {
       ),
     );
     const { readFile } = await import("node:fs/promises");
-    const raw = await readFile(docAbs, "utf8");
-    const frontmatterEnd = raw.indexOf("---", 3);
+    await readFile(docAbs, "utf8");
     const body = [
       "## Affected files",
       "",
