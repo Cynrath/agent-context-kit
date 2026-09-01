@@ -1,11 +1,11 @@
 ---
 id: "TASK-0047"
 title: "task schema integration: artifact refs and workflow-aware task docs"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0045", "TASK-0046"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -36,11 +36,11 @@ Integrate workflow/intent/reference contracts into the existing task model addit
 
 ## Acceptance criteria
 
-- [ ] Task documents with artifact references validate; references to missing intent docs / missing files surface as doctor problems with stable codes.
-- [ ] All 43 pre-existing task documents parse identically (no migration required); `serialize()` output for ref-less tasks is byte-identical to the current implementation.
-- [ ] `ackit task create --intent INTENT-0001 --spec docs/specs/x.md --plan docs/plans/y.md` produces a fully populated task doc.
-- [ ] Plan-first check runs deterministically with git present; degrades to an advisory with git unavailable.
-- [ ] Regenerated `schemas/task.schema.json` current; full test suite green.
+- [x] Task documents with artifact references validate; references to missing intent docs / missing files surface as doctor problems with stable codes.
+- [x] All 43 pre-existing task documents parse identically (no migration required); `serialize()` output for ref-less tasks is byte-identical to the current implementation.
+- [x] `ackit task create --intent INTENT-0001 --spec docs/specs/x.md --plan docs/plans/y.md` produces a fully populated task doc.
+- [x] Plan-first check runs deterministically with git present; degrades to an advisory with git unavailable.
+- [x] Regenerated `schemas/task.schema.json` current; full test suite green.
 
 ## Test steps
 
@@ -64,4 +64,28 @@ Focused revert; additive schema fields with no migration.
 
 ## Completion notes
 
-(placeholder)
+- `TaskMetaSchema` gained ADDITIVE optional `intentRef` (INTENT-#### regex),
+  `specRefs[]`/`decisionRefs[]` (max 8, repository-relative POSIX paths with traversal/
+  absolute/backslash rejection, THREAT_MODEL T19), and `planRef`. `schemaVersion` stays 2
+  (ADR-0025 §5 — no bump, no migration).
+- `serialize()` writes refs only when present: ref-less output byte-identical to the
+  pre-expansion format (asserted by unit test); all 62 real repository task docs (43 legacy
+  + 19 expansion) parse unchanged (`task doctor` integrity OK).
+- `TaskStore.create(options)` + CLI `task create --intent/--spec/--decision/--plan`
+  wired; new-task template extended with `## Required tests` and `## Dependencies` line
+  while preserving `## Completion notes` (completion-gate contract unchanged).
+- `doctor()` validates references: intent ids via IntentStore; doc refs via
+  containment-checked existence — missing refs report `TASK-REF-MISSING:<task>: ...`.
+- Plan-first machine check (`planFirstDiagnostics()`): for tasks with `planRef` and
+  declared affected files, the plan's first git commit date must precede the first commit
+  touching declared areas; git-unavailable degrades to an advisory
+  (`TASK-PLAN-FIRST-CHECK-UNAVAILABLE`), surfaced on stderr by `ackit doctor` — never a
+  hard failure (ADR-0025 §6 determinism-only rule).
+- `schemas/task.schema.json` regenerated (+27 lines, additive optional properties);
+  `pnpm gen:schemas` idempotent.
+- Tests: `tests/unit/tasks/task-refs.test.ts` 9/9 (legacy parse, ref acceptance, traversal
+  rejection, byte-identical serialize, doctor ref validation, planning sections); focused
+  suites 36/36; full suite 72 files / 403 tests green (one readme-parity tarball flake on
+  first run passed on re-run — consistent with the repo's known tarball-flake history).
+- Gates: typecheck clean; lint 0 problems (229 files); format:check clean; doctor all
+  checks passed; task doctor OK; `git diff --check` clean.

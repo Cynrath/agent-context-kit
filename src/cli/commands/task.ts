@@ -18,7 +18,17 @@ interface TaskCommandBase {
 export async function runTaskCommand(
   base: TaskCommandBase,
   subcommand: "create" | "list" | "doctor" | "show" | "start" | "complete" | "archive",
-  args: { title: string; dependencies?: string[] } | { all?: boolean } | { id: string },
+  args:
+    | {
+        title: string;
+        dependencies?: string[];
+        intentRef?: string | undefined;
+        specRefs?: string[] | undefined;
+        decisionRefs?: string[] | undefined;
+        planRef?: string | undefined;
+      }
+    | { all?: boolean }
+    | { id: string },
 ): Promise<ExitCodeValue> {
   const root = path.resolve(base.root ?? process.cwd());
   const store = new TaskStore(root);
@@ -26,7 +36,18 @@ export async function runTaskCommand(
     switch (subcommand) {
       case "create": {
         const { title, dependencies = [] } = args as { title: string; dependencies?: string[] };
-        const doc = await store.create(title, dependencies);
+        const extras = args as {
+          intentRef?: string | undefined;
+          specRefs?: string[] | undefined;
+          decisionRefs?: string[] | undefined;
+          planRef?: string | undefined;
+        };
+        const doc = await store.create(title, dependencies, {
+          intentRef: extras.intentRef,
+          specRefs: extras.specRefs,
+          decisionRefs: extras.decisionRefs,
+          planRef: extras.planRef,
+        });
         if (base.json) {
           emitTaskJson("create", { created: doc.meta.id, file: doc.relativePath });
         } else if (!base.quiet) {
@@ -155,18 +176,40 @@ export function registerTaskCommands(program: Command, invocation: CliInvocation
     .description("create a pending task with a tool-allocated id")
     .argument("<title>")
     .option("--depends-on <ids...>", "dependency TASK-#### ids")
-    .action(async (title: string, opts: { dependsOn?: string[] }) => {
-      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
-      invocation.exitCode = await runTaskCommand(
-        {
-          root: parentOptions.root,
-          json: parentOptions.json ?? false,
-          quiet: parentOptions.quiet ?? false,
+    .option("--intent <id>", "intent reference (INTENT-####)")
+    .option("--spec <paths...>", "spec document references (repo-relative)")
+    .option("--decision <paths...>", "decision document references (repo-relative)")
+    .option("--plan <path>", "plan document reference (repo-relative)")
+    .action(
+      async (
+        title: string,
+        opts: {
+          dependsOn?: string[];
+          intent?: string;
+          spec?: string[];
+          decision?: string[];
+          plan?: string;
         },
-        "create",
-        { title, dependencies: opts.dependsOn ?? [] },
-      );
-    });
+      ) => {
+        const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+        invocation.exitCode = await runTaskCommand(
+          {
+            root: parentOptions.root,
+            json: parentOptions.json ?? false,
+            quiet: parentOptions.quiet ?? false,
+          },
+          "create",
+          {
+            title,
+            dependencies: opts.dependsOn ?? [],
+            intentRef: opts.intent,
+            specRefs: opts.spec,
+            decisionRefs: opts.decision,
+            planRef: opts.plan,
+          },
+        );
+      },
+    );
   for (const [sub, description] of [
     ["list", "list tasks (active dir by default; --all includes archive)"],
     ["doctor", "validate the active task set integrity"],

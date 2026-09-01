@@ -69,7 +69,16 @@ export class TaskStore {
     return `TASK-${String(max + 1).padStart(4, "0")}`;
   }
 
-  async create(title: string, dependencies: readonly string[] = []): Promise<TaskDoc> {
+  async create(
+    title: string,
+    dependencies: readonly string[] = [],
+    options: {
+      intentRef?: string | undefined;
+      specRefs?: readonly string[] | undefined;
+      decisionRefs?: readonly string[] | undefined;
+      planRef?: string | undefined;
+    } = {},
+  ): Promise<TaskDoc> {
     if (title.trim().length === 0) throw new Error("task title must not be empty");
     const id = await this.nextId();
     await fsp.mkdir(this.activeDir, { recursive: true });
@@ -88,6 +97,14 @@ export class TaskStore {
       dependencies: [...dependencies],
       createdAt: new Date().toISOString().slice(0, 10),
       completedAt: null,
+      ...(options.intentRef !== undefined ? { intentRef: options.intentRef } : {}),
+      ...(options.specRefs !== undefined && options.specRefs.length > 0
+        ? { specRefs: [...options.specRefs] }
+        : {}),
+      ...(options.decisionRefs !== undefined && options.decisionRefs.length > 0
+        ? { decisionRefs: [...options.decisionRefs] }
+        : {}),
+      ...(options.planRef !== undefined ? { planRef: options.planRef } : {}),
     });
     const body = newTaskBody(meta.title, meta.dependencies);
     const fileContent = serialize(meta, body);
@@ -199,6 +216,29 @@ export class TaskStore {
       if (doc.meta.status === "completed" && !hasRealCompletionNotes(doc.body)) {
         problems.push(`${doc.meta.id}: completed without real completion notes`);
       }
+      // Artifact-reference validation (ADR-0025 §5): refs must resolve inside
+      // this repository — intent ids against the intent store, doc paths against
+      // the filesystem (containment-checked). Stable problem codes.
+      if (doc.meta.intentRef !== undefined) {
+        const { IntentStore } = await import("../intent/store.js");
+        const intent = await new IntentStore(this.repositoryRoot).find(doc.meta.intentRef);
+        if (intent === null) {
+          problems.push(
+            `TASK-REF-MISSING: ${doc.meta.id}: intentRef '${doc.meta.intentRef}' does not exist`,
+          );
+        }
+      }
+      for (const ref of [
+        ...(doc.meta.specRefs ?? []),
+        ...(doc.meta.decisionRefs ?? []),
+        ...(doc.meta.planRef !== undefined ? [doc.meta.planRef] : []),
+      ]) {
+        if (!(await this.refExists(ref))) {
+          problems.push(
+            `TASK-REF-MISSING: ${doc.meta.id}: referenced file '${ref}' does not exist`,
+          );
+        }
+      }
     }
     const activeCount = all.filter((doc) => doc.meta.status === "active").length;
     if (activeCount > 1) problems.push(`${activeCount} tasks are simultaneously active`);
@@ -231,6 +271,77 @@ export class TaskStore {
     const found = await this.find(id);
     if (found === null || found.archived) throw new Error(`unknown active task '${id}'`);
     return { doc: found.doc };
+  }
+
+  /** Containment-checked reference existence (THREAT_MODEL T19). */
+  private async refExists(ref: string): Promise<boolean> {
+    const absolute = path.resolve(this.repositoryRoot, ...ref.split("/"));
+    const contained =
+      absolute === this.repositoryRoot || absolute.startsWith(`${this.repositoryRoot}${path.sep}`);
+    if (!contained) return false;
+    try {
+      await fsp.access(absolute);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Plan-first machine check (ADR-0025 §6): for tasks with a planRef, the
+   * plan file's first git commit must not be AFTER the first commit touching
+   * the task's declared affected files (plan precedes implementation).
+   * Deterministic, best-effort: git-unavailable yields an advisory diagnostic,
+   * never a hard failure; tasks without planRef are skipped.
+   */
+  async planFirstDiagnostics(): Promise<{ code: string; message: string }[]> {
+    const diagnostics: { code: string; message: string }[] = [];
+    const all = await this.list(false);
+    for (const doc of all) {
+      if (doc.meta.planRef === undefined) continue;
+      const globs = extractSection(doc.body, "Affected files");
+      if (globs === null) continue;
+      const declared = globs
+        .split("\n")
+        .map((line) => line.replace(/^[-*]\s*/, "").trim())
+        .filter((line) => line.length > 0 && !line.includes("**"));
+      if (declared.length === 0) continue;
+      try {
+        const { execFileSync } = await import("node:child_process");
+        const planDate = execFileSync(
+          "git",
+          ["-C", this.repositoryRoot, "log", "--format=%as", "--reverse", doc.meta.planRef],
+          { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+        )
+          .split("\n")
+          .find((line) => line.trim().length > 0);
+        if (planDate === undefined) continue;
+        for (const target of declared) {
+          const targetDate = execFileSync(
+            "git",
+            ["-C", this.repositoryRoot, "log", "--format=%as", "--reverse", "--", target],
+            { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+          )
+            .split("\n")
+            .find((line) => line.trim().length > 0);
+          if (targetDate === undefined) continue;
+          if (targetDate.trim() < planDate.trim()) {
+            diagnostics.push({
+              code: "TASK-PLAN-AFTER-IMPLEMENTATION",
+              message: `${doc.meta.id}: declared area '${target}' has commits (${targetDate.trim()}) before the plan '${doc.meta.planRef}' first appeared (${planDate.trim()})`,
+            });
+            break;
+          }
+        }
+      } catch {
+        // Git unavailable or no history for these paths: advisory only.
+        diagnostics.push({
+          code: "TASK-PLAN-FIRST-CHECK-UNAVAILABLE",
+          message: `${doc.meta.id}: plan-first check skipped (git unavailable or no history for '${doc.meta.planRef}')`,
+        });
+      }
+    }
+    return diagnostics;
   }
 
   private async unparsableDocProblems(): Promise<string[]> {
@@ -290,7 +401,7 @@ function expectedFileName(doc: TaskDoc): string {
 }
 
 export function serialize(meta: TaskMeta, body: string): string {
-  return [
+  const lines: string[] = [
     "---",
     `id: "${meta.id}"`,
     `title: "${meta.title.replace(/"/g, '\\"')}"`,
@@ -298,10 +409,25 @@ export function serialize(meta: TaskMeta, body: string): string {
     `schemaVersion: ${meta.schemaVersion}`,
     "dependencies:",
     ...(meta.dependencies.length === 0 ? ["  []"] : meta.dependencies.map((dep) => `  - "${dep}"`)),
+  ];
+  // Additive refs (ADR-0025 §5): written ONLY when present so ref-less task
+  // serialization stays byte-identical to the pre-expansion format.
+  if (meta.intentRef !== undefined) lines.push(`intentRef: "${meta.intentRef}"`);
+  if (meta.specRefs !== undefined && meta.specRefs.length > 0) {
+    lines.push("specRefs:");
+    lines.push(...meta.specRefs.map((ref) => `  - "${ref}"`));
+  }
+  if (meta.decisionRefs !== undefined && meta.decisionRefs.length > 0) {
+    lines.push("decisionRefs:");
+    lines.push(...meta.decisionRefs.map((ref) => `  - "${ref}"`));
+  }
+  if (meta.planRef !== undefined) lines.push(`planRef: "${meta.planRef}"`);
+  lines.push(
     `createdAt: "${meta.createdAt}"`,
     `completedAt: ${meta.completedAt ?? "null"}`,
     "---",
     "",
     body,
-  ].join("\n");
+  );
+  return lines.join("\n");
 }

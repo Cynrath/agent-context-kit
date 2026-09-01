@@ -4,6 +4,26 @@ export const TASK_SCHEMA_VERSION = 2;
 export const TASK_STATUSES = ["pending", "active", "completed", "blocked"] as const;
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 
+/** Repository-relative POSIX reference path (no absolute/traversal/drive). */
+const refPath = z
+  .string()
+  .min(1)
+  .max(300)
+  .refine(
+    (value) =>
+      !value.startsWith("/") &&
+      !value.startsWith("../") &&
+      !/^[a-zA-Z]:/.test(value) &&
+      !value.includes("\\") &&
+      !value.includes(".."),
+    "repository-relative POSIX path expected (no absolute or traversal)",
+  );
+
+/**
+ * Task frontmatter v2 (REQ-TASKS-002) — ADDITIVE workflow-expansion references
+ * (ADR-0025 §5): optional artifact refs; schemaVersion intentionally stays 2
+ * (old documents parse identically; ref-less serialization byte-identical).
+ */
 export const TaskMetaSchema = z.object({
   id: z.string().regex(/^TASK-\d{4}$/),
   title: z.string().min(1),
@@ -12,6 +32,13 @@ export const TaskMetaSchema = z.object({
   dependencies: z.array(z.string().regex(/^TASK-\d{4}$/)).default([]),
   createdAt: z.string(),
   completedAt: z.string().nullable().default(null),
+  intentRef: z
+    .string()
+    .regex(/^INTENT-\d{4}$/)
+    .optional(),
+  specRefs: z.array(refPath).max(8).optional(),
+  decisionRefs: z.array(refPath).max(8).optional(),
+  planRef: refPath.optional(),
 });
 
 export type TaskMeta = z.infer<typeof TaskMetaSchema>;
@@ -64,6 +91,10 @@ export function newTaskBody(title: string, dependencies: readonly string[]): str
     "",
     "- ",
     "",
+    "## Required tests",
+    "",
+    "- ",
+    "",
     "## Acceptance criteria",
     "",
     "- [ ] Implementation matches scope.",
@@ -85,7 +116,6 @@ export function newTaskBody(title: string, dependencies: readonly string[]): str
     "",
     "(placeholder)",
     "",
-    dependencies.length > 0 ? "" : "",
     dependencies.length > 0 ? `Dependencies: ${dependencies.join(", ")}` : "",
     "",
   ]
