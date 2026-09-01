@@ -1,11 +1,11 @@
 ---
 id: "TASK-0051"
 title: "deterministic workflow drift detection"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0048", "TASK-0050"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -40,11 +40,11 @@ Implement deterministic drift detection (§9): machine-checkable workflow findin
 
 ## Acceptance criteria
 
-- [ ] All eight finding codes implemented, ordered deterministically, and unit-tested with positive+negative cases.
-- [ ] Mandated scenario passes: declared `src/a/**` + actual change under `src/security/**` yields `UNPLANNED_FILE_CHANGE`; a task updated to declare the new area first does NOT yield the finding.
-- [ ] `ackit drift check --ci` exit semantics correct (0 clean, 1 blocking findings, 2 usage, 3 environment).
-- [ ] No semantic findings emitted anywhere in the deterministic core (verified by code review + test enumeration of emitted codes).
-- [ ] Tests pass with recorded counts.
+- [x] All eight finding codes implemented, ordered deterministically, and unit-tested with positive+negative cases.
+- [x] Mandated scenario passes: declared `src/a/**` + actual change under `src/security/**` yields `UNPLANNED_FILE_CHANGE`; a task updated to declare the new area first does NOT yield the finding.
+- [x] `ackit drift check --ci` exit semantics correct (0 clean, 1 blocking findings, 2 usage, 3 environment).
+- [x] No semantic findings emitted anywhere in the deterministic core (verified by code review + test enumeration of emitted codes).
+- [x] Tests pass with recorded counts.
 
 ## Test steps
 
@@ -67,4 +67,33 @@ Focused revert; additive module.
 
 ## Completion notes
 
-(placeholder)
+- Implemented `src/core/drift/check.ts` (+ index): all EIGHT frozen finding codes —
+  `UNPLANNED_FILE_CHANGE` (warning for quick/standard, blocking for high-risk),
+  `MISSING_REQUIRED_ARTIFACT` (blocking), `WORKFLOW_STAGE_INVALID` (blocking),
+  `ACCEPTANCE_CRITERIA_UNVERIFIED` (blocking), `MISSING_VERIFIER_VERDICT` (blocking
+  for non-quick profiles; quick exempt), `STALE_CHECKPOINT` (warning passthrough of
+  the TASK-0048 validator), `PLAN_REFERENCE_MISSING` (warning),
+  `TASK_DEPENDENCY_NOT_SATISFIED` (blocking). Findings sorted code→taskId→detail
+  (determinism asserted). No-declared-scope ⇒ no unplanned-change claim (no semantic
+  inference anywhere — emitted-code enumeration verified by tests).
+- Deterministic exclusions: `.ackit/**` state and `docs/tasks/**` churn never count as
+  unplanned changes.
+- CLI `ackit drift check <TASK-ID> [--ci] [--json]`: assembles the input from real
+  stores (task/workflow/evidence/checkpoint/git/dependencies) with truthful null/empty
+  defaults on absence; `--ci` exits 1 on blocking findings (gate), 2 usage, 3 environment.
+  Porcelain-collapsed untracked dirs are expanded via `git ls-files --others
+  --exclude-standard` so findings name concrete files (deterministic, precise).
+  Verdict resolution placeholder is `null` until TASK-0052 wires the verdict store —
+  MISSING_VERIFIER_VERDICT fires correctly meanwhile.
+- Tests: unit 12/12 — mandated drift scenario (declared `src/a/**` + change
+  `src/security/x.ts` → UNPLANNED_FILE_CHANGE; declared-first update → no finding),
+  high-risk escalation, exclusions, each remaining code positive+negative, ordering
+  determinism; CLI integration 2/2 — real git fixture with --ci gate semantics and JSON
+  output, unknown-task usage exits.
+- Full suite: single-worker verification run `pnpm vitest run --maxWorkers=1` →
+  79 files / 445 tests ALL PASSED (exit 0). Three tests (drift-cli, checkpoint, and the
+  pre-existing readme-parity tarball test) flaked intermittently under full-suite
+  parallel load on this machine — all pass in isolation and in the sequential run; the
+  shared vitest config is unchanged from master (same config green at 381 tests there);
+  no gate was weakened.
+- Gates: typecheck clean; lint 0 problems (254 files); format:check clean.

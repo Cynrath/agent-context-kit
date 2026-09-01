@@ -7,6 +7,7 @@ import { runCacheCleanCommand } from "./commands/cache.js";
 import { registerCheckpointCommands } from "./commands/checkpoint.js";
 import { runConfigCheck } from "./commands/config.js";
 import { runDoctorCommand } from "./commands/doctor.js";
+import { registerDriftCommands } from "./commands/drift.js";
 import { registerEvidenceCommands } from "./commands/evidence.js";
 import { runHooksCommand } from "./commands/hooks.js";
 import { runInitCommand } from "./commands/init.js";
@@ -156,6 +157,8 @@ function buildProgram(invocation: CliInvocation): Command {
   registerCheckpointCommands(program, invocation);
 
   registerEvidenceCommands(program, invocation);
+
+  registerDriftCommands(program, invocation);
 
   const initCommand = program
     .command("init")
