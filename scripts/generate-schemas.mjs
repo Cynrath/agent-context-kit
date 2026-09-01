@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { CHECKPOINT_SCHEMA_ID, CheckpointSchema } from "../dist/core/checkpoint/index.js";
 import { ackitConfigJsonSchema } from "../dist/core/config/json-schema.js";
+import { EVIDENCE_SCHEMA_ID, EvidenceRegistrySchema } from "../dist/core/evidence/index.js";
 import { InstructionNodeSchema } from "../dist/core/instructions/types.js";
 import { INTENT_SCHEMA_ID, IntentMetaSchema } from "../dist/core/intent/index.js";
 import { POLICY_SCHEMA_VERSION, PolicyDocumentSchema } from "../dist/core/policy/index.js";
@@ -106,6 +107,18 @@ checkpointSchema.$comment = `ACKit checkpoint schema (${CHECKPOINT_SCHEMA_ID}).`
 writeFileSync(
   path.join(schemasDir, "checkpoint.schema.json"),
   `${JSON.stringify(checkpointSchema, null, 2)}\n`,
+  "utf8",
+);
+
+// evidence registry (ackit.evidence.v2, ADR-0026)
+const evidenceSchema = z.toJSONSchema(EvidenceRegistrySchema, {
+  io: "input",
+  unrepresentable: "any",
+});
+evidenceSchema.$comment = `ACKit evidence registry schema (${EVIDENCE_SCHEMA_ID}).`;
+writeFileSync(
+  path.join(schemasDir, "evidence.schema.json"),
+  `${JSON.stringify(evidenceSchema, null, 2)}\n`,
   "utf8",
 );
 console.log("schemas/ackit+task+policy+instruction-graph schemas written");

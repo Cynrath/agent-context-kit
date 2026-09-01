@@ -1,11 +1,11 @@
 ---
 id: "TASK-0050"
 title: "evidence contract v2: registry, validation, CLI"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0045", "TASK-0047"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -37,10 +37,10 @@ Implement the versioned evidence contract (ADR-0026, §5): link acceptance crite
 
 ## Acceptance criteria
 
-- [ ] Evidence registry round-trips strict-validated; criteria sync deterministically from the task doc; ids unique and document-ordered.
-- [ ] `validate` denies missing mandatory evidence with stable finding codes; manual-only evidence is insufficient unless explicitly allowed by config.
-- [ ] Secret-shaped refs rejected at registration and validation; refs length-capped.
-- [ ] `schemas/evidence.schema.json` committed and current; tests pass with recorded counts.
+- [x] Evidence registry round-trips strict-validated; criteria sync deterministically from the task doc; ids unique and document-ordered.
+- [x] `validate` denies missing mandatory evidence with stable finding codes; manual-only evidence is insufficient unless explicitly allowed by config.
+- [x] Secret-shaped refs rejected at registration and validation; refs length-capped.
+- [x] `schemas/evidence.schema.json` committed and current; tests pass with recorded counts.
 
 ## Test steps
 
@@ -64,4 +64,34 @@ Focused revert; additive module.
 
 ## Completion notes
 
-(placeholder)
+- Implemented `src/core/evidence/` (types/sync/store/validate/index):
+  `ackit.evidence.v2` strict registry schema (unknown fields rejected, T17);
+  frozen 14-value evidence-type enum; per-criterion `{id: AC-###, requirement,
+  status: unverified|verified, evidence[{type, ref, recordedAt}]}`.
+- `criteriaFromTaskDoc`/`syncRegistry`: the task doc's `## Acceptance criteria`
+  section is the criterion source of truth; ids assigned in document order;
+  checkbox state is NOT copied (implementation ≠ verified — asserted by test);
+  sync preserves recorded evidence only for unchanged requirement text.
+- `validateEvidence`: deterministic completeness — `CRITERION_UNVERIFIED`,
+  `REQUIRED_EVIDENCE_MISSING` (manual-only insufficient by default;
+  `allowedTypes` config can allow manual), `EVIDENCE_REF_INVALID`,
+  `EVIDENCE_SECRET_REF` (canonical secret gate reused — single detection
+  source), duplicate-criterion detection; problems sorted criterion→code
+  (determinism asserted).
+- `EvidenceStore` at `.ackit/workflow/TASK-####/evidence.yaml`: id validation
+  BEFORE any registry access (traversal safe), forged criterion ids rejected
+  (`EVIDENCE-CRITERION-UNKNOWN`), tampered files rejected on load; refs
+  length-capped (500) and dates calendar-validated.
+- CLI `ackit evidence sync|show|verify|validate` registered; workflow gate
+  now resolves `evidence` artifact presence via the canonical
+  `loadEvidenceRegistry` loader (single source, no drift). Exit semantics:
+  validate → 1 on missing mandatory evidence (gate), usage 2 on forged ids.
+- `schemas/evidence.schema.json` emitted and committed; `pnpm gen:schemas`
+  idempotent.
+- Tests: unit 9/9 (sync order + non-copy invariant, evidence preservation on
+  unchanged requirements, mandated evidence-gate scenario, manual-config
+  override, secret-ref rejection, deterministic ordering, store round-trip,
+  forged ids, tamper rejection) + CLI integration 2/2 (full
+  sync→show→denied→manual-still-denied→qualified→passed flow; forgery guard).
+  Full suite: 77 files / 431 tests green.
+- Gates: typecheck clean; lint 0 problems (249 files); format:check clean.

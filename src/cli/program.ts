@@ -7,6 +7,7 @@ import { runCacheCleanCommand } from "./commands/cache.js";
 import { registerCheckpointCommands } from "./commands/checkpoint.js";
 import { runConfigCheck } from "./commands/config.js";
 import { runDoctorCommand } from "./commands/doctor.js";
+import { registerEvidenceCommands } from "./commands/evidence.js";
 import { runHooksCommand } from "./commands/hooks.js";
 import { runInitCommand } from "./commands/init.js";
 import { runInstructionsCommand } from "./commands/instructions.js";
@@ -153,6 +154,8 @@ function buildProgram(invocation: CliInvocation): Command {
   registerIntentCommands(program, invocation);
 
   registerCheckpointCommands(program, invocation);
+
+  registerEvidenceCommands(program, invocation);
 
   const initCommand = program
     .command("init")

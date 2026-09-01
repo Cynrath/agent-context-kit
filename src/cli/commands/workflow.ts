@@ -47,13 +47,18 @@ async function resolveStores(base: WorkflowCommandBase) {
   return {
     config: configResult.config,
     root: rootResolution.root,
+    rootPath: rootResolution.root.canonicalPath,
     workflow: new WorkflowStore(rootResolution.root),
     tasks: new TaskStore(rootResolution.root.canonicalPath),
   };
 }
 
 /** Deterministic artifact existence for the required-artifact gate. */
-async function artifactsExist(tasks: TaskStore, taskId: string): Promise<Set<ArtifactKind>> {
+async function artifactsExist(
+  tasks: TaskStore,
+  taskId: string,
+  rootPath: string,
+): Promise<Set<ArtifactKind>> {
   const found = await tasks.find(taskId);
   const existing = new Set<ArtifactKind>();
   if (found !== null) existing.add("task");
@@ -74,9 +79,16 @@ async function artifactsExist(tasks: TaskStore, taskId: string): Promise<Set<Art
   }
   if (Array.isArray(metaExtra.specRefs) && metaExtra.specRefs.length > 0) existing.add("spec");
   if (typeof metaExtra.planRef === "string" && metaExtra.planRef.length > 0) existing.add("plan");
-  // Evidence/verdict artifact presence is enforced by the completion gate
-  // (TASK-0053) once those stores exist (ADR-0026); stage advancement checks
-  // the planning artifacts only.
+  // Evidence registry presence (ackit.evidence.v2, ADR-0026): stages that
+  // require evidence gate on registry existence via the canonical loader;
+  // verdict presence is enforced by the completion gate (TASK-0053).
+  try {
+    const { loadEvidenceRegistry } = await import("../../core/evidence/index.js");
+    const registry = await loadEvidenceRegistry(rootPath, taskId);
+    if (registry !== null) existing.add("evidence");
+  } catch {
+    // registry absent — treated as missing artifact
+  }
   return existing;
 }
 
@@ -99,9 +111,8 @@ export async function runWorkflowCommand(
 ): Promise<ExitCodeValue> {
   const stores = await resolveStores(base);
   if (stores === null) return EXIT_CODES.usage;
-  const { config, root, workflow, tasks } = stores;
+  const { config, workflow, tasks, rootPath } = stores;
   void config;
-  void root;
   try {
     switch (subcommand) {
       case "show": {
@@ -122,7 +133,7 @@ export async function runWorkflowCommand(
           }
           return EXIT_CODES.ok;
         }
-        const existing = await artifactsExist(tasks, taskId);
+        const existing = await artifactsExist(tasks, taskId, rootPath);
         const required = requiredArtifacts(state.profile, state.stage);
         const missing = required.artifacts.filter((kind) => !existing.has(kind));
         if (base.json) {
@@ -232,7 +243,7 @@ export async function runWorkflowCommand(
           );
           return EXIT_CODES.usage;
         }
-        const existing = await artifactsExist(tasks, taskId);
+        const existing = await artifactsExist(tasks, taskId, rootPath);
         const required = requiredArtifacts(state.profile, to);
         const missing = required.artifacts.filter((kind) => !existing.has(kind));
         if (missing.length > 0) {
