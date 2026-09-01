@@ -1,11 +1,11 @@
 ---
 id: "TASK-0060"
 title: "workflow expansion audit: security, benchmarks, compatibility"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0055", "TASK-0057", "TASK-0058", "TASK-0059"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -34,10 +34,10 @@ Close the audit trail for the expansion (§22/§23/§27): every new subsystem ge
 
 ## Acceptance criteria
 
-- [ ] All new security tests pass and are wired into the permanent suite (not skipped/relaxed); offline-egress covers all new families.
-- [ ] Benchmark harness measures all six mandated areas with median-of-3; actual numbers recorded in completion notes (no "negligible" claims without numbers).
-- [ ] Legacy compatibility snapshot/behavior tests pass on a fixture repository; documented conclusion: v0.2.2 behavior preserved for non-adopting repositories.
-- [ ] Full gate suite green in one recorded run; `git diff --check` clean.
+- [x] All new security tests pass and are wired into the permanent suite (not skipped/relaxed); offline-egress covers all new families.
+- [x] Benchmark harness measures all six mandated areas with median-of-3; actual numbers recorded in completion notes (no "negligible" claims without numbers).
+- [x] Legacy compatibility snapshot/behavior tests pass on a fixture repository; documented conclusion: v0.2.2 behavior preserved for non-adopting repositories.
+- [x] Full gate suite green in one recorded run; `git diff --check` clean.
 
 ## Test steps
 
@@ -61,4 +61,37 @@ Focused revert of test/benchmark additions; no product-code rollback needed.
 
 ## Completion notes
 
-(placeholder)
+- Security: `tests/security/offline-runtime.test.ts` gained a full-family offline test
+  driving task refs, intent, workflow, checkpoint, evidence, verdict registration,
+  verification bundle, drift, roles (7 built-ins), journal appends, policy-v2 resolution
+  — all under the network spy with ZERO egress attempts (14/14 file tests pass; suite
+  total now includes it permanently). Forgery/tamper/traversal rejections were already
+  asserted per-subsystem in TASK-0046..0058 unit suites (verdict forging T18, evidence
+  forging T17, state tamper T16, ref traversal T19, stale checkpoints T20, tier-bypass
+  T23, no-execution gates T24, metadata spoofing/shadowing T25, output redaction T26) —
+  the offline harness closes the T26/TELEMETRY dimension family-wide.
+- Benchmarks (`benchmarks/run.mjs`): seven new median-of-3 metrics on deterministic
+  fixtures (small + medium classes; results committed at
+  `benchmarks/results/baseline-2026-09-01.json`; machine: Windows, 12× AMD Ryzen 5
+  6600H, Node v24.13.0):
+  - small (10 files): taskPackMs 10.21, checkpointCreateMs 188.8, checkpointLoadMs 5.67,
+    evidenceValidateMs 0.02, bundleMs 121.52, driftMs 0.01, policyEvalMs 0.03
+  - medium (200 files): taskPackMs 146.96, checkpointCreateMs 231.72, checkpointLoadMs
+    4.5, evidenceValidateMs 0.03, bundleMs 134.14, driftMs 0.02, policyEvalMs 0.05
+  - Honest observations (no invented claims): checkpoint create and bundle generation
+    pay a first-call YAML/module warm-up cost (~120-230ms); evidence validation, drift
+    detection, and policy evaluation are sub-0.1ms pure functions; task-aware packs cost
+    ~+5% over plain packs at the same budget; checkpoint loads are ~5ms.
+- Compatibility: `tests/integration/compat/legacy-repository.test.ts` 2/2 — a
+  v0.2.2-shaped repository (config without workflow sections, task without refs, no
+  `.ackit/workflow/`) keeps identical behavior across config check, task list/doctor/
+  show/start/complete (legacy gate rules ONLY — no workflow blockers appear), workflow
+  show (legacy notice, no coercion), drift check-active (clean no-op), pack (byte-identical
+  determinism), and task resume (usage when no checkpoint). Conclusion recorded: v0.2.2
+  behavior is preserved for non-adopting repositories.
+- Full recorded gate run (this task): `pnpm lint` 0 problems (286 files); `pnpm
+  format:check` clean; `pnpm typecheck` clean; `pnpm build` ok; `node scripts/
+  check-offline-egress.mjs` PASS; `pnpm smoke:cli` all assertions passed; `pnpm run
+  smoke:package` OK (real tarball, v0.2.2); `git diff --check` clean. Full sequential
+  suite result recorded in the commit. `scan --ci` parity: same findings/exit behavior as
+  the master baseline (identical pre-existing finding set, readiness 88 pass).
