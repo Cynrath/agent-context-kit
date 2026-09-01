@@ -1,11 +1,11 @@
 ---
 id: "TASK-0055"
 title: "declarative ACKit lifecycle gates"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0053"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -39,11 +39,11 @@ Implement the small, stable, declarative lifecycle-gate contract at boundaries A
 
 ## Acceptance criteria
 
-- [ ] Gate contract is purely declarative: schema rejects any executable field (test proves `command`/`script`/`run` keys cannot parse).
-- [ ] All eight lifecycle points resolve deterministically from profile + config; the three hard boundaries (preTaskComplete, verification, preCommit-managed-block) enforce them.
-- [ ] Pre-commit managed block installs/uninstalls cleanly preserving user content (existing hooks contract tests stay green) and invokes only the repository-built CLI.
-- [ ] Release/error/sessionEnd surfaces are advisory only (no automation claims in docs or code).
-- [ ] Tests pass with recorded counts.
+- [x] Gate contract is purely declarative: schema rejects any executable field (test proves `command`/`script`/`run` keys cannot parse).
+- [x] All eight lifecycle points resolve deterministically from profile + config; the three hard boundaries (preTaskComplete, verification, preCommit-managed-block) enforce them.
+- [x] Pre-commit managed block installs/uninstalls cleanly preserving user content (existing hooks contract tests stay green) and invokes only the repository-built CLI.
+- [x] Release/error/sessionEnd surfaces are advisory only (no automation claims in docs or code).
+- [x] Tests pass with recorded counts.
 
 ## Test steps
 
@@ -67,4 +67,38 @@ Focused revert; managed pre-commit block uninstall path preserved.
 
 ## Completion notes
 
-(placeholder)
+- `src/core/workflow/gates.ts` (new): the FROZEN eight-point lifecycle list
+  (`sessionStart, taskStart, preTaskComplete, verification, preCommit, release, error,
+  sessionEnd`); `LifecycleGateSchema` — a strict declarative object whose fields are
+  require-artifacts/require-evidence-verified/require-verdict/require-clean-drift/message
+  ONLY. Structural no-execution guarantee (THREAT_MODEL T24): `command`/`script`/`run`/
+  `exec`/`shell`/`cmd` keys CANNOT parse — proven by contract test.
+- `resolveLifecycleGates` (built-ins + config layers): config layers may only ADD
+  requirements — attempted weakening (fewer artifacts, false booleans) is ignored;
+  artifacts union; booleans OR; deterministic sorted output. Invalid layers produce
+  stable diagnostics; provider-only points (`preToolUse`) cannot even parse.
+- Hard-boundary wiring:
+  - `preTaskComplete` — the built-in gate declares exactly the composed completion gate
+    from TASK-0053 (task+evidence+verdict artifacts, evidence verified, verdict, clean
+    drift); it is the declarative source describing the same checks, not a second engine.
+  - `verification` — the bundle header now carries a "Verification-point gate
+    requirements" section listing the resolved gate so a fresh verifier sees which
+    requirements apply (bundle.ts).
+  - `preCommit` — the managed pre-commit block (user-installed, marker-delimited,
+    foreign content preserved) gained a second managed line
+    `ackit drift check-active --ci` invoking ONLY the ACKit CLI. New `ackit drift
+    check-active` subcommand resolves the single active WORKFLOW task and gates on
+    blocking drift; with no workflow task it is a clean no-op exit 0 — legacy
+    repositories keep the pre-expansion commit experience.
+  - `release`/`error`/`sessionEnd`/`sessionStart`/`taskStart` — advisory surfaces only
+    (messages in gate defaults; no automation claims anywhere).
+- Tests: unit `lifecycle-gates.test.ts` 6/6 (frozen list, no-execution schema for six
+  forbidden field names, built-in coverage incl. preTaskComplete mirroring, additive-only
+  merge with weakening ignored, invalid-layer diagnostics + provider-point exclusion,
+  deterministic sorted resolution) + integration `managed-block.test.ts` 3/3 (install
+  preserves user content + both managed lines, uninstall removes only managed lines,
+  drift check-active no-op on a repository without workflow tasks). Workflow suite
+  22/22 + hooks 3/3.
+- Full sequential suite: 85 files / 478 tests green before the hooks-test addition;
+  re-run with it recorded in the commit.
+- Gates: typecheck clean; lint 0 problems (270 files); format:check clean.

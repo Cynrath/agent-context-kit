@@ -222,4 +222,46 @@ export function registerDriftCommands(program: Command, invocation: CliInvocatio
         taskId,
       );
     });
+  // preCommit lifecycle gate entry (ADR-0028 §3): invoked by the managed
+  // pre-commit block. Resolves the single active WORKFLOW task and gates on
+  // blocking drift; a clean no-op (exit 0) when no workflow task is active —
+  // legacy repositories keep the pre-expansion commit experience.
+  driftCommand
+    .command("check-active")
+    .description("gate the active workflow task on blocking drift (managed pre-commit entry)")
+    .option("--ci", "exit 1 when blocking findings exist (gate mode)", false)
+    .action(async (opts: { ci?: boolean }) => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const base = {
+        root: parentOptions.root,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        ci: opts.ci ?? false,
+      };
+      const rootRequested = path.resolve(base.root ?? process.cwd());
+      const rootResolution = await resolveRepositoryRoot(rootRequested);
+      if (!rootResolution.ok) {
+        emitDiagnostic(
+          { code: "environment-error", message: rootResolution.diagnostic.message },
+          { quiet: base.quiet, debug: false },
+        );
+        invocation.exitCode = EXIT_CODES.environment;
+        return;
+      }
+      const tasks = new TaskStore(rootResolution.root.canonicalPath);
+      const workflowStore = new WorkflowStore(rootResolution.root);
+      let target: string | null = null;
+      for (const doc of await tasks.list(false)) {
+        if (doc.meta.status !== "active") continue;
+        if (await workflowStore.exists(doc.meta.id)) {
+          target = doc.meta.id;
+          break;
+        }
+      }
+      if (target === null) {
+        invocation.exitCode = EXIT_CODES.ok; // no workflow task → no-op
+        return;
+      }
+      invocation.exitCode = await runDriftCheckCommand(base, target);
+    });
 }

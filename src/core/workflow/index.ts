@@ -1,4 +1,13 @@
 export {
+  BUILTIN_LIFECYCLE_GATES,
+  LIFECYCLE_POINTS,
+  type LifecycleGate,
+  LifecycleGateSchema,
+  type LifecyclePoint,
+  type ResolvedLifecycleGates,
+  resolveLifecycleGates,
+} from "./gates.js";
+export {
   BUILTIN_PROFILES,
   canAdvance,
   getProfile,

@@ -7,6 +7,7 @@ import { changedFiles } from "../git/git.js";
 import { IntentStore, intentFingerprint } from "../intent/index.js";
 import { TaskStore } from "../tasks/index.js";
 import type { TaskDoc } from "../tasks/types.js";
+import { resolveLifecycleGates } from "../workflow/gates.js";
 import { WorkflowStore } from "../workflow/index.js";
 import { VerdictStore } from "./store.js";
 
@@ -35,6 +36,8 @@ interface BundleParts {
   checkpointBlock: string;
   surfaceBlock: string;
   diffBlock: string;
+  /** Resolved verification-point lifecycle gate (ADR-0028 §3). */
+  gateRequirements: string[];
   taskDoc: Pick<TaskDoc, "body" | "relativePath"> & {
     meta: Pick<TaskDoc["meta"], "id" | "title" | "status">;
   };
@@ -174,6 +177,29 @@ export async function buildVerificationBundle(
     }
   }
 
+  // Verification-point lifecycle gate (ADR-0028 §3): the bundle header lists
+  // the resolved requirements so the verifier sees exactly which apply.
+  const { gates } = resolveLifecycleGates([]);
+  const verificationGate = gates.find((gate) => gate.point === "verification");
+  const gateRequirements: string[] = [];
+  if (verificationGate !== undefined) {
+    if (verificationGate.requireArtifacts.length > 0) {
+      gateRequirements.push(`artifacts: ${verificationGate.requireArtifacts.join(", ")}`);
+    }
+    if (verificationGate.requireEvidenceVerified) {
+      gateRequirements.push("evidence verified required");
+    }
+    if (verificationGate.requireVerdict) {
+      gateRequirements.push("verdict required");
+    }
+    if (verificationGate.requireCleanDrift) {
+      gateRequirements.push("clean drift required");
+    }
+    if (verificationGate.message !== null) {
+      gateRequirements.push(`note: ${verificationGate.message}`);
+    }
+  }
+
   const parts: BundleParts = {
     taskId,
     intentBlock,
@@ -183,6 +209,7 @@ export async function buildVerificationBundle(
     checkpointBlock,
     surfaceBlock,
     diffBlock,
+    gateRequirements,
     taskDoc: {
       meta: {
         id: found.doc.meta.id,
@@ -245,6 +272,12 @@ function render(parts: BundleParts): VerificationBundle {
     "## Implementation diff",
     "",
     parts.diffBlock,
+    "",
+    "## Verification-point gate requirements",
+    "",
+    ...(parts.gateRequirements.length > 0
+      ? parts.gateRequirements.map((line) => `- ${line}`)
+      : ["- (none declared)"]),
     "",
     "## Verdict instructions",
     "",
