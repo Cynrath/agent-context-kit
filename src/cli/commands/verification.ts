@@ -150,6 +150,16 @@ export async function runVerificationCommand(
           taskExists: async (id: string) => (await tasks.find(id)) !== null,
           evidenceRegistry: evidence,
         });
+        try {
+          const { JournalStore } = await import("../../core/journal/index.js");
+          await new JournalStore(root).append(
+            "verdict-registered",
+            { taskId, verdict: registered.verdict },
+            { taskId },
+          );
+        } catch {
+          // journal best-effort
+        }
         if (base.json) {
           emitJson("record", {
             task: taskId,

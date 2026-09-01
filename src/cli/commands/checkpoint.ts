@@ -95,7 +95,7 @@ export async function runCheckpointCommand(
 ): Promise<ExitCodeValue> {
   const stores = await resolveStores(base);
   if (stores === null) return EXIT_CODES.environment;
-  const { rootPath, checkpoints, tasks, workflow, intents } = stores;
+  const { root, rootPath, checkpoints, tasks, workflow, intents } = stores;
   try {
     switch (subcommand) {
       case "create": {
@@ -125,6 +125,16 @@ export async function runCheckpointCommand(
           wf !== null ? { profile: wf.profile, stage: wf.stage } : { profile: "quick" },
           args.nextAction,
         );
+        try {
+          const { JournalStore } = await import("../../core/journal/index.js");
+          await new JournalStore(root).append(
+            "checkpoint-created",
+            { taskId, checkpoint: checkpoint.id },
+            { taskId },
+          );
+        } catch {
+          // journal best-effort
+        }
         if (base.json) {
           emitJson("create", {
             task: taskId,

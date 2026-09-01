@@ -13,6 +13,7 @@ import { runHooksCommand } from "./commands/hooks.js";
 import { runInitCommand } from "./commands/init.js";
 import { runInstructionsCommand } from "./commands/instructions.js";
 import { registerIntentCommands } from "./commands/intent.js";
+import { registerJournalCommands } from "./commands/journal.js";
 import { runOptimizeCommand } from "./commands/optimize.js";
 import { runPackCommand } from "./commands/pack.js";
 import { runPolicyCheckCommand } from "./commands/policy.js";
@@ -165,6 +166,8 @@ function buildProgram(invocation: CliInvocation): Command {
   registerVerificationCommands(program, invocation);
 
   registerRoleCommands(program, invocation);
+
+  registerJournalCommands(program, invocation);
 
   const initCommand = program
     .command("init")

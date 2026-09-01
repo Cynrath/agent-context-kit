@@ -119,7 +119,7 @@ export async function runWorkflowCommand(
 ): Promise<ExitCodeValue> {
   const stores = await resolveStores(base);
   if (stores === null) return EXIT_CODES.usage;
-  const { config, workflow, tasks, rootPath } = stores;
+  const { config, workflow, tasks, rootPath, root } = stores;
   void config;
   try {
     switch (subcommand) {
@@ -265,6 +265,16 @@ export async function runWorkflowCommand(
           return EXIT_CODES.thresholdExceeded;
         }
         const updated = await workflow.advanceTo(taskId, to);
+        try {
+          const { JournalStore } = await import("../../core/journal/index.js");
+          await new JournalStore(root).append(
+            "workflow-stage",
+            { taskId, profile: updated.profile, stage: updated.stage },
+            { taskId },
+          );
+        } catch {
+          // journal best-effort
+        }
         if (base.json) {
           process.stdout.write(
             `${JSON.stringify({ task: taskId, profile: updated.profile, stage: updated.stage }, null, 2)}\n`,
@@ -288,6 +298,16 @@ export async function runWorkflowCommand(
           return EXIT_CODES.usage;
         }
         const updated = await workflow.recordVerificationAttempt(taskId, outcome);
+        try {
+          const { JournalStore } = await import("../../core/journal/index.js");
+          await new JournalStore(root).append(
+            "verification-attempt",
+            { taskId, outcome },
+            { taskId },
+          );
+        } catch {
+          // journal best-effort
+        }
         if (base.json) {
           process.stdout.write(
             `${JSON.stringify(

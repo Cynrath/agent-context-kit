@@ -143,6 +143,25 @@ export async function runTaskCommand(
           const archivedPath = await store.archive(id);
           void archivedPath;
         }
+        // Journal (ADR-0027 §6): best-effort, non-blocking; a failure to
+        // journal never fails the primary command.
+        try {
+          const { JournalStore } = await import("../../core/journal/index.js");
+          const { resolveRepositoryRoot } = await import("../../core/filesystem/root.js");
+          const resolvedRoot = await resolveRepositoryRoot(root);
+          if (resolvedRoot.ok) {
+            const journal = new JournalStore(resolvedRoot.root);
+            const to =
+              subcommand === "start"
+                ? "active"
+                : subcommand === "complete"
+                  ? "completed"
+                  : "completed";
+            await journal.append("task-transition", { to, taskId: id }, { taskId: id });
+          }
+        } catch {
+          // journal unavailable — primary command already succeeded
+        }
         if (base.json) {
           emitTaskJson(subcommand, { id, ok: true, warnings });
         } else if (!base.quiet) {
@@ -208,6 +227,20 @@ async function checkForceCompletionTier(base: {
     }
     const { autonomy } = resolveAutonomy(layers);
     const evaluation = evaluateBoundary("forceCompletion", autonomy);
+    try {
+      const { JournalStore } = await import("../../core/journal/index.js");
+      const { resolveRepositoryRoot } = await import("../../core/filesystem/root.js");
+      const resolvedRoot = await resolveRepositoryRoot(rootPath);
+      if (resolvedRoot.ok) {
+        await new JournalStore(resolvedRoot.root).append("policy-decision", {
+          boundary: "forceCompletion",
+          tier: evaluation.tier,
+          decision: evaluation.decision,
+        });
+      }
+    } catch {
+      // journal best-effort
+    }
     if (evaluation.decision === "deny") {
       emitDiagnostic(
         {

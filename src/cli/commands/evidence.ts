@@ -126,6 +126,16 @@ export async function runEvidenceCommand(
           type: type as EvidenceType,
           ref,
         });
+        try {
+          const { JournalStore } = await import("../../core/journal/index.js");
+          await new JournalStore(rootResolution.root).append(
+            "evidence-registered",
+            { taskId, criterion, type },
+            { taskId },
+          );
+        } catch {
+          // journal best-effort
+        }
         if (base.json) {
           emitJson("verify", { task: taskId, criterion, type, criteria: registry.criteria.length });
         } else if (!base.quiet) {

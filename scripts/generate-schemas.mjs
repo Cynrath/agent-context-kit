@@ -10,6 +10,7 @@ import { ackitConfigJsonSchema } from "../dist/core/config/json-schema.js";
 import { EVIDENCE_SCHEMA_ID, EvidenceRegistrySchema } from "../dist/core/evidence/index.js";
 import { InstructionNodeSchema } from "../dist/core/instructions/types.js";
 import { INTENT_SCHEMA_ID, IntentMetaSchema } from "../dist/core/intent/index.js";
+import { JOURNAL_SCHEMA_ID, JournalEventSchema } from "../dist/core/journal/index.js";
 import { POLICY_SCHEMA_VERSION, PolicyDocumentSchema } from "../dist/core/policy/index.js";
 import { ROLE_SCHEMA_ID, RoleContractSchema } from "../dist/core/roles/index.js";
 import { TASK_SCHEMA_VERSION, TaskMetaSchema } from "../dist/core/tasks/index.js";
@@ -139,6 +140,18 @@ roleSchema.$comment = `ACKit role contract schema (${ROLE_SCHEMA_ID}).`;
 writeFileSync(
   path.join(schemasDir, "role.schema.json"),
   `${JSON.stringify(roleSchema, null, 2)}\n`,
+  "utf8",
+);
+
+// execution journal (ackit.execution-journal.v1, ADR-0027)
+const journalSchema = z.toJSONSchema(JournalEventSchema, {
+  io: "input",
+  unrepresentable: "any",
+});
+journalSchema.$comment = `ACKit execution journal event schema (${JOURNAL_SCHEMA_ID}).`;
+writeFileSync(
+  path.join(schemasDir, "execution-journal.schema.json"),
+  `${JSON.stringify(journalSchema, null, 2)}\n`,
   "utf8",
 );
 
