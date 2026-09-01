@@ -1,11 +1,11 @@
 ---
 id: "TASK-0061"
 title: "workflow expansion documentation and end-to-end examples"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0059", "TASK-0060"]
 createdAt: "2026-08-31"
-completedAt: null
+completedAt: 2026-09-01
 ---
 
 ## Purpose
@@ -39,11 +39,11 @@ Deliver the complete documentation for the expansion (§24): what ACKit is and i
 
 ## Acceptance criteria
 
-- [ ] Every concept in the mandated list has accurate documentation matching shipped behavior (spot-checked against CLI `--help` and schema files).
-- [ ] The end-to-end example is reproducible: its commands run verbatim on a clean fixture (verified during authoring) and include the provider-switch resume transcript.
-- [ ] README + docs parity/contract tests green; no internal traceability tokens in user-facing docs.
-- [ ] Deferred/excluded features are never described as shipped; the docs include the explicit "is not" list.
-- [ ] `node dist/cli/index.js scan --ci` green after doc commits (no leaked paths/secrets in docs).
+- [x] Every concept in the mandated list has accurate documentation matching shipped behavior (spot-checked against CLI `--help` and schema files).
+- [x] The end-to-end example is reproducible: its commands run verbatim on a clean fixture (verified during authoring) and include the provider-switch resume transcript.
+- [x] README + docs parity/contract tests green; no internal traceability tokens in user-facing docs.
+- [x] Deferred/excluded features are never described as shipped; the docs include the explicit "is not" list.
+- [x] `node dist/cli/index.js scan --ci` green after doc commits (no leaked paths/secrets in docs).
 
 ## Test steps
 
@@ -65,4 +65,37 @@ Focused revert of documentation commits.
 
 ## Completion notes
 
-(placeholder)
+- New concept docs: `docs/concepts/workflows.md` (profiles, stage machine,
+  advancement gates, completion gate, lifecycle gates, policy v2 boundaries),
+  `docs/concepts/intent.md` (contract, when required vs over-bureaucracy,
+  document shape, fingerprints, task referencing), `docs/concepts/checkpoints.md`
+  (model, commands, staleness, provider switch, handoff pack),
+  `docs/concepts/evidence-verification.md` (evidence v2, types, manual-only
+  insufficiency, bundle, verdicts, completion behavior).
+- New reference: `docs/reference/drift.md` (all eight finding codes with
+  severities, exit semantics, exclusions). New guides:
+  `docs/guides/workflow-adoption.md` (legacy preserved; step-by-step adoption;
+  config surface; when NOT to adopt) and `docs/guides/workflow-example.md` —
+  the full end-to-end transcript, REPRODUCIBLE: every command was executed
+  verbatim on a fresh fixture during authoring (two runs; the second included
+  the criterion-tick step) and outputs in the doc are the real outputs,
+  including the provider-switch resume transcript, the DENIED completion
+  before the verdict, and the final `TASK-0001: completed` + journal tail.
+- Updated: `docs/reference/cli.md` (all new families — done in TASK-0059,
+  re-verified), `docs/reference/sdk.md` + `mcp.md` (TASK-0059), README —
+  four new feature-table rows for workflows+intent, evidence+verification,
+  checkpoints+resume, drift+policy v2, each explicitly marked
+  "(experimental branch)" because the work ships on `feat/workflow-expansion`
+  and is unreleased; and a "What ACKit is not" boundary paragraph (not an
+  autonomous coding agent, model runtime, browser automation framework, agent
+  router, or cloud service — model execution stays with the user's agent).
+- Boundary honesty: no deferred/excluded feature is described as shipped —
+  the README rows carry the experimental-branch marker, and the concept docs
+  document provider-interception and tier-4 limitations explicitly.
+- Verification: docs-gate, readme-current, readme-parity (tarball README
+  parity included) and cli-help contract tests all green (86/86 across the
+  contract directory); no internal traceability tokens in user-facing docs
+  (cli-help contract enforces); scan findings unchanged after doc commits
+  (same pre-existing set; readiness 88 pass; no new leaked paths/secrets).
+- Gates: lint 0 problems (docs outside biome src/tests scope — manual review
+  recorded); format:check clean.
