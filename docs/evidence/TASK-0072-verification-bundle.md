@@ -1,17 +1,31 @@
----
-id: "TASK-0072"
-title: "managed-asset lifecycle: unified version-aware sync command (ackit sync) with preview, check, apply, content-driven no-write semantics"
-status: active
-schemaVersion: 2
-dependencies:
-  - "TASK-0066"
-intentRef: "INTENT-0002"
-specRefs: []
-decisionRefs: []
-planRef: "docs/plans/managed-asset-sync-TASK-0072.md"
-createdAt: "2026-09-02"
-completedAt: null
----
+schema: ackit.verification-bundle.v1
+task: TASK-0072
+
+# ACKit Verification Bundle
+
+You are an INDEPENDENT verifier with a fresh context. Review the material
+below, judge semantic compliance against the acceptance criteria, and emit
+an ackit.verdict.v1 verdict (PASS | PASS_WITH_WARNINGS | REWORK_REQUIRED |
+BLOCKED). You should not implement the feature you are judging.
+
+## Intent
+
+INTENT-0002: managed-asset lifecycle: unified version-aware sync with preview-first, check-gated, content-driven reconciliation of ACKit-owned instruction and skill assets [accepted]
+fingerprint: 8887bff5f89d3ded95b5c09f11d1c4308216a8c076c5d7d1ecf69f56f16f1875
+problem: ACKit owns managed instruction blocks (AGENTS.md, CLAUDE.md/GEMINI.md/.github/copilot-instructions.md shims) and builtin skills, but after an npm package upgrade there was no single explicit, preview-first command to reconcile ALL of them; the ownership primitives existed in two separate engines (init + skills install) with no unified dry-run/check/apply view, no CI-safe staleness gate, and no doctor report.
+desired outcome: One first-class command `ackit sync` that reconciles all ACKit-owned managed assets in a single pass with stable statuses, zero-write preview/check modes, content-driven (never version-driven) write decisions, refusal/conflict semantics identical to the existing engines, a read-only doctor staleness row, and zero silent mutation from package install or CLI startup. Proven by a 19-scenario deterministic test matrix including mtime/checksum no-write proofs.
+non-goals: Browser Companion (paused, separate branch); New distribution channels, releases, tags, publishes this session; Reimplementing managed-block or skills ownership engines; Changing canonical managed-block content; TASK-0067..0071 follow-up content
+acceptance criteria: AC-001 ackit sync --dry-run/--check/apply/--json behave per spec with the stable status vocabulary (up-to-date, would-create, would-update-managed, updated-managed, installed, updated, conflict-user-modified, refused-non-managed, refused-third-party) | AC-002 Rule H: ACKit version change with unchanged canonical content produces zero file writes, proven by full-tree checksum snapshot plus mtime assertions on instruction files and the skills lock | AC-003 User files without ACKit managed markers are never touched, even with --force (refused-non-managed) | AC-004 Third-party skills are never overwritten, even with --force (refused-third-party); owned locally-modified skills conflict without --force and update only with --force | AC-005 Lock writes are material-change-gated and contain no absolute paths; doctor reports managed-asset staleness read-only and never writes | AC-006 Full gate matrix green: lint, format, typecheck, build, test (>=94 files/536 tests incl. new matrix), smokes, offline-egress, scan --ci exit 0
+
+## Workflow
+
+profile: standard, stage: verify
+
+## Task document
+
+source: docs/tasks/active/TASK-0072-managed-asset-lifecycle-unified-version-aware-sy.md [active]
+
+````
 
 ## Purpose
 
@@ -202,3 +216,69 @@ Focused revert of the single implementation commit (new files + minimal init ref
 - `sync --check` → `inSync: true`, exit 0.
 - Real repo `ackit sync --check` → correctly refuses human-authored `AGENTS.md`/`CLAUDE.md`/copilot-instructions (no markers), exit 1 — never modifies them.
 
+
+````
+
+## Acceptance criteria + evidence
+
+AC-001 [verified] `ackit sync --dry-run`/`--check`/apply/`--json` behave per spec with the stable status vocabulary (verified by `tests/integration/onboarding/sync.test.ts` scenarios 1, 14, 15, 16)
+    evidence: test: tests/integration/onboarding/sync.test.ts scenarios 1/14/15/16: 17/17 PASS (pnpm vitest run)
+AC-002 [verified] Rule H: ACKit version change with unchanged canonical content produces zero file writes (checksum snapshot + mtime proofs; scenario 5)
+    evidence: test: sync.test.ts scenario 5: rule-H zero-write proof via full-tree checksum snapshot + mtime (version=99.0.0-simulated-upgrade, statuses all up-to-date, tree identical)
+AC-003 [verified] User files without ACKit managed markers are never touched, even with `--force` (scenarios 2, 12b)
+    evidence: test: sync.test.ts scenarios 2+12b: refused-non-managed with bytes+mtime untouched, including under --force
+AC-004 [verified] Third-party skills are never overwritten even with `--force`; owned locally-modified skills conflict without `--force` and update only with `--force` (scenarios 8, 10, 11)
+    evidence: test: sync.test.ts scenarios 8/10/11: refused-third-party under force; conflict-user-modified without force (file untouched); updated only with force
+AC-005 [verified] Lock writes are material-change-gated with no absolute paths (scenarios 5, 13)
+    evidence: test: sync.test.ts scenarios 5+13: lock not rewritten on version-only change (install.ts upsertLockEntry material-change gate); lockHasAbsolutePaths false
+AC-006 [verified] Doctor reports managed-asset staleness read-only and never writes (`tests/integration/doctor/managed-assets.test.ts`)
+    evidence: test: tests/integration/doctor/managed-assets.test.ts 2/2: full-tree snapshot proves doctor never writes; JSON row present (up-to-date/updates available/conflict-user-modified)
+AC-007 [verified] Provider shims follow the same ownership behavior as AGENTS.md (scenario 7); managed blocks preserve user text outside blocks (scenario 3); unchanged canonical content means zero write (scenario 4); changed canonical content updates only the managed block (scenario 6)
+    evidence: test: sync.test.ts scenarios 3/4/6/7: user-prefix byte preservation; unchanged zero-write (mtime+checksum); stale block refreshed in place; CLAUDE/GEMINI/copilot same ownership rules
+AC-008 [verified] Missing builtin installs; identical builtin is up-to-date; owned-unchanged + changed builtin updates (scenarios 1, 17, 9)
+    evidence: test: sync.test.ts scenarios 1/17/9: would-create/installed; second run all up-to-date zero diff; owned-unchanged + changed builtin -> updated
+AC-009 [verified] Full gate matrix green: lint, format:check, typecheck, build, test (94 files/536 tests incl. new matrix), gen:schemas idempotence, smoke:cli, smoke:package, offline-egress, config check, doctor, task doctor, scan --ci exit 0, git diff --check
+    evidence: build: Full gates 2026-09-02 all exit 0: pnpm lint (292 files), format:check (276), typecheck, build, pnpm test 94 files/536 tests PASS, gen:schemas idempotent, smoke:cli, smoke:package (tarball v0.3.0), offline-egress, config check, doctor, task doctor, scan --ci (readiness 88), git diff --check
+AC-010 [verified] Legacy repositories retain current behavior (scenario 19; existing init/skills tests unchanged and green)
+    evidence: test: sync.test.ts scenario 19: planOrApplyInit/installSkills unchanged behavior verified (init dry-run 4 created, apply codex created, skills installed); existing tests/integration/init/init.test.ts + tests/integration/skills/install.test.ts green unchanged in full suite
+AC-011 [verified] Docs updated: CLI reference sync row/options/statuses; agent-integration lifecycle section with the two mandated statements; getting-started tour line
+    evidence: manual: docs/reference/cli.md (sync row + options + statuses), docs/guides/agent-integration.md (Managed-asset lifecycle section: never-rewrite-on-upgrade + only-owned-assets-on-explicit-command + full rule list + doctor read-only note), docs/guides/getting-started.md (sync --check tour line)
+AC-012 [unverified] Independent verification bundle built; fresh-context verifier verdict registered via the real flow; no blocking findings before merge
+
+## Registered verdicts
+
+(no verdicts registered yet — you are the fresh verifier)
+
+## Latest checkpoint
+
+(no checkpoint)
+
+## Implementation surface
+
+declared affected areas: `src/core/onboarding/sync.ts` (new — sync engine), `src/core/onboarding/init.ts` (minimal refactor: extract shared planning path; public behavior unchanged), `src/core/onboarding/index.ts` (export sync types for internal CLI use), `src/cli/commands/sync.ts` (new — CLI command), `src/cli/program.ts` (register `sync`), `src/cli/commands/doctor.ts` (managed-assets read-only check row), `tests/integration/onboarding/sync.test.ts` (new — 19-scenario matrix), `tests/integration/doctor/managed-assets.test.ts` (new — doctor read-only/no-write + staleness), `tests/e2e/cli-scaffold.smoke.mjs` (sync --check smoke) OR a focused addition in an existing e2e — final placement decided during implementation, `docs/reference/cli.md`, `docs/guides/agent-integration.md`, `docs/guides/getting-started.md`, `docs/tasks/active/TASK-0072-*.md` (this file, evidence)
+current changed/untracked files (3): docs/tasks/active/TASK-0072-managed-asset-lifecycle-unified-version-aware-sy.md, docs/intent/INTENT-0002-managed-asset-lifecycle-unified-version-aware-sy.md, docs/plans/managed-asset-sync-TASK-0072.md
+
+## Implementation diff
+
+(diff omitted — pass --diff for the capped full diff)
+
+## Verification-point gate requirements
+
+- artifacts: task
+- note: verification bundles carry the task's declared requirements
+
+## Verifier role contract
+
+verifier: Independent Verifier (ackit.role.v1)
+Judges the implementation against the acceptance criteria with a fresh context; never implements what it judges.
+required inputs: intent, spec, plan, task, diff, tests, evidence
+allowed: inspect intent, spec, plan, task, diff, tests, and evidence; read repository content; emit an ackit.verdict.v1 verdict
+forbidden: implement or modify the feature under judgment; edit source files; register evidence for the task being judged
+required outputs: ackit.verdict.v1 verdict
+
+## Verdict instructions
+
+- Compare the implementation surface, diff, and evidence against every criterion.
+- Blocking findings must carry the criterion id and a stable upper-snake code.
+- PASS-family verdicts cannot carry blocking findings (registration rejects them).
+- Register your verdict with: ackit verification record <task> --verdict <file>
