@@ -4,28 +4,46 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
-## [Unreleased]
+## [0.3.0] - 2026-09-02
 
-Workflow, verification, evidence and resumability expansion (unreleased feature line on `feat/workflow-expansion`).
+Workflow, verification, evidence and resumability expansion (minor release; merged from `feat/workflow-expansion` via PR #7). All capabilities are backward compatible — legacy repositories without `workflow:` config or artifact refs keep exact pre-`0.2.2` behavior. The Browser Companion experiment remains paused on its separate branch and is **not** part of this release.
 
 ### Added
 
-- **Workflow engine** (`src/core/workflow/`): three built-in profiles (`quick`/`standard`/`high-risk`) with canonical stage orders and per-stage required artifacts; per-task state under `.ackit/workflow/` (`ackit.workflow.v1`); `ackit workflow set|show|advance|verify` CLI; verify/fix-loop attempt recording with deterministic fail-rewind; declarative lifecycle gates (frozen eight-point list; no executable hooks by schema construction).
-- **Intent artifact** (`src/core/intent/`): committed `docs/intent/` documents (`ackit.intent.v1`), normalization, machine-path-independent fingerprints, secret-gated validation; `ackit intent new|list|show|validate|fingerprint` CLI.
-- **Task reference fields** (additive frontmatter): `intentRef`, `specRefs`, `decisionRefs`, `planRef` (schemaVersion stays 2 — legacy documents parse identically); `task create --intent/--spec/--decision/--plan`; doctor validates references; plan-first git ordering check (advisory).
-- **Checkpoints + resumability** (`src/core/checkpoint/`): `ackit.checkpoint.v1` per-task checkpoints with deterministic work extraction, staleness detection, resume context + handoff pack renderers; `ackit checkpoint create|show|validate|export` + `ackit task resume`; provider-switch scenario proven by tests.
+- **Workflow profiles** (`src/core/workflow/`): three built-in profiles (`quick`/`standard`/`high-risk`) with canonical stage orders and per-stage required artifacts; per-task state under `.ackit/workflow/` (`ackit.workflow.v1`); `ackit workflow set|show|advance|verify` CLI; verify/fix-loop attempt recording with deterministic fail-rewind; declarative lifecycle gates (frozen eight-point list; no executable hooks by schema construction).
+- **Intent artifacts** (`src/core/intent/`): committed `docs/intent/` documents (`ackit.intent.v1`), normalization, machine-path-independent fingerprints, secret-gated validation; `ackit intent new|list|show|validate|fingerprint` CLI.
+- **Task artifact references** (additive frontmatter): `intentRef`, `specRefs`, `decisionRefs`, `planRef` (schemaVersion stays 2 — legacy documents parse identically); `task create --intent/--spec/--decision/--plan`; doctor validates references; plan-first git ordering check (advisory).
+- **Checkpoints + resumability + handoff** (`src/core/checkpoint/`): `ackit.checkpoint.v1` per-task checkpoints with deterministic work extraction, staleness detection, resume context + handoff pack renderers; `ackit checkpoint create|show|validate|export` + `ackit task resume`; provider-switch scenario proven by tests.
 - **Task-aware context packs**: `ackit pack --task <id>` / `--resume` with documented ranking weights (`taskDeclaredScope`, `taskReference`); checkpoint resume section rides the REQ-CTX-001 mechanism.
-- **Evidence contract v2** (`src/core/evidence/`): `ackit.evidence.v2` registry linking acceptance criteria to typed evidence; criteria sync from the task doc (checkbox state is never copied — implementation ≠ verified); `ackit evidence sync|show|verify|validate` CLI; completeness validation with manual-only insufficiency by default.
-- **Independent verification** (`src/core/verification/`): bounded deterministic verification bundle (`ackit.verification-bundle.v1`) embedding intent, workflow, task, evidence, verdicts, checkpoint, implementation surface, verifier role contract; append-only `ackit.verdict.v1` store (PASS | PASS_WITH_WARNINGS | REWORK_REQUIRED | BLOCKED) with forged-criteria/cross-repo/blocking-on-PASS rejection; `ackit verification bundle|record|show` CLI.
-- **Completion gate integration**: workflow-enabled tasks gate completion on evidence completeness, verdict requirements, stage, verification attempts, and blocking drift — `VERIFY failed → completed` is structurally impossible; legacy tasks keep exact pre-expansion behavior; `--force` remains the explicit escape hatch.
+- **Evidence Contract v2** (`src/core/evidence/`): `ackit.evidence.v2` registry linking acceptance criteria to typed evidence; criteria sync from the task doc (checkbox state is never copied — implementation ≠ verified); `ackit evidence sync|show|verify|validate` CLI; completeness validation with manual-only insufficiency by default.
+- **Independent verification bundle/verdict protocol** (`src/core/verification/`): bounded deterministic verification bundle (`ackit.verification-bundle.v1`) embedding intent, workflow, task, evidence, verdicts, checkpoint, implementation surface, verifier role contract; append-only `ackit.verdict.v1` store (PASS | PASS_WITH_WARNINGS | REWORK_REQUIRED | BLOCKED) with forged-criteria/cross-repo/blocking-on-PASS rejection; `ackit verification bundle|record|show` CLI.
+- **Completion-gate enforcement**: workflow-enabled tasks gate completion on evidence completeness, verdict requirements, stage, verification attempts, and blocking drift — `VERIFY failed → completed` is structurally impossible; legacy tasks keep exact pre-expansion behavior; `--force` remains the explicit escape hatch.
 - **Deterministic drift detection** (`src/core/drift/`): eight frozen finding codes; `ackit drift check [--ci]` + managed pre-commit gate (`ackit drift check-active`, no-op without workflow tasks).
-- **Policy v2** (`src/core/policy/tiers.ts`): risk-tiered autonomy (`tier0..tier4 × allow|ask|deny`, deny wins across layers) + review policy on policy documents AND `ackit.yml`; `--force` is a tier2 boundary (deny → `POLICY-TIER-DENIED` exit 4; non-tty ask → deny); `ackit policy check` prints autonomy + review.
+- **Policy v2 risk tiers + review policy** (`src/core/policy/tiers.ts`): risk-tiered autonomy (`tier0..tier4 × allow|ask|deny`, deny wins across layers) + review policy on policy documents AND `ackit.yml`; `--force` is a tier2 boundary (deny → `POLICY-TIER-DENIED` exit 4; non-tty ask → deny); `ackit policy check` prints autonomy + review.
+- **Declarative lifecycle gates**: per-stage required-artifact gates declared in workflow profiles (data-only list; no executable hooks by schema construction).
 - **Role contracts** (`src/core/roles/`, `templates/roles/`): `ackit.role.v1` portable data-only contracts — researcher, architect, implementer, verifier, security-reviewer, documentation-reviewer, release-reviewer; `ackit role list|show|validate` CLI; verifier contract embedded in bundles; repository roles cannot shadow built-ins.
 - **Skills interoperability** (`src/core/skills/project.ts`): deterministic projections to Claude Code (identity), Copilot instructions (derived `applyTo`), and generic layouts; `ackit skills export --provider --out [--force]` with containment and overwrite refusal.
 - **Local execution journal** (`src/core/journal/`): sanitized append-only JSONL (`ackit.execution-journal.v1`) with a CLOSED event-kind list (no conversation/thought/tool-call capture structurally), redaction at construction, deterministic rotation; `ackit journal show|validate`; non-blocking wiring in task/workflow/evidence/verdict/checkpoint/policy paths.
-- **SDK**: focused typed additions to the frozen allowlist (workflow/intent/checkpoint/evidence/verdict/bundle/drift/policy/role functions and stores); contract test updated.
-- **MCP**: six new READ-ONLY tools (`ackit_workflow_status`, `ackit_get_intent`, `ackit_get_checkpoint`, `ackit_verification_bundle`, `ackit_drift_check`, `ackit_list_roles`); the read-only boundary is preserved — state mutation stays CLI-only by explicit decision (ADR-0028).
+- **CLI/SDK/MCP additions**: focused typed additions to the frozen SDK allowlist (workflow/intent/checkpoint/evidence/verdict/bundle/drift/policy/role functions and stores; contract test updated); six new READ-ONLY MCP tools (`ackit_workflow_status`, `ackit_get_intent`, `ackit_get_checkpoint`, `ackit_verification_bundle`, `ackit_drift_check`, `ackit_list_roles`).
 - **Schemas**: `workflow.schema.json`, `intent.schema.json`, `checkpoint.schema.json`, `evidence.schema.json`, `verdict.schema.json`, `verification-bundle.schema.json`, `role.schema.json`, `execution-journal.schema.json`; `ackit.schema.json`/`task.schema.json`/`policy.schema.json` extended additively.
+
+### Compatibility
+
+- Legacy repositories (no `workflow:` config, no artifact refs, no `.ackit/workflow/` state) retain exactly the supported pre-expansion behavior — proven by the legacy-repository integration fixture.
+- No LLM API, cloud service, or network dependency is introduced; the offline-first invariant (no network calls, no telemetry, no uploads in product code) is preserved and enforced by the offline-egress gate.
+- MCP remains within its documented read-only boundary — all state mutation stays CLI-only by explicit decision (ADR-0028).
+
+### Known limitations (non-blocking follow-ups)
+
+- `workflow:` config keys parse and validate but do not yet alter gate behavior.
+- Advance-gate planning-artifact validation remains declaration-based rather than disk-existence based.
+- Checkpoint writes are not yet temp+rename atomic.
+- MCP drift warning/input parity has the documented residual divergence.
+- Browser Companion remains **paused / experimental** on its separate branch and is excluded from this release.
+
+### Security
+
+- Offline-egress invariant extended over the new subsystems (static gate + runtime contract tests); journal redaction at construction; secret-gated intent validation; no new network calls, telemetry, or arbitrary plugin execution.
 
 ## [0.2.2] - 2026-08-27
 
