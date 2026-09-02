@@ -332,6 +332,8 @@ export async function createAckitMcpServer(requestedRoot?: string | undefined): 
     { taskId: z.string() },
     async (args: { taskId: string }) => {
       try {
+        const { promises: fsp } = await import("node:fs");
+        const path = await import("node:path");
         const { TaskStore } = await import("../core/tasks/index.js");
         const { WorkflowStore, requiredArtifacts } = await import("../core/workflow/index.js");
         const { EvidenceStore } = await import("../core/evidence/index.js");
@@ -361,13 +363,45 @@ export async function createAckitMcpServer(requestedRoot?: string | undefined): 
           const depFound = await tasks.find(dep);
           dependencies.push({ id: dep, completed: depFound?.doc.meta.status === "completed" });
         }
+        // Input resolution parity with the CLI (drift.ts): artifact presence
+        // includes intent/spec/plan/verdict existence checks and declared
+        // refs are resolved on disk, so the MCP tool reports exactly what
+        // `ackit drift check` reports for the same repository state
+        // (TASK-0064 audit-fidelity fix).
+        const metaExtra = found.doc.meta as {
+          intentRef?: string | undefined;
+          specRefs?: string[] | undefined;
+          decisionRefs?: string[] | undefined;
+          planRef?: string | undefined;
+        };
+        const existingArtifacts: string[] = ["task", ...(evidence !== null ? ["evidence"] : [])];
+        if (metaExtra.intentRef !== undefined) existingArtifacts.push("intent");
+        if (metaExtra.specRefs !== undefined && metaExtra.specRefs.length > 0)
+          existingArtifacts.push("spec");
+        if (metaExtra.planRef !== undefined && metaExtra.planRef.length > 0)
+          existingArtifacts.push("plan");
+        if (latest !== null) existingArtifacts.push("verdict");
+        const refPaths = [
+          ...(metaExtra.specRefs ?? []),
+          ...(metaExtra.decisionRefs ?? []),
+          ...(metaExtra.planRef !== undefined ? [metaExtra.planRef] : []),
+        ];
+        const referencePathsExist: string[] = [];
+        for (const ref of refPaths) {
+          try {
+            await fsp.access(path.resolve(repositoryRoot, ...ref.split("/")));
+            referencePathsExist.push(ref);
+          } catch {
+            // absent — drift flags it (same as the CLI)
+          }
+        }
         const findings = detectWorkflowDrift({
           taskId: args.taskId,
           taskDoc: found.doc,
           workflow: wf !== null ? { profile: wf.profile, stage: wf.stage } : null,
           requiredArtifacts: wf !== null ? requiredArtifacts(wf.profile, wf.stage).artifacts : [],
-          existingArtifacts: ["task", ...(evidence !== null ? ["evidence"] : [])],
-          referencePathsExist: [],
+          existingArtifacts,
+          referencePathsExist,
           evidence,
           latestVerdict: latest !== null ? { verdict: latest.verdict } : null,
           checkpoint,

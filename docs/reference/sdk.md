@@ -14,7 +14,14 @@ The programmatic SDK is the single supported import for embedding ACKit in Node.
 | `buildContextPack(root, opts?)` | function | Builds a budgeted deterministic context pack (`PackResult`). `opts.signal` supported. |
 | `buildInstructionGraph(root, opts?)` | function | Builds the instruction graph (`InstructionGraph`). `opts.signal` supported. |
 | `resolveEffectiveStack(graph, provider, forPath?)` | function | Pure function resolving the effective instruction stack for a provider/path. |
+| `analyzeOptimize(root, opts?)` | function | Optimization findings + suggestions (pack/context waste analysis). |
 | `validateSkills(root)` | function | Validates `.agents/skills/*/SKILL.md` set, returns `{skills, issues}`. |
+| `evaluateRulePacks(root, opts?)` | function | Evaluates declarative rule packs (exported since v0.2.0). |
+| `loadRulePacks(root)` | function | Loads rule pack documents. |
+| `scoreRepository(root, opts?)` | function | Readiness scoring engine (exported since v0.2.0). |
+| `detectProfiles`, `loadBuiltInProfiles`, `resolveProfile` | functions | Stack/profile detection and resolution. |
+| `ProfileSchema` | constant | Stack-profile zod schema. |
+| `READINESS_ENGINE_VERSION` | constant | Readiness engine version marker. |
 | `AckitError` | class | Typed error `extends Error { code: string; remediation?: string; cause?: unknown }`. Never a raw string. |
 | `AckitErrorCode` | type | Union of stable codes (`CONFIG-*`, `SCAN-*`, `FS-*`, `POLICY-*`, `GRAPH-*`, `PACK-*`, `UNKNOWN`). |
 | `AckitConfig` | type | Merged config (scan + context + policy + readiness (v0.2.0) + profile). |
@@ -37,10 +44,6 @@ The programmatic SDK is the single supported import for embedding ACKit in Node.
 | `resolveAutonomy`, `resolveReview` | functions | Policy v2 risk-tiered autonomy + review resolution (deny wins). |
 | `listRoles`, `loadRole` | functions | Portable role contracts (`ackit.role.v1`). |
 | `WorkflowStore`, `BUILTIN_PROFILES`, `listWorkflowProfiles`, `requiredArtifacts` | class/constants | Workflow engine (`ackit.workflow.v1`); profiles are frozen catalogs. |
-**Reserved v0.2.0 additions (not yet exported):**
-
-- `scoreRepository` (readiness, TASK-0008)
-- `evaluateRulePack` (rule packs, TASK-0012)
 
 Additions require ADR + contract test update; the allowlist test fails on accidental export.
 

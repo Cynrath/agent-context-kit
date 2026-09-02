@@ -5,11 +5,6 @@
  * Everything not re-exported here is internal and may change without notice;
  * the exported symbol set is contract-tested (tests/contract/api-surface) so
  * accidental additions/removals are caught before they become breaking.
- *
- * v0.2.0 reserved extension points (not yet implemented in this task):
- *   // - scoreRepository (TASK-0008)
- *   // - evaluateRulePack (TASK-0012)
- *   // - provider-aware BuildGraphOptions extensions (TASK-0011)
  */
 export type { AckitErrorCode } from "./api/errors.js";
 export { AckitError } from "./api/errors.js";

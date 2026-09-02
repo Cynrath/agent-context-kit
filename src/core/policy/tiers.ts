@@ -67,6 +67,18 @@ export interface ResolvedAutonomy {
   tier4: TierDecision;
 }
 
+/**
+ * Which tiers were EXPLICITLY set by any active layer (vs inherited from
+ * AUTONOMY_DEFAULTS). Boundary enforcement (ADR-0028 §1) fires deny/ask
+ * behavior only for explicitly-set tiers so that repositories without any
+ * autonomy configuration keep exact pre-policy behavior (compatibility).
+ */
+export interface ResolvedAutonomyReport {
+  autonomy: ResolvedAutonomy;
+  explicitTiers: ActionTier[];
+  diagnostics: string[];
+}
+
 /** Documented map of ACKit-owned boundaries to their tier (ADR-0028 §1). */
 export const ACKIT_BOUNDARY_TIERS = {
   /** task complete --force: explicit gate override = controlled state change. */
@@ -84,11 +96,9 @@ export type AckitBoundary = keyof typeof ACKIT_BOUNDARY_TIERS;
  * defaults; DENY IN ANY ACTIVE LAYER DENIES (deny wins — never bypassable via
  * a later allow). Returns the merged table plus diagnostics.
  */
-export function resolveAutonomy(layers: readonly unknown[]): {
-  autonomy: ResolvedAutonomy;
-  diagnostics: string[];
-} {
+export function resolveAutonomy(layers: readonly unknown[]): ResolvedAutonomyReport {
   const merged: Partial<Record<ActionTier, TierDecision>> = {};
+  const explicit = new Set<ActionTier>();
   const diagnostics: string[] = [];
   for (const [index, layer] of layers.entries()) {
     if (layer === null || layer === undefined) continue;
@@ -102,6 +112,7 @@ export function resolveAutonomy(layers: readonly unknown[]): {
       if (value === "allow" || value === "ask" || value === "deny") {
         // DENY is sticky: once any layer denies a tier, later allows cannot
         // reopen it (deny wins — policy bypass prevention, THREAT_MODEL T23).
+        explicit.add(tier);
         if (merged[tier] === "deny") continue;
         merged[tier] = value;
       } else if (value !== undefined) {
@@ -117,6 +128,7 @@ export function resolveAutonomy(layers: readonly unknown[]): {
       tier3: merged.tier3 ?? AUTONOMY_DEFAULTS.tier3,
       tier4: merged.tier4 ?? AUTONOMY_DEFAULTS.tier4,
     },
+    explicitTiers: [...explicit].sort(),
     diagnostics,
   };
 }
@@ -147,6 +159,30 @@ export function evaluateBoundary(
         : decision === "ask"
           ? `boundary '${boundary}' is tier ${tier} (ask)`
           : `boundary '${boundary}' is tier ${tier} (deny)`,
+  };
+}
+
+/**
+ * Enforcement decision for an ACKit-owned boundary (ADR-0028 §1) that
+ * preserves compatibility for unconfigured repositories: when no active
+ * layer explicitly set the boundary's tier, the boundary proceeds with
+ * today's behavior (the defaults are advisory for unconfigured repos);
+ * an explicit deny always refuses, and an explicit ask behaves as the
+ * documented --force precedent (non-interactive contexts treat ask as
+ * deny — no silent bypass).
+ */
+export function enforceBoundary(
+  boundary: AckitBoundary,
+  report: ResolvedAutonomyReport,
+): { enforce: boolean; decision: TierDecision; tier: ActionTier; reason: string } {
+  const evaluation = evaluateBoundary(boundary, report.autonomy);
+  const tier = ACKIT_BOUNDARY_TIERS[boundary];
+  const explicitlySet = report.explicitTiers.includes(tier);
+  return {
+    enforce: explicitlySet && evaluation.decision !== "allow",
+    decision: evaluation.decision,
+    tier,
+    reason: evaluation.reason,
   };
 }
 
@@ -215,14 +251,33 @@ export function checkVerdictAgainstReview(
 ): { ok: boolean; problems: string[] } {
   const problems: string[] = [];
   const covered = new Set<ReviewDimension>();
+  // Verdict finding severities (ackit.verdict.v1) are blocking|warning|info;
+  // review-policy severities are critical|high|medium (the scanner scale).
+  // Deterministic mapping for the cross-check: blocking → critical, warning
+  // → medium, info → below every blocking threshold.
+  const reviewRankOf = (findingSeverity: string): number =>
+    findingSeverity === "blocking" ? 3 : findingSeverity === "warning" ? 1 : 0;
   for (const finding of verdict.findings) {
     for (const [dimension, prefixes] of Object.entries(DIMENSION_PREFIXES)) {
       if (prefixes.some((prefix) => finding.code.startsWith(prefix))) {
         covered.add(dimension as ReviewDimension);
       }
     }
-    const severities = ["critical", "high", "medium"] as const;
-    void severities;
+    // blockingSeverity enforcement (ADR-0028 §2): a verdict finding at or
+    // above a configured blocking severity fails the review. Note that a
+    // literal `blocking` finding on a PASS-family verdict is already
+    // rejected structurally at registration (VERDICT-BLOCKING-ON-PASS) —
+    // this check covers the mapped severities of the remaining findings.
+    if (review.blockingSeverity.length > 0) {
+      const thresholdRank = Math.min(
+        ...review.blockingSeverity.map((sev) => (sev === "critical" ? 3 : sev === "high" ? 2 : 1)),
+      );
+      if (reviewRankOf(finding.severity) >= thresholdRank) {
+        problems.push(
+          `REVIEW-BLOCKING-SEVERITY: finding '${finding.code}' has severity '${finding.severity}', at or above the configured blocking severity`,
+        );
+      }
+    }
   }
   for (const dimension of review.required) {
     if (!covered.has(dimension)) {

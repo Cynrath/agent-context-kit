@@ -238,6 +238,16 @@ export class TaskStore {
         blockers.push(
           `VERDICT_BLOCKING: latest verdict ${latest.id} is ${latest.verdict} with blocking findings`,
         );
+      } else {
+        // 2b. Review policy (ADR-0028 §2): when a review policy is
+        // configured (required dimensions and/or blocking severities),
+        // the PASS-family verdict must also satisfy it. Surfaces through
+        // the same VERDICT_BLOCKING path; a repository with no review
+        // policy configured sees zero change.
+        const reviewProblems = await this.reviewPolicyProblems(latest);
+        for (const problem of reviewProblems) {
+          blockers.push(`VERDICT_BLOCKING: ${problem}`);
+        }
       }
     }
 
@@ -334,6 +344,47 @@ export class TaskStore {
     }
     void doc;
     return blockers;
+  }
+
+  /**
+   * Review-policy problems for a PASS-family verdict (ADR-0028 §2):
+   * resolves the effective review policy (policy documents over config)
+   * and checks the verdict's findings for required-dimension coverage and
+   * blocking-severity compliance. Returns [] when no review policy is
+   * configured (the common case — zero behavior change).
+   */
+  private async reviewPolicyProblems(latest: {
+    verdict: string;
+    findings: { severity: string; code: string }[];
+  }): Promise<string[]> {
+    try {
+      const { loadAckitConfig } = await import("../config/index.js");
+      const { checkVerdictAgainstReview, resolvePolicy, resolveReview } = await import(
+        "../policy/index.js"
+      );
+      const configResult = await loadAckitConfig(this.repositoryRoot, {});
+      if (!configResult.ok) return [];
+      const resolvedPolicy = await resolvePolicy(
+        { canonicalPath: this.repositoryRoot },
+        { entryFiles: configResult.config.policy.extends },
+      );
+      const layers: unknown[] = [];
+      for (const document of resolvedPolicy.documents) {
+        const doc = document as { review?: unknown };
+        layers.push(doc.review);
+      }
+      layers.push((configResult.config as { review?: unknown }).review);
+      const { review } = resolveReview(layers);
+      if (review.required.length === 0 && review.blockingSeverity.length === 0) return [];
+      const { problems } = checkVerdictAgainstReview(
+        { verdict: latest.verdict, findings: latest.findings },
+        review,
+      );
+      return problems;
+    } catch {
+      // Review-policy resolution failures never fabricate blockers.
+      return [];
+    }
   }
 
   async archive(id: string): Promise<string> {

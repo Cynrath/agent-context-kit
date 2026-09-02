@@ -10,6 +10,7 @@ import { VerdictStore, VerdictStoreError } from "../../core/verification/store.j
 import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
 import type { CliInvocation, GlobalOptions } from "../context.js";
+import { enforceAckitBoundary } from "./policy-boundary.js";
 
 interface VerificationCommandBase {
   root?: string | undefined;
@@ -111,6 +112,16 @@ export async function runVerificationCommand(
           );
           return EXIT_CODES.usage;
         }
+        // ADR-0028 §1 boundary: verdict registration appends verification
+        // state — enforce the autonomy table (explicit deny/ask refuse;
+        // unconfigured repositories proceed unchanged).
+        const boundary = await enforceAckitBoundary({
+          boundary: "verdictRegistration",
+          root: base.root,
+          quiet: base.quiet,
+          debug: base.debug,
+        });
+        if (boundary !== null) return boundary;
         // Read the verdict file with containment (repository-relative only).
         const vArg = verdictFile.split("\\").join("/");
         const escapes =

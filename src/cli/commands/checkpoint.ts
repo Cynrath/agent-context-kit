@@ -17,6 +17,7 @@ import { WorkflowStore } from "../../core/workflow/index.js";
 import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
 import type { CliInvocation, GlobalOptions } from "../context.js";
+import { enforceAckitBoundary } from "./policy-boundary.js";
 
 interface CheckpointCommandBase {
   root?: string | undefined;
@@ -204,6 +205,16 @@ export async function runCheckpointCommand(
       }
       case "export": {
         const taskId = args.taskId ?? "";
+        // ADR-0028 §1 boundary: checkpoint/handoff export is a tier2
+        // controlled state change — enforce the autonomy table (explicit
+        // deny/ask refuse; unconfigured repositories proceed unchanged).
+        const boundary = await enforceAckitBoundary({
+          boundary: "checkpointExport",
+          root: base.root,
+          quiet: base.quiet,
+          debug: base.debug,
+        });
+        if (boundary !== null) return boundary;
         const found = await tasks.find(taskId);
         const checkpoint = await checkpoints.latest(taskId);
         if (found === null || checkpoint === null) {

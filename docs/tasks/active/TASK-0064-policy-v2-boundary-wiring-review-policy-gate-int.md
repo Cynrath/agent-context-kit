@@ -1,7 +1,7 @@
 ---
 id: "TASK-0064"
 title: "policy v2 boundary wiring, review-policy gate integration, and audit-fidelity corrections"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0063"]
 intentRef: "INTENT-0001"

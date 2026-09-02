@@ -264,4 +264,163 @@ describe("workflow completion gate (ADR-0026 §5/§16, TASK-0053)", () => {
     expect(result.warnings.some((w) => w.includes("--force overrode"))).toBe(true);
     expect(result.warnings.some((w) => w.includes("MISSING_REQUIRED_ARTIFACT"))).toBe(true);
   });
+
+  it("NEGATIVE (audit TASK-0064): missing verdict ALONE denies completion (evidence complete, stage valid)", async () => {
+    const taskId = await makeCheckedTask("standard");
+    const store = new TaskStore(rootPath);
+    const workflowStore = new WorkflowStore(await resolvedRoot());
+    await evidenceComplete(taskId);
+    await workflowStore.advanceTo(taskId, "verify");
+    // No verdict registered → the ONLY blocker must be the missing verdict.
+    let blockers: string[] = [];
+    await expect(store.complete(taskId)).rejects.toThrow();
+    try {
+      await store.complete(taskId);
+    } catch (error) {
+      blockers = (error as Error).message.split(";").map((s) => s.trim());
+    }
+    expect(blockers.some((b) => b.startsWith("MISSING_VERIFIER_VERDICT"))).toBe(true);
+    expect(blockers.some((b) => b.startsWith("MISSING_REQUIRED_ARTIFACT"))).toBe(false);
+    expect(blockers.some((b) => b.startsWith("CRITERION_UNVERIFIED"))).toBe(false);
+    expect(blockers.some((b) => b.startsWith("WORKFLOW_STAGE_INVALID"))).toBe(false);
+  });
+
+  it("NEGATIVE (audit TASK-0064): blocking drift ALONE denies completion", async () => {
+    const taskId = await makeCheckedTask("standard");
+    const store = new TaskStore(rootPath);
+    const workflowStore = new WorkflowStore(await resolvedRoot());
+    await evidenceComplete(taskId);
+    await registerVerdict(taskId, "PASS");
+    await workflowStore.advanceTo(taskId, "verify");
+    // Create an untracked file OUTSIDE the task's declared scope → drift
+    // ACCEPTANCE_CRITERIA_UNVERIFIED is not it (evidence is complete);
+    // UNPLANNED_FILE_CHANGE is a warning for standard, so make the drift
+    // blocker the TASK_DEPENDENCY one instead: depend on a pending task.
+    const other = await store.create("unmet dependency fixture");
+    const doc = await store.find(taskId);
+    if (doc === null) throw new Error("task missing");
+    const metaWithDep = {
+      ...doc.doc.meta,
+      dependencies: [other.meta.id],
+    };
+    const docAbs = path.join(
+      rootPath,
+      "docs",
+      "tasks",
+      "active",
+      path.basename(doc.doc.relativePath),
+    );
+    await writeFile(docAbs, serialize(metaWithDep, doc.doc.body), "utf8");
+    let blockers: string[] = [];
+    await expect(store.complete(taskId)).rejects.toThrow();
+    try {
+      await store.complete(taskId);
+    } catch (error) {
+      blockers = (error as Error).message.split(";").map((s) => s.trim());
+    }
+    expect(blockers.some((b) => b.startsWith("TASK_DEPENDENCY_NOT_SATISFIED"))).toBe(true);
+    expect(blockers.some((b) => b.startsWith("MISSING_VERIFIER_VERDICT"))).toBe(false);
+  });
+});
+
+describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", () => {
+  it("a review policy requiring an uncovered dimension blocks a PASS verdict via VERDICT_BLOCKING", async () => {
+    // Configure a review policy in ackit.yml requiring the security dimension.
+    const { writeFile: wf } = await import("node:fs/promises");
+    await wf(
+      path.join(rootPath, "ackit.yml"),
+      ["schemaVersion: 1", "review:", "  required:", "    - security"].join("\n"),
+      "utf8",
+    );
+    const taskId = await makeCheckedTask("standard");
+    const store = new TaskStore(rootPath);
+    const workflowStore = new WorkflowStore(await resolvedRoot());
+    await evidenceComplete(taskId);
+    await workflowStore.advanceTo(taskId, "verify");
+    // PASS verdict whose findings carry NO security-dimension codes.
+    await registerVerdict(taskId, "PASS");
+    let blockers: string[] = [];
+    await expect(store.complete(taskId)).rejects.toThrow();
+    try {
+      await store.complete(taskId);
+    } catch (error) {
+      blockers = (error as Error).message.split(";").map((s) => s.trim());
+    }
+    const reviewBlocker = blockers.find((b) => b.includes("REVIEW-DIMENSION-MISSING"));
+    expect(reviewBlocker).toBeDefined();
+    expect(reviewBlocker?.includes("VERDICT_BLOCKING")).toBe(true);
+
+    // Remove the review policy → the same state completes (no regression for
+    // unconfigured repositories).
+    await wf(path.join(rootPath, "ackit.yml"), "schemaVersion: 1\n", "utf8");
+    const result = await store.complete(taskId);
+    expect(result.forced).toBe(false);
+  });
+
+  it("blockingSeverity enforcement: a warning finding blocks when blockingSeverity includes medium; info does not", async () => {
+    const { writeFile: wf } = await import("node:fs/promises");
+    await wf(
+      path.join(rootPath, "ackit.yml"),
+      ["schemaVersion: 1", "review:", "  blockingSeverity:", "    - medium"].join("\n"),
+      "utf8",
+    );
+    const taskId = await makeCheckedTask("standard");
+    const store = new TaskStore(rootPath);
+    const workflowStore = new WorkflowStore(await resolvedRoot());
+    await evidenceComplete(taskId);
+    await workflowStore.advanceTo(taskId, "verify");
+    const verdicts = new VerdictStore(rootPath);
+    const registry = await new EvidenceStore(await resolvedRoot()).load(taskId);
+    // severity "info" is BELOW the medium threshold → completes fine.
+    await verdicts.register(
+      taskId,
+      {
+        schemaId: "ackit.verdict.v1",
+        verdict: "PASS_WITH_WARNINGS",
+        verifier: { agent: "t/1.0", context: "fresh", issuedAt: today },
+        findings: [{ severity: "info", code: "DOC_STALE_NOTE", message: "doc note is stale" }],
+        checkedCriteria: ["AC-001", "AC-002"],
+        summary: "s",
+      },
+      { evidenceRegistry: registry },
+    );
+    const ok = await store.complete(taskId);
+    expect(ok.forced).toBe(false);
+
+    // severity "warning" maps to medium → REVIEW-BLOCKING-SEVERITY fires.
+    const taskId2 = await makeCheckedTask("standard");
+    const workflowStore2 = new WorkflowStore(await resolvedRoot());
+    await evidenceComplete(taskId2);
+    await workflowStore2.advanceTo(taskId2, "verify");
+    const registry2 = await new EvidenceStore(await resolvedRoot()).load(taskId2);
+    await verdicts.register(
+      taskId2,
+      {
+        schemaId: "ackit.verdict.v1",
+        verdict: "PASS_WITH_WARNINGS",
+        verifier: { agent: "t/1.0", context: "fresh", issuedAt: today },
+        findings: [
+          { severity: "warning", code: "CORRECTNESS_GAP", message: "correctness gap noted" },
+        ],
+        checkedCriteria: ["AC-001", "AC-002"],
+        summary: "s",
+      },
+      { evidenceRegistry: registry2 },
+    );
+    let blockers: string[] = [];
+    await expect(store.complete(taskId2)).rejects.toThrow();
+    try {
+      await store.complete(taskId2);
+    } catch (error) {
+      blockers = (error as Error).message.split(";").map((s) => s.trim());
+    }
+    expect(
+      blockers.some(
+        (b) => b.includes("REVIEW-BLOCKING-SEVERITY") && b.includes("VERDICT_BLOCKING"),
+      ),
+    ).toBe(true);
+
+    // Cleanup: remove the review policy for subsequent tests.
+    await wf(path.join(rootPath, "ackit.yml"), "schemaVersion: 1\n", "utf8");
+  });
 });
