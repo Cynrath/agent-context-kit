@@ -1,13 +1,13 @@
 ---
 id: "TASK-0065"
 title: "policy v2 reference doc and stale comment cleanup"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0064"]
 intentRef: "INTENT-0001"
 planRef: "docs/plans/final-validation-TASK-0064.md"
 createdAt: "2026-09-02"
-completedAt: null
+completedAt: 2026-09-02
 ---
 
 ## Purpose
@@ -60,11 +60,11 @@ sdk.md.
 
 ## Acceptance criteria
 
-- [ ] AC-001: `docs/reference/policy.md` exists and documents the tier
+- [x] AC-001: `docs/reference/policy.md` exists and documents the tier
   table, boundary enforcement semantics, review dimensions + code-prefix
   registry, blockingSeverity mapping, and the provider-advisory limitation;
   consistent with ADR-0028 and with the shipped code (TASK-0064 wiring).
-- [ ] AC-002: the stale reserved-extensions comment is gone from
+- [x] AC-002: the stale reserved-extensions comment is gone from
   api-surface.test.ts; the allowlist contract test still passes unchanged.
 
 ## Test steps
@@ -89,4 +89,12 @@ Revert the single docs commit.
 
 ## Completion notes
 
-(placeholder)
+Executed 2026-09-02: docs/reference/policy.md written (tier table with
+defaults + deny-stickiness, boundary table incl. the three enforced
+surfaces and the explicit-tier compatibility rule, exit-4 semantics,
+journaling, code-prefix registry, blockingSeverity severity mapping,
+provider-advisory limitation); stale reserved-extensions comment replaced
+with an accurate one in api-surface.test.ts. Evidence: tests 2 files / 8
+tests green (api-surface 4 + docs-gate 4, allowlist contract unchanged);
+lint 0/288; scan --ci exit 0. Verifier residual from TASK-0064's VR-0001
+closed.

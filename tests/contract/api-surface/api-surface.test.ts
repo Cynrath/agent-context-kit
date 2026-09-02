@@ -42,9 +42,8 @@ const ALLOWLIST = [
   "validateSkills",
 ].sort();
 
-// v0.2.0 reserved extension points (not yet exported):
-// - scoreRepository (TASK-0008)
-// - evaluateRulePack (TASK-0012)
+// All extension points shipped in v0.2.0+ (scoreRepository, evaluateRulePack,
+// etc.) are exported above; additions require ADR + allowlist update.
 // New SDK surface since v0.1.1: AckitError (typed error model, REQ-V020-J-002)
 // Workflow expansion (TASK-0059, ADR-0025..0028): typed workflow/intent/
 // checkpoint/evidence/verdict/drift/policy/role additions — classes count as
