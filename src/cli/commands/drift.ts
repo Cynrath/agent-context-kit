@@ -108,6 +108,7 @@ export async function runDriftCheckCommand(
   const metaExtra = found.doc.meta as {
     intentRef?: string | undefined;
     specRefs?: string[] | undefined;
+    decisionRefs?: string[] | undefined;
     planRef?: string | undefined;
   };
   if (metaExtra.intentRef !== undefined) existingArtifacts.push("intent");
@@ -156,6 +157,7 @@ export async function runDriftCheckCommand(
   const referencePathsExist: string[] = [];
   for (const ref of [
     ...(metaExtra.specRefs ?? []),
+    ...(metaExtra.decisionRefs ?? []),
     ...(metaExtra.planRef !== undefined ? [metaExtra.planRef] : []),
   ]) {
     try {

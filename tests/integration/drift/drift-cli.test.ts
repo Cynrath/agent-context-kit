@@ -147,4 +147,99 @@ describe("ackit drift check CLI integration (§9)", () => {
     const unknown = await cli(["drift", "check", "TASK-9999"]);
     expect(unknown.code).toBe(EXIT_CODES.usage);
   });
+
+  it("decisionRefs that exist on disk do not produce PLAN_REFERENCE_MISSING (regression: CLI omitted decisionRefs from existence resolution)", {
+    timeout: 60000,
+  }, async () => {
+    // Task with a decisionRef pointing at a file that EXISTS in the fixture.
+    const created = await cli(["task", "create", "decision ref fixture"]);
+    const taskId = /TASK-\d{4}/.exec(created.stdout)?.[0] ?? "";
+    const { mkdir, writeFile: wf } = await import("node:fs/promises");
+    await mkdir(path.join(rootPath, "docs", "decisions"), { recursive: true });
+    await wf(
+      path.join(rootPath, "docs", "decisions", "ADR-0001-fixture.md"),
+      "# ADR fixture\n",
+      "utf8",
+    );
+    const docAbs = path.join(
+      rootPath,
+      "docs",
+      "tasks",
+      "active",
+      `${taskId}-decision-ref-fixture.md`,
+    );
+    const { readFile } = await import("node:fs/promises");
+    await readFile(docAbs, "utf8");
+    const { serialize, TaskStore } = await import("../../../src/core/tasks/index.js");
+    const found = await new TaskStore(rootPath).find(taskId);
+    if (found === null) throw new Error("task doc missing");
+    const meta = {
+      ...found.doc.meta,
+      decisionRefs: ["docs/decisions/ADR-0001-fixture.md"],
+    } as typeof found.doc.meta;
+    await wf(
+      docAbs,
+      serialize(
+        meta,
+        [
+          "## Affected files",
+          "",
+          "- src/a/**",
+          "",
+          "## Acceptance criteria",
+          "",
+          "- [ ] A.",
+          "",
+          "## Completion notes",
+          "",
+          "(placeholder)",
+        ].join("\n"),
+      ),
+      "utf8",
+    );
+    const report = await cli(["drift", "check", taskId]);
+    expect(report.stdout).not.toContain("PLAN_REFERENCE_MISSING");
+
+    // ...while an absent decisionRef is still flagged (engine parity): a
+    // second task pointing at a nonexistent ADR path must produce the
+    // finding through the same CLI path.
+    const created2 = await cli(["task", "create", "decision ref absent fixture"]);
+    const taskId2 = /TASK-\d{4}/.exec(created2.stdout)?.[0] ?? "";
+    const docAbs2 = path.join(
+      rootPath,
+      "docs",
+      "tasks",
+      "active",
+      `${taskId2}-decision-ref-absent-fixture.md`,
+    );
+    await readFile(docAbs2, "utf8");
+    const found2 = await new TaskStore(rootPath).find(taskId2);
+    if (found2 === null) throw new Error("second task doc missing");
+    const metaAbsent2 = {
+      ...found2.doc.meta,
+      decisionRefs: ["docs/decisions/ADR-9999-absent.md"],
+    } as typeof found2.doc.meta;
+    await wf(
+      docAbs2,
+      serialize(
+        metaAbsent2,
+        [
+          "## Affected files",
+          "",
+          "- src/a/**",
+          "",
+          "## Acceptance criteria",
+          "",
+          "- [ ] A.",
+          "",
+          "## Completion notes",
+          "",
+          "(placeholder)",
+        ].join("\n"),
+      ),
+      "utf8",
+    );
+    const flagged2 = await cli(["drift", "check", taskId2]);
+    expect(flagged2.stdout).toContain("PLAN_REFERENCE_MISSING");
+  });
 });

@@ -72,18 +72,21 @@ a fresh independent verifier verdict, without merging.
 
 ## Affected files
 
-- `src/core/intent/types.ts` (problem-code constant line shape only)
-- `tests/e2e/core-product-test.test.ts` (child-process resume assertion)
-- `tests/contract/readme-parity.test.ts` (pack/prepack race fix if in scope —
-  see note: the pack race is a parallel-mode flakiness root cause; fix it here
-  as a narrowly scoped test-infrastructure correction because the final gate
-  matrix runs `pnpm test` in parallel mode in CI)
-- `docs/tasks/active/TASK-0063*` (this task)
-- `docs/intent/INTENT-0001*` (governing intent)
-- `docs/tasks/active/TASK-0060*`, `TASK-0062*` (completion-note corrections)
-- `docs/evidence/*` (bundle + verdict exports for the final dogfood)
-- `.ackit/workflow/**` (local, never committed: workflow state, evidence
-  registry, verdicts for this task)
+- src/core/intent/types.ts
+- src/core/intent/store.ts
+- src/cli/commands/drift.ts
+- vitest.config.ts
+- tests/e2e/core-product-test.test.ts
+- tests/contract/readme-parity.test.ts
+- tests/integration/checkpoint/checkpoint-cli.test.ts
+- tests/integration/drift/drift-cli.test.ts
+- benchmarks/results/baseline-2026-09-02.json
+- docs/tasks/active/TASK-0063*
+- docs/intent/INTENT-0001*
+- docs/plans/final-validation-TASK-0063.md
+- docs/tasks/active/TASK-0060*
+- docs/tasks/active/TASK-0062*
+- docs/evidence/*
 
 ## Required tests
 
