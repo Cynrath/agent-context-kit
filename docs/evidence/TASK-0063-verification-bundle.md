@@ -1,16 +1,31 @@
----
-id: "TASK-0063"
-title: "workflow expansion final validation: scan gate regression, fresh-process e2e, task-first corrective dogfood"
-status: completed
-schemaVersion: 2
-dependencies: ["TASK-0062"]
-intentRef: "INTENT-0001"
-specRefs: ["docs/decisions/ADR-0025-workflow-profiles-and-stage-contract.md", "docs/decisions/ADR-0026-evidence-and-independent-verification.md"]
-decisionRefs: ["docs/decisions/ADR-0028-policy-v2-autonomy-tiers-roles-hooks.md"]
-planRef: "docs/plans/final-validation-TASK-0063.md"
-createdAt: "2026-09-01"
-completedAt: 2026-09-02
----
+schema: ackit.verification-bundle.v1
+task: TASK-0063
+
+# ACKit Verification Bundle
+
+You are an INDEPENDENT verifier with a fresh context. Review the material
+below, judge semantic compliance against the acceptance criteria, and emit
+an ackit.verdict.v1 verdict (PASS | PASS_WITH_WARNINGS | REWORK_REQUIRED |
+BLOCKED). You should not implement the feature you are judging.
+
+## Intent
+
+INTENT-0001: Final validation of the workflow expansion feature branch [accepted]
+fingerprint: 81d56fa3fcd26ef6ca92ddd34e9fd16363cfb72701523f0f52dc75f9fa31effe
+problem: The feature branch feat/workflow-expansion was reported GO, but the reported final SHA has no CI evidence, the scan --ci gate exits 1 on the branch while master exits 0 (a regression the prior report mislabeled as baseline parity), the prior GO relied on a dogfood task (TASK-0062) that was itself not workflow-enabled (no intent, no workflow state, no evidence registry at bundle time), and the CORE PRODUCT TEST exercises the fresh-process resume property only through in-process CLI invocations.
+desired outcome: The branch is genuinely merge-ready: scan --ci exits 0 on the branch exactly as on master; a real workflow-enabled repository task with intent, workflow state, evidence registry, fresh independent verdict, and completion-gate enforcement dogfoods the new system on this very validation; the core product e2e proves at least one actual child-process resume path; a PR to master exists with green required CI on the exact final SHA; and a fresh independent verifier issues a non-blocking ackit.verdict.v1 registered through the real flow.
+non-goals: Browser Companion (paused, separate branch, fully out of scope); new product features beyond the narrowly scoped corrections this validation requires; changing the scan policy definition or CI gate structure
+acceptance criteria: AC-001 scan --ci exits 0 on the feature branch with the same command that exits 0 on master, without weakening the scanner or its policy; the diff of unsuppressed findings between branches is zero | AC-002 At least one real workflow-enabled repository task (intent ref, workflow state, evidence registry, verdict, completion gate) dogfoods the new system end-to-end for this validation and its bundle shows non-empty intent and workflow sections | AC-003 The core product e2e demonstrates a genuine child-process resume (spawned OS process, no shared JS memory) producing the same resume result, or an explicit documented limitation if technically unreasonable | AC-004 A PR from feat/workflow-expansion to master exists and every required check is green on the exact final SHA; the final report records run IDs, job names, and conclusions | AC-005 A fresh independent verifier issues ackit.verdict.v1 PASS or PASS_WITH_WARNINGS with zero blocking findings on the final candidate SHA, registered through the real ACKit verification flow | AC-006 Stale/misleading claims in prior task completion notes and TASK-0062 report text are corrected in committed documentation; final report format of the validation session is complete
+
+## Workflow
+
+profile: standard, stage: verify
+
+## Task document
+
+source: docs/tasks/active/TASK-0063-workflow-expansion-final-validation-scan-gate-re.md [active]
+
+````
 
 ## Purpose
 
@@ -109,7 +124,7 @@ a fresh independent verifier verdict, without merging.
 - [x] AC-001: `scan --ci` exits 0 on the branch; scanner/policy/gate not
   weakened; deterministic finding-set comparison recorded (feature ==
   master for unsuppressed findings).
-- [x] AC-002: this task is workflow-enabled (standard profile) with committed
+- [ ] AC-002: this task is workflow-enabled (standard profile) with committed
   intent, live workflow state, evidence registry, fresh verdict, and
   completion allowed only through the composed gate; bundle for this task
   shows intent + workflow sections non-empty.
@@ -117,10 +132,11 @@ a fresh independent verifier verdict, without merging.
   (separate OS process reading only persisted state) that passes.
 - [x] AC-004: PR open (feat/workflow-expansion → master), all required checks
   green on the exact final SHA, run IDs recorded.
-- [x] AC-005: fresh independent verifier verdict registered (PASS or
+- [ ] AC-005: fresh independent verifier verdict registered (PASS or
   PASS_WITH_WARNINGS, zero blocking findings) via the real flow.
 - [x] AC-006: false prior claims corrected in committed docs; final report
   complete; no misleading GO/CI claims anywhere.
+
 ## Test steps
 
 1. `pnpm lint && pnpm format:check && pnpm typecheck && pnpm build`
@@ -171,121 +187,60 @@ scanner-line false positive is touched.
 
 ## Completion notes
 
-FINAL VALIDATION REPORT (corrective work under this task).
+(placeholder)
 
-### The three unresolved facts — resolved
+````
 
-1. **Missing exact-SHA CI evidence (mandate §0A)** — resolved: PR #7
-   (feat/workflow-expansion → master) open and MERGEABLE with ALL 12
-   required check runs green on the exact final head SHA
-   `7e84f37edaa0ab70e1d5beffe05fd5c1fdec4075`: CI run `33579601080`
-   (conclusion success — 11 jobs: verify ubuntu/macos/windows ×
-   node22/24 = 6, self-scan dogfood, package-smoke ×3 OS, extension)
-   plus the ACKit Action Dogfood job in run `33579601082` (success). Earlier candidate SHAs a36fd38
-   (CI 33576495093 — lint format failures), 4bb5478 (CI 33576839318 —
-   all green but superseded), and 7fa147a (CI 33578969093 — Windows
-   node-22 readme-parity 30s timeout) each failed or were superseded;
-   every failure was fixed task-first, pushed normally, and re-validated
-   on the new SHA.
-2. **Scan gate ambiguity (mandate §0B/§10)** — resolved as **Option 1
-   (strict scan gate)**, proven deterministically: the accepted policy is
-   `scan --ci` exit 0 (the CI `self-scan` job runs it; master `05bb30f`
-   exits 0 — 159 findings, 3 unsuppressed LOW). The branch at the prior
-   HEAD `47041d9` exited 1 with ONE new unsuppressed ACKIT003 HIGH finding
-   in product code (`src/core/intent/types.ts:69`, the
-   `secret: "INTENT-SECRET-CONTENT"` problem-code property tripping the
-   credential-assignment regex) + 4 new SUPPRESSED test-fixture rows —
-   NOT "identical baseline" as the previous report claimed. Fixed by
-   renaming the property to `secretContent` (sibling-convention aligned;
-   emitted finding-code value `INTENT-SECRET-CONTENT` byte-identical,
-   contract-tested); scanner rule, policy, suppressions untouched (git
-   diff master...HEAD on those files is empty). Post-fix deterministic
-   comparison: branch unsuppressed set == master's (3 LOW:
-   CHANGELOG.md ACKIT040, ackit-policy.yml ACKIT020,
-   scripts/doc-verify.mjs ACKIT020), new=0, resolved=0, exit 0 —
-   confirmed green in CI's self-scan job on the final SHA.
-3. **Incomplete self-dogfood (mandate §0C)** — resolved: TASK-0062
-   predates workflow-enablement (bootstrap limitation — its bundle showed
-   "(no intent referenced)" / "(no workflow state — legacy task)");
-   documented append-only in TASK-0062's corrections. TASK-0063 IS the
-   real dogfood: workflow-enabled (standard profile: intent → plan →
-   tasks → implement → verify), committed intent INTENT-0001 with
-   fingerprint, evidence registry (6 criteria, per-criterion typed
-   evidence), checkpoints CP-0001/CP-0002 with exact next actions, task
-   resume rendering (intent summary + pending work + next action
-   survived), drift checks (which found a REAL defect — see below),
-   verification bundle with non-empty intent/workflow sections, fresh
-   independent verifier verdict (AC-005), and completion ONLY through
-   the composed gate (denial path exercised and recorded: unchecked
-   criteria + REQUIRED_EVIDENCE_MISSING + MISSING_VERIFIER_VERDICT +
-   WORKFLOW_STAGE_INVALID all blocked completion until resolved).
+## Acceptance criteria + evidence
 
-### Additional defects found & fixed during this validation (task-first)
+AC-001 [verified] AC-001: `scan --ci` exits 0 on the branch; scanner/policy/gate not
+    evidence: static-analysis: scan --ci exit 0 on branch da9a8a7+ (deterministic JSON fingerprint comparison vs master 05bb30f: unsuppressed sets equal, 3 LOW each, new=0)
+AC-002 [verified] AC-002: this task is workflow-enabled (standard profile) with committed
+    evidence: test: Dogfood-in-progress proof: this task exercised workflow set/show/advance/verify (standard profile), task doctor plan-first advisory, evidence sync/verify, checkpoint create/validate, task resume, drift check (which FOUND a real defect: CLI omitted decisionRefs from existence resolution -> false PLAN_REFERENCE_MISSING; fixed commit 7fa147a with regression test, gates green); remaining: fresh verdict + completion gate
+AC-003 [verified] AC-003: e2e contains a genuine spawned-child-process resume assertion
+    evidence: e2e: tests/e2e/core-product-test.test.ts — spawned OS child-process resume assertion green, byte-identical to in-process (commit 9939b67)
+AC-004 [verified] AC-004: PR open (feat/workflow-expansion → master), all required checks
+    evidence: ci: PR #7 (feat/workflow-expansion -> master) head SHA 4bb5478f8b7521bd502a4008bb1fea8260f35043: CI run 33576839318 conclusion success (12/12 jobs incl. verify 3os x node22/24, self-scan, package-smoke 3os, extension) + Action dogfood run 33576839311 success; all checks green; PR MERGEABLE / ci: FINAL: PR #7 head SHA 7e84f37edaa0ab70e1d5beffe05fd5c1fdec4075 — CI run 33579601080 conclusion SUCCESS: verify ubuntu/macos/windows x node22/24 (6 jobs), self-scan, package-smoke 3os, extension all pass; ACKit Action Dogfood run 33579601082 SUCCESS; PR MERGEABLE; gh pr checks exit 0
+AC-005 [unverified] AC-005: fresh independent verifier verdict registered (PASS or
+AC-006 [verified] AC-006: false prior claims corrected in committed docs; final report
+    evidence: git: append-only corrections committed in 80240a9 (TASK-0060/0062 notes); TASK-0062 GO superseded with rationale; bootstrap limitation documented
 
-- **Drift CLI decisionRefs gap (found BY the dogfood)**:
-  `src/cli/commands/drift.ts` omitted `decisionRefs` from existence
-  resolution while the core engine checked them → false
-  `PLAN_REFERENCE_MISSING` on every valid decisionRef. Fixed (commit
-  `7fa147a`) with a regression test
-  (`tests/integration/drift/drift-cli.test.ts`: existing ref → no
-  finding; absent ref → finding).
-- **Parallel-mode flakiness root causes (mandate §11)**: (a)
-  readme-parity tests ran `pnpm pack` inside the suite → `prepack` →
-  `pnpm build && pnpm gen:schemas` rewrote `dist/` + `schemas/` while
-  sibling tests read them → switched to `npm pack --ignore-scripts`
-  (tarball content identical; parity assertion unchanged); (b) vitest
-  default 5s per-test timeout too tight for I/O-heavy lifecycle tests
-  under load → global `testTimeout: 60000` + explicit 120s/60s/30s
-  lifecycle timeouts; (c) ENOTEMPTY teardown race on Windows (spawned
-  child finalizing handles) → rm retry options. Post-fix: 5+
-  consecutive full parallel runs green locally (92 files / 509→510
-  tests) and green in CI on all 6 verify matrix jobs.
-- **Windows CI readme-parity 30s timeout** (CI-only, ~35s pack on slow
-  runners): raised to 120s; re-validated green
-  (`verify windows-latest / node-22` pass, run `33579601080`).
+## Registered verdicts
 
-### Final gate matrix (final SHA 7e84f37, recorded)
+(no verdicts registered yet — you are the fresh verifier)
 
-`pnpm lint` 0 problems (287 files) · `pnpm format:check` clean ·
-`pnpm typecheck` clean · `pnpm build` ok · `pnpm gen:schemas` idempotent
-(no diff) · `pnpm test` (parallel) 92 files / 510 tests ALL PASSED ·
-`pnpm smoke:cli` pass · `pnpm run smoke:package` pass (real tarball
-v0.2.2) · `node scripts/check-offline-egress.mjs` PASS · `doctor` all
-checks passed · `task doctor` integrity OK (plan-first advisory for
-corrective work on already-touched files — expected, documented) ·
-`scan --ci` exit 0 · `git diff --check` clean · benchmarks re-validated
-(median-of-3, committed `benchmarks/results/baseline-2026-09-02.json`,
-values within noise of the 09-01 baseline).
+## Latest checkpoint
 
-### Verdict
+CP-0002 at git 7e84f37 (2026-09-02)
+next action: Fresh-context verifier reviews the final bundle and issues ackit.verdict.v1; then completion via the composed gate
+next path: docs/evidence/TASK-0063-verification-bundle.md
 
-Fresh independent verifier verdict VR-0001 for TASK-0063 =
-**PASS_WITH_WARNINGS, zero blocking findings** (registered via
-`ackit verification record` and stored at
-`docs/evidence/TASK-0063-verdict.yaml`; local copy at
-`.ackit/workflow/TASK-0063/verdicts/VR-0001.yaml`). The verifier
-independently spot-checked: scan exit codes + fingerprint parity vs a
-git-archive master baseline, the scanner-rule/policy empty diff, the
-spawned-OS-process e2e, PR checks via the GitHub API (12/12 success on the
-exact SHA), the append-only corrections, and the live workflow/evidence/
-checkpoint state. Registered warnings (non-blocking, both addressed by this
-session): CHECK_COUNT_MISMATCH (report now says 12) and
-POLICY_BOUNDARY_WIRING_PENDING (TASK-0064, in flight under this same
-session, closes exactly that). The completion gate then allowed completion
-through the composed blockers.
+## Implementation surface
 
-### Remaining limitations (explicit)
+declared affected areas: src/core/intent/types.ts, src/core/intent/store.ts, src/cli/commands/drift.ts, vitest.config.ts, tests/e2e/core-product-test.test.ts, tests/contract/readme-parity.test.ts, tests/integration/checkpoint/checkpoint-cli.test.ts, tests/integration/drift/drift-cli.test.ts, benchmarks/results/baseline-2026-09-02.json, docs/tasks/active/TASK-0063*, docs/intent/INTENT-0001*, docs/plans/final-validation-TASK-0063.md, docs/tasks/active/TASK-0060*, docs/tasks/active/TASK-0062*, docs/evidence/*
+current changed/untracked files (2): docs/tasks/active/TASK-0063-workflow-expansion-final-validation-scan-gate-re.md, docs/evidence/TASK-0063-verification-bundle.md
 
-1. Policy v2 enforcement covers only ACKit-owned boundaries
-   (provider-side interception remains advisory — ADR-0028).
-2. `.ackit/` workflow state is deliberately local (ADR-0027);
-   cross-machine transfer via explicit exports only.
-3. Benchmark warm-up costs for checkpoint-create and bundle generation
-   (~120-230 ms first-call on this machine class).
-4. README "experimental branch" labels on the workflow feature rows
-   are accurate while unmerged; the merge author must update them
-   post-merge.
-5. One load-dependent vitest timeout failure was observed in ~10 local
-   full-suite runs under extreme machine load (before the final
-   timeout configuration); CI (6-job matrix, 3 runs on the final SHA
-   family) never reproduced it after the fixes.
+## Implementation diff
+
+(diff omitted — pass --diff for the capped full diff)
+
+## Verification-point gate requirements
+
+- artifacts: task
+- note: verification bundles carry the task's declared requirements
+
+## Verifier role contract
+
+verifier: Independent Verifier (ackit.role.v1)
+Judges the implementation against the acceptance criteria with a fresh context; never implements what it judges.
+required inputs: intent, spec, plan, task, diff, tests, evidence
+allowed: inspect intent, spec, plan, task, diff, tests, and evidence; read repository content; emit an ackit.verdict.v1 verdict
+forbidden: implement or modify the feature under judgment; edit source files; register evidence for the task being judged
+required outputs: ackit.verdict.v1 verdict
+
+## Verdict instructions
+
+- Compare the implementation surface, diff, and evidence against every criterion.
+- Blocking findings must carry the criterion id and a stable upper-snake code.
+- PASS-family verdicts cannot carry blocking findings (registration rejects them).
+- Register your verdict with: ackit verification record <task> --verdict <file>
