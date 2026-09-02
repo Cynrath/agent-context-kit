@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "ackit.bench.v0",
+  "date": "2026-09-02",
+  "machine": {
+    "platform": "win32",
+    "cpus": 12,
+    "model": "AMD Ryzen 5 6600H with Radeon Graphics         ",
+    "node": "v24.13.0"
+  },
+  "results": {
+    "small": {
+      "files": 10,
+      "coldScanMs": 9.06,
+      "warmScanMs": 5.66,
+      "incrementalMs": 4.1,
+      "filesPerSec": 1767,
+      "peakRssMb": 80.87,
+      "graphMs": 4.38,
+      "packMs": 11.17,
+      "taskPackMs": 11.42,
+      "checkpointCreateMs": 193.05,
+      "checkpointLoadMs": 3.82,
+      "evidenceValidateMs": 0.02,
+      "bundleMs": 121.51,
+      "driftMs": 0.02,
+      "policyEvalMs": 0.03,
+      "cacheHitRatio": 0.9
+    },
+    "medium": {
+      "files": 200,
+      "coldScanMs": 108.25,
+      "warmScanMs": 120.29,
+      "incrementalMs": 89.87,
+      "filesPerSec": 1663,
+      "peakRssMb": 85.89,
+      "graphMs": 71.17,
+      "packMs": 143.49,
+      "taskPackMs": 152.22,
+      "checkpointCreateMs": 224.81,
+      "checkpointLoadMs": 4.92,
+      "evidenceValidateMs": 0.03,
+      "bundleMs": 141.8,
+      "driftMs": 0.02,
+      "policyEvalMs": 0.02,
+      "cacheHitRatio": 1
+    }
+  }
+}
