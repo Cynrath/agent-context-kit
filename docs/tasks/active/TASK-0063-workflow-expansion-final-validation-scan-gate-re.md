@@ -1,12 +1,13 @@
 ---
 id: "TASK-0063"
 title: "workflow expansion final validation: scan gate regression, fresh-process e2e, task-first corrective dogfood"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: ["TASK-0062"]
 intentRef: "INTENT-0001"
 specRefs: ["docs/decisions/ADR-0025-workflow-profiles-and-stage-contract.md", "docs/decisions/ADR-0026-evidence-and-independent-verification.md"]
 decisionRefs: ["docs/decisions/ADR-0028-policy-v2-autonomy-tiers-roles-hooks.md"]
+planRef: "docs/plans/final-validation-TASK-0063.md"
 createdAt: "2026-09-01"
 completedAt: null
 ---
