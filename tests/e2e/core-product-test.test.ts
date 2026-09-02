@@ -1,10 +1,13 @@
-import { execFileSync } from "node:child_process";
+import { execFile as execFileCallback, execFileSync } from "node:child_process";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { promisify } from "node:util";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { runCli } from "../../src/cli/index.js";
 import { EXIT_CODES } from "../../src/shared/exit-codes.js";
+
+const execFile = promisify(execFileCallback);
 
 /**
  * CORE PRODUCT TEST (expansion prompt, §22): the full cross-agent lifecycle
@@ -15,6 +18,12 @@ import { EXIT_CODES } from "../../src/shared/exit-codes.js";
  * ACKit verifies evidence + produces the bundle; a fresh verdict gates
  * completion. Both denial paths (missing evidence, REWORK verdict) are
  * exercised before the passing path.
+ *
+ * Process isolation: in addition to the fresh in-process CLI invocations
+ * (each re-reads all state from disk — no conversation/memory carry-over),
+ * this test ALSO resumes through a genuinely spawned OS child process
+ * (`node dist/cli/index.js task resume <id>` via execFile) with zero shared
+ * JS memory, reading only persisted repository state.
  */
 
 let rootPath = "";
@@ -222,6 +231,33 @@ Fixed separators; evidence + verdict below.
     // Task-aware resume pack also works for Agent B (deterministic).
     const pack = await agentB(["pack", "--task", taskId, "--resume", "--max-tokens", "4000"]);
     expect(pack.code).toBe(EXIT_CODES.ok);
+
+    // ---- SPAWNED-PROCESS RESUME: a genuine child OS process (no shared JS
+    // memory with this test process) re-reads the persisted state and must
+    // reach the same resume conclusions. This proves the resumability
+    // property without any in-process shortcut.
+    const repoRoot = path.resolve(import.meta.dirname, "..", "..");
+    const cliEntry = path.join(repoRoot, "dist", "cli", "index.js");
+    const spawned = await execFile(
+      process.execPath,
+      [cliEntry, "--root", rootPath, "task", "resume", taskId],
+      { encoding: "utf8" },
+    );
+    const spawnedResume = spawned.stdout;
+    expect(spawnedResume).toContain("# Resume");
+    expect(spawnedResume).toContain("The build fails on path separators");
+    expect(spawnedResume).toContain("pnpm build passes on Windows");
+    expect(spawnedResume).toContain("INTENT-0001");
+    expect(spawnedResume).toContain("## Completed work");
+    expect(spawnedResume).toContain("## Pending work");
+    expect(spawnedResume).toContain("## Next action");
+    expect(spawnedResume).toContain(
+      "Register AC-002 evidence, verify, and obtain the fresh verdict",
+    );
+    // The spawned process and the in-process invocation agree byte-for-byte
+    // on the deterministic resume block (same repository + same state).
+    const inProcessResume = resume.stdout;
+    expect(spawnedResume).toBe(inProcessResume);
 
     // ---- Agent B continues from the exact next action.
     await agentB([
