@@ -52,6 +52,33 @@ export async function runDoctorCommand(
           ? `${skills.skills.length} skill(s) OK`
           : `${strictIssues.length} strict issue(s)`,
     });
+
+    // Managed assets (TASK-0072): READ-ONLY staleness report over the
+    // instruction blocks + builtin skills. Doctor NEVER writes; this row is
+    // advisory (never a hard failure) — explicit gating lives in
+    // `ackit sync --check`.
+    try {
+      const { planOrApplyManagedSync } = await import("../../core/onboarding/sync.js");
+      const sync = await planOrApplyManagedSync(rootResolution.root, { check: true });
+      const conflicts = sync.rows.filter(
+        (row) =>
+          row.status === "conflict-user-modified" ||
+          row.status === "refused-non-managed" ||
+          row.status === "refused-third-party",
+      );
+      const detail = sync.inSync
+        ? "up-to-date"
+        : conflicts.length > 0
+          ? `conflict-user-modified (${conflicts.length} asset(s))`
+          : "updates available";
+      checks.push({ name: "managed assets", ok: true, detail });
+    } catch (error) {
+      checks.push({
+        name: "managed assets",
+        ok: true,
+        detail: `unavailable: ${(error as Error).message}`,
+      });
+    }
   } else {
     checks.push({ name: "skills", ok: false, detail: rootResolution.diagnostic.message });
   }

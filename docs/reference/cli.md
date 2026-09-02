@@ -8,6 +8,7 @@ Exit codes: see `docs/reference/exit-codes.md`.
 |---|---|
 | `ackit` | deterministic quick health summary; `--json` pure stdout |
 | `ackit init [--agents all\|list] [--dry-run]` | instruction shims + builtin skills plan/write |
+| `ackit sync [--dry-run] [--check] [--force]` | reconcile ACKit-owned managed assets (instructions + skills) after upgrades; content-driven, never version-driven |
 | `ackit scan [options]` | security/hygiene scan |
 | `ackit optimize [--fix] [--dry-run]` | hygiene advisor; fix fenced to managed surfaces |
 | `ackit pack [--max-tokens n] [--format md\|json] [--include globs] [--changed] [--task id] [--resume]` | budgeted context pack; task-aware ranking + resume section |
@@ -35,6 +36,22 @@ Exit codes: see `docs/reference/exit-codes.md`.
 | `ackit hooks install\|uninstall\|status` | managed pre-commit block (scan + active-task drift gate) |
 | `ackit report serve <file> [--host] [--port] [--allow-nonlocal]` | loopback report UI |
 | `ackit mcp serve` | MCP server over stdio (official SDK; read-only tools) |
+
+## sync options
+
+```
+--dry-run   preview the reconciliation plan without writing (would-* statuses)
+--check     read-only CI gate: exit 1 when anything is out-of-sync or blocked
+--force     discard local edits on OWNED skills (third-party names still refused)
+```
+
+Sync reconciles only ACKit-owned managed assets: the `AGENTS.md` managed
+block, the `CLAUDE.md` / `GEMINI.md` / `.github/copilot-instructions.md`
+shims, and builtin skills. Write decisions are content-driven — upgrading
+the npm package alone never rewrites files. Statuses: `up-to-date`,
+`would-create`, `would-update-managed`, `updated-managed`, `installed`,
+`updated`, `conflict-user-modified`, `refused-non-managed`,
+`refused-third-party`.
 
 ## scan options
 

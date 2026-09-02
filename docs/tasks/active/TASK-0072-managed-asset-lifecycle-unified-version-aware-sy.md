@@ -153,3 +153,33 @@ Focused revert of the single implementation commit (new files + minimal init ref
 ## Completion notes
 
 (plan; execution evidence appended below during implementation)
+
+---
+
+## Execution evidence log
+
+**2026-09-02 — Implementation complete (feat/managed-asset-sync branch):**
+
+- **Refactor `src/core/onboarding/init.ts`**: extracted `planInstructionSurfaces(root, {agents})` (read-only planning pass returning `InstructionSurfacePlan[]` with engine result + public action + detail). `planOrApplyInit` now consumes it — zero public behavior change; existing init tests (`tests/integration/init/init.test.ts`) green unchanged. Ownership logic exists exactly once.
+- **New `src/core/onboarding/sync.ts`** (`planOrApplyManagedSync`): orchestrates `planInstructionSurfaces` + `installSkills`; statuses `up-to-date | would-create | would-update-managed | updated-managed | installed | updated | conflict-user-modified | refused-non-managed | refused-third-party`; modes `dry-run` (zero writes, exit-neutral) / `check` (zero writes, `inSync` gate) / `apply` (writes via existing engines; exit-class-4 on refusals/conflicts). Read-only skills assessment (`planSkillsReadOnly`) mirrors installSkills checksum/lock semantics WITHOUT lock writes.
+- **Engine improvement `src/core/skills/install.ts`** (rule H compliance): lock write is now material-change-gated (`lockDirty`); `upsertLockEntry` returns whether checksum/files/ownership actually changed — a bare version-string difference never rewrites `.ackit/skills.lock.json`. `version` field is informational metadata recorded alongside genuine syncs.
+- **New CLI `src/cli/commands/sync.ts` + `program.ts` registration**: `ackit sync [--dry-run] [--check] [--force]`; `--dry-run`+`--check` mutually exclusive (usage exit 2); `--check` exit 0 in-sync / 1 drift; apply exit 4 on ownership blocks; JSON `ackit.managed-sync.v1` (mode/inSync/blocked/rows); ownership diagnostics on stderr in all modes.
+- **Doctor `src/cli/commands/doctor.ts`**: new read-only `managed assets` check row (`up-to-date` / `updates available` / `conflict-user-modified (n)` / `unavailable: ...`), `ok: true` always (advisory, never hard-fails; never writes — proven by test).
+- **Tests**: `tests/integration/onboarding/sync.test.ts` (17 tests — full 19-scenario matrix incl. rule-H zero-write with mtime+checksum proofs, force-scope, third-party refusal under force, idempotence, determinism, packaged discovery, legacy behavior) + `tests/integration/doctor/managed-assets.test.ts` (2 tests — read-only full-tree proof, JSON row presence). Note: scenario 8's lock-tampering fixture required file removal for ownership restoration because `installSkills` refuses third-party names even with `--force` (by design — re-asserted).
+- **Docs**: `docs/reference/cli.md` (sync row + options section + status vocabulary), `docs/guides/agent-integration.md` (Managed-asset lifecycle section with the two mandated statements: never-rewrite-on-upgrade + only-owned-assets-on-explicit-command; full rule list; doctor read-only note), `docs/guides/getting-started.md` (tour line).
+
+**Full gate matrix (all exit 0, 2026-09-02):**
+- `pnpm lint` (292 files), `pnpm format:check` (276 files), `pnpm typecheck` — clean.
+- `pnpm build` — ok; `ackit sync --help` verified.
+- `pnpm test`: **94 files / 536 tests PASS** (baseline 92/517; +2 files +19 tests).
+- `pnpm gen:schemas` idempotent (`git diff --exit-code -- schemas` clean).
+- `pnpm smoke:cli` all assertions; `pnpm run smoke:package` PASS (tarball v0.3.0).
+- `node scripts/check-offline-egress.mjs` PASS; `config check` OK; `doctor` PASS (managed assets row advisory); `task doctor` OK; `scan --ci` exit 0 (readiness 88); `git diff --check` clean.
+
+**Sandbox dogfood (controlled fixture, real repo's human files untouched):**
+- Empty repo dry-run → 8 `would-create` rows, zero writes, exit 0.
+- Apply → 8 `installed` rows (4 instruction surfaces + 4 skills), files created incl. `.ackit/skills.lock.json`.
+- Re-run → all `up-to-date` (idempotent, zero diff).
+- `sync --check` → `inSync: true`, exit 0.
+- Real repo `ackit sync --check` → correctly refuses human-authored `AGENTS.md`/`CLAUDE.md`/copilot-instructions (no markers), exit 1 — never modifies them.
+
