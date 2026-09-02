@@ -1,16 +1,31 @@
----
-id: "TASK-0064"
-title: "policy v2 boundary wiring, review-policy gate integration, and audit-fidelity corrections"
-status: active
-schemaVersion: 2
-dependencies: ["TASK-0063"]
-intentRef: "INTENT-0001"
-specRefs: ["docs/decisions/ADR-0028-policy-v2-autonomy-tiers-roles-hooks.md"]
-decisionRefs: ["docs/decisions/ADR-0025-workflow-profiles-and-stage-contract.md"]
-planRef: "docs/plans/final-validation-TASK-0064.md"
-createdAt: "2026-09-02"
-completedAt: null
----
+schema: ackit.verification-bundle.v1
+task: TASK-0064
+
+# ACKit Verification Bundle
+
+You are an INDEPENDENT verifier with a fresh context. Review the material
+below, judge semantic compliance against the acceptance criteria, and emit
+an ackit.verdict.v1 verdict (PASS | PASS_WITH_WARNINGS | REWORK_REQUIRED |
+BLOCKED). You should not implement the feature you are judging.
+
+## Intent
+
+INTENT-0001: Final validation of the workflow expansion feature branch [accepted]
+fingerprint: 81d56fa3fcd26ef6ca92ddd34e9fd16363cfb72701523f0f52dc75f9fa31effe
+problem: The feature branch feat/workflow-expansion was reported GO, but the reported final SHA has no CI evidence, the scan --ci gate exits 1 on the branch while master exits 0 (a regression the prior report mislabeled as baseline parity), the prior GO relied on a dogfood task (TASK-0062) that was itself not workflow-enabled (no intent, no workflow state, no evidence registry at bundle time), and the CORE PRODUCT TEST exercises the fresh-process resume property only through in-process CLI invocations.
+desired outcome: The branch is genuinely merge-ready: scan --ci exits 0 on the branch exactly as on master; a real workflow-enabled repository task with intent, workflow state, evidence registry, fresh independent verdict, and completion-gate enforcement dogfoods the new system on this very validation; the core product e2e proves at least one actual child-process resume path; a PR to master exists with green required CI on the exact final SHA; and a fresh independent verifier issues a non-blocking ackit.verdict.v1 registered through the real flow.
+non-goals: Browser Companion (paused, separate branch, fully out of scope); new product features beyond the narrowly scoped corrections this validation requires; changing the scan policy definition or CI gate structure
+acceptance criteria: AC-001 scan --ci exits 0 on the feature branch with the same command that exits 0 on master, without weakening the scanner or its policy; the diff of unsuppressed findings between branches is zero | AC-002 At least one real workflow-enabled repository task (intent ref, workflow state, evidence registry, verdict, completion gate) dogfoods the new system end-to-end for this validation and its bundle shows non-empty intent and workflow sections | AC-003 The core product e2e demonstrates a genuine child-process resume (spawned OS process, no shared JS memory) producing the same resume result, or an explicit documented limitation if technically unreasonable | AC-004 A PR from feat/workflow-expansion to master exists and every required check is green on the exact final SHA; the final report records run IDs, job names, and conclusions | AC-005 A fresh independent verifier issues ackit.verdict.v1 PASS or PASS_WITH_WARNINGS with zero blocking findings on the final candidate SHA, registered through the real ACKit verification flow | AC-006 Stale/misleading claims in prior task completion notes and TASK-0062 report text are corrected in committed documentation; final report format of the validation session is complete
+
+## Workflow
+
+profile: standard, stage: verify
+
+## Task document
+
+source: docs/tasks/active/TASK-0064-policy-v2-boundary-wiring-review-policy-gate-int.md [active]
+
+````
 
 ## Purpose
 
@@ -231,3 +246,60 @@ wiring `workflow:` config keys (semantic change for existing state,
 follow-up); advance-gate planning-artifact existence semantics (follow-up);
 checkpoint write atomicity (crash-window cosmetic); resume markdown-structure
 injection hardening.
+
+````
+
+## Acceptance criteria + evidence
+
+AC-001 [verified] AC-001: `checkpointExport` and `verdictRegistration` boundaries enforced
+    evidence: test: tests/integration/policy/policy-v2-cli.test.ts — checkpoint export + verdict registration: unconfigured proceeds (compat), explicit deny exit 4 POLICY-TIER-DENIED, explicit ask non-tty deny POLICY-TIER-ASK, journaled policy-decision; 5/5 green incl. new boundary suite
+AC-002 [verified] AC-002: review policy enforced through the completion gate's
+    evidence: test: tests/unit/tasks/completion-gate.test.ts review-policy describe: REVIEW-DIMENSION-MISSING via VERDICT_BLOCKING blocks PASS verdict under required-dimension policy; REVIEW-BLOCKING-SEVERITY (warning maps medium) blocks under blockingSeverity [medium], info does not; no-policy state completes unchanged; 10/10 green
+AC-003 [verified] AC-003: `docs/reference/sdk.md` matches the actual exported allowlist
+    evidence: static-analysis: docs/reference/sdk.md: stale 'not yet exported' claims removed (scoreRepository/evaluateRulePacks exported since v0.2.0), base symbol table aligned with the 43-symbol allowlist; docs/reference/config.md: autonomy/review sections documented honestly incl. boundary semantics + workflow keys inert limitation
+AC-004 [verified] AC-004: MCP `ackit_drift_check` resolves the same inputs as the CLI;
+    evidence: test: tests/contract/mcp/mcp-conformance.test.ts MCP drift parity test: identical finding sets through MCP tool and CLI resolution for a task with existing decisionRefs/planRef; no false MISSING_REQUIRED_ARTIFACT/PLAN_REFERENCE_MISSING; 9/9 green
+AC-005 [verified] AC-005: completion-gate negative assertions (blocking-drift-only denial,
+    evidence: test: completion-gate negative tests added: missing-verdict-only denial (evidence complete, stage verify) and blocking-drift-only denial (TASK_DEPENDENCY_NOT_SATISFIED alone) both singly asserted; 10/10 green
+AC-006 [verified] AC-006: full local gate matrix green on the new SHA; PR CI green on the
+    evidence: build: Local gate matrix on 7cf88e0: lint 0/288, format clean, typecheck clean, build ok, full suite 92 files/517 tests ALL PASSED parallel, scan --ci exit 0, gen:schemas idempotent; PR CI on new SHA + fresh verdict re-registration follow in this session
+
+## Registered verdicts
+
+(no verdicts registered yet — you are the fresh verifier)
+
+## Latest checkpoint
+
+CP-0001 at git 7cf88e0 (2026-09-02)
+next action: Push, watch PR CI on the exact new SHA, re-register fresh verifier verdict, complete via gate
+next path: docs/evidence/TASK-0064-verification-bundle.md
+
+## Implementation surface
+
+declared affected areas: src/cli/commands/checkpoint.ts, src/cli/commands/verification.ts, src/core/tasks/store.ts, src/core/policy/tiers.ts, src/mcp/server.ts, docs/reference/sdk.md, docs/reference/config.md, tests/integration/policy/policy-v2-cli.test.ts, tests/unit/tasks/completion-gate.test.ts, tests/unit/policy/policy-v2.test.ts, tests/contract/mcp/mcp-conformance.test.ts, docs/tasks/active/TASK-0064*, docs/plans/final-validation-TASK-0064.md
+current changed/untracked files (1): docs/tasks/active/TASK-0064-policy-v2-boundary-wiring-review-policy-gate-int.md
+
+## Implementation diff
+
+(diff omitted — pass --diff for the capped full diff)
+
+## Verification-point gate requirements
+
+- artifacts: task
+- note: verification bundles carry the task's declared requirements
+
+## Verifier role contract
+
+verifier: Independent Verifier (ackit.role.v1)
+Judges the implementation against the acceptance criteria with a fresh context; never implements what it judges.
+required inputs: intent, spec, plan, task, diff, tests, evidence
+allowed: inspect intent, spec, plan, task, diff, tests, and evidence; read repository content; emit an ackit.verdict.v1 verdict
+forbidden: implement or modify the feature under judgment; edit source files; register evidence for the task being judged
+required outputs: ackit.verdict.v1 verdict
+
+## Verdict instructions
+
+- Compare the implementation surface, diff, and evidence against every criterion.
+- Blocking findings must carry the criterion id and a stable upper-snake code.
+- PASS-family verdicts cannot carry blocking findings (registration rejects them).
+- Register your verdict with: ackit verification record <task> --verdict <file>
