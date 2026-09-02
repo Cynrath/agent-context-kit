@@ -1,5 +1,12 @@
 # Changelog — VS Code Extension
 
+## [0.3.0] - 2026-09-02
+
+- Sync: workspace dependency `@cynrath/agent-context-kit` `workspace:*` now resolves core `0.3.0` (workflow/intent/checkpoint/evidence/verification/drift/policy-v2/roles/skills/journal capabilities in the shared SDK).
+- Sync: manifest `version` `0.2.2 → 0.3.0` per ADR-0023 version coupling (root == extension == tag == release == action).
+- No extension UI behavior change in this release; extension surfaces (Readiness, Findings/Problems, Instruction Graph, Tasks, Policy, Optimize, Diagnostics) operate unchanged on the expanded SDK.
+- Offline-first unchanged: no network, no telemetry, no remote fonts.
+
 ## [0.2.2] - 2026-08-27
 
 - Fix: real TreeDataProvider for `ackit.readiness`/`ackit.findings`/`ackit.graph`/`ackit.tasks`/`ackit.policy`/`ackit.optimize` (previously no providers)

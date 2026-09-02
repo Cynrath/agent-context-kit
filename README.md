@@ -1,7 +1,7 @@
 # ACKit — AgentContextKit
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/v/@cynrath/agent-context-kit?label=npm%20v0.2.2&color=0B84FF&style=for-the-badge" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/v/@cynrath/agent-context-kit?label=npm%20v0.3.0&color=0B84FF&style=for-the-badge" alt="npm version"></a>
   <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/dt/@cynrath/agent-context-kit?label=downloads&style=for-the-badge&color=00C853" alt="downloads"></a>
   <a href="https://github.com/Cynrath/agent-context-kit"><img src="https://img.shields.io/github/stars/Cynrath/agent-context-kit?label=stars&style=for-the-badge&color=FFB300" alt="stars"></a>
   <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Cynrath/agent-context-kit/ci.yml?branch=master&label=CI&style=for-the-badge" alt="CI"></a>
@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="license"></a>
-  <a href="https://github.com/Cynrath/agent-context-kit/releases/tag/v0.2.2"><img src="https://img.shields.io/badge/release-v0.2.2-9C27B0?style=flat-square" alt="release"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit/releases/tag/v0.3.0"><img src="https://img.shields.io/badge/release-v0.3.0-9C27B0?style=flat-square" alt="release"></a>
   <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/badge/node-%3E%3D22-339933?style=flat-square&logo=node.js" alt="node"></a>
   <img src="https://img.shields.io/badge/offline--first-yes-00ACC1?style=flat-square" alt="offline">
   <img src="https://img.shields.io/badge/deterministic-yes-FF6F00?style=flat-square" alt="deterministic">
@@ -117,16 +117,16 @@ OpenCode, Copilot, Gemini, Cursor, Cline, any MCP-capable agent).
 <tr><td style="border:1px solid #d0d7de; padding:8px;">📦</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Context Packs</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit pack --max-tokens 50000</code></td><td style="border:1px solid #d0d7de; padding:8px;">Weighted deterministic ranking, manifest <code>hash/reason/tokens</code> per file</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🔒</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Scanning</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit scan --ci</code></td><td style="border:1px solid #d0d7de; padding:8px;">Secrets/assignments/private keys/connection strings/entropy/absolute-path/CI pinning/drift, redacted evidence, SARIF 2.1.0</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">✅</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Tasks</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit task</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>docs/tasks</code> single-active, <code>[ ]/[~]/[x]/[!]</code>, completion gate, <code>task doctor</code></td></tr>
-<tr><td style="border:1px solid #d0d7de; padding:8px;">🧭</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Workflows + Intent</strong> <em>(experimental branch)</em></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit workflow set --profile standard</code></td><td style="border:1px solid #d0d7de; padding:8px;">quick/standard/high-risk lifecycles with stage gates (<code>ackit.workflow.v1</code>), committed intent docs with fingerprints (<code>ackit.intent.v1</code>), artifact refs on tasks</td></tr>
-<tr><td style="border:1px solid #d0d7de; padding:8px;">🧾</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Evidence + Verification</strong> <em>(experimental branch)</em></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit evidence verify … && ackit verification record …</code></td><td style="border:1px solid #d0d7de; padding:8px;">criteria↔proof registry (<code>ackit.evidence.v2</code>), bounded verification bundles for fresh verifiers, append-only <code>ackit.verdict.v1</code> verdicts, completion gate enforcement</td></tr>
-<tr><td style="border:1px solid #d0d7de; padding:8px;">⏸️</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Checkpoints + Resume</strong> <em>(experimental branch)</em></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit checkpoint create … && ackit task resume …</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit.checkpoint.v1</code> snapshots, staleness detection, deterministic resume context + handoff packs, task-aware context packs</td></tr>
-<tr><td style="border:1px solid #d0d7de; padding:8px;">🛰️</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Drift + Policy v2</strong> <em>(experimental branch)</em></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit drift check --ci</code></td><td style="border:1px solid #d0d7de; padding:8px;">8 deterministic finding codes, risk-tiered autonomy (<code>tier0-4 × allow/ask/deny</code>, deny wins) + review policy, declarative lifecycle gates (no executable hooks), portable role contracts</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧭</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Workflows + Intent</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit workflow set --profile standard</code></td><td style="border:1px solid #d0d7de; padding:8px;">quick/standard/high-risk lifecycles with stage gates (<code>ackit.workflow.v1</code>), committed intent docs with fingerprints (<code>ackit.intent.v1</code>), artifact refs on tasks</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧾</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Evidence + Verification</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit evidence verify … && ackit verification record …</code></td><td style="border:1px solid #d0d7de; padding:8px;">criteria↔proof registry (<code>ackit.evidence.v2</code>), bounded verification bundles for fresh verifiers, append-only <code>ackit.verdict.v1</code> verdicts, completion gate enforcement</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">⏸️</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Checkpoints + Resume</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit checkpoint create … && ackit task resume …</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit.checkpoint.v1</code> snapshots, staleness detection, deterministic resume context + handoff packs, task-aware context packs</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🛰️</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Drift + Policy v2</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit drift check --ci</code></td><td style="border:1px solid #d0d7de; padding:8px;">8 deterministic finding codes, risk-tiered autonomy (<code>tier0-4 × allow/ask/deny</code>, deny wins) + review policy, declarative lifecycle gates (no executable hooks), portable role contracts</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🔭</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Watch/Dashboard</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit dashboard</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>scan --watch</code> debounced 400ms + cache; <code>dashboard</code> localhost-only <code>127.0.0.1</code>, <code>CSP</code> + <code>nosniff</code>, <code>/api/*</code> paginated, <code>&lt;50KB</code> vanilla JS</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🩺</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Diagnostics</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit diagnostics bundle</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit.diagnostics.v1</code> + deterministic <code>bundle-manifest.json</code> (<code>sha256</code> + redaction count), 5-secret <code>[REDACTED]</code> proof</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">⚡</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Benchmarks</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>benchmarks/run.mjs</code></td><td style="border:1px solid #d0d7de; padding:8px;">7 deterministic fixtures, 8 metrics (<code>coldScanMs</code>/<code>warmScanMs</code>/<code>incrementalMs</code>/<code>peakRssMb</code>/<code>filesPerSec</code>/<code>packMs</code>/<code>graphMs</code>/<code>cacheHitRatio</code>), median-of-3</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🔌</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>SDK v1</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>import { scanRepository } from "@cynrath/agent-context-kit"</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>sideEffects:false</code>, <code>type:module</code>, <code>exports {".","./mcp"}</code>, <code>AbortSignal</code> &lt;200ms, <code>AckitError</code></td></tr>
-<tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>VS Code</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>extensions/vscode</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>0.2.2</code>, <code>cynrath</code>, <code>lints</code> Linters, <code>onStartupFinished</code>, readiness tree + Problems <code>ACKITxxx</code>, <code>&lt;2MB</code> VSIX — <strong>VSIX-ready, not yet Marketplace</strong></td></tr>
-<tr><td style="border:1px solid #d0d7de; padding:8px;">🤖</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>MCP</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit mcp serve</code></td><td style="border:1px solid #d0d7de; padding:8px;">Official SDK stdio, 9 read-only tools, 5 resources, 4 prompts, <code>InMemoryTransport</code> cancellation</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>VS Code</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>extensions/vscode</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>0.3.0</code>, <code>Cynrath</code>, <code>lints</code> Linters, <code>onStartupFinished</code>, readiness tree + Problems <code>ACKITxxx</code>, <code>&lt;2MB</code> VSIX — <strong>Marketplace: <code>Cynrath.ackit-vscode</code></strong></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🤖</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>MCP</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit mcp serve</code></td><td style="border:1px solid #d0d7de; padding:8px;">Official SDK stdio, 15 read-only tools (incl. workflow status, intent, checkpoint, verification bundle, drift, roles), 5 resources, 4 prompts, <code>InMemoryTransport</code> cancellation</td></tr>
 </tbody>
 </table>
 
@@ -139,11 +139,11 @@ OpenCode, Copilot, Gemini, Cursor, Cline, any MCP-capable agent).
 ```bash
 # global (recommended)
 npm install --global @cynrath/agent-context-kit
-ackit --version  # 0.2.2
+ackit --version  # 0.3.0
 
 # one-shot, pinned
-npx --yes @cynrath/agent-context-kit@0.2.2 --version
-npx --yes @cynrath/agent-context-kit@0.2.2 --help
+npx --yes @cynrath/agent-context-kit@0.3.0 --version
+npx --yes @cynrath/agent-context-kit@0.3.0 --help
 
 # from source
 pnpm install --frozen-lockfile && pnpm build
@@ -183,7 +183,9 @@ ackit dashboard --port 0 --open  # localhost-only
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🔭</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit dashboard</code></td><td style="border:1px solid #d0d7de; padding:8px;">Local dashboard (localhost-only by default)</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--host</code> <code>--port</code> <code>--allow-nonlocal</code> <code>--open</code></td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit instructions</code></td><td style="border:1px solid #d0d7de; padding:8px;">Instruction graph v2</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--provider</code> <code>--profile</code> <code>--for</code> <code>--explain</code> <code>--json</code></td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">📦</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit pack</code></td><td style="border:1px solid #d0d7de; padding:8px;">Provider-aware context pack</td><td style="border:1px solid #d0d7de; padding:8px;"><code>--max-tokens</code> <code>--profile</code> <code>--include</code> <code>--changed</code></td></tr>
-<tr><td style="border:1px solid #d0d7de; padding:8px;">🛠️</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit skills</code> / <code>task</code> / <code>policy</code> / <code>config</code></td><td style="border:1px solid #d0d7de; padding:8px;">Skills, task workflow, policy and configuration</td><td style="border:1px solid #d0d7de; padding:8px;"><code>skills list/validate/install</code> · <code>task create/list/start/complete</code> · <code>policy check</code> · <code>config check</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🛠️</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit skills</code> / <code>task</code> / <code>policy</code> / <code>config</code></td><td style="border:1px solid #d0d7de; padding:8px;">Skills, task workflow, policy and configuration</td><td style="border:1px solid #d0d7de; padding:8px;"><code>skills list/validate/install/export</code> · <code>task create/list/start/complete/resume</code> · <code>policy check</code> · <code>config check</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧭</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit workflow</code> / <code>intent</code> / <code>checkpoint</code></td><td style="border:1px solid #d0d7de; padding:8px;">Workflow lifecycles, intent docs, resume</td><td style="border:1px solid #d0d7de; padding:8px;"><code>workflow set/show/advance/verify</code> · <code>intent new/list/show/validate/fingerprint</code> · <code>checkpoint create/show/validate/export</code></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧾</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit evidence</code> / <code>verification</code> / <code>drift</code> / <code>role</code> / <code>journal</code></td><td style="border:1px solid #d0d7de; padding:8px;">Evidence registry, verifier bundles, drift, roles, journal</td><td style="border:1px solid #d0d7de; padding:8px;"><code>evidence sync/show/verify/validate</code> · <code>verification bundle/record/show</code> · <code>drift check [--ci]</code> · <code>role list/show/validate</code> · <code>journal show/validate</code></td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🔧</td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit cache</code> / <code>workspaces</code> / <code>hooks</code> / <code>report</code> / <code>mcp</code></td><td style="border:1px solid #d0d7de; padding:8px;">Utility commands</td><td style="border:1px solid #d0d7de; padding:8px;"><code>cache clean</code> · <code>workspaces</code> · <code>hooks</code> · <code>report serve</code> · <code>mcp serve</code></td></tr>
 </tbody>
 </table>
@@ -253,7 +255,7 @@ More: [`docs/architecture/overview.md`](docs/architecture/overview.md)
 
 ### 🤖 GitHub Action
 
-Official `Cynrath/agent-context-kit@v0.2.2` (SHA-pinned for high-assurance):
+Official `Cynrath/agent-context-kit@v0.3.0` (SHA-pinned for high-assurance):
 
 ```yaml
 permissions:
@@ -263,7 +265,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
-      - uses: Cynrath/agent-context-kit@v0.2.2
+      - uses: Cynrath/agent-context-kit@v0.3.0
         with:
           command: scan
           args: "--json"
@@ -312,13 +314,13 @@ ESM-only, `sideEffects:false`, `AbortSignal` cancellable, no `process.exit`. Ref
 
 ### 🧩 VS Code
 
-Extension is **implemented and VSIX-ready (`extensions/vscode` `0.2.2`, `<2MB`) but not yet published to Marketplace** — separate `marketplace: yes` checkpoint.
+Extension is **published on the VS Code Marketplace** — [`Cynrath.ackit-vscode`](https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode) (`0.3.0`, `<2MB` VSIX, offline-first, no telemetry).
 
 From source:
 
 ```bash
 pnpm --filter vscode build
-vsce package # → ackit-0.2.2.vsix
+vsce package # → ackit-vscode-0.3.0.vsix
 ```
 
 Features: readiness tree, Problems `ACKITxxx`, graph “instructions for current file”, tasks/policy/optimize, palette `Refresh/Show Graph/Optimize/Diagnostics`, file watcher debounced, no telemetry.
@@ -332,10 +334,10 @@ Guide: [`docs/guides/vscode.md`](docs/guides/vscode.md)
 | Area | Link |
 |---|---|
 | Architecture | [`docs/architecture/overview.md`](docs/architecture/overview.md) |
-| Concepts | `instruction-graph` · `context-budget` · `provider-profiles` · `readiness` |
-| Guides | [`getting-started`](docs/guides/getting-started.md) · [`readiness`](docs/guides/readiness.md) · [`optimize`](docs/guides/optimize.md) · [`provider-profiles`](docs/guides/provider-profiles.md) · [`instruction-graph`](docs/guides/instruction-graph.md) · [`rule-packs`](docs/guides/rule-packs.md) · [`ci`](docs/guides/ci.md) · [`watch-dashboard`](docs/guides/watch-dashboard.md) · [`diagnostics`](docs/guides/diagnostics.md) · [`sdk`](docs/guides/sdk.md) · [`vscode`](docs/guides/vscode.md) · [`monorepo`](docs/guides/monorepo.md) |
-| Reference | `cli` · `config` · `rules` · `readiness` · `profile` · `rule-pack` · `instruction-graph` · `diagnostics` · `sdk` · `exit-codes` · `mcp` · `schemas` |
-| Decisions | [`docs/decisions/`](docs/decisions/) · `v0.2.0`: [`docs/v0.2.0/`](docs/v0.2.0/) |
+| Concepts | `instruction-graph` · `context-budget` · `provider-profiles` · `readiness` · [`workflows`](docs/concepts/workflows.md) · [`intent`](docs/concepts/intent.md) · [`checkpoints`](docs/concepts/checkpoints.md) · [`evidence-verification`](docs/concepts/evidence-verification.md) |
+| Guides | [`getting-started`](docs/guides/getting-started.md) · [`readiness`](docs/guides/readiness.md) · [`optimize`](docs/guides/optimize.md) · [`provider-profiles`](docs/guides/provider-profiles.md) · [`instruction-graph`](docs/guides/instruction-graph.md) · [`rule-packs`](docs/guides/rule-packs.md) · [`ci`](docs/guides/ci.md) · [`watch-dashboard`](docs/guides/watch-dashboard.md) · [`diagnostics`](docs/guides/diagnostics.md) · [`sdk`](docs/guides/sdk.md) · [`vscode`](docs/guides/vscode.md) · [`monorepo`](docs/guides/monorepo.md) · [`workflow-adoption`](docs/guides/workflow-adoption.md) · [`workflow-example`](docs/guides/workflow-example.md) |
+| Reference | `cli` · `config` · `rules` · `readiness` · `profile` · `rule-pack` · `instruction-graph` · `diagnostics` · `sdk` · `exit-codes` · `mcp` · `schemas` · [`drift`](docs/reference/drift.md) · [`policy`](docs/reference/policy.md) |
+| Decisions | [`docs/decisions/`](docs/decisions/) · `v0.2.0`: [`docs/v0.2.0/`](docs/v0.2.0/) · `ADR-0025..0028`: workflow/evidence/checkpoint/policy-v2 |
 | Tasks | [`docs/tasks/active`](docs/tasks/active) |
 
 ---
@@ -369,7 +371,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the docs-first workflow.
 
 ### 🔖 Versioning
 
-Current: **`0.2.2`** on `master` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases) · `latest → 0.2.2` via OIDC Trusted Publishing with provenance. Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
+Current: **`0.3.0`** on `master` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases) · `latest → 0.3.0` via OIDC Trusted Publishing with provenance. Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
 
 ---
 
