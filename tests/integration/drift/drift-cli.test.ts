@@ -47,7 +47,9 @@ async function cli(args: string[]): Promise<{ code: number; stdout: string; stde
 }
 
 describe("ackit drift check CLI integration (§9)", () => {
-  it("reports findings with --ci gate semantics on a real repository", { timeout: 60000 }, async () => {
+  it("reports findings with --ci gate semantics on a real repository", {
+    timeout: 60000,
+  }, async () => {
     const created = await cli(["task", "create", "drift cli fixture"]);
     const taskId = /TASK-\d{4}/.exec(created.stdout)?.[0] ?? "";
 

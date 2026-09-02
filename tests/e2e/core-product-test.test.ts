@@ -90,10 +90,9 @@ function taskIdFrom(stdout: string): string {
 }
 
 describe("CORE PRODUCT TEST (§22, TASK-0062)", () => {
-  it(
-    "full lifecycle: Agent A checkpoint → fresh Agent B resume → evidence gate → verifier → completion",
-    { timeout: 120000 },
-    async () => {
+  it("full lifecycle: Agent A checkpoint → fresh Agent B resume → evidence gate → verifier → completion", {
+    timeout: 120000,
+  }, async () => {
     // ---- Agent A: records intent, creates the plan/task, implements part.
     await agentA(["intent", "new", "Make the build green on Windows"]);
     const fsp = await import("node:fs/promises");
