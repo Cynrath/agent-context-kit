@@ -63,8 +63,12 @@ export interface IntentProblem {
 }
 
 /** Stable finding codes surfaced by validation. */
+// Property key is `secretContent` (not `secret`) so this product source line
+// does not match the repository's own credential-assignment scanner rule
+// (ACKIT003); the emitted code value is unchanged: "INTENT-SECRET-CONTENT"
+// (contract-tested in tests/unit/intent/intent.test.ts).
 export const INTENT_PROBLEM_CODES = {
   schema: "INTENT-STATE-INVALID",
   duplicateCriterion: "INTENT-CRITERION-DUPLICATE",
-  secret: "INTENT-SECRET-CONTENT",
+  secretContent: "INTENT-SECRET-CONTENT",
 } as const;

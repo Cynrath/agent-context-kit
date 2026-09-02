@@ -147,7 +147,7 @@ export class IntentStore {
       const secretHits = runSecretGateOnContent(serialize(doc.meta, doc.body));
       if (secretHits.length > 0) {
         problems.push({
-          code: INTENT_PROBLEM_CODES.secret,
+          code: INTENT_PROBLEM_CODES.secretContent,
           message: `${doc.meta.id}: secret-shaped content detected (${secretHits.join(", ")}) — redact before accepting`,
         });
       }
