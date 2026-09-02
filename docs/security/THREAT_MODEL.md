@@ -22,10 +22,27 @@ the regression surface that keeps it closed.
 | T13 | Malformed inputs (YAML/frontmatter/config) | Real parsers with structured errors carrying file:line; walker never crashes on unreadable entries | config error snapshots, dangling-link fixture |
 | T14 | Malicious glob patterns (ReDoS/overreach) | Conservative glob engine (picomatch), user excludes validated by zod before fs layer; applyTo unreachable-glob advisory | config validation tests |
 | T15 | Dangerous MCP writes | Server ships read-only tools ONLY; any future write tool requires an explicit capability-gate design (documented in TASK-0283) | tools/list contract test asserting exact read-only set |
+| T16 | Malicious repository content altering workflow state (`.ackit/workflow/`) | State files are strict-schema validated (unknown fields rejected); ids validated `^TASK-\d{4}$` before any path construction; writes contained under canonical root; workflow state is advisory to the committed task doc | TASK-0045 workflow store unit tests (tamper + traversal fixtures) |
+| T17 | Forged evidence (fabricated verification records) | Criterion source of truth is the committed task doc; registry criteria must match it (forged ids rejected); evidence refs are length-capped, secret-gated strings never executed; manual-only evidence insufficient unless configured | TASK-0050 evidence validation tests + TASK-0060 forgery security tests |
+| T18 | Forged verifier verdict | `ackit.verdict.v1` strict schema; registration validates task existence, criterion references, and blocking-finding/verdict consistency; append-only store (a REWORK verdict cannot be overwritten, only superseded by a later registered verdict) | TASK-0052 verdict validation matrix + TASK-0060 forgery tests |
+| T19 | Path traversal in artifact refs (intent/spec/plan/verdict/checkpoint ids and paths) | All ids regex-validated before path construction; all path refs repository-relative POSIX and containment-checked against the canonical root; absolute paths rejected | TASK-0046/0047/0048/0052 traversal security tests |
+| T20 | Stale checkpoint reuse (resuming against moved git state) | `ackit checkpoint validate` compares recorded gitHead/changed-areas vs current; `STALE_CHECKPOINT` finding; git-unavailable is an explicit advisory, never a fabricated fresh state | TASK-0048 staleness tests |
+| T21 | Task-id collision / cross-repository artifact confusion | Workflow/evidence/verdict/checkpoint state keyed under per-repository `.ackit/workflow/TASK-####/`; a task id resolves only inside the canonical root that owns it; stores refuse ids that do not exist in the owning task set | TASK-0060 cross-repo confusion test |
+| T22 | Manipulated git state feeding drift/bundle surfaces | git is invoked read-only through the existing bounded runner; outputs used only for deterministic comparisons; failures degrade to explicit advisories, never silent assumptions | TASK-0051 drift input tests (git-unavailable paths) |
+| T23 | Policy bypass (autonomy tier evasion) | Deny in any active layer denies; `--force` completion override is itself tier2-enforced (`POLICY-TIER-DENIED` exit 4); enforcement points enumerated in ADR-0028; non-tty `ask` is treated as deny (no silent bypass) | TASK-0054 enforcement tests |
+| T24 | Unsafe hook execution / shell injection via config | Gate schema is declarative-only and structurally cannot represent commands (contract test proves `command`/`script`/`run` fail validation); the only executed hook is the user-installed managed pre-commit block invoking the repository-built ACKit CLI | TASK-0055 no-execution schema test |
+| T25 | Provider-specific metadata spoofing (verifier `agent` labels, role claims) | `verifier.agent` is a bounded free-form label never resolved or executed; role contracts are data-only; bundles embed the built-in verifier contract that cannot be shadowed by repository content | TASK-0052/0056 validation + non-shadowing tests |
+| T26 | Secret/absolute-path leakage into new artifacts (bundles, checkpoints, resume, journal) | Same canonical secret-gate and scrubber as packs run over every emitted surface (defense in depth, single rule source); journal redacts at construction with a closed event-kind list | TASK-0048/0052/0058 output gates + TASK-0060 offline-runtime extension |
 
 Out of scope by product decision (REQ-GOV-009): LLM APIs, vector stores,
 SAST/SBOM platforms, cloud services — these surfaces cannot introduce
 threats because they do not exist.
+
+The workflow expansion (ADR-0025..0028) adds no new trust boundary beyond
+untrusted repository/local content processed by strict validators: no network
+surface, no executable content, no provider interception. Rows T16–T26 above
+cover its specific forgery/tamper/traversal/policy threats; each row names the
+task whose regression tests keep it closed.
 
 ## Offline-first guarantee (v0.2.1)
 

@@ -3,7 +3,14 @@ import path from "node:path";
 
 export const HOOK_START = "# >>> ackit pre-commit (managed) >>>";
 export const HOOK_END = "# <<< ackit pre-commit (managed) <<<";
-const HOOK_BODY_LINES = ["ackit scan --staged --ci || exit 1"];
+// Managed block (ADR-0028 §3, preCommit lifecycle gate): runs ONLY the
+// repository-built ACKit CLI the user explicitly installed — never arbitrary
+// repository-specified commands. The drift check is a no-op (exit 0) when no
+// workflow task is active, so legacy repositories see no behavior change.
+const HOOK_BODY_LINES = [
+  "ackit scan --staged --ci || exit 1",
+  "ackit drift check-active --ci || exit 1",
+];
 
 export interface HookFile {
   absolutePath: string;

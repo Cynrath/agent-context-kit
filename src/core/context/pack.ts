@@ -36,6 +36,10 @@ export const RANKING_WEIGHTS = {
   baseByType: 10,
   sizePenaltyPer4k: 5,
   sizePenaltyCap: 40,
+  /** Task-aware ranking (TASK-0049 / ADR-0027 §5): declared task scope. */
+  taskDeclaredScope: 80,
+  /** Task-aware ranking: files referenced by task/intent/plan/evidence docs. */
+  taskReference: 70,
 } as const;
 
 const ABSOLUTE_PATH_PATTERNS: readonly RegExp[] = [
@@ -90,7 +94,8 @@ export interface PackContextSection {
     | "active-tasks"
     | "skills-catalog"
     | "policy-summary"
-    | "repository-metadata";
+    | "repository-metadata"
+    | "task-resume";
   title: string;
   body: string;
 }
@@ -112,6 +117,23 @@ export interface BuildPackOptions {
     | import("../profiles/types.js").ResolvedProfile
     | import("../profiles/types.js").Profile
     | undefined;
+  /**
+   * Task-aware ranking context (TASK-0049 / ADR-0027 §5), precomputed by the
+   * caller: declared scope globs from the task doc, reference paths from
+   * intent/plan/spec/evidence/checkpoint material, and the changed-file boost.
+   * Deterministic; no embeddings or semantic retrieval.
+   */
+  taskContext?: TaskPackContext | undefined;
+}
+
+/** Deterministic task-aware ranking inputs (ADR-0027 §5). */
+export interface TaskPackContext {
+  /** Declared affected-area globs from the task's `## Affected files` section. */
+  declaredScopeGlobs: readonly string[];
+  /** Concrete reference paths from task/intent/plan/spec/evidence docs. */
+  referencePaths: readonly string[];
+  /** Changed files to boost (git working set at pack time). */
+  changedFiles?: readonly string[] | undefined;
 }
 
 export interface PackResult {
@@ -172,6 +194,14 @@ export async function buildContextPack(
       : new Set(options.restrictToFiles.map((file) => file.split("\\").join("/")));
   const instructionRefs = new Set((options.instructionReferenceTargets ?? []).map(toPosix));
   const activeTaskText = options.activeTaskContent ?? "";
+  // Task-aware ranking inputs (TASK-0049): declared-scope matcher and reference
+  // set — pure deterministic signals, no semantic retrieval (ADR-0027 §5).
+  const taskDeclaredMatch =
+    options.taskContext !== undefined && options.taskContext.declaredScopeGlobs.length > 0
+      ? picomatch([...options.taskContext.declaredScopeGlobs], { dot: true })
+      : null;
+  const taskReferenceSet = new Set((options.taskContext?.referencePaths ?? []).map(toPosix));
+  const taskChangedSet = new Set((options.taskContext?.changedFiles ?? []).map(toPosix));
 
   const scored: Scored[] = [];
   const manifestDraft: PackManifestEntry[] = [];
@@ -300,6 +330,9 @@ export async function buildContextPack(
       (includeMatch?.(target.relativePath) ? RANKING_WEIGHTS.explicitInclude : 0) +
       (restrictSet !== null ? RANKING_WEIGHTS.changed : 0) +
       (changedSetHas(options.restrictToFiles, target.relativePath) ? RANKING_WEIGHTS.changed : 0) +
+      (taskDeclaredMatch?.(target.relativePath) === true ? RANKING_WEIGHTS.taskDeclaredScope : 0) +
+      (taskReferenceSet.has(target.relativePath) ? RANKING_WEIGHTS.taskReference : 0) +
+      (taskChangedSet.has(target.relativePath) ? RANKING_WEIGHTS.changed : 0) +
       (activeTaskText.length > 0 && activeTaskText.includes(target.relativePath)
         ? RANKING_WEIGHTS.activeTaskRef
         : 0) +

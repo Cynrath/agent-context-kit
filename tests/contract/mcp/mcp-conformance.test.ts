@@ -47,21 +47,27 @@ describe("ackit MCP conformance (REQ-MCP-004)", () => {
     }
   });
 
-  it("tools/list exposes the nine read-only tools; write tools absent", async () => {
+  it("tools/list exposes the fifteen read-only tools; write tools absent", async () => {
     const session = await connect();
     try {
       const { tools } = await session.client.listTools();
       const names = tools.map((tool) => tool.name).sort();
       expect(names).toEqual([
         "ackit_doctor",
+        "ackit_drift_check",
+        "ackit_get_checkpoint",
+        "ackit_get_intent",
         "ackit_get_task",
         "ackit_instruction_graph",
+        "ackit_list_roles",
         "ackit_list_skills",
         "ackit_list_tasks",
         "ackit_pack",
         "ackit_policy_check",
         "ackit_scan",
         "ackit_validate_skills",
+        "ackit_verification_bundle",
+        "ackit_workflow_status",
       ]);
     } finally {
       await session.close();
@@ -81,6 +87,7 @@ describe("ackit MCP conformance (REQ-MCP-004)", () => {
         "ackit_validate_skills",
         "ackit_list_tasks",
         "ackit_policy_check",
+        "ackit_list_roles",
       ]) {
         const result = await session.client.callTool({ name, arguments: {} });
         expect(result.isError ?? false, `${name} errored`).toBe(false);
@@ -95,6 +102,205 @@ describe("ackit MCP conformance (REQ-MCP-004)", () => {
       delete process.env["ACKIT_ROOT"];
       await session.close();
     }
+  });
+
+  it("workflow expansion tools answer read-only with correct semantics", async () => {
+    // Fixture: create a task + workflow state + evidence via the core stores,
+    // then verify the MCP tools surface them without mutation.
+    const { TaskStore } = await import("../../../src/core/tasks/index.js");
+    const { WorkflowStore } = await import("../../../src/core/workflow/index.js");
+    const { EvidenceStore } = await import("../../../src/core/evidence/index.js");
+    const { syncRegistry } = await import("../../../src/core/evidence/sync.js");
+    const store = new TaskStore(rootPath);
+    const created = await store.create("mcp workflow fixture");
+    const taskId = created.meta.id;
+    const { resolveRepositoryRoot } = await import("../../../src/core/filesystem/root.js");
+    const resolved = await resolveRepositoryRoot(rootPath);
+    if (!resolved.ok) throw new Error(resolved.diagnostic.message);
+    await new WorkflowStore(resolved.root).setProfile(taskId, "standard");
+    const evidenceStore = new EvidenceStore(resolved.root);
+    const doc = await store.find(taskId);
+    if (doc === null) throw new Error("task missing");
+    await evidenceStore.save(taskId, syncRegistry(doc.doc, null, "2026-08-31"));
+
+    process.env["ACKIT_ROOT"] = rootPath;
+    const session = await connect();
+    try {
+      const status = await session.client.callTool({
+        name: "ackit_workflow_status",
+        arguments: { taskId },
+      });
+      expect(status.isError ?? false).toBe(false);
+      const statusText = JSON.stringify(status.content);
+      expect(statusText).toContain("standard");
+
+      const evidence = await session.client.callTool({
+        name: "ackit_drift_check",
+        arguments: { taskId },
+      });
+      expect(evidence.isError ?? false).toBe(false);
+
+      const bundle = await session.client.callTool({
+        name: "ackit_verification_bundle",
+        arguments: { taskId },
+      });
+      expect(bundle.isError ?? false).toBe(false);
+      const bundleText = JSON.stringify(bundle.content);
+      expect(bundleText).toContain("ackit.verification-bundle.v1");
+
+      const legacyStatus = await session.client.callTool({
+        name: "ackit_workflow_status",
+        arguments: { taskId: "TASK-9999" },
+      });
+      expect(legacyStatus.isError ?? false).toBe(false);
+      expect(JSON.stringify(legacyStatus.content)).toContain("no workflow state");
+    } finally {
+      delete process.env["ACKIT_ROOT"];
+      await session.close();
+    }
+  });
+
+  it("MCP drift tool input resolution matches the CLI (TASK-0064 parity: no false artifacts)", async () => {
+    // A task whose declared refs (spec/decision/plan) ALL exist on disk must
+    // produce the SAME findings through the MCP tool and the CLI — before
+    // the parity fix the MCP tool passed existingArtifacts: ["task", evidence]
+    // and referencePathsExist: [] and could emit false
+    // MISSING_REQUIRED_ARTIFACT / PLAN_REFERENCE_MISSING findings.
+    const { TaskStore, serialize } = await import("../../../src/core/tasks/index.js");
+    const { WorkflowStore } = await import("../../../src/core/workflow/index.js");
+    const { EvidenceStore } = await import("../../../src/core/evidence/index.js");
+    const { syncRegistry } = await import("../../../src/core/evidence/sync.js");
+    const { detectWorkflowDrift } = await import("../../../src/core/drift/index.js");
+    const store = new TaskStore(rootPath);
+    const created = await store.create("mcp drift parity fixture");
+    const taskId = created.meta.id;
+    // Author refs that exist.
+    await writeFile(path.join(rootPath, "docs", "decisions", "ADR-9001-parity.md"), "# a\n", {
+      flag: "w",
+    } as never).catch(async () => {
+      const { mkdir } = await import("node:fs/promises");
+      await mkdir(path.join(rootPath, "docs", "decisions"), { recursive: true });
+      await writeFile(path.join(rootPath, "docs", "decisions", "ADR-9001-parity.md"), "# a\n");
+    });
+    await writeFile(path.join(rootPath, "docs", "plans", "parity.md"), "# p\n", {
+      flag: "w",
+    } as never).catch(async () => {
+      const { mkdir } = await import("node:fs/promises");
+      await mkdir(path.join(rootPath, "docs", "plans"), { recursive: true });
+      await writeFile(path.join(rootPath, "docs", "plans", "parity.md"), "# p\n");
+    });
+    const found = await store.find(taskId);
+    if (found === null) throw new Error("task missing");
+    const docAbs = path.join(
+      rootPath,
+      "docs",
+      "tasks",
+      "active",
+      path.basename(found.doc.relativePath),
+    );
+    const meta = {
+      ...found.doc.meta,
+      decisionRefs: ["docs/decisions/ADR-9001-parity.md"],
+      planRef: "docs/plans/parity.md",
+    } as typeof found.doc.meta;
+    await writeFile(
+      docAbs,
+      serialize(
+        meta,
+        [
+          "## Acceptance criteria",
+          "",
+          "- [ ] A.",
+          "",
+          "## Completion notes",
+          "",
+          "(placeholder)",
+        ].join("\n"),
+      ),
+    );
+    const { resolveRepositoryRoot } = await import("../../../src/core/filesystem/root.js");
+    const resolved = await resolveRepositoryRoot(rootPath);
+    if (!resolved.ok) throw new Error(resolved.diagnostic.message);
+    const wf = new WorkflowStore(resolved.root);
+    await wf.setProfile(taskId, "standard");
+    await wf.advanceTo(taskId, "plan");
+    await wf.advanceTo(taskId, "tasks");
+    await wf.advanceTo(taskId, "implement");
+    const doc = await store.find(taskId);
+    if (doc === null) throw new Error("task missing");
+    const evidenceStore = new EvidenceStore(resolved.root);
+    await evidenceStore.save(taskId, syncRegistry(doc.doc, null, "2026-09-02"));
+
+    process.env["ACKIT_ROOT"] = rootPath;
+    const session = await connect();
+    let mcpFindings: { code: string }[] = [];
+    try {
+      const result = await session.client.callTool({
+        name: "ackit_drift_check",
+        arguments: { taskId },
+      });
+      expect(result.isError ?? false).toBe(false);
+      // The tool returns a single text block whose text is {"findings":[...]}.
+      const content = result.content as { type: string; text?: string }[];
+      const first = content[0];
+      if (first === undefined || first.text === undefined) throw new Error("no text content");
+      const payload = JSON.parse(first.text) as { findings?: { code: string }[] };
+      if (payload.findings === undefined) throw new Error("no findings in payload");
+      mcpFindings = payload.findings;
+    } finally {
+      delete process.env["ACKIT_ROOT"];
+      await session.close();
+    }
+
+    // CLI parity: run the same resolution the CLI performs and compare
+    // finding code sets.
+    const { VerdictStore } = await import("../../../src/core/verification/store.js");
+    const verdicts = new VerdictStore(rootPath);
+    const latest = await verdicts.latest(taskId);
+    const referencePathsExist: string[] = [];
+    const fsp = await import("node:fs/promises");
+    for (const ref of [
+      ...(meta.decisionRefs ?? []),
+      ...(meta.planRef !== undefined ? [meta.planRef] : []),
+    ]) {
+      try {
+        await fsp.access(path.resolve(rootPath, ...ref.split("/")));
+        referencePathsExist.push(ref);
+      } catch {
+        // absent
+      }
+    }
+    const { requiredArtifacts } = await import("../../../src/core/workflow/index.js");
+    const wfState = await wf.load(taskId);
+    if (wfState === null) throw new Error("workflow state missing");
+    const cliFindings = detectWorkflowDrift({
+      taskId,
+      taskDoc: doc.doc,
+      workflow: { profile: wfState.profile, stage: wfState.stage },
+      requiredArtifacts: requiredArtifacts(wfState.profile, wfState.stage).artifacts,
+      existingArtifacts: [
+        "task",
+        "intent",
+        "spec",
+        "plan",
+        "evidence",
+        ...(latest !== null ? ["verdict"] : []),
+      ],
+      referencePathsExist,
+      evidence: await evidenceStore.load(taskId),
+      latestVerdict: latest !== null ? { verdict: latest.verdict } : null,
+      checkpoint: null,
+      checkpointProblems: [],
+      changedFiles: [],
+      dependencies: [],
+    });
+    const mcpCodes = mcpFindings.map((f) => f.code).sort();
+    const cliCodes = cliFindings.map((f) => f.code).sort();
+    // The finding sets must be IDENTICAL — specifically NO false
+    // MISSING_REQUIRED_ARTIFACT (intent/spec/plan resolved) and NO false
+    // PLAN_REFERENCE_MISSING (refs exist).
+    expect(mcpCodes).toEqual(cliCodes);
+    expect(mcpCodes).not.toContain("PLAN_REFERENCE_MISSING");
   });
 
   it("resources/list and resources/read work", async () => {

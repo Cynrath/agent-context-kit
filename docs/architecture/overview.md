@@ -68,3 +68,67 @@ The following modules are reserved for v0.2.0 and not yet implemented in this ba
 No code exists for these subsystems in this baseline commit; they are documented here to pin architecture boundaries before implementation starts. See `docs/v0.2.0/EXECUTION_PLAN.md` and ADRs 0015–0024.
 
 Details: `docs/concepts/*.md`, ADRs under `docs/rebuild/decisions/` and `docs/decisions/`.
+
+## Workflow expansion architecture (ADR-0025 … 0028)
+
+New first-class primitives (additive; legacy repositories unaffected):
+
+```
+src/core/
+  workflow/      profiles (quick|standard|high-risk), stage machine, per-task
+                 state store (.ackit/workflow/TASK-####/state.yaml,
+                 ackit.workflow.v1), declarative lifecycle gates, verification
+                 attempt state (verify/fix loop)
+  intent/        committed intent docs (docs/intent/, ackit.intent.v1):
+                 validate, normalize, fingerprint (machine-independent sha256)
+  checkpoint/    per-task checkpoints (.ackit/workflow/.../checkpoints/,
+                 ackit.checkpoint.v1): deterministic extraction, staleness
+                 detection, resume context + handoff pack renderers
+  evidence/      evidence contract v2 (ackit.evidence.v2): criteria synced
+                 from the task doc, typed evidence entries, completeness
+                 validation (structure only — never semantic judgment)
+  verification/  verification bundle (ackit.verification-bundle.v1) +
+                 verdict registration/validation (ackit.verdict.v1,
+                 append-only, latest governs)
+  drift/         deterministic drift findings (frozen code list:
+                 UNPLANNED_FILE_CHANGE, MISSING_REQUIRED_ARTIFACT, ...)
+  roles/         portable role contracts (templates/roles/, ackit.role.v1,
+                 data-only — no subagent runtime)
+  journal/       sanitized local execution journal (ackit.execution-journal.v1,
+                 closed event-kind list, redaction at construction)
+```
+
+Existing subsystems are extended, never duplicated: task frontmatter gains
+optional `intentRef`/`specRefs`/`decisionRefs`/`planRef` (schemaVersion stays 2);
+`buildContextPack` gains task/resume ranking signals; the policy engine gains
+optional `autonomy` (tier0–4 × allow/ask/deny) and `review` sections; skills gain
+deterministic provider projections.
+
+### Terminology
+
+- **Intent** — committed, schema-versioned record of problem/desired
+  outcome/constraints/non-goals/acceptance criteria (`ackit.intent.v1`).
+  Required only by workflow profiles that declare it; never inferred by ACKit.
+- **Workflow profile** — explicit lifecycle contract selected per task:
+  `quick`, `standard`, or `high-risk` (ADR-0025).
+- **Stage** — one ordered step of a profile; forward-only, machine-checkable.
+- **Required artifact** — a declared prerequisite (intent, spec, plan, task,
+  evidence, verdict) that must exist before its stage advances.
+- **Evidence** — typed, referenced proof linked to an acceptance criterion
+  (`ackit.evidence.v2`). Implementation existing ≠ criterion verified.
+- **Verdict** — a fresh-context verifier's structured judgment
+  (`ackit.verdict.v1`): PASS / PASS_WITH_WARNINGS / REWORK_REQUIRED / BLOCKED.
+- **Checkpoint** — deterministic per-task snapshot enabling resume after
+  compaction, chat/model/provider switch, restart, or handoff
+  (`ackit.checkpoint.v1`).
+- **Resume / handoff pack** — deterministic rendered context (concise resume
+  block; self-contained handoff document) for a fresh agent.
+- **Drift finding** — deterministic machine check result with a frozen code
+  (e.g. `UNPLANNED_FILE_CHANGE`); never a semantic claim.
+- **Autonomy tier** — risk classification (0–4) of an action with an
+  allow/ask/deny policy; enforced only at ACKit-owned boundaries (ADR-0028).
+- **Role contract** — portable, data-only YAML contract a provider may use when
+  spawning subagents (verifier must emit `ackit.verdict.v1`); ACKit never
+  spawns or routes agents.
+- **Execution journal** — sanitized local-only event log of ACKit-observable
+  transitions; not telemetry; never uploaded.

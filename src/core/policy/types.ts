@@ -40,6 +40,40 @@ export const PolicyDocumentSchema = z.strictObject({
     .default({}),
   suppressions: z.array(PolicySuppressionSchema).default([]),
   forbiddenPatterns: z.array(ForbiddenPatternSchema).default([]),
+  // Policy v2 additions (ADR-0028 §1/§2): risk-tiered autonomy + review
+  // policy. Additive optional sections — existing documents unaffected
+  // (digest-stable for documents without them).
+  autonomy: z
+    .strictObject({
+      tier0: z.enum(["allow", "ask", "deny"]).optional(),
+      tier1: z.enum(["allow", "ask", "deny"]).optional(),
+      tier2: z.enum(["allow", "ask", "deny"]).optional(),
+      tier3: z.enum(["allow", "ask", "deny"]).optional(),
+      tier4: z.enum(["allow", "ask", "deny"]).optional(),
+    })
+    .optional(),
+  review: z
+    .strictObject({
+      required: z
+        .array(
+          z.enum([
+            "correctness",
+            "regression",
+            "security",
+            "tests",
+            "architecture",
+            "plan-compliance",
+            "documentation",
+          ]),
+        )
+        .max(7)
+        .optional(),
+      blockingSeverity: z
+        .array(z.enum(["critical", "high", "medium"]))
+        .max(3)
+        .optional(),
+    })
+    .optional(),
 });
 
 export type PolicyDocument = z.infer<typeof PolicyDocumentSchema>;

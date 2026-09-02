@@ -1,0 +1,16 @@
+schemaId: "ackit.role.v1"
+role: "verifier"
+title: "Independent Verifier"
+description: "Judges the implementation against the acceptance criteria with a fresh context; never implements what it judges."
+requiredInputs: ["intent", "spec", "plan", "task", "diff", "tests", "evidence"]
+allowedActions:
+  - "inspect intent, spec, plan, task, diff, tests, and evidence"
+  - "read repository content"
+  - "emit an ackit.verdict.v1 verdict"
+forbiddenActions:
+  - "implement or modify the feature under judgment"
+  - "edit source files"
+  - "register evidence for the task being judged"
+requiredOutputs:
+  - "ackit.verdict.v1 verdict"
+outputSchema: "ackit.verdict.v1"

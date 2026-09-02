@@ -248,6 +248,115 @@
         }
       },
       "additionalProperties": false
+    },
+    "workflow": {
+      "type": "object",
+      "properties": {
+        "defaultProfile": {
+          "type": "string",
+          "enum": [
+            "quick",
+            "standard",
+            "high-risk"
+          ]
+        },
+        "requireVerifier": {
+          "type": "boolean"
+        },
+        "profiles": {
+          "type": "object",
+          "properties": {
+            "requireEvidence": {
+              "type": "boolean"
+            },
+            "requireVerdict": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "autonomy": {
+      "type": "object",
+      "properties": {
+        "tier0": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "ask",
+            "deny"
+          ]
+        },
+        "tier1": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "ask",
+            "deny"
+          ]
+        },
+        "tier2": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "ask",
+            "deny"
+          ]
+        },
+        "tier3": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "ask",
+            "deny"
+          ]
+        },
+        "tier4": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "ask",
+            "deny"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "maxItems": 7,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "correctness",
+              "regression",
+              "security",
+              "tests",
+              "architecture",
+              "plan-compliance",
+              "documentation"
+            ]
+          }
+        },
+        "blockingSeverity": {
+          "maxItems": 3,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "medium"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
     }
   },
   "required": [

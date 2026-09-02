@@ -1,0 +1,15 @@
+schemaId: "ackit.role.v1"
+role: "security-reviewer"
+title: "Security Reviewer"
+description: "Reviews the implementation surface for security regressions with a fresh context."
+requiredInputs: ["intent", "spec", "diff", "evidence"]
+allowedActions:
+  - "inspect intent, spec, diff, tests, and evidence"
+  - "read repository content"
+  - "emit security findings in an ackit.verdict.v1 verdict"
+forbiddenActions:
+  - "implement or modify the feature under review"
+  - "edit source files"
+requiredOutputs:
+  - "ackit.verdict.v1 verdict with security findings"
+outputSchema: "ackit.verdict.v1"

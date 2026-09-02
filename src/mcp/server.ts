@@ -218,6 +218,216 @@ export async function createAckitMcpServer(requestedRoot?: string | undefined): 
     },
   );
 
+  // ---- Workflow expansion read-only tools (TASK-0059, ADR-0028 §6) ----------
+  // Boundary preserved: READ-ONLY only — state mutation (workflow set/advance/
+  // verify, checkpoint create, evidence register, verdict record) stays
+  // CLI-only by explicit decision; a future write tool requires its own
+  // architecture/security decision.
+
+  server.tool(
+    "ackit_workflow_status",
+    "Workflow state for a task (profile, stage, required artifacts)",
+    { taskId: z.string() },
+    async (args: { taskId: string }) => {
+      try {
+        const { WorkflowStore, requiredArtifacts } = await import("../core/workflow/index.js");
+        const workflow = new WorkflowStore({ canonicalPath: repositoryRoot });
+        const state = await workflow.load(args.taskId);
+        if (state === null) {
+          return textResult(
+            JSON.stringify({
+              task: args.taskId,
+              workflow: null,
+              note: "no workflow state (legacy task)",
+            }),
+          );
+        }
+        const required = requiredArtifacts(state.profile, state.stage);
+        return textResult(
+          JSON.stringify({
+            task: args.taskId,
+            profile: state.profile,
+            stage: state.stage,
+            requiredArtifacts: required.artifacts,
+            verificationAttempts: state.verificationAttempts.length,
+          }),
+        );
+      } catch (error) {
+        return textResult(JSON.stringify({ error: (error as Error).message }));
+      }
+    },
+  );
+
+  server.tool(
+    "ackit_get_intent",
+    "Return one intent document by id (normalized contract + fingerprint)",
+    { id: z.string() },
+    async (args: { id: string }) => {
+      try {
+        const { IntentStore, intentFingerprint } = await import("../core/intent/index.js");
+        const found = await new IntentStore(repositoryRoot).find(args.id);
+        if (found === null) return textResult(JSON.stringify({ error: "unknown intent" }));
+        return textResult(
+          JSON.stringify({
+            intent: found.doc.meta,
+            fingerprint: intentFingerprint(found.doc.meta),
+          }),
+        );
+      } catch (error) {
+        return textResult(JSON.stringify({ error: (error as Error).message }));
+      }
+    },
+  );
+
+  server.tool(
+    "ackit_get_checkpoint",
+    "Return the latest checkpoint of a task (with resume context)",
+    { taskId: z.string() },
+    async (args: { taskId: string }) => {
+      try {
+        const { CheckpointStore, renderResumeContext } = await import(
+          "../core/checkpoint/index.js"
+        );
+        const store = new CheckpointStore({ canonicalPath: repositoryRoot }, repositoryRoot);
+        const latest = await store.latest(args.taskId);
+        if (latest === null) {
+          return textResult(JSON.stringify({ task: args.taskId, checkpoint: null }));
+        }
+        const resume = renderResumeContext(
+          latest,
+          { id: args.taskId, title: "(task)", status: "active" },
+          null,
+        );
+        return textResult(JSON.stringify({ checkpoint: latest, resume }));
+      } catch (error) {
+        return textResult(JSON.stringify({ error: (error as Error).message }));
+      }
+    },
+  );
+
+  server.tool(
+    "ackit_verification_bundle",
+    "Build the deterministic verification bundle for a fresh verifier",
+    { taskId: z.string() },
+    async (args: { taskId: string }) => {
+      try {
+        const { buildVerificationBundle } = await import("../core/verification/index.js");
+        const result = await buildVerificationBundle(
+          { canonicalPath: repositoryRoot },
+          args.taskId,
+        );
+        if (!result.ok) {
+          return textResult(JSON.stringify({ error: result.diagnostic.message }));
+        }
+        return textResult(result.bundle.markdown);
+      } catch (error) {
+        return textResult(JSON.stringify({ error: (error as Error).message }));
+      }
+    },
+  );
+
+  server.tool(
+    "ackit_drift_check",
+    "Deterministic workflow drift findings for a task",
+    { taskId: z.string() },
+    async (args: { taskId: string }) => {
+      try {
+        const { promises: fsp } = await import("node:fs");
+        const path = await import("node:path");
+        const { TaskStore } = await import("../core/tasks/index.js");
+        const { WorkflowStore, requiredArtifacts } = await import("../core/workflow/index.js");
+        const { EvidenceStore } = await import("../core/evidence/index.js");
+        const { VerdictStore } = await import("../core/verification/index.js");
+        const { CheckpointStore } = await import("../core/checkpoint/index.js");
+        const { changedFiles } = await import("../core/git/git.js");
+        const { detectWorkflowDrift } = await import("../core/drift/index.js");
+        const tasks = new TaskStore(repositoryRoot);
+        const found = await tasks.find(args.taskId);
+        if (found === null) return textResult(JSON.stringify({ error: "unknown task" }));
+        const workflow = new WorkflowStore({ canonicalPath: repositoryRoot });
+        const wf = await workflow.load(args.taskId);
+        const root = { canonicalPath: repositoryRoot };
+        const evidence = await new EvidenceStore(root).load(args.taskId);
+        const verdicts = new VerdictStore(repositoryRoot);
+        const latest = await verdicts.latest(args.taskId);
+        const checkpoints = new CheckpointStore(root, repositoryRoot);
+        const checkpoint = await checkpoints.latest(args.taskId);
+        let gitChanged: string[] = [];
+        try {
+          gitChanged = changedFiles(repositoryRoot);
+        } catch {
+          gitChanged = [];
+        }
+        const dependencies: { id: string; completed: boolean }[] = [];
+        for (const dep of found.doc.meta.dependencies) {
+          const depFound = await tasks.find(dep);
+          dependencies.push({ id: dep, completed: depFound?.doc.meta.status === "completed" });
+        }
+        // Input resolution parity with the CLI (drift.ts): artifact presence
+        // includes intent/spec/plan/verdict existence checks and declared
+        // refs are resolved on disk, so the MCP tool reports exactly what
+        // `ackit drift check` reports for the same repository state
+        // (TASK-0064 audit-fidelity fix).
+        const metaExtra = found.doc.meta as {
+          intentRef?: string | undefined;
+          specRefs?: string[] | undefined;
+          decisionRefs?: string[] | undefined;
+          planRef?: string | undefined;
+        };
+        const existingArtifacts: string[] = ["task", ...(evidence !== null ? ["evidence"] : [])];
+        if (metaExtra.intentRef !== undefined) existingArtifacts.push("intent");
+        if (metaExtra.specRefs !== undefined && metaExtra.specRefs.length > 0)
+          existingArtifacts.push("spec");
+        if (metaExtra.planRef !== undefined && metaExtra.planRef.length > 0)
+          existingArtifacts.push("plan");
+        if (latest !== null) existingArtifacts.push("verdict");
+        const refPaths = [
+          ...(metaExtra.specRefs ?? []),
+          ...(metaExtra.decisionRefs ?? []),
+          ...(metaExtra.planRef !== undefined ? [metaExtra.planRef] : []),
+        ];
+        const referencePathsExist: string[] = [];
+        for (const ref of refPaths) {
+          try {
+            await fsp.access(path.resolve(repositoryRoot, ...ref.split("/")));
+            referencePathsExist.push(ref);
+          } catch {
+            // absent — drift flags it (same as the CLI)
+          }
+        }
+        const findings = detectWorkflowDrift({
+          taskId: args.taskId,
+          taskDoc: found.doc,
+          workflow: wf !== null ? { profile: wf.profile, stage: wf.stage } : null,
+          requiredArtifacts: wf !== null ? requiredArtifacts(wf.profile, wf.stage).artifacts : [],
+          existingArtifacts,
+          referencePathsExist,
+          evidence,
+          latestVerdict: latest !== null ? { verdict: latest.verdict } : null,
+          checkpoint,
+          checkpointProblems: [],
+          changedFiles: gitChanged,
+          dependencies,
+        });
+        return textResult(JSON.stringify({ findings }));
+      } catch (error) {
+        return textResult(JSON.stringify({ error: (error as Error).message }));
+      }
+    },
+  );
+
+  server.tool("ackit_list_roles", "List portable role contracts", {}, async () => {
+    try {
+      const { listRoles } = await import("../core/roles/index.js");
+      const { roles } = await listRoles(repositoryRoot);
+      return textResult(
+        JSON.stringify(roles.map((role) => ({ role: role.role, title: role.title }))),
+      );
+    } catch (error) {
+      return textResult(JSON.stringify({ error: (error as Error).message }));
+    }
+  });
+
   // ---- Resources (REQ-MCP-003) -------------------------------------------
   server.resource("repository-summary", "repo://summary", async () => {
     const graph = await buildInstructionGraph({ canonicalPath: repositoryRoot });

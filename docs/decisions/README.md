@@ -30,3 +30,11 @@ v0.2.0 additions (ADR-0015 … ADR-0024, Accepted 2026-08-27):
 - ADR-0022 benchmark / regression policy
 - ADR-0023 multi-artifact version/release strategy
 - ADR-0024 cross-cutting security hardening
+
+Workflow expansion additions (ADR-0025 … ADR-0028, Accepted 2026-08-31, governing
+TASK-0044 … TASK-0062):
+
+- ADR-0025 workflow profiles + stage contract + intent artifact + additive task refs
+- ADR-0026 evidence contract v2 + independent verification protocol + verdicts
+- ADR-0027 checkpoints, resumability, local workflow store, task-aware packs
+- ADR-0028 policy v2 autonomy tiers + review policy + declarative gates + roles + skills projections

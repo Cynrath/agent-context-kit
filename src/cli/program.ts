@@ -4,19 +4,27 @@ import { emitDiagnostic } from "../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../shared/exit-codes.js";
 import { getPackageIdentity } from "../shared/version.js";
 import { runCacheCleanCommand } from "./commands/cache.js";
+import { registerCheckpointCommands } from "./commands/checkpoint.js";
 import { runConfigCheck } from "./commands/config.js";
 import { runDoctorCommand } from "./commands/doctor.js";
+import { registerDriftCommands } from "./commands/drift.js";
+import { registerEvidenceCommands } from "./commands/evidence.js";
 import { runHooksCommand } from "./commands/hooks.js";
 import { runInitCommand } from "./commands/init.js";
 import { runInstructionsCommand } from "./commands/instructions.js";
+import { registerIntentCommands } from "./commands/intent.js";
+import { registerJournalCommands } from "./commands/journal.js";
 import { runOptimizeCommand } from "./commands/optimize.js";
 import { runPackCommand } from "./commands/pack.js";
 import { runPolicyCheckCommand } from "./commands/policy.js";
 import { runReportServeCommand } from "./commands/report.js";
+import { registerRoleCommands } from "./commands/role.js";
 import { runScanCommand } from "./commands/scan.js";
 import { registerSkillsCommands } from "./commands/skills.js";
 import { runSummary } from "./commands/summary.js";
 import { registerTaskCommands } from "./commands/task.js";
+import { registerVerificationCommands } from "./commands/verification.js";
+import { registerWorkflowCommands } from "./commands/workflow.js";
 import { runWorkspacesCommand } from "./commands/workspaces.js";
 import type { CliInvocation, GlobalOptions } from "./context.js";
 import { isUsageError } from "./errors.js";
@@ -145,6 +153,22 @@ function buildProgram(invocation: CliInvocation): Command {
 
   registerTaskCommands(program, invocation);
 
+  registerWorkflowCommands(program, invocation);
+
+  registerIntentCommands(program, invocation);
+
+  registerCheckpointCommands(program, invocation);
+
+  registerEvidenceCommands(program, invocation);
+
+  registerDriftCommands(program, invocation);
+
+  registerVerificationCommands(program, invocation);
+
+  registerRoleCommands(program, invocation);
+
+  registerJournalCommands(program, invocation);
+
   const initCommand = program
     .command("init")
     .description("onboard a repository with agent instructions and built-in skills");
@@ -177,6 +201,12 @@ function buildProgram(invocation: CliInvocation): Command {
     .option("--include <globs...>", "explicit include globs (highest ranking signal)")
     .option("--changed", "boost/limit candidates to git-changed files", false)
     .option("--profile <name>", "provider profile (codex|claude|copilot|gemini|generic)")
+    .option("--task <id>", "task-aware pack: rank declared scope, refs, and changed files")
+    .option(
+      "--resume",
+      "embed the latest checkpoint resume section (uses the single active task when --task is omitted)",
+      false,
+    )
     .action(async () => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
       const commandOptions = (packCommand.opts() ?? {}) as {
@@ -185,6 +215,8 @@ function buildProgram(invocation: CliInvocation): Command {
         include?: string[];
         changed?: boolean;
         profile?: string;
+        task?: string;
+        resume?: boolean;
       };
       invocation.exitCode = await runPackCommand({
         root: parentOptions.root,
@@ -197,6 +229,8 @@ function buildProgram(invocation: CliInvocation): Command {
         include: commandOptions.include,
         changed: commandOptions.changed ?? false,
         profile: commandOptions.profile,
+        task: commandOptions.task,
+        resume: commandOptions.resume ?? false,
       });
     });
 

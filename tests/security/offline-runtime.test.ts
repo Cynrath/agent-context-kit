@@ -229,6 +229,83 @@ describe("offline-runtime deny-egress harness", () => {
     expect(egressAttempts).toEqual([]);
   });
 
+  it("workflow expansion families run offline without egress (TASK-0060)", async () => {
+    // Exercise every new family end-to-end under the egress spy: task refs,
+    // intent, workflow, checkpoint, evidence, verdict/bundle, drift, roles,
+    // journal, skills export, policy v2 — all local fs/git only.
+    const { TaskStore } = await import("../../src/core/tasks/store.js");
+    const { IntentStore } = await import("../../src/core/intent/index.js");
+    const { WorkflowStore } = await import("../../src/core/workflow/index.js");
+    const { CheckpointStore } = await import("../../src/core/checkpoint/index.js");
+    const { EvidenceStore } = await import("../../src/core/evidence/index.js");
+    const { syncRegistry } = await import("../../src/core/evidence/sync.js");
+    const { VerdictStore, buildVerificationBundle } = await import(
+      "../../src/core/verification/index.js"
+    );
+    const { detectWorkflowDrift } = await import("../../src/core/drift/index.js");
+    const { listRoles } = await import("../../src/core/roles/index.js");
+    const { JournalStore } = await import("../../src/core/journal/index.js");
+    const { resolveAutonomy, resolveReview } = await import("../../src/core/policy/index.js");
+    const { validateEvidence } = await import("../../src/core/evidence/index.js");
+    const root = { canonicalPath: tmpRepo };
+
+    const tasks = new TaskStore(tmpRepo);
+    const created = await tasks.create("offline workflow fixture", [], {
+      planRef: "docs/plans/p.md",
+    });
+    const taskId = created.meta.id;
+    await new IntentStore(tmpRepo).create("offline intent fixture");
+    const workflow = new WorkflowStore(root);
+    await workflow.setProfile(taskId, "quick");
+    await workflow.recordVerificationAttempt(taskId, "pass");
+    const doc = await tasks.find(taskId);
+    if (doc === null) throw new Error("task missing");
+    const checkpoints = new CheckpointStore(root, tmpRepo);
+    await checkpoints.create(
+      taskId,
+      doc.doc,
+      { profile: "quick" },
+      { objective: "offline checkpoint" },
+    );
+    const evidenceStore = new EvidenceStore(root);
+    const registry = syncRegistry(doc.doc, null, "2026-08-31");
+    await evidenceStore.save(taskId, registry);
+    validateEvidence(registry);
+    const verdicts = new VerdictStore(tmpRepo);
+    await verdicts.register(taskId, {
+      schemaId: "ackit.verdict.v1",
+      verdict: "PASS",
+      verifier: { agent: "offline-verifier", context: "fresh", issuedAt: "2026-08-31" },
+      findings: [],
+      checkedCriteria: registry.criteria.map((c) => c.id),
+      summary: "offline",
+    });
+    const bundle = await buildVerificationBundle(root, taskId);
+    expect(bundle.ok).toBe(true);
+    detectWorkflowDrift({
+      taskId,
+      taskDoc: doc.doc,
+      workflow: { profile: "quick", stage: "task" },
+      requiredArtifacts: ["task"],
+      existingArtifacts: ["task"],
+      referencePathsExist: [],
+      evidence: registry,
+      latestVerdict: { verdict: "PASS" },
+      checkpoint: null,
+      checkpointProblems: [],
+      changedFiles: [],
+      dependencies: [],
+    });
+    const { roles, problems } = await listRoles(tmpRepo);
+    expect(roles.length).toBeGreaterThanOrEqual(7);
+    expect(problems).toEqual([]);
+    const journal = new JournalStore(root);
+    await journal.append("ackit-command", { command: "offline", outcome: "ok" });
+    resolveAutonomy([{ tier2: "deny" }]);
+    resolveReview([{ required: ["security"] }]);
+    expect(egressAttempts).toEqual([]);
+  });
+
   it("rule-pack evaluation refuses remote URL without egress", async () => {
     // Direct remote URL as pack spec should be refused without attempting fetch
     const { diagnostics } = await loadRulePacks({ canonicalPath: tmpRepo }, [

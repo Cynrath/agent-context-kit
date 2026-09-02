@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaId": {
+      "type": "string",
+      "const": "ackit.checkpoint.v1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^CP-\\d{4}$"
+    },
+    "taskId": {
+      "type": "string",
+      "pattern": "^TASK-\\d{4}$"
+    },
+    "workflow": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "type": "string",
+          "enum": [
+            "quick",
+            "standard",
+            "high-risk"
+          ]
+        },
+        "stage": {
+          "type": "string",
+          "enum": [
+            "task",
+            "intent",
+            "spec",
+            "plan",
+            "tasks",
+            "implement",
+            "verify",
+            "review",
+            "independent-review",
+            "release-evidence"
+          ]
+        }
+      },
+      "required": [
+        "profile"
+      ]
+    },
+    "intentRef": {
+      "type": "string",
+      "pattern": "^INTENT-\\d{4}$"
+    },
+    "planRef": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "completedWork": {
+      "maxItems": 64,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "pendingWork": {
+      "maxItems": 64,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "decisions": {
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "failures": {
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "blockers": {
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "evidenceRefs": {
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 200
+      }
+    },
+    "changedAreas": {
+      "maxItems": 128,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 200
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "properties": {
+        "objective": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "path": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "command": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "expectedResult": {
+          "type": "string",
+          "maxLength": 500
+        }
+      },
+      "required": [
+        "objective"
+      ]
+    },
+    "gitHead": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "gitUnavailable": {
+      "default": false,
+      "type": "boolean"
+    },
+    "createdAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    }
+  },
+  "required": [
+    "schemaId",
+    "id",
+    "taskId",
+    "workflow",
+    "completedWork",
+    "pendingWork",
+    "decisions",
+    "failures",
+    "blockers",
+    "evidenceRefs",
+    "changedAreas",
+    "nextAction",
+    "gitHead",
+    "createdAt"
+  ],
+  "additionalProperties": false,
+  "$comment": "ACKit checkpoint schema (ackit.checkpoint.v1)."
+}

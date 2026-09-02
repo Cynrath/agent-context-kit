@@ -30,6 +30,12 @@ export async function runDoctorCommand(
       ok: report.ok,
       detail: report.ok ? "integrity OK" : `${report.problems.length} problem(s)`,
     });
+    // Plan-first machine check (ADR-0025 §6): advisory diagnostics only —
+    // surfaced by doctor, never a hard failure (git-unavailable tolerant).
+    const planFirst = await store.planFirstDiagnostics();
+    for (const diagnostic of planFirst) {
+      process.stderr.write(`[ackit] ${diagnostic.code}: ${diagnostic.message}\n`);
+    }
   } catch (error) {
     checks.push({ name: "tasks", ok: false, detail: (error as Error).message });
   }

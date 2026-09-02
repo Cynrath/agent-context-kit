@@ -48,8 +48,14 @@ describe("npm README parity", () => {
     const tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), "ackit-parity-test-"));
     const extractDir = await fsp.mkdtemp(path.join(os.tmpdir(), "ackit-parity-extract-"));
     try {
-      // Pack
-      execSync(`pnpm pack --pack-destination "${tmpDir}"`, {
+      // Pack WITHOUT running lifecycle scripts (--ignore-scripts): the
+      // prepack hook (pnpm build && pnpm gen:schemas) rewrites dist/ and
+      // schemas/ — racing sibling tests that read those files in the same
+      // parallel vitest run (root cause of parallel-mode flakiness). dist/
+      // must already exist (pnpm build precedes the test suite), so the
+      // tarball content is identical either way; the parity assertion is
+      // unchanged.
+      execSync(`npm pack --ignore-scripts --pack-destination "${tmpDir}"`, {
         cwd: repoRoot,
         stdio: "pipe",
         encoding: "utf8",
@@ -81,12 +87,17 @@ describe("npm README parity", () => {
       await fsp.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
       await fsp.rm(extractDir, { recursive: true, force: true }).catch(() => {});
     }
-  }, 30000);
+    // 120000: npm pack + tar extraction measured ~35s alone on slow CI
+    // Windows runners; the previous 30000 cap produced load-dependent
+    // timeouts there.
+  }, 120000);
 
   it("tarball audit: no secrets, no absolute local paths", async () => {
     const tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), "ackit-audit-test-"));
     try {
-      execSync(`pnpm pack --pack-destination "${tmpDir}"`, {
+      // --ignore-scripts: same rationale as the parity pack above (avoid
+      // prepack's dist//schemas/ rewrite racing parallel sibling tests).
+      execSync(`npm pack --ignore-scripts --pack-destination "${tmpDir}"`, {
         cwd: repoRoot,
         stdio: "pipe",
       });
@@ -120,5 +131,6 @@ describe("npm README parity", () => {
     } finally {
       await fsp.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
     }
-  }, 30000);
+    // 120000: same rationale as the parity test above (pack on slow CI).
+  }, 120000);
 });

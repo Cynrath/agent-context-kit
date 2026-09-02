@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaId": {
+      "type": "string",
+      "const": "ackit.intent.v1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^INTENT-\\d{4}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "status": {
+      "default": "draft",
+      "type": "string",
+      "enum": [
+        "draft",
+        "accepted",
+        "superseded"
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "source": {
+      "default": "",
+      "type": "string",
+      "maxLength": 500
+    },
+    "problem": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "desiredOutcome": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "constraints": {
+      "default": [],
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4000
+      }
+    },
+    "nonGoals": {
+      "default": [],
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4000
+      }
+    },
+    "affectedSystems": {
+      "default": [],
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4000
+      }
+    },
+    "acceptanceCriteria": {
+      "default": [],
+      "maxItems": 64,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^AC-\\d{3}$"
+          },
+          "requirement": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "id",
+          "requirement"
+        ]
+      }
+    },
+    "openQuestions": {
+      "default": [],
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4000
+      }
+    },
+    "risks": {
+      "default": [],
+      "maxItems": 32,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4000
+      }
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "createdAt",
+    "problem",
+    "desiredOutcome"
+  ],
+  "additionalProperties": false,
+  "$comment": "ACKit intent document schema (ackit.intent.v1)."
+}

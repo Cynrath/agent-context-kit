@@ -45,6 +45,33 @@
           "type": "null"
         }
       ]
+    },
+    "intentRef": {
+      "type": "string",
+      "pattern": "^INTENT-\\d{4}$"
+    },
+    "specRefs": {
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      }
+    },
+    "decisionRefs": {
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+      }
+    },
+    "planRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
     }
   },
   "required": [

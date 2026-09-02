@@ -1,0 +1,17 @@
+schemaId: "ackit.role.v1"
+role: "implementer"
+title: "Implementer"
+description: "Implements the planned changes from the task and plan, registering evidence as work completes."
+requiredInputs: ["intent", "plan", "task"]
+allowedActions:
+  - "edit source files within the declared affected areas"
+  - "run local tests and gates"
+  - "register evidence for acceptance criteria"
+  - "create checkpoints"
+forbiddenActions:
+  - "expand scope beyond the declared affected areas without updating the task"
+  - "complete the task without required evidence or verdict"
+requiredOutputs:
+  - "implementation within declared scope"
+  - "evidence records"
+outputSchema: "ackit.evidence.v2"
