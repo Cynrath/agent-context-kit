@@ -1,7 +1,7 @@
 ---
 id: "TASK-0064"
 title: "policy v2 boundary wiring, review-policy gate integration, and audit-fidelity corrections"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: ["TASK-0063"]
 intentRef: "INTENT-0001"
@@ -9,7 +9,7 @@ specRefs: ["docs/decisions/ADR-0028-policy-v2-autonomy-tiers-roles-hooks.md"]
 decisionRefs: ["docs/decisions/ADR-0025-workflow-profiles-and-stage-contract.md"]
 planRef: "docs/plans/final-validation-TASK-0064.md"
 createdAt: "2026-09-02"
-completedAt: null
+completedAt: 2026-09-02
 ---
 
 ## Purpose
@@ -134,7 +134,7 @@ repository's own rules.
   conformance test proves identical findings for the same fixture.
 - [x] AC-005: completion-gate negative assertions (blocking-drift-only denial,
   missing-verdict-only denial) added and green.
-- [ ] AC-006: full local gate matrix green on the new SHA; PR CI green on the
+- [x] AC-006: full local gate matrix green on the new SHA; PR CI green on the
   exact new head SHA; fresh verifier verdict on the final state re-registered
   (append-only) if the prior verdict predates these changes.
 
