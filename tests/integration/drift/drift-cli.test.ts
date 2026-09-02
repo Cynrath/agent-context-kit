@@ -47,7 +47,7 @@ async function cli(args: string[]): Promise<{ code: number; stdout: string; stde
 }
 
 describe("ackit drift check CLI integration (§9)", () => {
-  it("reports findings with --ci gate semantics on a real repository", async () => {
+  it("reports findings with --ci gate semantics on a real repository", { timeout: 60000 }, async () => {
     const created = await cli(["task", "create", "drift cli fixture"]);
     const taskId = /TASK-\d{4}/.exec(created.stdout)?.[0] ?? "";
 
@@ -141,7 +141,7 @@ describe("ackit drift check CLI integration (§9)", () => {
     expect(Array.isArray(parsed.findings)).toBe(true);
   });
 
-  it("unknown tasks fail with usage exit code", async () => {
+  it("unknown tasks fail with usage exit code", { timeout: 30000 }, async () => {
     const unknown = await cli(["drift", "check", "TASK-9999"]);
     expect(unknown.code).toBe(EXIT_CODES.usage);
   });

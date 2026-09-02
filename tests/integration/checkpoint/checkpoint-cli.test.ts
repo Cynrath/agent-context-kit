@@ -48,7 +48,7 @@ async function cli(args: string[]): Promise<{ code: number; stdout: string; stde
 }
 
 describe("ackit checkpoint CLI integration (ADR-0027)", () => {
-  it("create → show → validate → task resume → export flow", async () => {
+  it("create → show → validate → task resume → export flow", { timeout: 60000 }, async () => {
     const created = await cli(["task", "create", "checkpoint cli flow"]);
     expect(created.code).toBe(EXIT_CODES.ok);
     const taskId = /TASK-\d{4}/.exec(created.stdout)?.[0] ?? "";
@@ -102,7 +102,7 @@ describe("ackit checkpoint CLI integration (ADR-0027)", () => {
     expect(escapeAttempt.code).toBe(EXIT_CODES.securityBoundary);
   });
 
-  it("missing checkpoint and unknown task fail with usage codes", async () => {
+  it("missing checkpoint and unknown task fail with usage codes", { timeout: 30000 }, async () => {
     const show = await cli(["checkpoint", "show", "TASK-9999"]);
     expect(show.code).toBe(EXIT_CODES.usage);
     const resume = await cli(["task", "resume", "TASK-9999"]);

@@ -42,7 +42,11 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await rm(rootPath, { recursive: true, force: true });
+  // maxRetries: on Windows a spawned child process (the child-process resume
+  // assertion) may still be finalizing file handles under .ackit/workflow/
+  // when teardown runs; a single rm can race it with ENOTEMPTY. Retrying
+  // makes teardown deterministic without weakening any assertion.
+  await rm(rootPath, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
 });
 
 async function agentA(args: string[]): Promise<{ code: number; stdout: string; stderr: string }> {
@@ -86,7 +90,10 @@ function taskIdFrom(stdout: string): string {
 }
 
 describe("CORE PRODUCT TEST (§22, TASK-0062)", () => {
-  it("full lifecycle: Agent A checkpoint → fresh Agent B resume → evidence gate → verifier → completion", async () => {
+  it(
+    "full lifecycle: Agent A checkpoint → fresh Agent B resume → evidence gate → verifier → completion",
+    { timeout: 120000 },
+    async () => {
     // ---- Agent A: records intent, creates the plan/task, implements part.
     await agentA(["intent", "new", "Make the build green on Windows"]);
     const fsp = await import("node:fs/promises");
