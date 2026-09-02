@@ -197,6 +197,33 @@ this branch** — the verifier records this as a warning, not a blocker.
    test, occasionally others under heavy load); sequential runs are stable.
 4. `scan --ci` exits 1 on the pre-existing documented finding set (identical to
    the master baseline — no new findings from this work).
+
+### CORRECTIONS (2026-09-01, TASK-0063 final validation)
+
+Two claims in this task's report require append-only correction:
+
+1. **Limitation 4 above was false.** `scan --ci` exit 1 was NOT baseline
+   parity: master `05bb30f` exits 0, and the feature branch at `47041d9`
+   carried one new unsuppressed ACKIT003 HIGH finding
+   (`src/core/intent/types.ts:69`) plus four new suppressed test-fixture
+   rows. Fixed under TASK-0063 (AC-001) without weakening the scanner;
+   the branch now exits 0 with an unsuppressed set identical to master's
+   (3 LOW findings, zero new).
+2. **Self-dogfood was incomplete (the governing prompt §0C).** This task
+   predates the workflow-enablement it delivered and was itself NOT
+   workflow-enabled: its verification bundle shows "(no intent referenced)"
+   and "(no workflow state — legacy task)", and the committed bundle's
+   acceptance criteria were rendered unchecked. This is a genuine
+   bootstrapping limitation, not a silent pass. The real workflow-enabled
+   dogfood of the new system is TASK-0063 (intent INTENT-0001, standard
+   profile, evidence registry, fresh verdict, composed completion gate) —
+   performed with the complete new system.
+3. Consequently, the "GO" recorded below was premature under the
+   repository's own rules (final GO requires CI evidence, which did not
+   exist for the final SHA). The corrected starting state per the final
+   validation mandate is: LOCAL IMPLEMENTATION provisionally healthy,
+   MERGE READINESS NO-GO — CI PENDING (later resolved by TASK-0063's PR
+   with green exact-SHA CI).
 5. Policy enforcement covers only ACKit-owned boundaries; provider-side
    interception remains advisory (documented in ADR-0028 and docs).
 
@@ -204,3 +231,12 @@ this branch** — the verifier records this as a warning, not a blocker.
 
 **GO** — fresh verifier verdict PASS_WITH_WARNINGS with zero blocking findings;
 all 19 tasks complete with evidence; all gates green.
+
+> **SUPERSEDED (2026-09-01, TASK-0063 final validation):** the GO above is
+> revised to **NO-GO — CI PENDING** at the time it was issued, per the
+> corrections above (no exact-SHA CI evidence existed; the `scan --ci`
+> exit-1 was a genuine regression, not baseline parity; the self-dogfood
+> was incomplete). Final merge-readiness is re-rendered by TASK-0063 with
+> exact-SHA CI evidence, the strict scan gate green, and a real
+> workflow-enabled dogfood. This note is append-only; history is not
+> rewritten.

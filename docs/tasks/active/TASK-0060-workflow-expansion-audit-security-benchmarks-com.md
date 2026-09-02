@@ -93,5 +93,25 @@ Focused revert of test/benchmark additions; no product-code rollback needed.
   format:check` clean; `pnpm typecheck` clean; `pnpm build` ok; `node scripts/
   check-offline-egress.mjs` PASS; `pnpm smoke:cli` all assertions passed; `pnpm run
   smoke:package` OK (real tarball, v0.2.2); `git diff --check` clean. Full sequential
-  suite result recorded in the commit. `scan --ci` parity: same findings/exit behavior as
-  the master baseline (identical pre-existing finding set, readiness 88 pass).
+  suite result recorded in the commit.
+
+### CORRECTION (2026-09-01, TASK-0063 final validation)
+
+The claim above that `scan --ci` showed "parity: same findings/exit behavior
+as the master baseline (identical pre-existing finding set)" was FALSE and is
+corrected here append-only. Deterministic comparison of JSON finding
+fingerprints (`ruleId|relativePath|line|column`, same tool/config on both
+branches) established:
+
+- master `05bb30f`: `scan --ci` **exit 0** — 159 findings, 3 unsuppressed (all LOW);
+- feature branch at TASK-0062's head `47041d9`: `scan --ci` **exit 1** — 164
+  findings, 4 unsuppressed, including one NEW unsuppressed ACKIT003 HIGH at
+  `src/core/intent/types.ts:69` (the `secret: "INTENT-SECRET-CONTENT"`
+  problem-code property tripped the credential-assignment rule), plus 4 new
+  SUPPRESSED ACKIT001 fixture rows in tests.
+
+The scan gate policy is the strict one (CI `self-scan` job runs `scan --ci`
+and master exits 0), so exit 1 on the feature branch was a merge blocker, not
+an accepted baseline. The defect was fixed in TASK-0063 (property renamed
+`secretContent`; emitted code value unchanged) without weakening the scanner
+rule, its policy, or its tests.
