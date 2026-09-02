@@ -1,12 +1,12 @@
 ---
 id: "TASK-0066"
 title: "v0.3.0 release — version coupling, CHANGELOG, README, tag, npm OIDC, VSIX, Action, docs sync, post-release verification"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   []
 createdAt: "2026-09-02"
-completedAt: null
+completedAt: 2026-09-02
 ---
 
 ## Purpose
@@ -117,21 +117,21 @@ This task carries explicit user authorization (recorded in the release session g
 
 ## Acceptance criteria
 
-- [ ] Post-merge master CI + Dogfood green at `5b1f4a0` (run IDs recorded)
-- [ ] Version coupling synchronized: root == extension == 0.3.0; ci.yml extension contract updated; frozen-lockfile install passes
-- [ ] CHANGELOG.md `## [0.3.0] - 2026-09-02` accurate (shipped capabilities, Browser Companion exclusion, compatibility facts, 5 limitations visible); extension CHANGELOG 0.3.0 entry
-- [ ] README shipped rows updated (no stale `(experimental branch)` on shipped features), limitations accurate, all version refs 0.3.0 (historical paths preserved), parity test green
-- [ ] Full local gate matrix green on release-candidate commit (counts recorded)
-- [ ] Release commit pushed; exact-SHA CI + Dogfood green before tag
-- [ ] Annotated immutable tag `v0.3.0` on exact release commit; tag-absence verified pre-creation; never moved
-- [ ] `release.yml` succeeded: npm 0.3.0 published via OIDC with provenance; `latest` → 0.3.0; shasum/integrity verified; fresh consumer + npx smoke green; GitHub Release v0.3.0 created (notes from CHANGELOG, not draft)
-- [ ] VSIX 0.3.0 audited (<2MB, clean contents) and published to Marketplace under `Cynrath`; verified visible
-- [ ] Action `@v0.3.0` resolvable; post-tag dogfood green
-- [ ] Hosted docs synced and live-describing 0.3.0
-- [ ] Global `ackit` 0.3.0 verified
-- [ ] Post-release verification matrix all PASS with concrete URLs/IDs
-- [ ] Post-release maintenance task chain proposed as separate tasks (not mixed into release)
-- [ ] Working tree clean at completion; task completed with evidence; focused conventional commit(s)
+- [x] Post-merge master CI + Dogfood green at `5b1f4a0` (run IDs recorded)
+- [x] Version coupling synchronized: root == extension == 0.3.0; ci.yml extension contract updated; frozen-lockfile install passes
+- [x] CHANGELOG.md `## [0.3.0] - 2026-09-02` accurate (shipped capabilities, Browser Companion exclusion, compatibility facts, 5 limitations visible); extension CHANGELOG 0.3.0 entry
+- [x] README shipped rows updated (no stale `(experimental branch)` on shipped features), limitations accurate, all version refs 0.3.0 (historical paths preserved), parity test green
+- [x] Full local gate matrix green on release-candidate commit (counts recorded)
+- [x] Release commit pushed; exact-SHA CI + Dogfood green before tag
+- [x] Annotated immutable tag `v0.3.0` on exact release commit; tag-absence verified pre-creation; never moved
+- [x] `release.yml` succeeded: npm 0.3.0 published via OIDC with provenance; `latest` → 0.3.0; shasum/integrity verified; fresh consumer + npx smoke green; GitHub Release v0.3.0 created (notes from CHANGELOG, not draft)
+- [x] VSIX 0.3.0 audited (<2MB, clean contents) and published to Marketplace under `Cynrath`; verified visible
+- [x] Action `@v0.3.0` resolvable; post-tag dogfood green
+- [x] Hosted docs synced and live-describing 0.3.0
+- [x] Global `ackit` 0.3.0 verified
+- [x] Post-release verification matrix all PASS with concrete URLs/IDs
+- [x] Post-release maintenance task chain proposed as separate tasks (not mixed into release)
+- [x] Working tree clean at completion; task completed with evidence; focused conventional commit(s)
 
 ## Test steps
 
@@ -180,3 +180,102 @@ This task carries explicit user authorization (recorded in the release session g
 ## Completion notes
 
 (plan; execution evidence recorded below as steps complete)
+
+---
+
+## Execution evidence log
+
+**2026-09-02 — Merge + release preparation (in progress):**
+
+- PR #7 final live recheck PASS: state OPEN → merged; head `737c0b196da6e00a62b060a62fd7f61041a39d4d` (expected), base `master`, `mergeable=MERGEABLE`, `mergeStateStatus=CLEAN`, 12/12 required checks green (CI `33593476396`, Dogfood `33593476378`), no reviews (none required by ruleset).
+- Self-approval attempt rejected by GitHub: `Review Can not approve your own pull request` (author `Cynrath` == authenticated account) — expected behavior, recorded; branch protection requires only status checks; no fake reviewer manufactured.
+- PR #7 **squash-merged** (linear-history ruleset `protect-master` id 17913688 + PR #6 squash precedent): merge commit `5b1f4a0be78d6abeb1e2f26583ac608d4251e2de`, mergedAt `2026-09-02T09:29:29Z`, 166 files +18,700 lines.
+- Post-merge master at `5b1f4a0`: CI run `33614396988` SUCCESS (11 jobs), Dogfood run `33614396992` SUCCESS.
+- TASK-0066 created via `node dist/cli/index.js task create` (tool-allocated id), fully populated, committed pre-implementation `eb7cf91` per Rule 3 (`docs(tasks): plan TASK-0066 ...`), task doctor OK, scan --ci exit 0.
+- Version decision: **0.3.0** (minor) — backward-compatible capability expansion; rationale recorded in task §Version decision.
+- Synchronized version bump applied: `package.json` 0.3.0, `extensions/vscode/package.json` 0.3.0, `.github/workflows/ci.yml` extension contract + VSIX filenames 0.3.0 (0 stale 0.2.2), `extensions/vscode/README.md` 0.3.0, `extensions/vscode/CHANGELOG.md` `## [0.3.0] - 2026-09-02`, `CHANGELOG.md` `## [Unreleased]` → `## [0.3.0] - 2026-09-02` (shipped framing, compatibility facts, 5 known limitations, Browser Companion exclusion, security notes), README.md shipped rows (4 `(experimental branch)` labels removed), VS Code Marketplace-published status, all 0.2.2 → 0.3.0 refs (badges/npx/Action/current), MCP tools 9 → 15, CLI table rows added (workflow/intent/checkpoint + evidence/verification/drift/role/journal), docs map updated (concepts/guides/reference/ADR links).
+- Local gate matrix at release-candidate tree `e7427ae` (all exit 0):
+  - `pnpm install` lockfile up-to-date; `pnpm lint` 0 errors (288 files); `pnpm format:check` PASS (272 files); `pnpm typecheck` PASS.
+  - `pnpm build` PASS; `node dist/cli/index.js --version` → `0.3.0`.
+  - `pnpm gen:schemas` idempotent (`git diff --exit-code -- schemas` clean).
+  - `pnpm test`: **92 files / 517 tests PASS** (matches validated baseline).
+  - `pnpm smoke:cli` all assertions passed; `pnpm run smoke:package` PASS (`cynrath-agent-context-kit-0.3.0.tgz`, v0.3.0).
+  - `node scripts/check-offline-egress.mjs` PASS; `node scripts/check-readme-parity.mjs` PASS (root==packed SHA-256 `e0fe8452ed2b20d4026e68b1f0d40d458c0146a7d9627bb62f0bac5a6138a051`).
+  - `config check` OK (digest 6db3b0fdf5d9); `doctor` all passed; `task doctor` OK; `skills validate` 0/0; `instructions` exit 0; `scan --ci` exit 0 (readiness 88 ≥ 80).
+  - Extension: `tsc -p tsconfig.json --noEmit` PASS, `tsc -p tsconfig.test.json --noEmit` PASS, esbuild PASS; `vsce ls --no-dependencies` clean (no node_modules); `vsce package` → `ackit-vscode-0.3.0.vsix` 652704 bytes <2MB; VSIX audit: manifest `version=0.3.0 publisher=Cynrath displayName=ACKit Toolkit`, icon 256×256 26534 bytes, SHA-256 `90A0753820D1004D15FE6F409CA4B21D13907153F13E7CCF03D14BDE02FBC514`.
+  - `git diff --check` clean; generated artifacts (VSIX/dist/out) removed before commit.
+- Release prep commit `e7427aee5f8f4ee2258905acb83693e8a6229b82` (`chore(release): v0.3.0 version coupling ... (TASK-0066)`).
+- Direct master push **rejected** by ruleset `protect-master` (strict required status checks; `GH013: 12 of 12 required status checks are expected`) — the TASK-0042 protection working as designed. Established path used instead: branch `release/v0.3.0` (pushed, commits preserved), PR #8 created.
+- PR #8 (head `e7427ae`): 12/12 required checks PASS (CI run `33616446317` all 12 jobs green; Dogfood run `33616446055` green). Squash-merged: master → `11ced55b2dd8dcc32ba4f77427c4c49695c70489` at `2026-09-02T09:54:25Z`; trees byte-identical to local candidate (verified `git diff master origin/master --stat` empty); local master realigned (`git reset --hard origin/master`, local pointer only; original commits preserved on `release/v0.3.0`).
+- Pre-tag absence gates verified: `npm view @cynrath/agent-context-kit@0.3.0` → E404; `dist-tags.latest` → `0.2.2`; `git tag --list v0.3.0` empty; `gh release view v0.3.0` → not found; Marketplace `Cynrath.ackit-vscode` latest 0.2.2 (0.3.0 absent); npm CLI 11.6.2 (Trusted Publishing capable ≥11.5.1).
+- `node scripts/extract-changelog-section.mjs 0.3.0 CHANGELOG.md` extracts the correct section (release notes feed verified).
+- Post-merge master CI on exact release SHA `11ced55`: Dogfood run `33616657375` SUCCESS; CI run `33616657383` SUCCESS (watched to completion, all 12 required checks green).
+
+**2026-09-02 — Tag, npm publish, GitHub Release (all complete):**
+
+- Annotated tag `v0.3.0` created on exact release commit `11ced55b2dd8dcc32ba4f77427c4c49695c70489` (`git tag -a v0.3.0 -m "AgentContextKit v0.3.0" 11ced55`): tag object `cc8c8c0f081bb531b641ca07a13057f3ccb9adfc`, dereference verified `v0.3.0^{} == 11ced55b`, pushed `* [new tag] v0.3.0 -> v0.3.0`, remote ref verified via API (`object cc8c8c0..., type tag`). Tag is immutable; never moved.
+- `release.yml` run `33616900377` (head `11ced55`, tag `v0.3.0`) — **every step SUCCESS**: Validate tag shape/checkout identity/package identity/npm CLI → Frozen install → Lint/format/typecheck → Build+schemas (drift gate) → Tests → Pack tarball + shasum → Real-tarball isolated consumer smoke → Confirm version absent → **Publish to npm via OIDC Trusted Publishing** → Verify registry metadata/shasum/dist-tag → Fresh isolated registry consumer PASS → Secondary npx (best-effort warning: npx cache stale, design) → Create GitHub Release (strictly last).
+- npm registry verification:
+  - `npm view @cynrath/agent-context-kit@0.3.0 version` → `0.3.0`
+  - `npm view @cynrath/agent-context-kit dist-tags` → `{ latest: '0.3.0' }`
+  - `dist.shasum` → `fc9be0da353dfdb08c7345457a42cec5cf9be6ae`
+  - `dist.integrity` → `sha512-6vLE/WnsSofYEXxurmJ0WPfnuK5meriI5LPqROlQE3aPc3o69WjdGwkky0KqtlPdSBqsz+/PwdiopwB+RqXnFw==`
+  - `dist.attestations` → provenance `https://slsa.dev/provenance/v1` (URL `registry.npmjs.org/-/npm/v1/attestations/@cynrath%2fagent-context-kit@0.3.0`)
+- Fresh isolated consumer (local, hard gate): temp consumer + unique cache → `npm install --prefix @cynrath/agent-context-kit@0.3.0` → `ackit --version` `0.3.0`, `--help` leak-free (no REQ-/ADR-/VNEXT/GOAL2/rebuild identifiers), PASS.
+- Local npx initially showed stale `0.2.2` (same documented v0.2.2 phenomenon); after registry propagation `npx --yes @cynrath/agent-context-kit@0.3.0 --version` → **`0.3.0`** (verified post-propagation).
+- GitHub Release `v0.3.0`: `gh release view` → tagName `v0.3.0`, name `AgentContextKit v0.3.0`, url `https://github.com/Cynrath/agent-context-kit/releases/tag/v0.3.0`, `isDraft: false`, `isPrerelease: false`, publishedAt `2026-09-02T09:59:48Z`, target `master`; body verified: header + install block + full `## [0.3.0]` CHANGELOG section (shipped capabilities, compatibility, 5 known limitations, security).
+
+**2026-09-02 — VS Code Marketplace publish (complete):**
+
+- VSIX rebuilt from merged master `11ced55` (root build + esbuild + `vsce package --no-dependencies`): `ackit-vscode-0.3.0.vsix` 652704 bytes (637.41 KB) 12 files, SHA-256 `43F19D0C3650947C5F88D5036E784642F74B35152E96524E60E0E94190FFE8C9`; manifest `version 0.3.0 publisher Cynrath displayName ACKit Toolkit`; icon 256×256 26534 bytes; `vsce ls` clean (no node_modules).
+- `vsce publish --packagePath ackit-vscode-0.3.0.vsix --no-dependencies` → `DONE Published Cynrath.ackit-vscode v0.3.0.` (Extension URL `https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode`, Hub URL `.../manage/publishers/Cynrath/extensions/ackit-vscode/hub`).
+- Registration proof: retry publish → `ERROR Cynrath.ackit-vscode v0.3.0 already exists.` (same verification method as v0.2.2 release). Gallery propagation at check time still showed 0.2.2 in `vsce show` cache (5–10 min typical, same as v0.2.2); final sweep re-verified.
+
+**2026-09-02 — GitHub Action channel (complete):**
+
+- Tag `v0.3.0` on remote verified → `Cynrath/agent-context-kit@v0.3.0` resolvable; Action Marketplace listing `https://github.com/marketplace/actions/agentcontextkit` HTTP 200 and mentions `v0.3.0` (auto-updated with the Release, same as established process; no new tags, no moving alias tags).
+- Action dogfood at the tag's commit: run `33616657375` SUCCESS (`action smoke (uses ./)` on `11ced55`).
+
+**2026-09-02 — Hosted docs sync (complete):**
+
+- `node ./scripts/sync-ackit-docs.mjs --source O:\projeler\agent-context-kit` (from `Cynrath.github.io` repo) → `[sync] ACKit 0.3.0: 17 pages + llms + sitemap/robots (root index protected)`, 20 files changed (+1240/−682).
+- Committed `c43c5147e1dd8564455633435078ebc6ae2bb72a` `docs: sync AgentContextKit v0.3.0`, pushed `main` `6bd157a..c43c514`.
+- Live verification: `https://cynrath.github.io/agent-context-kit/` HTTP 200 with 5× `0.3.0`; `/vscode/` HTTP 200 with 3× `0.3.0` (title `VS Code — ACKit 0.3.0`); `/github-action/` HTTP 200 with `v0.3.0` present.
+
+**2026-09-02 — Global CLI (complete):**
+
+- `npm install --global @cynrath/agent-context-kit@0.3.0` → `ackit --version` `0.3.0`; `where.exe ackit` → `C:\Users\gizem\AppData\Roaming\npm\ackit(.cmd)`; no .dotnet legacy.
+
+**Post-release verification matrix (final sweep recorded below in completion summary).**
+
+**2026-09-02 — Post-release verification matrix (all channels verified):**
+
+| Channel | Check | Result |
+|---|---|---|
+| GitHub | PR #7 merged (squash `5b1f4a0`, 2026-09-02T09:29:29Z); PR #8 merged (squash `11ced55`, 09:54:25Z); master at `11ced55` == local == origin | PASS |
+| GitHub | Tag `v0.3.0` (object `cc8c8c0f`) → commit `11ced55b2dd8dcc32ba4f77427c4c49695c70489` (remote API verified) | PASS |
+| GitHub | Release `v0.3.0` `AgentContextKit v0.3.0` not draft/prerelease, notes == CHANGELOG section, published 09:59:48Z | PASS |
+| GitHub CI | Merge SHA `5b1f4a0`: CI `33614396988` + Dogfood `33614396992` SUCCESS; release SHA `11ced55`: CI `33616657383` + Dogfood `33616657375` + Release `33616900377` SUCCESS | PASS |
+| npm | `@cynrath/agent-context-kit@0.3.0` version present, `latest → 0.3.0`, shasum `fc9be0da...`, integrity `sha512-6vLE...`, provenance SLSA v1 | PASS |
+| npm | Fresh isolated consumer (CI + local): install → `ackit --version` `0.3.0`, `--help` leak-free; `npx @0.3.0 --version` → `0.3.0` after propagation; global install → `0.3.0` | PASS |
+| Marketplace | `Cynrath.ackit-vscode` `0.3.0` published (retry-publish "already exists" proof), `vsce show` displays `0.3.0` (September 2, 2026) after propagation; publisher `Cynrath` / displayName `ACKit Toolkit` unchanged | PASS |
+| Action | Tag `v0.3.0` resolvable; Marketplace listing `github.com/marketplace/actions/agentcontextkit` HTTP 200 mentioning `v0.3.0`; dogfood run `33616657375` green at tag commit | PASS |
+| Docs | `cynrath.github.io/agent-context-kit/` 200 + `0.3.0` (5 hits); `/vscode/` 200 + `0.3.0` (title "VS Code — ACKit 0.3.0"); `/github-action/` 200 + `v0.3.0`; repo `c43c514` pushed | PASS |
+| Docs/README | Shipped rows no longer labeled experimental; 5 limitations accurately documented (CHANGELOG known-limitations + config.md); Browser Companion excluded everywhere | PASS |
+
+**2026-09-02 — Post-release maintenance chain (proposed, not executed in release):**
+
+- TASK-0067 wire parsed `workflow:` config keys into gate behavior
+- TASK-0068 advance-gate planning-artifact disk-existence validation
+- TASK-0069 atomic checkpoint writes (temp+rename)
+- TASK-0070 MCP drift warning/input parity completion
+- TASK-0071 post-release docs cleanup sweep
+
+All five created via `ackit task create --depends-on TASK-0066`, fully planned (purpose/scope/acceptance/tests/risks/rollback), statuses `pending` — product changes intentionally NOT mixed into the v0.3.0 release.
+
+## Final completion summary
+
+v0.3.0 logical minor release fully executed and verified across every established first-party channel. Merge → master CI → coupling (root/extension/ci.yml/READMEs/CHANGELOGs) → local gates (92 files/517 tests) → release PR #8 (12/12 required checks) → squash merge `11ced55` → exact-SHA CI green → annotated immutable tag `v0.3.0` → tag-triggered `release.yml` (OIDC npm publish + provenance + fresh-consumer verification + GitHub Release strictly last) → VSIX `0.3.0` Marketplace publish → Action listing → hosted docs sync → global install → full post-release matrix. Browser Companion remained excluded throughout. No force-push, no tag movement, no gate weakening; prohibited actions never invoked.
+
+
+
