@@ -1,12 +1,12 @@
 ---
 id: "TASK-0074"
 title: "Repository hygiene — archive completed task docs and lifecycle guard"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   []
 createdAt: "2026-09-03"
-completedAt: null
+completedAt: 2026-09-03
 ---
 
 ## Purpose
@@ -57,12 +57,12 @@ Session authorization (exact scope for THIS task chain): the session goal author
 
 ## Acceptance criteria
 
-- [ ] `task list` (active) shows 0 completed; every remaining active task (only TASK-0074/0075/0076 until closed) parses pending/active/blocked.
-- [ ] `task list --all` shows 73 archived completed + chain tasks; duplicate IDs = 0; non-completed in archive = 0.
-- [ ] `task doctor` green on final state; new completed-in-active finding fires deterministically on a fixture (test-proven).
-- [ ] `task show` / `find` resolves an archived completed task by ID; dependency/evidence/verdict lookups for archived IDs pass (tests).
-- [ ] `task archive <pending>` refused (test-proven); archiving is idempotent for already-archived IDs.
-- [ ] `git diff --check`, `task doctor`, full gates per §12 green; package stays `0.4.0`; Browser Companion untouched.
+- [x] `task list` (active) shows 0 completed; every remaining active task (only TASK-0074/0075/0076 until closed) parses pending/active/blocked.
+- [x] `task list --all` shows 73 archived completed + chain tasks; duplicate IDs = 0; non-completed in archive = 0.
+- [x] `task doctor` green on final state; new completed-in-active finding fires deterministically on a fixture (test-proven).
+- [x] `task show` / `find` resolves an archived completed task by ID; dependency/evidence/verdict lookups for archived IDs pass (tests).
+- [x] `task archive <pending>` refused (test-proven); archiving is idempotent for already-archived IDs.
+- [x] `git diff --check`, `task doctor`, full gates per §12 green; package stays `0.4.0`; Browser Companion untouched.
 
 ## Test steps
 
@@ -90,4 +90,20 @@ Session authorization (exact scope for THIS task chain): the session goal author
 
 ## Completion notes
 
-(placeholder)
+Done 2026-09-03 on `chore/repository-hygiene`. Audit: 73/73 active docs parsed
+`completed` (TASK-0001..0073), dependency closure clean, no duplicates/malformed,
+archive held 0 files. All 73 moved with `task archive TASK-XXXX` (pure renames,
+bytes preserved); `task show TASK-0001/TASK-0073` resolve from archive.
+Live-reference audit (`git grep docs/tasks/active/TASK-` minus active/evidence/rebuild):
+only historical prose (ADR-0025 range, evidence bundles, root legacy tasks, plan
+backlink), one synthetic guide example, and in-memory test/readiness fixtures —
+no functional edits required; all runtime lookups are id-based (`TaskStore.find`
+covers active+archive; evidence/verdict stores are id-keyed under
+`.ackit/workflow/`). Guard: `doctor` emits `TASK-COMPLETED-IN-ACTIVE` for
+completed-in-active; bulk `task archive --completed [--dry-run]` moves
+completed-only, deterministic/idempotent. Governance recorded in
+`docs/reference/cli.md` ("task lifecycle guard"). Evidence:
+`tests/unit/tasks/archive.test.ts` 8/8 pass; task suites 35/35 pass;
+`pnpm lint`, `format:check`, `typecheck`, `build` green; `task doctor` integrity
+OK; `task archive TASK-0075` (pending) refused live; bulk `--dry-run` reports
+nothing left. Package `0.4.0`; Browser Companion untouched.
