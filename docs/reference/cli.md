@@ -8,7 +8,7 @@ Exit codes: see `docs/reference/exit-codes.md`.
 |---|---|
 | `ackit` | deterministic quick health summary; `--json` pure stdout |
 | `ackit init [--agents all\|list] [--dry-run]` | instruction shims + builtin skills plan/write |
-| `ackit sync [--dry-run] [--check] [--force]` | reconcile ACKit-owned managed assets (instructions + skills) after upgrades; content-driven, never version-driven |
+| `ackit sync [--dry-run] [--check] [--force]` | reconcile ACKit-owned managed assets (instructions + skills) after upgrades; content-driven, never version-driven (current master/next release — NOT in published 0.3.0) |
 | `ackit scan [options]` | security/hygiene scan |
 | `ackit optimize [--fix] [--dry-run]` | hygiene advisor; fix fenced to managed surfaces |
 | `ackit pack [--max-tokens n] [--format md\|json] [--include globs] [--changed] [--task id] [--resume]` | budgeted context pack; task-aware ranking + resume section |
@@ -18,7 +18,7 @@ Exit codes: see `docs/reference/exit-codes.md`.
 | `ackit task create <title> [--depends-on ids] [--intent id] [--spec paths] [--decision paths] [--plan path]` | docs-first tasks with artifact references |
 | `ackit task list\|start\|complete [--force]\|archive\|doctor\|show` | task lifecycle (completion gate: evidence, verdict, stage, drift for workflow tasks) |
 | `ackit task resume <id>` | print the deterministic resume context of the latest checkpoint |
-| `ackit workflow set <id> --profile quick\|standard\|high-risk` | explicit workflow profile selection |
+| `ackit workflow set <id> [--profile quick\|standard\|high-risk]` | explicit workflow profile selection (defaults to configured `workflow.defaultProfile`) |
 | `ackit workflow show [id]` \| `advance <id> [--to stage]` \| `verify <id> --outcome pass\|fail` | stage machine + verify/fix-loop state |
 | `ackit intent new <title> \| list \| show <id> \| validate [id] \| fingerprint <id>` | intent artifacts (`docs/intent/`) |
 | `ackit checkpoint create <id> --next-objective text [--next-path p] [--next-command c] [--next-expected e]` | record a checkpoint with the exact next action |
@@ -37,7 +37,7 @@ Exit codes: see `docs/reference/exit-codes.md`.
 | `ackit report serve <file> [--host] [--port] [--allow-nonlocal]` | loopback report UI |
 | `ackit mcp serve` | MCP server over stdio (official SDK; read-only tools) |
 
-## sync options
+## sync options (current master/next release — NOT in published 0.3.0)
 
 ```
 --dry-run   preview the reconciliation plan without writing (would-* statuses)

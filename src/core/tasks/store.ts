@@ -198,12 +198,29 @@ export class TaskStore {
     const workflowStore = new WorkflowStore(resolved.root);
     const wf = await workflowStore.load(id);
     if (wf === null) return blockers; // legacy task — no workflow gate
-    const { getProfile } = await import("../workflow/index.js");
+    const { getProfile, resolveProfileRequirements, workflowOverridesFromConfig } = await import(
+      "../workflow/index.js"
+    );
     const profile = getProfile(wf.profile);
+    // TASK-0067: resolved workflow config tightens the built-in minimums
+    // (additive-only). Absent config yields empty overrides → exact v0.3.0
+    // behavior. Config load failure never fabricates blockers (legacy path).
+    let overrides: {
+      requireVerifier?: boolean | undefined;
+      requireEvidence?: boolean | undefined;
+    } = {};
+    try {
+      const { loadAckitConfig } = await import("../config/index.js");
+      const configResult = await loadAckitConfig(this.repositoryRoot, {});
+      if (configResult.ok) overrides = workflowOverridesFromConfig(configResult.config);
+    } catch {
+      overrides = {};
+    }
+    const effective = resolveProfileRequirements(wf.profile, overrides);
 
     // 1. Evidence completeness (ADR-0026 §5): every criterion verified with
-    //    qualifying evidence when the profile requires evidence.
-    if (profile.requiresEvidence) {
+    //    qualifying evidence when the effective profile requires evidence.
+    if (effective.requiresEvidence) {
       const { EvidenceStore, validateEvidence } = await import("../evidence/index.js");
       const evidenceStore = new EvidenceStore(resolved.root);
       const registry = await evidenceStore.load(id);
@@ -218,9 +235,9 @@ export class TaskStore {
       }
     }
 
-    // 2. Verifier verdict (ADR-0026 §4): profile requires an independent
-    //    verdict; latest must be PASS-family with zero blocking findings.
-    if (profile.requiresVerdict) {
+    // 2. Verifier verdict (ADR-0026 §4): effective profile requires an
+    //    independent verdict; latest must be PASS-family with zero blocking.
+    if (effective.requiresVerdict) {
       const { VerdictStore } = await import("../verification/index.js");
       const verdicts = new VerdictStore(this.repositoryRoot);
       const latest = await verdicts.latest(id);

@@ -75,14 +75,25 @@ describe("workflow profile catalog (ADR-0025)", () => {
     expect(requiredArtifacts("quick", "verify").artifacts).toEqual([]);
   });
 
-  it("config overrides tune requirements without inventing profiles", () => {
+  it("config overrides tighten requirements additively, never loosen (TASK-0067)", () => {
     expect(resolveProfileRequirements("standard").requiresVerdict).toBe(true);
+    // Built-in true stays true even when config says false (additive-only).
     expect(resolveProfileRequirements("standard", { requireVerifier: false }).requiresVerdict).toBe(
-      false,
+      true,
     );
+    expect(
+      resolveProfileRequirements("standard", { requireEvidence: false }).requiresEvidence,
+    ).toBe(true);
+    // Explicit true tightens a built-in false.
     expect(resolveProfileRequirements("quick", { requireVerifier: true }).requiresVerdict).toBe(
       true,
     );
+    expect(resolveProfileRequirements("quick", { requireEvidence: true }).requiresEvidence).toBe(
+      true,
+    );
+    // Absence preserves defaults.
+    expect(resolveProfileRequirements("quick").requiresVerdict).toBe(false);
+    expect(resolveProfileRequirements("quick").requiresEvidence).toBe(false);
   });
 
   it("forward-only transitions; skip/back are invalid", () => {

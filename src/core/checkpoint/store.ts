@@ -189,11 +189,44 @@ export class CheckpointStore {
     const dir = this.dir(taskId);
     await fsp.mkdir(dir, { recursive: true });
     const { stringify } = await import("yaml");
-    await fsp.writeFile(
-      path.join(dir, `${checkpoint.id}.yaml`),
-      stringify(checkpoint, { lineWidth: 0 }),
-      "utf8",
-    );
+    const payload = stringify(checkpoint, { lineWidth: 0 });
+    const target = path.join(dir, `${checkpoint.id}.yaml`);
+    // TASK-0069: temp+fsync+rename atomicity — a crash mid-write can never
+    // leave a truncated canonical file. Temp lives in the SAME directory
+    // (same filesystem → atomic rename). Name carries only the checkpoint id
+    // + process-unique suffix (no absolute-path leakage). Success renames over
+    // the target; any failure removes the temp and leaves the previous
+    // checkpoint fully intact.
+    const unique = `${process.pid}-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+    const tmp = path.join(dir, `.${checkpoint.id}.${unique}.tmp`);
+    try {
+      const handle = await fsp.open(tmp, "w");
+      try {
+        await handle.writeFile(payload, "utf8");
+        await handle.sync();
+      } finally {
+        await handle.close();
+      }
+      try {
+        await fsp.rename(tmp, target);
+      } catch (error) {
+        const code = (error as NodeJS.ErrnoException).code;
+        // Windows replace semantics: rename-over-existing may surface
+        // EPERM/EEXIST on some filesystems — unlink-then-rename preserves
+        // atomicity for small-file local IO (previous checkpoint already
+        // intact; temp still complete at this point).
+        if (code === "EPERM" || code === "EEXIST" || code === "EBUSY") {
+          await fsp.unlink(target).catch(() => {});
+          await fsp.rename(tmp, target);
+        } else {
+          throw error;
+        }
+      }
+    } finally {
+      // No stale temp after success (already renamed → unlink no-ops) and no
+      // partial temp accepted as canonical after failure.
+      await fsp.unlink(tmp).catch(() => {});
+    }
   }
 }
 

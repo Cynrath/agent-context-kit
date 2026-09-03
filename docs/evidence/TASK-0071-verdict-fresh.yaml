@@ -1,0 +1,33 @@
+schemaId: ackit.verdict.v1
+id: VR-0001
+taskId: TASK-0071
+verdict: PASS_WITH_WARNINGS
+verifier:
+  agent: fresh-subagent (independent fresh-context verifier, 9b4d1773)
+  context: fresh
+  issuedAt: 2026-09-03
+findings:
+  - severity: warning
+    code: DRIFT_MISSING_VERDICT_PRE_VERDICT
+    message: "drift check TASK-0071 --ci reports one BLOCKING MISSING_VERIFIER_VERDICT (no independent verdict registered yet) — expected pre-verdict workflow state, clears on verdict registration, not a work defect."
+  - severity: warning
+    code: DRIFT_UNPLANNED_FILE_WARNINGS
+    message: "drift check emits UNPLANNED_FILE_CHANGE warnings for every changed file because the evaluator does not expand the docs/** glob in Affected files and attributes sibling-task (0067-0070) files on the shared branch to TASK-0071; all 28 files confirmed in the five tasks' scope plus workflow artifacts — evaluator artifact, not scope creep."
+  - severity: info
+    code: INTENT_0003_STUB
+    message: "docs/intent/INTENT-0003-post-v0-3-0-docs-and-quality-cleanup.md is a draft with placeholder problem/outcome fields; the bundle quotes it verbatim rather than inventing content, and the corrected gate requires only an existing (not accepted) intent — thin but honest and gate-satisfying."
+  - severity: info
+    code: FULL_SUITE_NOT_RERUN
+    message: "Full ~122s/554-test suite not re-run by the verifier; focused suites (37/37) plus docs-gate/readme-parity (8/8) cover the change surface."
+  - severity: info
+    code: HOSTED_DOCS_DEFERRED
+    message: "Hosted-docs publish deferred with rationale, explicitly permitted by AC-006's OR-branch."
+checkedCriteria:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  - AC-005
+  - AC-006
+  - AC-007
+summary: "Independently reproduced every required gate on feat/post-v030-hardening: lint, format:check, typecheck, build exit 0; six focused suites 37/37 PASS; readme-parity plus docs-gate 8/8 PASS; scan --ci exit 0 readiness 88; task doctor OK; evidence validate TASK-0071 complete. Grep sweeps confirm no 9-tools, experimental, unreleased, or stale 0.2.x claims in forward docs and all three ackit sync mentions carry current-master/next-release wording. CHANGELOG, README, package.json untouched, version 0.3.0 with no new tag; Browser Companion branch exists remotely with no shared commits. Sibling tasks' claimed test files exist and pass. Merge-ready once the verdict is recorded; no rework needed."
