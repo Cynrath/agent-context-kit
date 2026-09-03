@@ -1,7 +1,7 @@
 ---
 id: "TASK-0073"
 title: "v0.4.0 release — version hygiene, release preparation, publication, hosted docs sync"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0066"
@@ -12,7 +12,7 @@ dependencies:
   - "TASK-0071"
   - "TASK-0072"
 createdAt: "2026-09-03"
-completedAt: null
+completedAt: 2026-09-03
 ---
 
 ## Purpose
@@ -254,26 +254,26 @@ NOT renamed (identity/history stability).
 
 ## Acceptance criteria
 
-- [ ] Classification matrix complete; zero CURRENT-facing stale refs (0.2/0.3 as
+- [x] Classification matrix complete; zero CURRENT-facing stale refs (0.2/0.3 as
   current); historical/protocol refs preserved.
-- [ ] `AGENTS.md` version-agnostic truth; `CLAUDE.md`/Copilot thin shims; no
+- [x] `AGENTS.md` version-agnostic truth; `CLAUDE.md`/Copilot thin shims; no
   managed-ownership violations.
-- [ ] Parity guard implemented + tested + green in gates.
-- [ ] `package.json` + extension `0.4.0` coupled; `ci.yml` `0.4.0`; READMEs/docs
+- [x] Parity guard implemented + tested + green in gates.
+- [x] `package.json` + extension `0.4.0` coupled; `ci.yml` `0.4.0`; READMEs/docs
   current surfaces `0.4.0`; historical sections untouched.
-- [ ] `CHANGELOG.md` `## [0.4.0] - 2026-09-03` complete per scope §5.
-- [ ] All RC gates green; `--version` == `0.4.0`; real-tarball smoke
+- [x] `CHANGELOG.md` `## [0.4.0] - 2026-09-03` complete per scope §5.
+- [x] All RC gates green; `--version` == `0.4.0`; real-tarball smoke
   (`--version/--help/sync --help`) green.
-- [ ] Sync regression proven (zero-write, managed-only updates, read-only checks).
-- [ ] Independent verifier PASS/PASS_WITH_WARNINGS (zero blockers), registered.
-- [ ] PR merged on exact-head green CI; post-merge master CI green.
-- [ ] `v0.4.0` tag on release commit; npm `0.4.0` (`latest → 0.4.0`, provenance)
+- [x] Sync regression proven (zero-write, managed-only updates, read-only checks).
+- [x] Independent verifier PASS/PASS_WITH_WARNINGS (zero blockers), registered.
+- [x] PR merged on exact-head green CI; post-merge master CI green.
+- [x] `v0.4.0` tag on release commit; npm `0.4.0` (`latest → 0.4.0`, provenance)
   + fresh global/npx verify; Marketplace `0.4.0` verified; GitHub Release live
   (notes match CHANGELOG); Action `@v0.4.0` per convention.
-- [ ] Hosted docs regenerated from published 0.4.0; theme hashes unchanged;
+- [x] Hosted docs regenerated from published 0.4.0; theme hashes unchanged;
   nav/SEO/llms/sitemap valid; site commit recorded; live URLs verified
   (200 + 0.4.0 + sync released + JSON-LD + assets).
-- [ ] Final audit: stale CURRENT refs 0; branches `master` +
+- [x] Final audit: stale CURRENT refs 0; branches `master` +
   `feat/browser-companion-v0.3` only.
 
 ## Test steps
