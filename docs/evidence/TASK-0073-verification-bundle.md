@@ -1,19 +1,26 @@
----
-id: "TASK-0073"
-title: "v0.4.0 release — version hygiene, release preparation, publication, hosted docs sync"
-status: active
-schemaVersion: 2
-dependencies:
-  - "TASK-0066"
-  - "TASK-0067"
-  - "TASK-0068"
-  - "TASK-0069"
-  - "TASK-0070"
-  - "TASK-0071"
-  - "TASK-0072"
-createdAt: "2026-09-03"
-completedAt: null
----
+schema: ackit.verification-bundle.v1
+task: TASK-0073
+
+# ACKit Verification Bundle
+
+You are an INDEPENDENT verifier with a fresh context. Review the material
+below, judge semantic compliance against the acceptance criteria, and emit
+an ackit.verdict.v1 verdict (PASS | PASS_WITH_WARNINGS | REWORK_REQUIRED |
+BLOCKED). You should not implement the feature you are judging.
+
+## Intent
+
+(no intent referenced)
+
+## Workflow
+
+(no workflow state — legacy task)
+
+## Task document
+
+source: docs/tasks/active/TASK-0073-v0-4-0-release-version-hygiene-release-preparati.md [active]
+
+````
 
 ## Purpose
 
@@ -355,27 +362,48 @@ intentionally preserved.
 
 ## Completion notes
 
-- RC gates (release/v0.4.0 @ 02fa985): frozen install OK; lint OK; format:check
-  OK; typecheck OK; build OK; `pnpm test` 99 files / 566 tests PASS;
-  gen:schemas idempotent; smoke:cli PASS; smoke:package PASS
-  (cynrath-agent-context-kit-0.4.0.tgz, v0.4.0); offline-egress exit 0; config
-  check OK; doctor OK (managed-assets row informational); task doctor OK; sync
-  --check exit 1 by design (refused-non-managed own files + would-create
-  GEMINI/skills — REQ-GOV-008 refusal proven, zero writes); scan --ci exit 0
-  (readiness 88); parity guard exit 0; `--version` 0.4.0; diff-check clean.
-- Sync regression: tests/integration/onboarding + skills + init + task-refs —
-  5 files / 38 tests PASS. No postinstall script. Extension: tsc (both
-  configs) OK, esbuild OK, vsce ls clean, vsce package
-  ackit-vscode-0.4.0.vsix 653208 bytes (<2MB), icon 256x256, no node_modules.
-  (mocha-direct run fails with Cannot-find-module-vscode outside Electron —
-  same as CI, which gates on the xvfb Electron job instead.)
-- Independent verifier (fresh subagent 2d35c2ea): VERDICT PASS_WITH_WARNINGS,
-  zero blocking findings, registered as VR-0001 (`verification show
-  TASK-0073`). Evidence registry synced (12 criteria AC-001..AC-012);
-  checked AC-001..AC-008. Bundle: docs/evidence/TASK-0073-verification-bundle.md.
-- Pre-tag absence (2026-09-03): `git tag --list v0.4.0` empty; npm
-  `@cynrath/agent-context-kit@0.4.0` E404; dist-tags.latest 0.3.0.
-- Release branch pushed: origin/release/v0.4.0 (commits b07d6d1, 02fa985 on
-  top of master incl. c86d92d).
-- Remaining: PR → exact-head CI → merge → post-merge CI → tag v0.4.0 → release.yml
-  (npm + GitHub Release) → Marketplace → Action → hosted docs → final audit.
+(in progress — evidence appended as gates complete)
+
+````
+
+## Acceptance criteria + evidence
+
+(no evidence registry — run 'ackit evidence sync')
+
+## Registered verdicts
+
+(no verdicts registered yet — you are the fresh verifier)
+
+## Latest checkpoint
+
+(no checkpoint)
+
+## Implementation surface
+
+declared affected areas: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, Version-parity guard: new script (e.g. `scripts/check-version-parity.mjs`) +, deterministic tests (e.g. `tests/security/version-parity*.test.ts` or adjacent, contract test) + wiring (package script / CI gate where repo convention puts it), `package.json`, `pnpm-lock.yaml`, `extensions/vscode/package.json`,, `extensions/vscode/README.md`, `extensions/vscode/CHANGELOG.md`,, `.github/workflows/ci.yml` (extension job `0.4.0`), `README.md` (current status/install), current `docs/**` install/reference, snippets, `CHANGELOG.md` (`## [0.4.0]`), `docs/tasks/active/TASK-0073-*.md` (this task) + verification bundle/verdict, artifacts per verification flow, Tag `v0.4.0`; GitHub Release `v0.4.0`, Site repo: `scripts/sync-ackit-docs.mjs`, `agent-context-kit/**`,, `sitemap.xml`, `robots.txt`, `llms.txt`, `llms-full.txt` (generated only)
+current changed/untracked files (0): (none)
+
+## Implementation diff
+
+(diff omitted — pass --diff for the capped full diff)
+
+## Verification-point gate requirements
+
+- artifacts: task
+- note: verification bundles carry the task's declared requirements
+
+## Verifier role contract
+
+verifier: Independent Verifier (ackit.role.v1)
+Judges the implementation against the acceptance criteria with a fresh context; never implements what it judges.
+required inputs: intent, spec, plan, task, diff, tests, evidence
+allowed: inspect intent, spec, plan, task, diff, tests, and evidence; read repository content; emit an ackit.verdict.v1 verdict
+forbidden: implement or modify the feature under judgment; edit source files; register evidence for the task being judged
+required outputs: ackit.verdict.v1 verdict
+
+## Verdict instructions
+
+- Compare the implementation surface, diff, and evidence against every criterion.
+- Blocking findings must carry the criterion id and a stable upper-snake code.
+- PASS-family verdicts cannot carry blocking findings (registration rejects them).
+- Register your verdict with: ackit verification record <task> --verdict <file>

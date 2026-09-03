@@ -1,0 +1,27 @@
+schemaId: ackit.verdict.v1
+taskId: TASK-0073
+verdict: PASS_WITH_WARNINGS
+verifier:
+  agent: fresh-subagent (independent fresh-context verifier, 2d35c2ea)
+  context: fresh
+  issuedAt: 2026-09-03
+findings:
+  - severity: warning
+    code: VERIFIER_PROMPT_COMMIT_COUNT_STALE
+    message: "Verifier prompt described 3 commits on top of master; master already contains c86d92d, so master..HEAD is 2 commits (b07d6d1, 02fa985). Prompt-description staleness only; verified file set is complete and no companion code is present."
+  - severity: info
+    code: NO_PACKED_TGZ_IN_TREE
+    message: "No packed .tgz artifact in the tree (gitignored build output, by design). Package-smoke evidence is scripts/package-smoke.mjs plus the dynamic tarball name cynrath-agent-context-kit-0.4.0.tgz observed in the release-prep run."
+  - severity: info
+    code: UNTRACKED_BUNDLE_AT_VERIFY_TIME
+    message: "docs/evidence/TASK-0073-verification-bundle.md was untracked at verify time; committed alongside this verdict before the PR."
+checkedCriteria:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  - AC-005
+  - AC-006
+  - AC-007
+  - AC-008
+summary: "Fresh verifier reproduced the release-candidate gates: coupling 0.4.0 (manifests, ci.yml, CLI --version), parity guard exit 0 with version-agnostic instruction files, CHANGELOG 0.4.0 complete with history intact, sync --help plus RELEASED wording in cli.md/agent-integration/getting-started, offline-egress and scan --ci exit 0 with no postinstall, 27/27 version-guard contract tests green, package-smoke script dynamic to 0.4.0, history and Browser Companion branch untouched. Zero blocking findings; merge-ready once the verdict is recorded."
