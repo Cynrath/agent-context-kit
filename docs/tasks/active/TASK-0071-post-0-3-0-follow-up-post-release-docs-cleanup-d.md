@@ -1,14 +1,14 @@
 ---
 id: "TASK-0071"
 title: "post-0.3.0 follow-up: post-release docs cleanup deferred from release"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0066"
 intentRef: "INTENT-0003"
 planRef: "docs/plans/post-v030-hardening-TASK-0071.md"
 createdAt: "2026-09-02"
-completedAt: null
+completedAt: 2026-09-03
 ---
 
 ## Purpose
