@@ -8,7 +8,7 @@ Exit codes: see `docs/reference/exit-codes.md`.
 |---|---|
 | `ackit` | deterministic quick health summary; `--json` pure stdout |
 | `ackit init [--agents all\|list] [--dry-run]` | instruction shims + builtin skills plan/write |
-| `ackit sync [--dry-run] [--check] [--force]` | reconcile ACKit-owned managed assets (instructions + skills) after upgrades; content-driven, never version-driven (current master/next release — NOT in published 0.3.0) |
+| `ackit sync [--dry-run] [--check] [--force]` | reconcile ACKit-owned managed assets (instructions + skills) after upgrades; content-driven, never version-driven (released in 0.4.0) |
 | `ackit scan [options]` | security/hygiene scan |
 | `ackit optimize [--fix] [--dry-run]` | hygiene advisor; fix fenced to managed surfaces |
 | `ackit pack [--max-tokens n] [--format md\|json] [--include globs] [--changed] [--task id] [--resume]` | budgeted context pack; task-aware ranking + resume section |
@@ -37,7 +37,7 @@ Exit codes: see `docs/reference/exit-codes.md`.
 | `ackit report serve <file> [--host] [--port] [--allow-nonlocal]` | loopback report UI |
 | `ackit mcp serve` | MCP server over stdio (official SDK; read-only tools) |
 
-## sync options (current master/next release — NOT in published 0.3.0)
+## sync options (released in 0.4.0)
 
 ```
 --dry-run   preview the reconciliation plan without writing (would-* statuses)

@@ -14,21 +14,21 @@ npm install --global @cynrath/agent-context-kit
 ackit --version
 ```
 
-One-shot usage: `npx --yes @cynrath/agent-context-kit@0.3.0 --help` (pinned to current `0.3.0`).
+One-shot usage: `npx --yes @cynrath/agent-context-kit@0.4.0 --help` (pinned to current `0.4.0`).
 
 From a source checkout instead:
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm build
-node dist/cli/index.js --version  # 0.3.0
+node dist/cli/index.js --version  # 0.4.0
 ```
 
-## 30-second tour (verified commands — v0.3.0; `ackit sync` is current-master/next-release — see note below)
+## 30-second tour (verified commands — v0.4.0)
 
 ```bash
 ackit init --dry-run          # plan instruction shims + builtin skills
-ackit sync --check            # CI gate: are ACKit-owned assets in sync? (current master; NOT in published 0.3.0 — ships in the next release)
+ackit sync --check            # CI gate: are ACKit-owned assets in sync?
 ackit scan --ci               # gate mode: exit 1 at/over threshold (medium)
 ackit readiness               # 0–100 scoring across 6 categories
 ackit instructions --explain  # graph v2 with provenance

@@ -1,7 +1,7 @@
 # ACKit — AgentContextKit
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/v/@cynrath/agent-context-kit?label=npm%20v0.3.0&color=0B84FF&style=for-the-badge" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/v/@cynrath/agent-context-kit?label=npm%20v0.4.0&color=0B84FF&style=for-the-badge" alt="npm version"></a>
   <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/npm/dt/@cynrath/agent-context-kit?label=downloads&style=for-the-badge&color=00C853" alt="downloads"></a>
   <a href="https://github.com/Cynrath/agent-context-kit"><img src="https://img.shields.io/github/stars/Cynrath/agent-context-kit?label=stars&style=for-the-badge&color=FFB300" alt="stars"></a>
   <a href="https://github.com/Cynrath/agent-context-kit/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Cynrath/agent-context-kit/ci.yml?branch=master&label=CI&style=for-the-badge" alt="CI"></a>
@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="license"></a>
-  <a href="https://github.com/Cynrath/agent-context-kit/releases/tag/v0.3.0"><img src="https://img.shields.io/badge/release-v0.3.0-9C27B0?style=flat-square" alt="release"></a>
+  <a href="https://github.com/Cynrath/agent-context-kit/releases/tag/v0.4.0"><img src="https://img.shields.io/badge/release-v0.4.0-9C27B0?style=flat-square" alt="release"></a>
   <a href="https://www.npmjs.com/package/@cynrath/agent-context-kit"><img src="https://img.shields.io/badge/node-%3E%3D22-339933?style=flat-square&logo=node.js" alt="node"></a>
   <img src="https://img.shields.io/badge/offline--first-yes-00ACC1?style=flat-square" alt="offline">
   <img src="https://img.shields.io/badge/deterministic-yes-FF6F00?style=flat-square" alt="deterministic">
@@ -125,7 +125,7 @@ OpenCode, Copilot, Gemini, Cursor, Cline, any MCP-capable agent).
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🩺</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Diagnostics</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit diagnostics bundle</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit.diagnostics.v1</code> + deterministic <code>bundle-manifest.json</code> (<code>sha256</code> + redaction count), 5-secret <code>[REDACTED]</code> proof</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">⚡</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Benchmarks</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>benchmarks/run.mjs</code></td><td style="border:1px solid #d0d7de; padding:8px;">7 deterministic fixtures, 8 metrics (<code>coldScanMs</code>/<code>warmScanMs</code>/<code>incrementalMs</code>/<code>peakRssMb</code>/<code>filesPerSec</code>/<code>packMs</code>/<code>graphMs</code>/<code>cacheHitRatio</code>), median-of-3</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🔌</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>SDK v1</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>import { scanRepository } from "@cynrath/agent-context-kit"</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>sideEffects:false</code>, <code>type:module</code>, <code>exports {".","./mcp"}</code>, <code>AbortSignal</code> &lt;200ms, <code>AckitError</code></td></tr>
-<tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>VS Code</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>extensions/vscode</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>0.3.0</code>, <code>Cynrath</code>, <code>lints</code> Linters, <code>onStartupFinished</code>, readiness tree + Problems <code>ACKITxxx</code>, <code>&lt;2MB</code> VSIX — <strong>Marketplace: <code>Cynrath.ackit-vscode</code></strong></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>VS Code</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>extensions/vscode</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>0.4.0</code>, <code>Cynrath</code>, <code>lints</code> Linters, <code>onStartupFinished</code>, readiness tree + Problems <code>ACKITxxx</code>, <code>&lt;2MB</code> VSIX — <strong>Marketplace: <code>Cynrath.ackit-vscode</code></strong></td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🤖</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>MCP</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit mcp serve</code></td><td style="border:1px solid #d0d7de; padding:8px;">Official SDK stdio, 15 read-only tools (incl. workflow status, intent, checkpoint, verification bundle, drift, roles), 5 resources, 4 prompts, <code>InMemoryTransport</code> cancellation</td></tr>
 </tbody>
 </table>
@@ -139,11 +139,11 @@ OpenCode, Copilot, Gemini, Cursor, Cline, any MCP-capable agent).
 ```bash
 # global (recommended)
 npm install --global @cynrath/agent-context-kit
-ackit --version  # 0.3.0
+ackit --version  # 0.4.0
 
 # one-shot, pinned
-npx --yes @cynrath/agent-context-kit@0.3.0 --version
-npx --yes @cynrath/agent-context-kit@0.3.0 --help
+npx --yes @cynrath/agent-context-kit@0.4.0 --version
+npx --yes @cynrath/agent-context-kit@0.4.0 --help
 
 # from source
 pnpm install --frozen-lockfile && pnpm build
@@ -255,7 +255,7 @@ More: [`docs/architecture/overview.md`](docs/architecture/overview.md)
 
 ### 🤖 GitHub Action
 
-Official `Cynrath/agent-context-kit@v0.3.0` (SHA-pinned for high-assurance):
+Official `Cynrath/agent-context-kit@v0.4.0` (SHA-pinned for high-assurance):
 
 ```yaml
 permissions:
@@ -265,7 +265,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
-      - uses: Cynrath/agent-context-kit@v0.3.0
+      - uses: Cynrath/agent-context-kit@v0.4.0
         with:
           command: scan
           args: "--json"
@@ -314,13 +314,13 @@ ESM-only, `sideEffects:false`, `AbortSignal` cancellable, no `process.exit`. Ref
 
 ### 🧩 VS Code
 
-Extension is **published on the VS Code Marketplace** — [`Cynrath.ackit-vscode`](https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode) (`0.3.0`, `<2MB` VSIX, offline-first, no telemetry).
+Extension is **published on the VS Code Marketplace** — [`Cynrath.ackit-vscode`](https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode) (`0.4.0`, `<2MB` VSIX, offline-first, no telemetry).
 
 From source:
 
 ```bash
 pnpm --filter vscode build
-vsce package # → ackit-vscode-0.3.0.vsix
+vsce package # → ackit-vscode-0.4.0.vsix
 ```
 
 Features: readiness tree, Problems `ACKITxxx`, graph “instructions for current file”, tasks/policy/optimize, palette `Refresh/Show Graph/Optimize/Diagnostics`, file watcher debounced, no telemetry.
@@ -371,7 +371,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the docs-first workflow.
 
 ### 🔖 Versioning
 
-Current: **`0.3.0`** on `master` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases) · `latest → 0.3.0` via OIDC Trusted Publishing with provenance. Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
+Current: **`0.4.0`** on `master` · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases) · `latest → 0.4.0` via OIDC Trusted Publishing with provenance. Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
 
 ---
 
