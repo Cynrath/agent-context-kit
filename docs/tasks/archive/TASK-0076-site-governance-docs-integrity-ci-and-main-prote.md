@@ -1,12 +1,12 @@
 ---
 id: "TASK-0076"
 title: "Site governance — docs-integrity CI and main protection"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0075"
 createdAt: "2026-09-03"
-completedAt: null
+completedAt: 2026-09-03
 ---
 
 ## Purpose
@@ -49,11 +49,11 @@ Session authorization for site + product merge (recorded per Controlled-release 
 
 ## Acceptance criteria
 
-- [ ] `node scripts/verify-site.mjs` passes on clean `main` and on the site PR head; design hashes unchanged; no generated HTML churn.
-- [ ] `docs-integrity` succeeds exact-head on the site PR and again on merged `main`.
-- [ ] Live ruleset/protection queried back and reported: ID, enforcement, branch condition, deletion/non-fast-forward/linear/PR rules, required `docs-integrity`, bypass actors.
-- [ ] Site governance docs state PR + `docs-integrity` workflow; current docs still 0.4.0.
-- [ ] Product PR merged at exact-head green; post-merge CI green; final branches product `master` + companion only, site `main` only; both clean local==origin; package `0.4.0`.
+- [x] `node scripts/verify-site.mjs` passes on clean `main` and on the site PR head; design hashes unchanged; no generated HTML churn.
+- [x] `docs-integrity` succeeds exact-head on the site PR and again on merged `main`.
+- [x] Live ruleset/protection queried back and reported: ID, enforcement, branch condition, deletion/non-fast-forward/linear/PR rules, required `docs-integrity`, bypass actors.
+- [x] Site governance docs state PR + `docs-integrity` workflow; current docs still 0.4.0.
+- [x] Product PR merged at exact-head green; post-merge CI green; final branches product `master` + companion only, site `main` only; both clean local==origin; package `0.4.0`.
 
 ## Test steps
 
@@ -79,4 +79,43 @@ Session authorization for site + product merge (recorded per Controlled-release 
 
 ## Completion notes
 
-(placeholder)
+Done 2026-09-03. Product validation (§12, head `59c091d`): frozen install,
+lint, format:check, typecheck, build green; `pnpm test` 101 files / 584
+tests pass; `gen:schemas` idempotent; `smoke:cli` + `smoke:package`
+(`cynrath-agent-context-kit-0.4.0.tgz`) pass; offline-egress, `config check`,
+`doctor`, `task doctor` green; `scan --ci` readiness 88 pass; text-hygiene
+repo scan clean; `git diff --check` clean; invariants completed-in-active 0,
+non-completed-in-archive 0, duplicates 0. Independent verifier bundle
+(`verification bundle TASK-0076 --format json`) + fresh read-only verifier:
+`VERIFIER: GO (zero blockers)`, all 10 items PASS (75/75 archived completed,
+pure R100 renames, archived IDs resolvable, base `e646371` ancestor-intact,
+BEL regression 10/10, body-file rule in both instruction files, gates green,
+`0.4.0` both manifests with no new tags, companion branch disjoint, site
+branch 3-file scope with verifier PASS).
+
+Product PR #14 (`chore/repository-hygiene` → `master`, head `59c091d`,
+body via body-file + hygiene PASS): all checks green after one infra retry
+(`verify windows-latest/node-24` tarball-audit test timed out at 138s >
+120s limit; same-head rerun passed 2m8s — no assertion failure, no gate
+weakened). Squash-merged `e8692611` after exact-head green + verifier GO.
+
+Site: branch `chore/docs-governance` (`c2218dd`: verifier + workflow +
+README governance; theme hashes before==after; no HTML churn). PR #2 to
+`main`: exact-head `docs-integrity` SUCCESS (`c2218dd`), squash-merged
+`49e6fdc`; post-merge `docs-integrity` on `main` SUCCESS; temp branch
+deleted; `main` clean local==origin. Ruleset `main-branch-governance`
+(id `22197169`, enforcement active, `refs/heads/main`): deletion,
+non-fast-forward, required-linear-history, PR-required (approvals 0, single
+maintainer, no fake reviewer), required check `docs-integrity`
+(strict, integration 15368), bypass actors none — queried back live and
+confirmed via `gh ruleset check main` (5 rules apply). Current docs 0.4.0.
+
+Process note (Rule 9 transparency): this coordination task could only close
+after the merges it coordinated, so its closure ships in a second,
+bookkeeping-only PR from the same single branch — no new branch created,
+full CI required, no direct master mutation, no history rewrite. Product
+master governance observed live: classic protection 404, active ruleset
+`protect-master` (id `17913688`: deletion, non-fast-forward, linear history,
+required status checks; no PR rule) — direct pushes stay out of workflow.
+
+Package `0.4.0`; no publish/tag/release; Browser Companion untouched.
