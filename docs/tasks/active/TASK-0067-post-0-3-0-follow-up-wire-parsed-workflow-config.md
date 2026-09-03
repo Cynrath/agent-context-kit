@@ -1,12 +1,12 @@
 ---
 id: "TASK-0067"
 title: "post-0.3.0 follow-up: wire parsed workflow config keys into gate behavior"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0066"
 createdAt: "2026-09-02"
-completedAt: null
+completedAt: 2026-09-03
 ---
 
 ## Purpose
@@ -39,10 +39,10 @@ Close the documented v0.3.0 limitation: `ackit.yml` `workflow:` keys (`defaultPr
 
 ## Acceptance criteria
 
-- [ ] `workflow.requireEvidence`/`requireVerifier`/`defaultProfile`/profile overrides measurably change gate outcomes (unit tests with config fixtures proving gate denies/allows accordingly)
-- [ ] Legacy fixture: repositories without `workflow:` config behave exactly as v0.3.0 (behavior/snapshot test unchanged)
-- [ ] Full gate matrix green (lint/format/typecheck/build/test/scan --ci), task doctor OK
-- [ ] `docs/reference/config.md` limitation note replaced by effective-behavior documentation
+- [x] `workflow.requireEvidence`/`requireVerifier`/`defaultProfile`/profile overrides measurably change gate outcomes (unit tests with config fixtures proving gate denies/allows accordingly)
+- [x] Legacy fixture: repositories without `workflow:` config behave exactly as v0.3.0 (behavior/snapshot test unchanged)
+- [x] Full gate matrix green (lint/format/typecheck/build/test/scan --ci), task doctor OK
+- [x] `docs/reference/config.md` limitation note replaced by effective-behavior documentation
 
 ## Test steps
 
@@ -61,4 +61,27 @@ Focused commit revert; config parsing surface stays valid (schema unchanged).
 
 ## Completion notes
 
-(proposed post-0.3.0 maintenance chain; planned 2026-09-02 during the v0.3.0 release session per release-task §20 — not executed in the release itself)
+Implemented 2026-09-03 on `feat/post-v030-hardening` (AC-001→004 in order):
+
+- AC-001 (config changes gates): canonical `workflowOverridesFromConfig` /
+  `defaultProfileFromConfig` / `resolveProfileRequirements` (additive-only:
+  explicit `true` tightens, `false`/absence never loosens) /
+  `effectiveRequiredArtifacts` in `src/core/workflow/profiles.ts`, wired into
+  the single gate path — task completion gate (`src/core/tasks/store.ts`),
+  `workflow set` (default profile)/`show`/`advance`, drift
+  (`requiresVerdict` input, default = built-in `profile !== "quick"`), and MCP
+  `ackit_workflow_status`. Proven by `tests/unit/workflow/workflow-config.test.ts`
+  (8 tests: defaults, quick tightening incl. advance artifacts, per-section
+  precedence, defaultProfile validation, CFG-* malformed errors, drift
+  verdict tightening, set-default/show-effective e2e, legacy usage error).
+- AC-002 (legacy): `tests/integration/compat/legacy-repository.test.ts`
+  unchanged and green; `workflowOverridesFromConfig(undefined) == {}` and
+  effective artifacts equal catalog without config.
+- AC-003 (gates): `pnpm lint` (297 files clean), `format:check` (281 clean),
+  `typecheck`, `build`, full `pnpm test` 98 files / 554 tests PASS, `task doctor`
+  OK, `scan --ci` exit 0 (readiness 88).
+- AC-004 (docs): `docs/reference/config.md` limitation row replaced by
+  effective-semantics documentation; `concepts/workflows.md` profile intro
+  points at it; MCP reference rows updated.
+
+No schema change (strict shape frozen); no provider/LLM/network dependency.

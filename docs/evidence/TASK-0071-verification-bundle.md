@@ -1,15 +1,31 @@
----
-id: "TASK-0071"
-title: "post-0.3.0 follow-up: post-release docs cleanup deferred from release"
-status: active
-schemaVersion: 2
-dependencies:
-  - "TASK-0066"
-intentRef: "INTENT-0003"
-planRef: "docs/plans/post-v030-hardening-TASK-0071.md"
-createdAt: "2026-09-02"
-completedAt: null
----
+schema: ackit.verification-bundle.v1
+task: TASK-0071
+
+# ACKit Verification Bundle
+
+You are an INDEPENDENT verifier with a fresh context. Review the material
+below, judge semantic compliance against the acceptance criteria, and emit
+an ackit.verdict.v1 verdict (PASS | PASS_WITH_WARNINGS | REWORK_REQUIRED |
+BLOCKED). You should not implement the feature you are judging.
+
+## Intent
+
+INTENT-0003: Post-v0.3.0 docs and quality cleanup [draft]
+fingerprint: ba75fee88a779d5b318b6c0e3e8cd4e84c259aee4aa75ded57ee77aba7b5f471
+problem: (describe the problem this work solves)
+desired outcome: (describe the measurable desired outcome)
+non-goals: (none)
+acceptance criteria: (none in intent)
+
+## Workflow
+
+profile: standard, stage: review
+
+## Task document
+
+source: docs/tasks/active/TASK-0071-post-0-3-0-follow-up-post-release-docs-cleanup-d.md [active]
+
+````
 
 ## Purpose
 
@@ -121,3 +137,62 @@ release session.
 
 `pnpm test` readme-parity + docs-gate green (8 tests); full 98/554 PASS;
 `scan --ci` exit 0; `task doctor` OK.
+
+````
+
+## Acceptance criteria + evidence
+
+AC-001 [verified] Sweep executed with an explicit checklist of areas (reference/, concepts/, guides/, examples/, README) and per-area verdicts recorded
+    evidence: manual: Completion notes sweep verdicts per area; per-file diffs in git working tree (docs/reference/cli.md, config.md, mcp.md; docs/concepts/workflows.md; docs/guides/getting-started.md, agent-integration.md; docs/plans/post-v030-hardening-TASK-0071.md) / test: tests/contract/docs-gate.test.ts + tests/contract/readme-parity.test.ts 8 tests PASS (job focused run)
+AC-002 [verified] No stale-version or unshipped-claim text remains outside historical/CHANGELOG contexts (grep-verified)
+    evidence: manual: grep sweeps: '9 tools' confined to historical task docs; 0.2.x matches confined to historical/CHANGELOG; README has no stale claims; forward docs fixed as listed / static-analysis: grep sweeps recorded in task (9-tools/0.2.x/experimental); docs-gate contract suite green; git diff shows only intended forward-doc files
+AC-003 [verified] `ackit sync` mentions use current-master/next-release wording (never implying published 0.3.0 contains it)
+    evidence: manual: docs/reference/cli.md sync row+options, docs/guides/getting-started.md tour, docs/guides/agent-integration.md lifecycle all carry current-master/next-release wording; grep for 'ackit sync' reviewed / static-analysis: grep 'ackit sync' forward mentions all carry next-release wording (cli.md, getting-started.md, agent-integration.md); docs-gate green
+AC-004 [verified] Control-character investigation recorded (repo-owned emitter or external-only verdict with evidence)
+    evidence: manual: scripts/*.mjs grep shows no PR-body path; sanitizeTerminalText (src/shared/diagnostics.ts) + tests/unit/diagnostics.test.ts; external-shell-quoting verdict documented in task / test: tests/unit/diagnostics.test.ts sanitizeTerminalText C0/ANSI-strip cases PASS (full suite 98/554)
+AC-005 [verified] Windows/node-24 timeout investigation recorded (narrow fix or separate future task)
+    evidence: test: pnpm test full suite 98 files/554 tests PASS in ~122s (job pwsh-11); tarball smoke ~119s with 300s budget; vitest.config.ts documents 60s load-based budget
+AC-006 [verified] Hosted docs re-synced and live pages verified, OR deferred-with-rationale recorded (publish action out of session scope)
+    evidence: manual: Hosted-docs publish deferred with rationale in task + plan (network/publish out of single-PR session scope; sources updated; sync runs in v0.4.0 release session) / git: branch feat/post-v030-hardening: docs sources updated here; hosted publish deferred to v0.4.0 release session per task rationale
+AC-007 [verified] `pnpm test` (readme-parity) + `scan --ci` green after changes
+    evidence: test: pnpm test tests/contract/readme-parity.test.ts + docs-gate 8 tests PASS; full 98/554 PASS; scan --ci exit 0 readiness 88
+
+## Registered verdicts
+
+(no verdicts registered yet — you are the fresh verifier)
+
+## Latest checkpoint
+
+CP-0001 at git 7a56f38 (2026-09-03)
+next action: Advance through standard stages, build verification bundle, obtain fresh verifier verdict, complete via gate
+next path: docs/tasks/active/TASK-0071-post-0-3-0-follow-up-post-release-docs-cleanup-d.md
+
+## Implementation surface
+
+declared affected areas: `docs/**` (as found by the sweep), `README.md` (if needed), hosted docs repo pages via sync script, CHANGELOG (only if a factual error is found — corrections belong to the next release section, never rewriting 0.3.0 history).
+current changed/untracked files (28): docs/concepts/workflows.md, docs/guides/agent-integration.md, docs/guides/getting-started.md, docs/reference/cli.md, docs/reference/config.md, docs/reference/mcp.md, docs/tasks/active/TASK-0067-post-0-3-0-follow-up-wire-parsed-workflow-config.md, docs/tasks/active/TASK-0068-post-0-3-0-follow-up-validate-advance-gate-plann.md, docs/tasks/active/TASK-0069-post-0-3-0-follow-up-atomic-checkpoint-writes-vi.md, docs/tasks/active/TASK-0070-post-0-3-0-follow-up-complete-mcp-drift-warning-.md, docs/tasks/active/TASK-0071-post-0-3-0-follow-up-post-release-docs-cleanup-d.md, src/cli/commands/drift.ts, src/cli/commands/workflow.ts, src/core/checkpoint/store.ts, src/core/drift/check.ts, src/core/drift/index.ts, src/core/tasks/store.ts, src/core/workflow/index.ts, src/core/workflow/profiles.ts, src/mcp/server.ts, tests/unit/workflow/workflow.test.ts, docs/intent/INTENT-0003-post-v0-3-0-docs-and-quality-cleanup.md, docs/plans/post-v030-hardening-TASK-0071.md, src/core/drift/assemble.ts, tests/contract/mcp/drift-parity.test.ts, tests/unit/checkpoint/checkpoint-atomic.test.ts, tests/unit/workflow/advance-disk.test.ts, tests/unit/workflow/workflow-config.test.ts
+
+## Implementation diff
+
+(diff omitted — pass --diff for the capped full diff)
+
+## Verification-point gate requirements
+
+- artifacts: task
+- note: verification bundles carry the task's declared requirements
+
+## Verifier role contract
+
+verifier: Independent Verifier (ackit.role.v1)
+Judges the implementation against the acceptance criteria with a fresh context; never implements what it judges.
+required inputs: intent, spec, plan, task, diff, tests, evidence
+allowed: inspect intent, spec, plan, task, diff, tests, and evidence; read repository content; emit an ackit.verdict.v1 verdict
+forbidden: implement or modify the feature under judgment; edit source files; register evidence for the task being judged
+required outputs: ackit.verdict.v1 verdict
+
+## Verdict instructions
+
+- Compare the implementation surface, diff, and evidence against every criterion.
+- Blocking findings must carry the criterion id and a stable upper-snake code.
+- PASS-family verdicts cannot carry blocking findings (registration rejects them).
+- Register your verdict with: ackit verification record <task> --verdict <file>

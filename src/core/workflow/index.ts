@@ -10,6 +10,8 @@ export {
 export {
   BUILTIN_PROFILES,
   canAdvance,
+  defaultProfileFromConfig,
+  effectiveRequiredArtifacts,
   getProfile,
   listWorkflowProfiles,
   profileStages,
@@ -18,6 +20,7 @@ export {
   stageInProfile,
   type WorkflowConfigOverrides,
   type WorkflowProfileDefinition,
+  workflowOverridesFromConfig,
 } from "./profiles.js";
 export {
   WORKFLOW_STAGE_INVALID,

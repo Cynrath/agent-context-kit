@@ -138,8 +138,9 @@ export function requiredArtifacts(id: WorkflowProfileId, stage: WorkflowStage): 
 }
 
 /**
- * Resolve user config overrides onto the catalog. Overrides may only flip
- * verdict/evidence requirements and default profile — stage orders are fixed
+ * Resolve user config overrides onto the catalog. Overrides are
+ * ADDITIVE-ONLY (TASK-0067): explicit `true` tightens the built-in minimum,
+ * explicit `false`/absence never loosens it. Stage orders are fixed
  * (ADR-0025: config tunes requirements, never invents profiles/stages).
  */
 export interface WorkflowConfigOverrides {
@@ -152,10 +153,97 @@ export function resolveProfileRequirements(
   overrides: WorkflowConfigOverrides = {},
 ): Pick<WorkflowProfileDefinition, "requiresVerdict" | "requiresEvidence"> {
   const profile = getProfile(id);
-  // Explicit config values win over profile defaults (per-repository opt-in
-  // tuning); absence keeps the built-in default (ADR-0025 §7).
+  // Additive-only: built-in `true` stays `true` even when config says false.
+  // Explicit config `true` tightens a built-in `false` (per-repository opt-in).
+  // Absence keeps the built-in default (ADR-0025 §7, TASK-0067 risk mitigation).
   return {
-    requiresVerdict: overrides.requireVerifier ?? profile.requiresVerdict,
-    requiresEvidence: overrides.requireEvidence ?? profile.requiresEvidence,
+    requiresVerdict: profile.requiresVerdict || (overrides.requireVerifier ?? false),
+    requiresEvidence: profile.requiresEvidence || (overrides.requireEvidence ?? false),
   };
+}
+
+/**
+ * Canonical workflow-config extraction (TASK-0067): single place where the
+ * parsed `ackit.yml` `workflow:` section becomes gate overrides + default
+ * profile. All gates (completion, advance, drift, show) read through here —
+ * no second gate engine. Legacy repos (no `workflow:` section) yield empty
+ * overrides and no default (exact v0.3.0 behavior).
+ *
+ * Schema shape (frozen): `workflow.defaultProfile`, `workflow.requireVerifier`
+ * (top-level), `workflow.profiles.requireEvidence` / `requireVerdict`.
+ * The per-section `requireVerdict` wins over top-level `requireVerifier`
+ * when both are set (more specific layer).
+ */
+export function workflowOverridesFromConfig(
+  config:
+    | {
+        workflow?:
+          | {
+              requireVerifier?: boolean | undefined;
+              profiles?:
+                | {
+                    requireEvidence?: boolean | undefined;
+                    requireVerdict?: boolean | undefined;
+                  }
+                | undefined;
+            }
+          | undefined;
+      }
+    | undefined,
+): WorkflowConfigOverrides {
+  const workflow = config?.workflow;
+  if (workflow === undefined) return {};
+  const requireVerifier =
+    workflow.profiles?.requireVerdict ?? workflow.requireVerifier ?? undefined;
+  const requireEvidence = workflow.profiles?.requireEvidence ?? undefined;
+  const overrides: WorkflowConfigOverrides = {};
+  if (requireVerifier !== undefined) overrides.requireVerifier = requireVerifier;
+  if (requireEvidence !== undefined) overrides.requireEvidence = requireEvidence;
+  return overrides;
+}
+
+/** Resolved default profile from config (undefined = no config default). */
+export function defaultProfileFromConfig(
+  config: { workflow?: { defaultProfile?: WorkflowProfileId | undefined } | undefined } | undefined,
+): WorkflowProfileId | undefined {
+  const candidate = config?.workflow?.defaultProfile;
+  if (candidate === undefined) return undefined;
+  // Schema already constrains to the frozen set; defensive check keeps this
+  // pure function total for programmatic callers.
+  return (WORKFLOW_PROFILES as readonly string[]).includes(candidate) ? candidate : undefined;
+}
+
+/**
+ * Effective required artifacts for a stage under config overrides
+ * (TASK-0067): catalog requirements plus tightening additions. Currently the
+ * only tightening is evidence on `verify` for profiles whose catalog does not
+ * already require it (quick) when effective `requiresEvidence` is true, and
+ * verdict on `verify` for quick when effective `requiresVerdict` is true
+ * (quick has no independent-review stage, so `verify` is the enforcement
+ * point). Standard/high-risk catalog already covers their enforcement stages,
+ * so overrides add nothing there. Absent config returns the catalog exactly
+ * (legacy preservation).
+ */
+export function effectiveRequiredArtifacts(
+  id: WorkflowProfileId,
+  stage: WorkflowStage,
+  overrides: WorkflowConfigOverrides = {},
+): { profile: WorkflowProfileId; stage: WorkflowStage; artifacts: ArtifactKind[] } {
+  const base = requiredArtifacts(id, stage);
+  const effective = resolveProfileRequirements(id, overrides);
+  const catalog = getProfile(id);
+  const extra: ArtifactKind[] = [];
+  if (stage === "verify") {
+    if (effective.requiresEvidence && !base.artifacts.includes("evidence")) {
+      extra.push("evidence");
+    }
+    // Quick-only tightening: quick has no independent-review stage, so a
+    // configured verifier requirement is enforced at verify advancement.
+    if (id === "quick" && effective.requiresVerdict && !base.artifacts.includes("verdict")) {
+      extra.push("verdict");
+    }
+  }
+  void catalog;
+  if (extra.length === 0) return { profile: id, stage, artifacts: [...base.artifacts] };
+  return { profile: id, stage, artifacts: [...base.artifacts, ...extra].sort() };
 }

@@ -51,6 +51,12 @@ export interface DriftInput {
   changedFiles: readonly string[];
   /** Dependency statuses: dependency task id → completed?. */
   dependencies: readonly { id: string; completed: boolean }[];
+  /**
+   * Effective verifier requirement override (TASK-0067): when provided, the
+   * drift evaluator uses it instead of the built-in `profile !== "quick"`
+   * default. Absence preserves exact v0.3.0 behavior (legacy repos).
+   */
+  requiresVerdict?: boolean | undefined;
 }
 
 /** Deterministic exclusions: state/docs churn is never drift. */
@@ -141,8 +147,11 @@ export function detectWorkflowDrift(input: DriftInput): DriftFinding[] {
     }
   }
 
-  // MISSING_VERIFIER_VERDICT: profile requires a verdict but none registered.
-  const requiresVerdict = input.workflow !== null && input.workflow.profile !== "quick";
+  // MISSING_VERIFIER_VERDICT: effective profile requires a verdict but none
+  // registered. TASK-0067: explicit `requiresVerdict` input wins; absence
+  // falls back to the built-in `profile !== "quick"` default (legacy).
+  const requiresVerdict =
+    input.requiresVerdict ?? (input.workflow !== null && input.workflow.profile !== "quick");
   if (requiresVerdict && input.latestVerdict === null) {
     findings.push({
       code: "MISSING_VERIFIER_VERDICT",

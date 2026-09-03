@@ -230,7 +230,10 @@ export async function createAckitMcpServer(requestedRoot?: string | undefined): 
     { taskId: z.string() },
     async (args: { taskId: string }) => {
       try {
-        const { WorkflowStore, requiredArtifacts } = await import("../core/workflow/index.js");
+        const { WorkflowStore, effectiveRequiredArtifacts, resolveProfileRequirements } =
+          await import("../core/workflow/index.js");
+        const { loadAckitConfig } = await import("../core/config/index.js");
+        const { workflowOverridesFromConfig } = await import("../core/workflow/index.js");
         const workflow = new WorkflowStore({ canonicalPath: repositoryRoot });
         const state = await workflow.load(args.taskId);
         if (state === null) {
@@ -242,13 +245,20 @@ export async function createAckitMcpServer(requestedRoot?: string | undefined): 
             }),
           );
         }
-        const required = requiredArtifacts(state.profile, state.stage);
+        // TASK-0067: same canonical resolved path as the CLI — absent config
+        // yields the catalog defaults (legacy preservation).
+        const configResult = await loadAckitConfig(repositoryRoot);
+        const overrides = configResult.ok ? workflowOverridesFromConfig(configResult.config) : {};
+        const required = effectiveRequiredArtifacts(state.profile, state.stage, overrides);
+        const effective = resolveProfileRequirements(state.profile, overrides);
         return textResult(
           JSON.stringify({
             task: args.taskId,
             profile: state.profile,
             stage: state.stage,
             requiredArtifacts: required.artifacts,
+            effectiveRequiresEvidence: effective.requiresEvidence,
+            effectiveRequiresVerdict: effective.requiresVerdict,
             verificationAttempts: state.verificationAttempts.length,
           }),
         );
@@ -332,83 +342,16 @@ export async function createAckitMcpServer(requestedRoot?: string | undefined): 
     { taskId: z.string() },
     async (args: { taskId: string }) => {
       try {
-        const { promises: fsp } = await import("node:fs");
-        const path = await import("node:path");
-        const { TaskStore } = await import("../core/tasks/index.js");
-        const { WorkflowStore, requiredArtifacts } = await import("../core/workflow/index.js");
-        const { EvidenceStore } = await import("../core/evidence/index.js");
-        const { VerdictStore } = await import("../core/verification/index.js");
-        const { CheckpointStore } = await import("../core/checkpoint/index.js");
-        const { changedFiles } = await import("../core/git/git.js");
-        const { detectWorkflowDrift } = await import("../core/drift/index.js");
-        const tasks = new TaskStore(repositoryRoot);
-        const found = await tasks.find(args.taskId);
-        if (found === null) return textResult(JSON.stringify({ error: "unknown task" }));
-        const workflow = new WorkflowStore({ canonicalPath: repositoryRoot });
-        const wf = await workflow.load(args.taskId);
-        const root = { canonicalPath: repositoryRoot };
-        const evidence = await new EvidenceStore(root).load(args.taskId);
-        const verdicts = new VerdictStore(repositoryRoot);
-        const latest = await verdicts.latest(args.taskId);
-        const checkpoints = new CheckpointStore(root, repositoryRoot);
-        const checkpoint = await checkpoints.latest(args.taskId);
-        let gitChanged: string[] = [];
-        try {
-          gitChanged = changedFiles(repositoryRoot);
-        } catch {
-          gitChanged = [];
+        // TASK-0070: single canonical evaluator shared with the CLI —
+        // same state + same input ⇒ same findings (codes/severities/order).
+        // Read-only: assembler never writes; no exit-code semantics over MCP
+        // (the CLI `--ci` gate stays CLI-only by design).
+        const { assembleDriftInput, detectWorkflowDrift } = await import("../core/drift/index.js");
+        const assembled = await assembleDriftInput(repositoryRoot, args.taskId);
+        if (!assembled.ok) {
+          return textResult(JSON.stringify({ error: assembled.message }));
         }
-        const dependencies: { id: string; completed: boolean }[] = [];
-        for (const dep of found.doc.meta.dependencies) {
-          const depFound = await tasks.find(dep);
-          dependencies.push({ id: dep, completed: depFound?.doc.meta.status === "completed" });
-        }
-        // Input resolution parity with the CLI (drift.ts): artifact presence
-        // includes intent/spec/plan/verdict existence checks and declared
-        // refs are resolved on disk, so the MCP tool reports exactly what
-        // `ackit drift check` reports for the same repository state
-        // (TASK-0064 audit-fidelity fix).
-        const metaExtra = found.doc.meta as {
-          intentRef?: string | undefined;
-          specRefs?: string[] | undefined;
-          decisionRefs?: string[] | undefined;
-          planRef?: string | undefined;
-        };
-        const existingArtifacts: string[] = ["task", ...(evidence !== null ? ["evidence"] : [])];
-        if (metaExtra.intentRef !== undefined) existingArtifacts.push("intent");
-        if (metaExtra.specRefs !== undefined && metaExtra.specRefs.length > 0)
-          existingArtifacts.push("spec");
-        if (metaExtra.planRef !== undefined && metaExtra.planRef.length > 0)
-          existingArtifacts.push("plan");
-        if (latest !== null) existingArtifacts.push("verdict");
-        const refPaths = [
-          ...(metaExtra.specRefs ?? []),
-          ...(metaExtra.decisionRefs ?? []),
-          ...(metaExtra.planRef !== undefined ? [metaExtra.planRef] : []),
-        ];
-        const referencePathsExist: string[] = [];
-        for (const ref of refPaths) {
-          try {
-            await fsp.access(path.resolve(repositoryRoot, ...ref.split("/")));
-            referencePathsExist.push(ref);
-          } catch {
-            // absent — drift flags it (same as the CLI)
-          }
-        }
-        const findings = detectWorkflowDrift({
-          taskId: args.taskId,
-          taskDoc: found.doc,
-          workflow: wf !== null ? { profile: wf.profile, stage: wf.stage } : null,
-          requiredArtifacts: wf !== null ? requiredArtifacts(wf.profile, wf.stage).artifacts : [],
-          existingArtifacts,
-          referencePathsExist,
-          evidence,
-          latestVerdict: latest !== null ? { verdict: latest.verdict } : null,
-          checkpoint,
-          checkpointProblems: [],
-          changedFiles: gitChanged,
-          dependencies,
-        });
+        const findings = detectWorkflowDrift(assembled.input);
         return textResult(JSON.stringify({ findings }));
       } catch (error) {
         return textResult(JSON.stringify({ error: (error as Error).message }));

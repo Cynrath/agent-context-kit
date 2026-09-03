@@ -6,8 +6,9 @@ behavior (ADR-0025).
 
 ## Profiles
 
-Three built-in profiles ship (frozen catalog; config may tune required
-artifacts, never invent profiles or stages):
+Three built-in profiles ship (frozen catalog; `ackit.yml` `workflow:` may
+tighten evidence/verifier requirements additively and select the default
+profile — never invent profiles or stages; see `docs/reference/config.md`):
 
 | Profile | Stages | Verdict required | Evidence required |
 |---|---|---|---|
@@ -34,7 +35,7 @@ to `implement` deterministically; recording the later `pass` unblocks.
 Advancing past a stage requires that stage's declared artifacts to exist
 (presence checks only — ACKit never judges semantics):
 
-- `intent` requires an `intentRef` on the task (and an accepted intent document)
+- `intent` requires an `intentRef` on the task (and an existing intent document in `docs/intent/`)
 - `spec` requires `specRefs`
 - `plan` requires `planRef`
 - `verify` (standard/high-risk) requires an evidence registry

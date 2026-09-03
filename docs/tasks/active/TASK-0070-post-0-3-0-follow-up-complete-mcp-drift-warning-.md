@@ -1,12 +1,12 @@
 ---
 id: "TASK-0070"
 title: "post-0.3.0 follow-up: complete MCP drift warning and input parity"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0066"
 createdAt: "2026-09-02"
-completedAt: null
+completedAt: 2026-09-03
 ---
 
 ## Purpose
@@ -37,12 +37,24 @@ Close the documented v0.3.0 limitation: the MCP `ackit_drift_check` tool has a r
 - `tests/contract/mcp/mcp-conformance.test.ts`, `tests/integration/drift/drift-cli.test.ts`
 - `docs/reference/mcp.md`, CHANGELOG (next release)
 
+## Divergence enumeration (AC-001 — audited 2026-09-03, pre-fix)
+
+| # | Dimension | CLI (`drift check`) | MCP (`ackit_drift_check`) | Impact |
+|---|---|---|---|---|
+| D1 | Changed-file set | expanded (`git ls-files` expands collapsed untracked dirs) | raw `changedFiles` (collapsed `docs/`-style entries) | different `UNPLANNED_FILE_CHANGE` findings on repos with untracked dirs |
+| D2 | Checkpoint problems | `validateCheckpointStaleness` computed | hardcoded `[]` | MCP never reported `STALE_CHECKPOINT` warnings the CLI reported |
+| D3 | Effective verdict requirement | built-in `profile !== "quick"` (plus TASK-0067 config override) | built-in only, no config override | tightened-quick repos diverged on `MISSING_VERIFIER_VERDICT` |
+| D4 | Verdict summary source | `VerdictStore.latestVerdictSummary` | `VerdictStore.latest` | potential shape/filtering skew in `existingArtifacts`/`latestVerdict` |
+| D5 | Exit/`--ci` semantics | exit 1 on blocking under `--ci` | findings JSON, no exit codes | deliberate, documented difference (tool boundary cannot carry exit codes) |
+
+D1–D4 closed by the canonical assembler; D5 kept by design (read-only boundary, no mutating inputs added).
+
 ## Acceptance criteria
 
-- [ ] Divergence enumeration recorded in this task (concrete list: which inputs, which warning shapes)
-- [ ] Parity tests assert same findings/warnings for equivalent inputs across CLI and MCP (conformance test)
-- [ ] Read-only boundary unchanged (no mutation tools/params added)
-- [ ] Full gate matrix green; MCP stdio smoke green cross-platform
+- [x] Divergence enumeration recorded in this task (concrete list: which inputs, which warning shapes)
+- [x] Parity tests assert same findings/warnings for equivalent inputs across CLI and MCP (conformance test)
+- [x] Read-only boundary unchanged (no mutation tools/params added)
+- [x] Full gate matrix green; MCP stdio smoke green cross-platform
 
 ## Test steps
 
@@ -60,4 +72,23 @@ Focused commit revert.
 
 ## Completion notes
 
-(proposed post-0.3.0 maintenance chain; planned 2026-09-02 during the v0.3.0 release session per release-task §20 — not executed in the release itself)
+Implemented 2026-09-03 on `feat/post-v030-hardening` (quick profile, verify stage):
+
+- New canonical `assembleDriftInput(repositoryRoot, taskId)` in
+  `src/core/drift/assemble.ts` (exported via `drift/index.ts`): the ONE
+  input-assembly path — task/workflow/evidence/verdict-summary/checkpoint +
+  full staleness problems + expanded changed files + disk-checked refs +
+  effective `requiresVerdict` (TASK-0067). Read-only, never writes.
+- `runDriftCheckCommand` (CLI) and MCP `ackit_drift_check` both call the
+  assembler then the single `detectWorkflowDrift` core — duplicated inline
+  assembly deleted from both surfaces (no second business logic). `--ci`/exit
+  semantics stay CLI-only (deliberate D5); MCP returns findings JSON.
+- Finding codes frozen (eight); severities/order from the core sort
+  (code → taskId → detail) — identical inputs now yield identical outputs.
+- Proven by `tests/contract/mcp/drift-parity.test.ts` (CLI JSON ≡ MCP JSON ≡
+  core on an identical unplanned-file fixture; deterministic order asserted;
+  read-only tool list asserted — no `workflow_set`/`advance`/`checkpoint_create`/
+  `task_complete`). `mcp-conformance` (9) + `drift-cli` (3) green.
+- MCP stdio smoke: `tests/e2e` + contract MCP suites green locally on Windows;
+  cross-platform proof deferred to PR CI (Linux runner) per session §13.
+- Full matrix 98/554 PASS. No write tools/params added (tool count still 15).

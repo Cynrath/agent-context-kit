@@ -1,12 +1,12 @@
 ---
 id: "TASK-0068"
 title: "post-0.3.0 follow-up: validate advance-gate planning artifacts by disk existence"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0066"
 createdAt: "2026-09-02"
-completedAt: null
+completedAt: 2026-09-03
 ---
 
 ## Purpose
@@ -39,10 +39,10 @@ Close the documented v0.3.0 limitation: advance-gate planning-artifact validatio
 
 ## Acceptance criteria
 
-- [ ] Advance past a planning stage with a declared-but-missing plan artifact fails with a deterministic, documented finding
-- [ ] Existing valid references (present on disk) advance exactly as before (regression tests)
-- [ ] Path traversal/escape attempts are rejected by containment (test)
-- [ ] Full gate matrix green; legacy compatibility fixture unchanged
+- [x] Advance past a planning stage with a declared-but-missing plan artifact fails with a deterministic, documented finding
+- [x] Existing valid references (present on disk) advance exactly as before (regression tests)
+- [x] Path traversal/escape attempts are rejected by containment (test)
+- [x] Full gate matrix green; legacy compatibility fixture unchanged
 
 ## Test steps
 
@@ -60,4 +60,22 @@ Focused commit revert.
 
 ## Completion notes
 
-(proposed post-0.3.0 maintenance chain; planned 2026-09-02 during the v0.3.0 release session per release-task §20 — not executed in the release itself)
+Implemented 2026-09-03 on `feat/post-v030-hardening` (quick profile, verify stage):
+
+- Advance gate (`src/cli/commands/workflow.ts` `artifactsExist`) now proves
+  disk existence instead of trusting declarations: intent via `IntentStore.find`,
+  spec refs (all must resolve) and `planRef` via containment-checked
+  `refExistsOnDisk` (absolute → deny, root escape → deny, absent → deny, no
+  implicit creation, same resolve→contained→access policy as
+  `TaskStore.refExists` — symlink escape follows that policy).
+- Doctor decision (plan review): no doctor change needed — `task doctor`
+  already distinguishes declared vs present via `TASK-REF-MISSING`
+  (file-existence, advisory), and `TaskMetaSchema` already rejects
+  absolute/traversal refs at parse time (deterministic schema deny, proven by
+  test: unparsable doc + `workflow set` usage denial).
+- Proven by `tests/unit/workflow/advance-disk.test.ts` (4 tests:
+  declared-but-missing plan → `missing-required-artifact` threshold denial;
+  valid nested path → advances; absolute/traversal → schema+gate denial; no
+  planRef → denial). Existing `workflow-cli` (4), `lifecycle-gates` (6),
+  `task-refs` (8), legacy compat (2) all green unchanged.
+- Full matrix: lint/format/typecheck/build clean; `pnpm test` 98/554 PASS.
