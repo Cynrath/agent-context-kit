@@ -67,6 +67,7 @@
     "format:check": "biome format src tests scripts schemas examples",
     "format": "biome format --write src tests scripts schemas examples",
     "test": "vitest run",
+    "check:text-hygiene": "node scripts/check-text-hygiene.mjs --repo",
     "smoke:cli": "node tests/e2e/cli-scaffold.smoke.mjs",
     "smoke:package": "node scripts/package-smoke.mjs"
   },

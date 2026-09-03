@@ -79,6 +79,10 @@ git diff --check
 
 - Canonical development branch is `master`. Changes land via pull request with
   exact-head required CI green — direct pushes are rejected by branch protection.
+- PR/release bodies must avoid shell interpolation corruption: write a UTF-8
+  body file, pass `node scripts/check-text-hygiene.mjs <file>`, then use
+  `gh pr create/edit --body-file <file>` (releases: `--notes-file <file>`).
+  Never compose multiline `--body` inline.
 - The `rebuild/ackit-vnext` branch is retired and preserved as historical evidence only; do not push to it.
 - Everything else follows Controlled-release governance above.
 - Never commit generated junk: `.ackit/`, `artifacts/`, `dist/`, `node_modules/`, coverage, reports, prompt packs, context exports, packed tarballs.

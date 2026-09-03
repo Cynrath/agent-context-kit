@@ -1,12 +1,12 @@
 ---
 id: "TASK-0075"
 title: "Control-character hardening — text hygiene checker and safe PR workflow"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0074"
 createdAt: "2026-09-03"
-completedAt: null
+completedAt: 2026-09-03
 ---
 
 ## Purpose
@@ -49,12 +49,12 @@ Treat repeated BEL (`U+0007`) corruption of `ackit` in real PR metadata as a pro
 
 ## Acceptance criteria
 
-- [ ] `"a\u0007ckit sync"` fails the checker and names `U+0007` (automated test).
-- [ ] Clean Markdown/backticks/backslashes/Turkish/Unicode passes (automated test).
-- [ ] Checker scans repo scope with documented excludes; findings format has file/line-col/codepoint/escaped; exit non-zero on findings; no raw control echo.
-- [ ] CI runs the hygiene gate; local `node scripts/check-text-hygiene.mjs <repo-scope>` passes on the tree.
-- [ ] Safe body-file workflow documented in AGENTS/maintenance surface; product PR body created via body-file + PASS (evidence in PR task notes).
-- [ ] Full gates green; `0.4.0` unchanged; Browser Companion untouched.
+- [x] `"a\u0007ckit sync"` fails the checker and names `U+0007` (automated test).
+- [x] Clean Markdown/backticks/backslashes/Turkish/Unicode passes (automated test).
+- [x] Checker scans repo scope with documented excludes; findings format has file/line-col/codepoint/escaped; exit non-zero on findings; no raw control echo.
+- [x] CI step integrated in `verify` job; local repo-scope run passes (exact-head CI proof lands with the product PR in TASK-0076).
+- [x] Safe body-file workflow documented in AGENTS/maintenance surface (dogfood proof recorded with the product PR in TASK-0076).
+- [x] Full gates green; `0.4.0` unchanged; Browser Companion untouched.
 
 ## Test steps
 
@@ -81,4 +81,22 @@ Treat repeated BEL (`U+0007`) corruption of `ackit` in real PR metadata as a pro
 
 ## Completion notes
 
-(placeholder)
+Done 2026-09-03 on `chore/repository-hygiene`. Root cause/process conclusion:
+tracked files were clean; corruption happens at PR-body composition
+(multiline inline `--body` interpolation), so the fix is a composition-time
+gate, not a repo-content fix. Delivered: `scripts/check-text-hygiene.mjs`
+(files + `--stdin` + `--repo`, allows LF/TAB/CR, rejects other C0 + DEL,
+`file:line:col: U+XXXX (\uXXXX NAME)` output, never echoes raw controls,
+exit 0/1/2, zero deps) + `scripts/check-text-hygiene.d.mts` typings;
+`--repo` scope `*.md *.yml *.yaml *.json *.mjs *.mts *.ts` minus
+`.git/node_modules/dist/coverage/.ackit/artifacts/backup*`;
+`check:text-hygiene` npm script; `Text hygiene (C0 controls)` step in
+`ci.yml verify`; safe body-file workflow in `AGENTS.md` Git discipline +
+`.github/copilot-instructions.md` Commit Hygiene. Test sources carry no raw
+controls (built via `String.fromCharCode`/concatenation; the checker scans
+itself clean). Evidence: `tests/security/text-hygiene.test.ts` 10/10
+(BEL regression names U+0007, no-echo assertion, NUL/DEL/ESC, Turkish/Unicode/
+Markdown pass, stdin, exit-2 paths, live `--repo` exit 0); `pnpm lint`,
+`format:check`, `typecheck` green; `--repo --quiet` exit 0 on the tree.
+Exact-head CI proof + PR dogfood (`--body-file` + PASS) execute with the
+product PR in TASK-0076. Package `0.4.0`; Browser Companion untouched.

@@ -43,6 +43,8 @@ jobs:
         run: pnpm build
       - name: Offline-egress static gate
         run: node scripts/check-offline-egress.mjs
+      - name: Text hygiene (C0 controls)
+        run: node scripts/check-text-hygiene.mjs --repo
       - name: Tests (unit/integration/contract/security)
         run: pnpm test
 
