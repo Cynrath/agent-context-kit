@@ -1,7 +1,7 @@
 ---
 id: "TASK-0072"
 title: "managed-asset lifecycle: unified version-aware sync command (ackit sync) with preview, check, apply, content-driven no-write semantics"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0066"
@@ -10,7 +10,7 @@ specRefs: []
 decisionRefs: []
 planRef: "docs/plans/managed-asset-sync-TASK-0072.md"
 createdAt: "2026-09-02"
-completedAt: null
+completedAt: 2026-09-03
 ---
 
 ## Purpose
@@ -89,15 +89,20 @@ The audit (2026-09-02, this task's Current-state evidence) proves every *primiti
 
 - `src/core/onboarding/sync.ts` (new — sync engine)
 - `src/core/onboarding/init.ts` (minimal refactor: extract shared planning path; public behavior unchanged)
-- `src/core/onboarding/index.ts` (export sync types for internal CLI use)
+- `src/core/skills/install.ts` (material-change-gated lock write)
 - `src/cli/commands/sync.ts` (new — CLI command)
 - `src/cli/program.ts` (register `sync`)
 - `src/cli/commands/doctor.ts` (managed-assets read-only check row)
 - `tests/integration/onboarding/sync.test.ts` (new — 19-scenario matrix)
 - `tests/integration/doctor/managed-assets.test.ts` (new — doctor read-only/no-write + staleness)
-- `tests/e2e/cli-scaffold.smoke.mjs` (sync --check smoke) OR a focused addition in an existing e2e — final placement decided during implementation
-- `docs/reference/cli.md`, `docs/guides/agent-integration.md`, `docs/guides/getting-started.md`
-- `docs/tasks/active/TASK-0072-*.md` (this file, evidence)
+- `docs/reference/cli.md`
+- `docs/guides/agent-integration.md`
+- `docs/guides/getting-started.md`
+- `docs/tasks/active/TASK-0072-managed-asset-lifecycle-unified-version-aware-sy.md` (this file, evidence)
+- `docs/intent/INTENT-0002-managed-asset-lifecycle-unified-version-aware-sy.md`
+- `docs/plans/managed-asset-sync-TASK-0072.md`
+- `docs/evidence/TASK-0072-verification-bundle.md`
+- `docs/evidence/TASK-0072-verdict-fresh.yaml`
 
 ## Required tests (acceptance-gated; each must pass with recorded counts)
 
@@ -156,18 +161,18 @@ Focused revert of the single implementation commit (new files + minimal init ref
 
 ## Acceptance criteria
 
-- [ ] `ackit sync --dry-run`/`--check`/apply/`--json` behave per spec with the stable status vocabulary (verified by `tests/integration/onboarding/sync.test.ts` scenarios 1, 14, 15, 16)
-- [ ] Rule H: ACKit version change with unchanged canonical content produces zero file writes (checksum snapshot + mtime proofs; scenario 5)
-- [ ] User files without ACKit managed markers are never touched, even with `--force` (scenarios 2, 12b)
-- [ ] Third-party skills are never overwritten even with `--force`; owned locally-modified skills conflict without `--force` and update only with `--force` (scenarios 8, 10, 11)
-- [ ] Lock writes are material-change-gated with no absolute paths (scenarios 5, 13)
-- [ ] Doctor reports managed-asset staleness read-only and never writes (`tests/integration/doctor/managed-assets.test.ts`)
-- [ ] Provider shims follow the same ownership behavior as AGENTS.md (scenario 7); managed blocks preserve user text outside blocks (scenario 3); unchanged canonical content means zero write (scenario 4); changed canonical content updates only the managed block (scenario 6)
-- [ ] Missing builtin installs; identical builtin is up-to-date; owned-unchanged + changed builtin updates (scenarios 1, 17, 9)
-- [ ] Full gate matrix green: lint, format:check, typecheck, build, test (94 files/536 tests incl. new matrix), gen:schemas idempotence, smoke:cli, smoke:package, offline-egress, config check, doctor, task doctor, scan --ci exit 0, git diff --check
-- [ ] Legacy repositories retain current behavior (scenario 19; existing init/skills tests unchanged and green)
-- [ ] Docs updated: CLI reference sync row/options/statuses; agent-integration lifecycle section with the two mandated statements; getting-started tour line
-- [ ] Independent verification bundle built; fresh-context verifier verdict registered via the real flow; no blocking findings before merge
+- [x] `ackit sync --dry-run`/`--check`/apply/`--json` behave per spec with the stable status vocabulary (verified by `tests/integration/onboarding/sync.test.ts` scenarios 1, 14, 15, 16)
+- [x] Rule H: ACKit version change with unchanged canonical content produces zero file writes (checksum snapshot + mtime proofs; scenario 5)
+- [x] User files without ACKit managed markers are never touched, even with `--force` (scenarios 2, 12b)
+- [x] Third-party skills are never overwritten even with `--force`; owned locally-modified skills conflict without `--force` and update only with `--force` (scenarios 8, 10, 11)
+- [x] Lock writes are material-change-gated with no absolute paths (scenarios 5, 13)
+- [x] Doctor reports managed-asset staleness read-only and never writes (`tests/integration/doctor/managed-assets.test.ts`)
+- [x] Provider shims follow the same ownership behavior as AGENTS.md (scenario 7); managed blocks preserve user text outside blocks (scenario 3); unchanged canonical content means zero write (scenario 4); changed canonical content updates only the managed block (scenario 6)
+- [x] Missing builtin installs; identical builtin is up-to-date; owned-unchanged + changed builtin updates (scenarios 1, 17, 9)
+- [x] Full gate matrix green: lint, format:check, typecheck, build, test (94 files/536 tests incl. new matrix), gen:schemas idempotence, smoke:cli, smoke:package, offline-egress, config check, doctor, task doctor, scan --ci exit 0, git diff --check
+- [x] Legacy repositories retain current behavior (scenario 19; existing init/skills tests unchanged and green)
+- [x] Docs updated: CLI reference sync row/options/statuses; agent-integration lifecycle section with the two mandated statements; getting-started tour line
+- [x] Independent verification bundle built; fresh-context verifier verdict registered via the real flow; no blocking findings before merge (VR-0001 PASS_WITH_WARNINGS)
 
 ## Completion notes
 
@@ -201,4 +206,16 @@ Focused revert of the single implementation commit (new files + minimal init ref
 - Re-run → all `up-to-date` (idempotent, zero diff).
 - `sync --check` → `inSync: true`, exit 0.
 - Real repo `ackit sync --check` → correctly refuses human-authored `AGENTS.md`/`CLAUDE.md`/copilot-instructions (no markers), exit 1 — never modifies them.
+
+**Post-verification fix (verifier warning SYNC-JSON-SCHEMA-LABEL, non-blocking):**
+- Verifier found sync CLI JSON emitted `schemaVersion: 1` (numeric) while the task/documents claimed the `ackit.managed-sync.v1` string. Fixed: `src/core/onboarding/sync.ts` now exports `MANAGED_SYNC_SCHEMA_ID = "ackit.managed-sync.v1"` (numeric `MANAGED_SYNC_SCHEMA_VERSION` kept); `src/cli/commands/sync.ts` emits the string (matching the `ackit.doctor.v1` convention).
+- Regression-pinned by new coverage: scenario 16 extended with an end-to-end `runCli` JSON-envelope assertion (`schemaVersion === "ackit.managed-sync.v1"`, command/mode/inSync/rows shape).
+- Verifier warning 2 (scenario-18 depth) also addressed: scenario 18 rewritten to exercise the BUILT dist CLI (`skills install` twice against a temp consumer — installed ×4 then up-to-date ×4), proving real packaged-layout template discovery with no seam; src-level `discoverBuiltinSkills` assertion kept as the unit proof.
+- Full gate matrix re-verified after the fix (see below); focused suites 4 files / 29 tests PASS; full suite 94 files / 536 tests PASS (one transient single-test failure in one intermediate full run, unreproduced in two subsequent clean full runs — recorded honestly).
+
+**Independent verification:**
+- Workflow `TASK-0072` (standard profile): intent INTENT-0002 (accepted, fingerprint `8887bff5…`), plan `docs/plans/managed-asset-sync-TASK-0072.md`, evidence registry synced (12 criteria), verify evidence recorded per criterion (test/build/manual), workflow verify outcome `pass` (attempt 1), bundle `docs/evidence/TASK-0072-verification-bundle.md` (284 lines, embeds intent/evidence/bundle-protocol role contract).
+- Fresh-context verifier (subagent, no shared conversation) personally reproduced: focused matrix, full 94/536 suite, every gate, plus dist-CLI sandbox probes in throwaway temp dirs (dry-run/apply/check + user-file refusal under `--force` with hash+mtime checks).
+- Verdict **VR-0001 `PASS_WITH_WARNINGS`** registered via the real flow (`ackit verification record TASK-0072 --verdict docs/evidence/TASK-0072-verdict-fresh.yaml`, exit 0). No blocking findings. The 2 residual warnings (scenario-18 depth — now strengthened; JSON schema label — now fixed) were both closed by the fix above; AC-012 evidence recorded.
+
 

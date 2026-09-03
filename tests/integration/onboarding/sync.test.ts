@@ -435,7 +435,7 @@ describe("managed-asset sync — modes, determinism, idempotence (14-19)", () =>
     }
   });
 
-  it("16. JSON output deterministic across runs", async () => {
+  it("16. JSON output deterministic across runs (CLI envelope carries ackit.managed-sync.v1)", async () => {
     const fixture = await makeFixture();
     try {
       await planOrApplyManagedSync(fixture.root, { builtinsDir: fixture.builtinsDir });
@@ -448,6 +448,44 @@ describe("managed-asset sync — modes, determinism, idempotence (14-19)", () =>
         builtinsDir: fixture.builtinsDir,
       });
       expect(JSON.stringify(run1)).toBe(JSON.stringify(run2));
+
+      // Pin the CLI JSON envelope end-to-end (regression guard for the
+      // verifier's schema-label warning): runCli executes in-process, so
+      // capture stdout and assert the schema identifier string.
+      const { runCli } = await import("../../../src/cli/index.js");
+      const chunks: string[] = [];
+      const originalWrite = process.stdout.write;
+      process.stdout.write = ((chunk: string) => {
+        chunks.push(String(chunk));
+        return true;
+      }) as typeof process.stdout.write;
+      let exitCode = 0;
+      try {
+        exitCode = await runCli([
+          "node",
+          "ackit",
+          "--root",
+          fixture.rootPath,
+          "--json",
+          "sync",
+          "--check",
+        ]);
+      } finally {
+        process.stdout.write = originalWrite;
+      }
+      expect(exitCode).toBe(1); // fixture seam skills are pending, not up-to-date
+      const envelope = JSON.parse(chunks.join("")) as {
+        schemaVersion: string;
+        command: string;
+        mode: string;
+        inSync: boolean;
+        rows: unknown[];
+      };
+      expect(envelope.schemaVersion).toBe("ackit.managed-sync.v1");
+      expect(envelope.command).toBe("sync");
+      expect(envelope.mode).toBe("check");
+      expect(envelope.inSync).toBe(false);
+      expect(Array.isArray(envelope.rows)).toBe(true);
     } finally {
       await fixture.cleanup();
     }
@@ -469,15 +507,58 @@ describe("managed-asset sync — modes, determinism, idempotence (14-19)", () =>
     }
   });
 
-  it("18. packaged-layout discovery: dist-adjacent templates are found by the engine", async () => {
+  it("18. packaged-layout discovery: the built dist CLI discovers builtin templates", async () => {
     // The discovery walker resolves templates/skills by walking up from the
-    // module directory; prove it works from a dist-like layout by invoking
-    // discoverBuiltinSkills with no override from within the repo (src build),
-    // and prove the seam-free path via a real repo-relative call.
+    // module directory. Two proofs:
+    // (a) src build: discoverBuiltinSkills with no override finds the builtins;
+    // (b) packaged artifact: the BUILT dist CLI (dist/ adjacent to templates/
+    //     — exactly the tarball layout) installs all builtins into a temp
+    //     consumer with no discovery seam, then reports up-to-date.
+    const repoRoot = path.resolve(
+      path.dirname(
+        decodeURIComponent(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:)/, "$1"),
+      ),
+      "..",
+      "..",
+      "..",
+    );
     const { discoverBuiltinSkills } = await import("../../../src/core/skills/install.js");
     const discovered = await discoverBuiltinSkills();
     expect(discovered.skills.length).toBeGreaterThan(0);
     expect(discovered.skills.map((skill) => skill.name)).toContain("ackit-workflow");
+
+    const { execFileSync } = await import("node:child_process");
+    const { existsSync } = await import("node:fs");
+    const cli = path.join(repoRoot, "dist", "cli", "index.js");
+    const consumer = await mkdtemp(path.join(tmpdir(), "ackit-sync-distconsumer-"));
+    try {
+      const first = execFileSync(
+        process.execPath,
+        [cli, "--root", consumer, "--json", "skills", "install"],
+        { encoding: "utf8" },
+      );
+      const outcomes = (JSON.parse(first) as { outcomes: Array<{ skill: string; status: string }> })
+        .outcomes;
+      expect(outcomes.map((outcome) => outcome.skill).sort()).toEqual([
+        "ackit-context-optimization",
+        "ackit-policy-authoring",
+        "ackit-scan-and-fix",
+        "ackit-workflow",
+      ]);
+      expect(outcomes.every((outcome) => outcome.status === "installed")).toBe(true);
+      const sample = path.join(consumer, ".agents", "skills", "ackit-workflow", "SKILL.md");
+      expect(existsSync(sample)).toBe(true);
+
+      const second = execFileSync(
+        process.execPath,
+        [cli, "--root", consumer, "--json", "skills", "install"],
+        { encoding: "utf8" },
+      );
+      const rerun = (JSON.parse(second) as { outcomes: Array<{ status: string }> }).outcomes;
+      expect(rerun.every((outcome) => outcome.status === "up-to-date")).toBe(true);
+    } finally {
+      await rm(consumer, { recursive: true, force: true });
+    }
   });
 
   it("19. legacy repositories retain current behavior (init/skills engines unchanged)", async () => {

@@ -36,6 +36,9 @@ import { type InstructionSurfacePlan, planInstructionSurfaces } from "./init.js"
 
 export const MANAGED_SYNC_SCHEMA_VERSION = 1;
 
+/** Machine-readable schema identifier for sync JSON output (ackit.*.v1 convention, e.g. ackit.doctor.v1). */
+export const MANAGED_SYNC_SCHEMA_ID = "ackit.managed-sync.v1";
+
 /** Stable status vocabulary (TASK-0072 contract). */
 export type ManagedSyncStatus =
   | "up-to-date"

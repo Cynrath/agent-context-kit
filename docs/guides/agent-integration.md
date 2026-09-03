@@ -31,10 +31,8 @@ ackit sync --force     # additionally discard local edits on OWNED skills
 
 Rules that hold for both commands:
 
-- ACKit never silently rewrites repository instruction/skill files merely
-  because the npm package was upgraded.
-- Only ACKit-owned managed regions/assets are eligible for reconciliation
-  when the user explicitly runs the state-changing sync/init command.
+- ACKit never silently rewrites repository instruction/skill files merely because the npm package was upgraded.
+- Only ACKit-owned managed regions/assets are eligible for reconciliation when the user explicitly runs the state-changing sync/init command.
 - Write decisions are content-driven: when canonical content is unchanged,
   files are not rewritten (`up-to-date`, zero diff, no timestamp churn).
 - User-authored files without an ACKit managed block are refused

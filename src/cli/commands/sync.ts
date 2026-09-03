@@ -1,6 +1,6 @@
 import process from "node:process";
 import {
-  MANAGED_SYNC_SCHEMA_VERSION,
+  MANAGED_SYNC_SCHEMA_ID,
   type ManagedSyncRow,
   planOrApplyManagedSync,
 } from "../../core/onboarding/sync.js";
@@ -55,7 +55,7 @@ export async function runSyncCommand(options: SyncCommandOptions): Promise<ExitC
     process.stdout.write(
       `${JSON.stringify(
         {
-          schemaVersion: MANAGED_SYNC_SCHEMA_VERSION,
+          schemaVersion: MANAGED_SYNC_SCHEMA_ID,
           tool: "ackit",
           command: "sync",
           mode: result.mode,
