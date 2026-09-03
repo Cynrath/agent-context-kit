@@ -1,0 +1,32 @@
+schemaId: ackit.verdict.v1
+id: VR-0001
+taskId: TASK-0072
+verdict: PASS_WITH_WARNINGS
+verifier:
+  agent: fresh-subagent (independent fresh-context verifier, eb6b27c7)
+  context: fresh
+  issuedAt: 2026-09-02
+findings:
+  - severity: warning
+    code: SYNC_JSON_SCHEMA_VERSION_MISMATCH
+    message: "sync CLI JSON emits schemaVersion: 1 (MANAGED_SYNC_SCHEMA_VERSION numeric) while the task/scope/evidence-claimed identifier string 'ackit.managed-sync.v1' is not used in the emitted JSON; cosmetic consistency gap, non-blocking."
+  - severity: warning
+    code: SCENARIO18_DISCOVERY_FROM_SRC_BUILD
+    message: "Scenario 18 exercises builtin discovery from the src build (discoverBuiltinSkills on the repo layout) rather than through a packaged dist-layout fixture running sync end-to-end; mitigated by the verifier's independent dist-CLI sandbox probe discovering all 4 builtins and a green smoke:package run."
+  - severity: info
+    code: VERDICT_FORMAT_MAPPING
+    message: "Verifier's delegated YAML (criteriaVerdicts/warnings/blocking) mapped to the repository ackit.verdict.v1 schema (verifier/findings/checkedCriteria/summary) for registration; no semantic content lost."
+checkedCriteria:
+  - AC-001
+  - AC-002
+  - AC-003
+  - AC-004
+  - AC-005
+  - AC-006
+  - AC-007
+  - AC-008
+  - AC-009
+  - AC-010
+  - AC-011
+  - AC-012
+summary: "All 12 acceptance criteria verified with personally-observed evidence: focused matrix 19/19 PASS (sync + doctor managed-assets tests); full suite 94 files/536 tests PASS; complete gate matrix exit 0 (lint/format/typecheck/build/gen:schemas idempotence/smoke:cli/smoke:package/offline-egress/config check/doctor/task doctor/scan --ci/git diff --check). Sandbox probes with the dist CLI in throwaway temp dirs proved dry-run zero-writes, apply creating all managed surfaces + skills + lock, idempotent re-run all up-to-date, and refusal of a user-only AGENTS.md under both --check (exit 1) and --force apply (exit 4) with hash+mtime unchanged. Rule H verified in code (lockDirty gate on writeSkillsLock; upsertLockEntry returns false on version-only diff, install.ts L286-316) and by the scenario-5 mtime+checksum zero-write proof. Doctor managed-assets row is advisory (ok:true, exit 0 even with conflicts). Docs verified (cli.md sync row/options/statuses; agent-integration.md lifecycle section with both mandated statements; getting-started.md tour line). Three non-blocking warnings recorded: JSON schemaVersion value form, scenario-18 discovery-fixture depth (mitigated by independent dist probe), and verdict format mapping. No blocking findings."

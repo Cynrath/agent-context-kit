@@ -28,6 +28,7 @@ node dist/cli/index.js --version  # 0.2.0
 
 ```bash
 ackit init --dry-run          # plan instruction shims + builtin skills
+ackit sync --check            # CI gate: are ACKit-owned assets in sync?
 ackit scan --ci               # gate mode: exit 1 at/over threshold (medium)
 ackit readiness               # 0–100 scoring across 6 categories
 ackit instructions --explain  # graph v2 with provenance

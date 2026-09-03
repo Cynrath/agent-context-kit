@@ -199,6 +199,7 @@ export async function installSkills(
   const { skills } = await discoverBuiltinSkills(options.builtinsDir);
   const lock = await readSkillsLock(root);
   const outcomes: InstallOutcome[] = [];
+  let lockDirty = false;
 
   for (const skill of skills) {
     const targetDir = path.join(root.canonicalPath, ".agents", "skills", skill.name);
@@ -210,12 +211,13 @@ export async function installSkills(
 
     if (existingContent === null) {
       await copyTree(skill.sourceDir, targetDir);
-      upsertLockEntry(lock, {
-        name: skill.name,
-        version: options.version ?? readOwnVersion(),
-        checksum: sourceChecksum,
-        files: skill.files.map((file) => `.agents/skills/${skill.name}/${file}`),
-      });
+      lockDirty =
+        upsertLockEntry(lock, {
+          name: skill.name,
+          version: options.version ?? readOwnVersion(),
+          checksum: sourceChecksum,
+          files: skill.files.map((file) => `.agents/skills/${skill.name}/${file}`),
+        }) || lockDirty;
       outcomes.push({ skill: skill.name, status: "installed", message: "skill created" });
       continue;
     }
@@ -224,12 +226,18 @@ export async function installSkills(
     const lockedEntry = lock.skills.find((entry) => entry.name === skill.name);
 
     if (targetChecksum === sourceChecksum) {
-      upsertLockEntry(lock, {
-        name: skill.name,
-        version: options.version ?? readOwnVersion(),
-        checksum: sourceChecksum,
-        files: skill.files.map((file) => `.agents/skills/${skill.name}/${file}`),
-      });
+      // Content already canonical: refresh the lock entry in memory. The
+      // upsert itself is material-change-gated (checksum/files/ownership);
+      // a bare version-string change never dirties the lock — the lock file
+      // is repository content and version alone must not rewrite it
+      // (TASK-0072 rule H).
+      lockDirty =
+        upsertLockEntry(lock, {
+          name: skill.name,
+          version: options.version ?? readOwnVersion(),
+          checksum: sourceChecksum,
+          files: skill.files.map((file) => `.agents/skills/${skill.name}/${file}`),
+        }) || lockDirty;
       outcomes.push({
         skill: skill.name,
         status: "up-to-date",
@@ -261,12 +269,13 @@ export async function installSkills(
 
     await fsp.rm(targetDir, { recursive: true, force: true });
     await copyTree(skill.sourceDir, targetDir);
-    upsertLockEntry(lock, {
-      name: skill.name,
-      version: options.version ?? readOwnVersion(),
-      checksum: sourceChecksum,
-      files: skill.files.map((file) => `.agents/skills/${skill.name}/${file}`),
-    });
+    lockDirty =
+      upsertLockEntry(lock, {
+        name: skill.name,
+        version: options.version ?? readOwnVersion(),
+        checksum: sourceChecksum,
+        files: skill.files.map((file) => `.agents/skills/${skill.name}/${file}`),
+      }) || lockDirty;
     outcomes.push({
       skill: skill.name,
       status: userModified ? "updated" : "updated",
@@ -274,15 +283,36 @@ export async function installSkills(
     });
   }
 
-  await writeSkillsLock(root, lock);
+  if (lockDirty) {
+    await writeSkillsLock(root, lock);
+  }
   return outcomes;
 }
 
-function upsertLockEntry(lock: SkillsLock, entry: LockEntry): void {
+/** Upserts an entry; returns true when the lock content actually changed.
+ * The `version` field is informational metadata recorded alongside genuine
+ * syncs — a version-only difference never counts as a change (TASK-0072
+ * rule H: version bumps must not rewrite repository files). */
+function upsertLockEntry(lock: SkillsLock, entry: LockEntry): boolean {
   const index = lock.skills.findIndex((existing) => existing.name === entry.name);
-  if (index >= 0) lock.skills[index] = entry;
-  else lock.skills.push(entry);
+  if (index >= 0) {
+    const current = lock.skills[index];
+    if (current === undefined) {
+      lock.skills[index] = entry;
+      lock.skills.sort((a, b) => (a.name < b.name ? -1 : 1));
+      return true;
+    }
+    const materiallyUnchanged =
+      current.checksum === entry.checksum &&
+      current.files.length === entry.files.length &&
+      current.files.every((file, i) => file === entry.files[i]);
+    if (materiallyUnchanged) return false;
+    lock.skills[index] = entry;
+    return true;
+  }
+  lock.skills.push(entry);
   lock.skills.sort((a, b) => (a.name < b.name ? -1 : 1));
+  return true;
 }
 
 async function copyTree(from: string, to: string): Promise<void> {

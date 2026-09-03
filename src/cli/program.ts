@@ -22,6 +22,7 @@ import { registerRoleCommands } from "./commands/role.js";
 import { runScanCommand } from "./commands/scan.js";
 import { registerSkillsCommands } from "./commands/skills.js";
 import { runSummary } from "./commands/summary.js";
+import { runSyncCommand } from "./commands/sync.js";
 import { registerTaskCommands } from "./commands/task.js";
 import { registerVerificationCommands } from "./commands/verification.js";
 import { registerWorkflowCommands } from "./commands/workflow.js";
@@ -152,6 +153,36 @@ function buildProgram(invocation: CliInvocation): Command {
   registerSkillsCommands(program, invocation);
 
   registerTaskCommands(program, invocation);
+
+  const syncCommand = program
+    .command("sync")
+    .description("reconcile ACKit-owned managed assets (instructions + skills) after upgrades");
+  syncCommand
+    .option("--dry-run", "preview the reconciliation plan without writing", false)
+    .option("--check", "read-only CI gate: exit 1 when anything is out-of-sync or blocked", false)
+    .option(
+      "--force",
+      "discard local edits on OWNED skills (third-party names still refused)",
+      false,
+    )
+    .action(async () => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      const commandOptions = (syncCommand.opts() ?? {}) as {
+        dryRun?: boolean;
+        check?: boolean;
+        force?: boolean;
+      };
+      invocation.exitCode = await runSyncCommand({
+        root: parentOptions.root,
+        config: parentOptions.config,
+        json: parentOptions.json ?? false,
+        quiet: parentOptions.quiet ?? false,
+        debug: parentOptions.debug ?? false,
+        dryRun: commandOptions.dryRun ?? false,
+        check: commandOptions.check ?? false,
+        force: commandOptions.force ?? false,
+      });
+    });
 
   registerWorkflowCommands(program, invocation);
 
