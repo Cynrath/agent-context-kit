@@ -44,4 +44,5 @@ This file is hand-maintained. `ackit generate` does not regenerate it. Update it
 
 ## Commit Hygiene
 - Conventional Commits scoped to the real diff; no model name, generator, or AI authorship in commit messages.
+- PR/release bodies: write a UTF-8 body file, pass `node scripts/check-text-hygiene.mjs <file>`, then `gh pr create/edit --body-file <file>` (releases: `--notes-file`); never compose multiline `--body` inline.
 - Never commit generated `.ackit/`, SARIF, HTML, prompt pack, context export, `dist/`, `node_modules/`, coverage, or temp artifacts.

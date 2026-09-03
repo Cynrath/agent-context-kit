@@ -17,6 +17,7 @@ Exit codes: see `docs/reference/exit-codes.md`.
 | `ackit skills export --provider claude\|copilot\|generic --out <dir> [--force]` | provider projections of canonical skills |
 | `ackit task create <title> [--depends-on ids] [--intent id] [--spec paths] [--decision paths] [--plan path]` | docs-first tasks with artifact references |
 | `ackit task list\|start\|complete [--force]\|archive\|doctor\|show` | task lifecycle (completion gate: evidence, verdict, stage, drift for workflow tasks) |
+| `ackit task archive <id> \| archive --completed [--dry-run]` | archive completed tasks (`active/` → `archive/`); bulk mode moves parsed-`completed` only — pending/active/blocked never move |
 | `ackit task resume <id>` | print the deterministic resume context of the latest checkpoint |
 | `ackit workflow set <id> [--profile quick\|standard\|high-risk]` | explicit workflow profile selection (defaults to configured `workflow.defaultProfile`) |
 | `ackit workflow show [id]` \| `advance <id> [--to stage]` \| `verify <id> --outcome pass\|fail` | stage machine + verify/fix-loop state |
@@ -36,6 +37,18 @@ Exit codes: see `docs/reference/exit-codes.md`.
 | `ackit hooks install\|uninstall\|status` | managed pre-commit block (scan + active-task drift gate) |
 | `ackit report serve <file> [--host] [--port] [--allow-nonlocal]` | loopback report UI |
 | `ackit mcp serve` | MCP server over stdio (official SDK; read-only tools) |
+
+## task lifecycle guard
+
+After final completion evidence is recorded, archive completed task docs —
+do not leave completed work in `docs/tasks/active` at final closure.
+`docs/tasks/active` holds only pending/active/blocked work;
+`docs/tasks/archive` holds completed work only. `ackit task doctor` reports
+`TASK-COMPLETED-IN-ACTIVE` for any completed doc still under `active/`.
+Release tasks may remain active only until post-publish evidence is recorded,
+then must be archived in that same final bookkeeping change. Task lookups
+are id-based and resolve both locations, so archiving never breaks
+`show`, dependency, evidence, or verdict resolution.
 
 ## sync options (released in 0.4.0)
 
