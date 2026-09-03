@@ -8,7 +8,7 @@ This file is hand-maintained. `ackit generate` does not regenerate it. Update it
 ## Governance
 - Authoritative agent policy: `AGENTS.md` — controlled-release governance.
 - Release actions (`master` push/merge, npm publish, tags, GitHub Releases) are user-authorized only; they require explicit authorization inside the active task. Always prohibited: force-push, history rewrite, tag movement/deletion, workflow dispatch, deployments.
-- Canonical development branch is `master`; `rebuild/ackit-vnext` is retired (historical evidence only, do not push).
+- Canonical development branch is `master` (changes land via pull request with exact-head required CI green; direct pushes are rejected by branch protection); `rebuild/ackit-vnext` is retired (historical evidence only, do not push).
 
 ## Workflow
 - Task-first workflow is mandatory. Every implementation change starts from a task record under `docs/tasks/active/`, created with `node dist/cli/index.js task "<title>"`.
@@ -31,7 +31,7 @@ This file is hand-maintained. `ackit generate` does not regenerate it. Update it
   The old global .NET `ackit` tool and `dotnet run` invocations are not valid validation tools on this branch.
 
 ## Release Status
-- Current line: AgentContextKit, package `@cynrath/agent-context-kit`, version `0.2.0` on `master` (tag `v0.2.0`, npm `latest → 0.2.0`, GitHub Release `v0.2.0`); `0.1.1`/`0.1.0` remain as historical releases.
+- Source-checkout version: `package.json` is the single source of truth (see Version truth in `AGENTS.md` — this file stays version-agnostic and never names a current release number). Published stable: the latest immutable npm/GitHub Release. `0.1.1`/`0.1.0` remain as historical releases; `docs/v0.2.0/**` is historical, not current governance.
 - npm publish, tag creation, GitHub Releases, and other master mutations require explicit user authorization. Automated publishing runs only through the tag-triggered `.github/workflows/release.yml` after that authorization; master pushes never publish.
 - Legacy .NET line is frozen and immutable: NuGet `AgentContextKit` `1.0.0-rc.1` (exact tag/release/assets/attestations at repository commit `258918b33c3d1359aac967604ee524e8b66ddf02`) and earlier prereleases remain untouchable; do not republish, reuse, move, replace, or delete them. Historical failed recovery evidence remains preserved.
 

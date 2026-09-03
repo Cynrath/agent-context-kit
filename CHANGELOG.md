@@ -4,6 +4,78 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.4.0] - 2026-09-03
+
+Managed-asset sync, post-0.3.0 limitation closure, and version hygiene (minor
+release). All capabilities are backward compatible — legacy repositories keep
+their supported defaults. The Browser Companion experiment remains paused on its
+separate branch and is **not** part of this release.
+
+### Added
+
+- **`ackit sync` managed-asset lifecycle** (TASK-0072): unified, version-aware,
+  preview-first reconciliation of ALL ACKit-owned managed assets in one pass —
+  the managed instruction block in `AGENTS.md`, the provider shims (`CLAUDE.md`,
+  `GEMINI.md`, `.github/copilot-instructions.md`), and the builtin skills — with
+  `ackit sync [--dry-run] [--check] [--json] [--force]`, stable per-asset
+  statuses (`up-to-date`, `would-create`, `would-update-managed`,
+  `updated-managed`, `installed`, `updated`, `conflict-user-modified`,
+  `refused-non-managed`, `refused-third-party`), a read-only `doctor`
+  managed-assets staleness row, and content-driven (never version-driven) write
+  decisions: upgrading the npm package alone never rewrites repository files.
+- **Workflow config wiring** (TASK-0067): the parsed `ackit.yml` `workflow:` keys
+  (`defaultProfile`, `requireVerifier`, per-profile `requireEvidence`/
+  `requireVerifier`) now alter real gate behavior (completion gate, `workflow
+  advance`/`verify`, drift evaluation, MCP `ackit_workflow_status`) instead of
+  parsing without effect. Repositories without `workflow:` config keep exact
+  prior behavior.
+- **Disk-proven advance gate** (TASK-0068): `ackit workflow advance` now verifies
+  real disk existence of referenced planning artifacts (`planRef`/stage-required
+  plan documents) instead of trusting the declaration — a declared-but-absent
+  plan blocks advancing past PLAN-style stages.
+- **Atomic checkpoint writes** (TASK-0069): `CheckpointStore` writes via
+  temp-file + fsync + atomic rename, so a crash mid-write can never leave a
+  truncated checkpoint.
+- **MCP drift parity** (TASK-0070): the MCP `ackit_drift_check` tool reaches full
+  input/warning parity with CLI `ackit drift check` within the read-only
+  boundary (no state mutation via MCP, per ADR-0028).
+- **Current-facing version-parity guard** (`scripts/check-version-parity.mjs` +
+  `tests/contract/version-parity.test.ts`): deterministic classifier that
+  distinguishes CURRENT-facing from HISTORICAL version references and verifies
+  `package.json` == extension manifest == README/docs current truth; it never
+  fails on legitimate history (`docs/v0.2.0/**`, CHANGELOG history, task
+  records, behavioral baseline pins, API since-notes, protocol generations).
+
+### Changed
+
+- **Agent instruction truth is version-agnostic**: `AGENTS.md` no longer
+  hard-codes a release number (`package.json` is authoritative for the
+  checkout, the latest immutable release for published stable); `CLAUDE.md` and
+  `.github/copilot-instructions.md` are thin shims to it. `docs/v0.2.0/**` is
+  marked historical; current behavior contracts are `docs/reference/`,
+  `docs/concepts/`, `docs/guides/`, `docs/architecture/`. Canonical branch
+  policy now states the enforced truth: changes land via pull request with
+  exact-head CI green (direct pushes are rejected by branch protection).
+- **Optimize SARIF driver version is dynamic**: `ackit optimize --format sarif`
+  stamps `tool.driver.version` from `package.json` (was hard-coded `0.2.0`).
+- **Docs describe `ackit sync` as RELEASED** (`docs/guides/agent-integration.md`,
+  `docs/guides/getting-started.md`, `docs/reference/cli.md`); the
+  current-master/next-release caveats are retired.
+- **Release-proof contract tests**: `tests/contract/readme-current.test.ts` and
+  `readme-parity.test.ts` assert the dynamic package version instead of a
+  hard-coded line.
+
+### Compatibility
+
+- Backward compatible: legacy repositories (no `workflow:` config, no artifact
+  refs) retain supported defaults — prior behavior is preserved and covered by
+  the legacy-repository fixture.
+- No new network/LLM dependency: the offline-first invariant (no network calls,
+  no telemetry, no uploads in product code) is preserved and gated.
+- MCP remains read-only: all state mutation stays CLI-only.
+- Browser Companion excluded: the paused experiment on
+  `feat/browser-companion-v0.3` is untouched by this release.
+
 ## [0.3.0] - 2026-09-02
 
 Workflow, verification, evidence and resumability expansion (minor release; merged from `feat/workflow-expansion` via PR #7). All capabilities are backward compatible — legacy repositories without `workflow:` config or artifact refs keep exact pre-`0.2.2` behavior. The Browser Companion experiment remains paused on its separate branch and is **not** part of this release.

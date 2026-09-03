@@ -5,6 +5,7 @@ import { analyzeOptimize, applyFixes } from "../../core/context/index.js";
 import { resolveRepositoryRoot } from "../../core/filesystem/root.js";
 import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
+import { getPackageIdentity } from "../../shared/version.js";
 import type { InstructionsCommandOptions } from "../context.js";
 import { reportConfigErrors } from "./config.js";
 
@@ -147,7 +148,7 @@ export async function runOptimizeCommand(
       version: "2.1.0",
       runs: [
         {
-          tool: { driver: { name: "ackit", version: "0.2.0", rules: [] } },
+          tool: { driver: { name: "ackit", version: getPackageIdentity().version, rules: [] } },
           results: suggestions.map((s) => ({
             ruleId: s.id,
             level: s.severity === "high" ? "error" : s.severity === "medium" ? "warning" : "note",

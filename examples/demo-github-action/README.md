@@ -1,6 +1,6 @@
 # Demo: GitHub Action
 
-Official `Cynrath/agent-context-kit@v0.2.1`
+Official `Cynrath/agent-context-kit@v0.4.0`
 
 ```yaml
 permissions:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
-      - uses: Cynrath/agent-context-kit@v0.2.1
+      - uses: Cynrath/agent-context-kit@v0.4.0
         with:
           command: scan
           args: "--json"

@@ -18,10 +18,8 @@ duplicates.
 
 ## Managed-asset lifecycle (init → sync)
 
-> Availability: `ackit sync` exists on current master (post-v0.3.0) and ships
-> in the next release — it is NOT in published npm
-> `@cynrath/agent-context-kit@0.3.0`. Use the repository-built CLI
-> (`node dist/cli/index.js sync …`) until then.
+> Availability: `ackit sync` is RELEASED in `0.4.0` and ships in published npm
+> `@cynrath/agent-context-kit@0.4.0`.
 
 `ackit init` is the first-time onboarding; `ackit sync` is the later,
 version-aware reconciliation. Both run on the same ownership engine — the
