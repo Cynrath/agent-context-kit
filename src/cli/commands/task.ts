@@ -13,6 +13,8 @@ interface TaskCommandBase {
   quiet: boolean;
   debug?: boolean | undefined;
   force?: boolean | undefined;
+  completed?: boolean | undefined;
+  dryRun?: boolean | undefined;
 }
 
 export async function runTaskCommand(
@@ -28,7 +30,7 @@ export async function runTaskCommand(
         planRef?: string | undefined;
       }
     | { all?: boolean }
-    | { id: string },
+    | { id?: string },
 ): Promise<ExitCodeValue> {
   const root = path.resolve(base.root ?? process.cwd());
   const store = new TaskStore(root);
@@ -118,10 +120,16 @@ export async function runTaskCommand(
       case "start":
       case "complete":
       case "archive": {
-        const { id } = args as { id: string };
+        const { id } = args as { id?: string };
         let warnings: string[] = [];
         if (subcommand === "complete") {
-          // Policy v2 (ADR-0028 §1): --force is an ACKit-owned tier2 boundary
+          if (id === undefined) {
+            emitDiagnostic(
+              { code: "task-error", message: "task id required for complete" },
+              { quiet: base.quiet, debug: base.debug ?? false },
+            );
+            return EXIT_CODES.usage;
+          } // Policy v2 (ADR-0028 §1): --force is an ACKit-owned tier2 boundary
           // (controlled state change past the gate). A resolved tier2 deny
           // refuses the override outright (exit 4, POLICY-TIER-DENIED); ask in
           // a non-tty context is treated as deny (no silent bypass).
@@ -138,8 +146,68 @@ export async function runTaskCommand(
             });
           }
         } else if (subcommand === "start") {
+          if (id === undefined) {
+            emitDiagnostic(
+              { code: "task-error", message: "task id required for start" },
+              { quiet: base.quiet, debug: base.debug ?? false },
+            );
+            return EXIT_CODES.usage;
+          }
           await store.start(id);
         } else {
+          // Bulk helper (TASK-0074): `task archive --completed [--dry-run]`
+          // moves every parsed-completed task out of the active dir.
+          // Pending/active/blocked tasks never move.
+          if (base.completed === true) {
+            const result = await store.archiveCompleted(base.dryRun === true);
+            const moved = base.dryRun === true ? result.wouldArchive : result.archived;
+            // Journal each real move (ADR-0027 §6): best-effort, non-blocking.
+            if (base.dryRun !== true) {
+              try {
+                const { JournalStore } = await import("../../core/journal/index.js");
+                const { resolveRepositoryRoot } = await import("../../core/filesystem/root.js");
+                const resolvedRoot = await resolveRepositoryRoot(root);
+                if (resolvedRoot.ok) {
+                  const journal = new JournalStore(resolvedRoot.root);
+                  for (const movedId of result.archived) {
+                    await journal.append(
+                      "task-transition",
+                      { to: "completed", taskId: movedId },
+                      { taskId: movedId },
+                    );
+                  }
+                }
+              } catch {
+                // journal unavailable — primary command already succeeded
+              }
+            }
+            if (base.json) {
+              emitTaskJson(subcommand, {
+                ok: true,
+                dryRun: base.dryRun === true,
+                archived: result.archived,
+                wouldArchive: result.wouldArchive,
+              });
+            } else if (!base.quiet) {
+              if (moved.length === 0) {
+                process.stdout.write("no completed tasks to archive\n");
+              } else {
+                for (const movedId of moved) {
+                  process.stdout.write(
+                    base.dryRun === true ? `would archive ${movedId}\n` : `${movedId}: archived\n`,
+                  );
+                }
+              }
+            }
+            return EXIT_CODES.ok;
+          }
+          if (id === undefined) {
+            emitDiagnostic(
+              { code: "task-error", message: "task id required for archive" },
+              { quiet: base.quiet, debug: base.debug ?? false },
+            );
+            return EXIT_CODES.usage;
+          }
           const archivedPath = await store.archive(id);
           void archivedPath;
         }
@@ -353,7 +421,7 @@ export function registerTaskCommands(program: Command, invocation: CliInvocation
         id,
       );
     });
-  for (const sub of ["start", "complete", "archive"] as const) {
+  for (const sub of ["start", "complete"] as const) {
     taskCommand
       .command(sub)
       .argument("<id>")
@@ -373,4 +441,35 @@ export function registerTaskCommands(program: Command, invocation: CliInvocation
         );
       });
   }
+  taskCommand
+    .command("archive")
+    .argument("[id]", "task id (omit with --completed for bulk archive)")
+    .description("archive the given task")
+    .option("--force", "override completion gate with explicit intent (complete only)", false)
+    .option(
+      "--completed",
+      "archive every parsed-completed task in docs/tasks/active (pending/active/blocked never move)",
+      false,
+    )
+    .option("--dry-run", "with --completed: list what would move without moving", false)
+    .action(
+      async (
+        id: string | undefined,
+        opts: { force?: boolean; completed?: boolean; dryRun?: boolean },
+      ) => {
+        const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+        invocation.exitCode = await runTaskCommand(
+          {
+            root: parentOptions.root,
+            json: parentOptions.json ?? false,
+            quiet: parentOptions.quiet ?? false,
+            force: opts.force ?? false,
+            completed: opts.completed ?? false,
+            dryRun: opts.dryRun ?? false,
+          },
+          "archive",
+          { id },
+        );
+      },
+    );
 }

@@ -420,6 +420,27 @@ export class TaskStore {
     return found.doc.relativePath;
   }
 
+  /**
+   * Bulk archive (TASK-0074): move every parsed-`completed` task still under
+   * `docs/tasks/active/` to the archive. Pending/active/blocked tasks never
+   * move. Deterministic (id order), idempotent (second run moves nothing),
+   * and dry-runnable. Only completed tasks move — anything else is left
+   * untouched rather than failed, so the helper stays safe on mixed trees.
+   */
+  async archiveCompleted(dryRun = false): Promise<{ archived: string[]; wouldArchive: string[] }> {
+    const active = await this.listDir(this.activeDir, ACTIVE_DIR);
+    const candidates = active
+      .filter((doc) => doc.meta.status === "completed")
+      .sort((a, b) => (a.meta.id < b.meta.id ? -1 : 1));
+    if (dryRun) return { archived: [], wouldArchive: candidates.map((doc) => doc.meta.id) };
+    const archived: string[] = [];
+    for (const doc of candidates) {
+      await this.archive(doc.meta.id);
+      archived.push(doc.meta.id);
+    }
+    return { archived, wouldArchive: [] };
+  }
+
   async doctor(): Promise<{ ok: boolean; problems: string[] }> {
     const problems: string[] = [];
     const all = await this.list(true);
@@ -437,6 +458,14 @@ export class TaskStore {
     for (const doc of all) {
       for (const dep of doc.meta.dependencies) {
         if (!byId.has(dep)) problems.push(`${doc.meta.id}: dependency '${dep}' does not exist`);
+      }
+      // Lifecycle guard (TASK-0074): completed work must not accumulate in
+      // the active dir — archive it after final completion evidence lands.
+      // Archive-side completed docs are the healthy steady state.
+      if (doc.meta.status === "completed" && doc.relativePath.startsWith(`${ACTIVE_DIR}/`)) {
+        problems.push(
+          `TASK-COMPLETED-IN-ACTIVE: ${doc.meta.id}: completed task remains in docs/tasks/active (archive it with 'ackit task archive ${doc.meta.id}')`,
+        );
       }
       if (doc.meta.status === "completed" && acceptanceUnchecked(doc.body) > 0) {
         problems.push(`${doc.meta.id}: completed with unchecked acceptance criteria`);
