@@ -309,6 +309,50 @@ NOT renamed (identity/history stability).
   patch release, never same-version content mutation.
 - Site: revert to pre-sync commit; re-run generator after fix.
 
+## Classification matrix (Path | Version reference | CURRENT | HISTORICAL | ACTION)
+
+CURRENT-facing (fixed on `release/v0.4.0`):
+
+| Path | Version reference | Action |
+|---|---|---|
+| `AGENTS.md` | `v0.2.0` header, `0.2.0` package claim, `docs/v0.2.0` as canonical contract, direct-push wording | version-agnostic truth (done) |
+| `CLAUDE.md` | `0.2.0` Release Status, direct-push wording | version-agnostic shim (done) |
+| `.github/copilot-instructions.md` | `0.2.0` Release Status | version-agnostic shim (done) |
+| `package.json` | `0.3.0` | `0.4.0` (done) |
+| `extensions/vscode/package.json` | `0.3.0` | `0.4.0` (done) |
+| `.github/workflows/ci.yml` | `0.3.0` manifest contract + VSIX names (6x) | `0.4.0` (done) |
+| `README.md` | `0.3.0` badges/install/Action/VS Code/Versioning | `0.4.0` (done) |
+| `extensions/vscode/README.md` | `0.3.0` version + changelog link | `0.4.0` (done) |
+| `extensions/vscode/CHANGELOG.md` | missing 0.4.0 | new `0.4.0` section, history kept (done) |
+| `CHANGELOG.md` | missing 0.4.0 | new `0.4.0` section, history kept (done) |
+| `docs/guides/getting-started.md` | `0.3.0` pins, sync next-release caveat | `0.4.0`, sync shipped (done) |
+| `docs/guides/agent-integration.md` | sync NOT-in-0.3.0 caveat | RELEASED in 0.4.0 (done) |
+| `docs/reference/cli.md` | sync next-release caveat (2x) | released in 0.4.0 (done) |
+| `examples/demo-github-action/README.md` | `v0.2.1` Action pins (2x) | `v0.4.0` (done) |
+| `src/cli/commands/optimize.ts` | SARIF driver `0.2.0` hard-code | dynamic `getPackageIdentity()` (done) |
+| `tests/contract/readme-current.test.ts` | hard-coded `0.2.0` assertions | dynamic release-proof (done) |
+| `tests/contract/readme-parity.test.ts` | hard-coded `0.2.2` name/comments | dynamic (done) |
+
+HISTORICAL (intentionally preserved): `CHANGELOG.md` old sections;
+`docs/v0.2.0/**`; ADRs incl. ADR-0015 `v0.3.0/v0.4.0` planning record;
+`docs/tasks/**` (incl. `post-0.3.0` filenames, TASK-0073 baseline refs);
+`docs/evidence/**`, `docs/plans/**`, `docs/intent/INTENT-0003`;
+`docs/rebuild/**`, `docs/history/v1.md`, `docs/MAINTENANCE_MODE.md`;
+`docs/architecture/overview.md` v0.2.0 baseline pin;
+`docs/reference/sdk.md` since-notes, `policy.md` v0.2.2 pin,
+`config.md` v0.3.0-defaults pin; `examples/demo-readiness` validated-against
+note; `extensions/vscode/CHANGELOG.md` old sections; test fixtures
+(changelog-extract, legacy-repository v0.2.2-shaped, api-surface comment);
+`pnpm-lock.yaml` third-party 0.x deps; `GEMINI.md` untouched (no root managed
+file exists — only `fixtures/profile-gemini/GEMINI.md` test fixture).
+
+PROTOCOL/generation (kept, not package versions): Instruction Graph v2,
+Evidence Contract v2, Policy v2, `schemaVersion: 2`, SDK v1, SARIF 2.1.0,
+`ackit.*.v1` schemas, `ENGINE_VERSION 0.2.0-readiness.1`.
+
+Final count: current-facing stale refs 0 (guard green); historical refs
+intentionally preserved.
+
 ## Completion notes
 
 (in progress — evidence appended as gates complete)

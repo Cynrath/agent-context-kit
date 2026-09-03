@@ -19,12 +19,12 @@ describe("npm README parity", () => {
     expect(pkg.files).toContain("README.md");
   });
 
-  it("root README contains v0.2.2 badges and examples (not stale 0.2.1/0.2.0)", async () => {
+  it("root README contains current-version badges and examples (not stale older lines)", async () => {
     const readme = await fsp.readFile(path.join(repoRoot, "README.md"), "utf8");
     const pkg = JSON.parse(await fsp.readFile(path.join(repoRoot, "package.json"), "utf8")) as {
       version: string;
     };
-    const ver = pkg.version; // single source of truth, expected 0.2.2
+    const ver = pkg.version; // single source of truth, dynamic across releases
     expect(ver).toMatch(/^\d+\.\d+\.\d+$/);
     expect(readme).toContain(`v${ver}`);
     expect(readme).toContain(`npm%20v${ver}`);
@@ -32,15 +32,17 @@ describe("npm README parity", () => {
     expect(readme).toContain(`npx --yes @cynrath/agent-context-kit@${ver}`);
     expect(readme).toContain(`Cynrath/agent-context-kit@v${ver}`);
     // Ensure old version not present in badge areas (allow docs/v0.2.0 folder reference)
-    // The only allowed 0.2.0 is in docs/v0.2.0 path and legacy notes
+    // The only allowed old line there is in docs/v0.2.0 paths and legacy notes
     const withoutDocs = readme.replaceAll("docs/v0.2.0", "");
     // Check that npm badge not stale
     expect(withoutDocs).not.toContain("npm%20v0.2.0");
     expect(withoutDocs).not.toContain("release-v0.2.0");
-    // If current is 0.2.2, ensure 0.2.1 stale badges are gone
-    if (ver !== "0.2.1") {
-      expect(withoutDocs).not.toContain("npm%20v0.2.1");
-      expect(withoutDocs).not.toContain("release-v0.2.1");
+    // Ensure the previous minor's stale badges are gone (dynamic across releases)
+    const [badgeMajor = 0, badgeMinor = 0] = ver.split(".").map(Number);
+    if (badgeMinor > 0) {
+      const prevMinor = `${badgeMajor}.${badgeMinor - 1}`;
+      expect(withoutDocs).not.toContain(`npm%20v${prevMinor}`);
+      expect(withoutDocs).not.toContain(`release-v${prevMinor}`);
     }
   });
 

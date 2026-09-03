@@ -1,9 +1,17 @@
-# AGENTS.md — AgentContextKit v0.2.0
+# AGENTS.md — AgentContextKit
 
-AgentContextKit (`ackit`, TypeScript + Node.js + npm) is feature-complete on
-`master` and ships as the scoped npm package `@cynrath/agent-context-kit`
-`0.2.0` (CLI binary `ackit`). The repository's own docs are the single
-source of truth for agents.
+AgentContextKit (`ackit`, TypeScript + Node.js + npm) ships as the scoped npm
+package `@cynrath/agent-context-kit` (CLI binary `ackit`). The repository's own
+docs are the single source of truth for agents.
+
+## Version truth (authoritative — do not hard-code a release number here)
+
+- `package.json` is authoritative for the source-checkout package version.
+- The latest immutable npm/GitHub Release is authoritative for the published
+  stable version.
+- Historical versioned documents (`docs/v0.2.0/**`, old ADRs, CHANGELOG history,
+  completed task records) are historical and not current governance.
+- This file must stay version-agnostic: it never names a current release number.
 
 ## Controlled-release governance
 
@@ -25,10 +33,10 @@ Release actions are **user-authorized, not agent-authorized**:
 
 1. `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md` — current governance (this file is authoritative)
 2. The current active task under `docs/tasks/active/`
-3. `docs/v0.2.0/REQUIREMENTS.md`, `docs/v0.2.0/TRACEABILITY.md`, `docs/v0.2.0/ROADMAP.md`, `docs/v0.2.0/EXECUTION_PLAN.md` — v0.2.0 canonical contract
-4. `docs/decisions/ADR-0015..0024` (v0.2.0) + `docs/decisions/ADR-0001..0014` (baseline, reused)
-5. `docs/rebuild/` — historical vNext Goal-2 evidence, preserved verbatim (not active)
-6. Decisions: `docs/decisions/`
+3. Current product docs: `docs/reference/`, `docs/concepts/`, `docs/guides/`, `docs/architecture/` — current behavior contracts
+4. `docs/decisions/` — architecture decisions (baseline reused; release-wave ADRs describe the release that introduced them)
+5. `docs/v0.2.0/` — v0.2.0 historical contract (history only, not current governance)
+6. `docs/rebuild/` — historical vNext Goal-2 evidence, preserved verbatim (not active)
 
 ## ACKit-first / task-first / docs-first workflow
 
@@ -69,7 +77,8 @@ git diff --check
 
 ## Git discipline
 
-- Canonical development branch is `master` (fast-forward pushes per governance).
+- Canonical development branch is `master`. Changes land via pull request with
+  exact-head required CI green — direct pushes are rejected by branch protection.
 - The `rebuild/ackit-vnext` branch is retired and preserved as historical evidence only; do not push to it.
 - Everything else follows Controlled-release governance above.
 - Never commit generated junk: `.ackit/`, `artifacts/`, `dist/`, `node_modules/`, coverage, reports, prompt packs, context exports, packed tarballs.
