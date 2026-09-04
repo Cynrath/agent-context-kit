@@ -38,3 +38,11 @@ so no secret can leak through it.
 Scan cache lives under `.ackit/cache` keyed by content hash + rule version +
 config/policy digests. `ackit cache clean` removes ONLY that tree. Add
 `.ackit/` to your `.gitignore`.
+
+## Local branch-switch build hygiene
+
+`dist/` is git-ignored and survives `git switch`. After switching branches
+(especially between release lines, e.g. maintenance and development), run
+`pnpm build` before using the repository-built CLI (`node dist/cli/index.js`)
+so validation never runs one branch's source against another branch's stale
+`dist/`.
