@@ -2,7 +2,7 @@
   "name": "ackit-vscode",
   "displayName": "ACKit Toolkit",
   "description": "Offline-first agent readiness toolkit for VS Code",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "publisher": "Cynrath",
   "engines": {
     "vscode": "^1.90.0"

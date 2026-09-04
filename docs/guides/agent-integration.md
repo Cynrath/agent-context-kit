@@ -18,8 +18,8 @@ duplicates.
 
 ## Managed-asset lifecycle (init → sync)
 
-> Availability: `ackit sync` is RELEASED in `0.4.0` and ships in published npm
-> `@cynrath/agent-context-kit@0.4.0`.
+> Availability: `ackit sync` is RELEASED and ships in the published npm
+> package (see CHANGELOG for the release that introduced it).
 
 `ackit init` is the first-time onboarding; `ackit sync` is the later,
 version-aware reconciliation. Both run on the same ownership engine — the

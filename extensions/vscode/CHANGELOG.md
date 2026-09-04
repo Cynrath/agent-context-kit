@@ -1,5 +1,12 @@
 # Changelog — VS Code Extension
 
+## [0.4.1] - 2026-09-04
+
+- Sync: workspace dependency `@cynrath/agent-context-kit` `workspace:*` now resolves core `0.4.1` (builtin skill template corrections, skills `install`/`sync` `--force` CLI wiring fix, skill↔CLI regression tests).
+- Sync: manifest `version` `0.4.0 → 0.4.1` per ADR-0023 version coupling (root == extension == tag == release == action).
+- No extension UI behavior change in this release; extension surfaces operate unchanged on the patched SDK.
+- Offline-first unchanged: no network, no telemetry, no remote fonts.
+
 ## [0.4.0] - 2026-09-03
 
 - Sync: workspace dependency `@cynrath/agent-context-kit` `workspace:*` now resolves core `0.4.0` (managed-asset sync, workflow-config gate wiring, disk-proven advance gate, atomic checkpoints, MCP drift parity).

@@ -6,7 +6,7 @@ import { findStaleRefs, readCurrentVersion } from "../../scripts/check-version-p
 
 // Deterministic classifier/guard tests (TASK-0073): the guard must catch
 // stale CURRENT-facing claims without failing on legitimate history.
-const CURRENT = "0.4.0";
+const CURRENT = "0.4.1";
 
 describe("version-parity classifier", () => {
   it("flags a stale 0.2.0 current claim", () => {
@@ -14,13 +14,18 @@ describe("version-parity classifier", () => {
     expect(rows.map((row) => row.text)).toEqual(["0.2.0"]);
   });
 
-  it("flags a stale 0.3.x claim once 0.4.0 is current", () => {
+  it("flags a stale 0.3.x claim once 0.4.1 is current", () => {
     const rows = findStaleRefs("ackit --version  # 0.3.0", CURRENT);
     expect(rows.map((row) => row.text)).toEqual(["0.3.0"]);
   });
 
+  it("flags a stale 0.4.0 claim once 0.4.1 is current", () => {
+    const rows = findStaleRefs("ackit --version  # 0.4.0", CURRENT);
+    expect(rows.map((row) => row.text)).toEqual(["0.4.0"]);
+  });
+
   it("passes the current version itself", () => {
-    expect(findStaleRefs("Current: **`0.4.0`** on `master`", CURRENT)).toEqual([]);
+    expect(findStaleRefs("Current stable: **`0.4.1`**", CURRENT)).toEqual([]);
   });
 
   it("keeps historical docs/v0.2.0 path references", () => {

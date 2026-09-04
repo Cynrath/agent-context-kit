@@ -4,6 +4,55 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.4.1] - 2026-09-04
+
+Patch release from the v0.4.0 maintenance line (no minor features; current
+master-only additions such as `task archive --completed` and
+`TASK-COMPLETED-IN-ACTIVE` are intentionally excluded and remain targeted at
+a future minor). The Browser Companion experiment remains paused on its
+separate branch and is **not** part of this release.
+
+### Fixed
+
+- **Builtin skill template correctness** (backport of the TASK-0077 audit,
+  adapted to the v0.4.x capability surface): `ackit-workflow` no longer
+  instructs the invalid `ackit task "<title>"` shorthand (correct syntax is
+  `ackit task create "<title>"`) and now covers the shipped workflow surface
+  (task-first plan, intent when required, workflow profiles/stages,
+  plan/spec/decision refs, checkpoints/resume/handoff, evidence,
+  verification/verdict, composed completion gate, no false completion, final
+  `task archive <id>` lifecycle, doctor/task doctor/scan gates);
+  `ackit-scan-and-fix` documents the exact inline suppression form
+  (`# ackit-ignore:ACKITnnn <reason>`), severity triage, and the
+  non-suppressible `ACKIT099` advisory with no gate weakening;
+  `ackit-context-optimization` documents deterministic task-aware packs
+  (`--task`/`--resume`), budget behavior, and `optimize --fix` fenced to
+  ACKit-managed surfaces; `ackit-policy-authoring` documents Policy
+  v2 tiers/autonomy where public, deterministic layered merge, locks, and
+  offline-only resolution verified via `ackit policy check`.
+- **Skills `install`/`sync` `--force` CLI wiring**: the flag was read from
+  the parent command options instead of the subcommand options, so it was
+  silently ignored and owned-modified skills stayed conflicted. Both
+  subcommands now honor `--force` (third-party skills are still refused even
+  with `--force`).
+
+### Added
+
+- **Builtin-skill ↔ CLI/package regression tests**: `tests/contract/
+  skills-parity.test.ts` (builtin discovery, frontmatter/name/path, explicit
+  command-case ↔ CLI `--help` smoke, stale-syntax and master-only-helper
+  negative probes, npm packaging whitelist) and `tests/integration/skills/
+  force-cli.test.ts` (CLI-level `--force` behavior incl. third-party
+  refusal).
+
+### Compatibility
+
+- Backward compatible patch: no new commands, options, skills, or findings;
+  legacy repositories keep their supported defaults.
+- No new network/LLM dependency: the offline-first invariant is preserved
+  and gated.
+- MCP remains read-only: all state mutation stays CLI-only.
+
 ## [0.4.0] - 2026-09-03
 
 Managed-asset sync, post-0.3.0 limitation closure, and version hygiene (minor

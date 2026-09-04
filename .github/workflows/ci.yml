@@ -105,7 +105,7 @@ jobs:
         run: |
           node -e "
           const pkg=require('./extensions/vscode/package.json');
-          if(pkg.version!=='0.4.0') throw new Error('extension version must be 0.4.0');
+          if(pkg.version!=='0.4.1') throw new Error('extension version must be 0.4.1');
           if(pkg.publisher!=='Cynrath') throw new Error('publisher must be Cynrath');
           if(pkg.displayName!=='ACKit Toolkit') throw new Error('displayName must be ACKit Toolkit');
           if(!pkg.contributes.views.ackit.find(v=>v.id==='ackit.readiness')) throw new Error('ackit.readiness view missing');
@@ -140,9 +140,9 @@ jobs:
       - name: vsce package --no-dependencies
         run: |
           cd extensions/vscode
-          npx --yes @vscode/vsce package --no-dependencies --no-yarn --out ackit-vscode-0.4.0.vsix
-          test -f ackit-vscode-0.4.0.vsix
-          ls -lh ackit-vscode-0.4.0.vsix
+          npx --yes @vscode/vsce package --no-dependencies --no-yarn --out ackit-vscode-0.4.1.vsix
+          test -f ackit-vscode-0.4.1.vsix
+          ls -lh ackit-vscode-0.4.1.vsix
       - name: VSIX content audit
         run: |
           cd extensions/vscode
@@ -153,12 +153,12 @@ jobs:
           ls -lh images/icon.png
           file images/icon.png
           # check VSIX size <2MB
-          size=$(stat -c%s ackit-vscode-0.4.0.vsix 2>/dev/null || stat -f%z ackit-vscode-0.4.0.vsix)
+          size=$(stat -c%s ackit-vscode-0.4.1.vsix 2>/dev/null || stat -f%z ackit-vscode-0.4.1.vsix)
           echo "VSIX size $size bytes"
           if [ "$size" -gt 2097152 ]; then echo "::error::VSIX >2MB"; exit 1; fi
           # check no secrets in VSIX
-          unzip -l ackit-vscode-0.4.0.vsix | head -20
-          if unzip -p ackit-vscode-0.4.0.vsix extension/package.json | grep -q "AKIA"; then echo "::error::secret in VSIX"; exit 1; fi
+          unzip -l ackit-vscode-0.4.1.vsix | head -20
+          if unzip -p ackit-vscode-0.4.1.vsix extension/package.json | grep -q "AKIA"; then echo "::error::secret in VSIX"; exit 1; fi
       - name: Icon dimensions
         run: |
           cd extensions/vscode
