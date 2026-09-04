@@ -1,11 +1,11 @@
 ---
 id: "TASK-0077"
 title: "Builtin skill template audit and CLI parity hardening"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-04
 ---
 
 ## Purpose
@@ -72,8 +72,8 @@ Session authorization (exact scope for THIS task): the session goal authorizes (
 - [x] Package proof recorded: candidate tarball contains corrected templates; fresh isolated install shows four generated SKILL.md equal to packaged templates; `ackit --version`, `skills install`, `skills validate`, `sync --check` verified.
 - [x] Post-v0.4.0 delta classification complete with evidence for `task archive --completed`, `TASK-COMPLETED-IN-ACTIVE`, text-hygiene, skill fixes; no new public CLI behavior hidden.
 - [x] Exactly one SemVer decision emitted with policy citation; if 0.5.0 REQUIRED, no version-surface edits, no PR merge, no tag/npm/VS Code/Release/Action/docs publish attempted.
-- [ ] If PATCH-VALID, all version surfaces synchronized, CHANGELOG accurate, full gates green, fresh verifier zero blockers, single PR merged on exact-head green, post-merge master green, all v0.4.1 channels published and verified.
-- [ ] `SKILL-TEMPLATE-PATCH: SUCCESS` only upon completed audit+fixes+tests+proofs and (PATCH-VALID→published | 0.5.0 REQUIRED→correctly stopped); otherwise `SKILL-TEMPLATE-PATCH: NO-GO`.
+- [x] If PATCH-VALID, all version surfaces synchronized, CHANGELOG accurate, full gates green, fresh verifier zero blockers, single PR merged on exact-head green, post-merge master green, all v0.4.1 channels published and verified. — N/A on this line: SEMVER DECISION was 0.5.0 REQUIRED so the PATCH-VALID antecedent never held; v0.4.1 was published from the separate `maintenance/v0.4.1` line instead; verified zero version-surface edits on this branch (`package.json` stays `0.4.0`, no `CHANGELOG.md` 0.4.1 entry, no lockfile change). The single-PR exact-head-green merge happens here for the v0.5 line instead (PR #16).
+- [x] `SKILL-TEMPLATE-PATCH: SUCCESS` only upon completed audit+fixes+tests+proofs and (PATCH-VALID→published | 0.5.0 REQUIRED→correctly stopped); otherwise `SKILL-TEMPLATE-PATCH: NO-GO`. — SUCCESS via the second disjunct: audit+fixes+tests+proofs complete, 0.4.1 publication correctly stopped on this line (delivered via maintenance line), and the current-master variant now lands via PR #16. Earlier `NO-GO (for 0.4.1)` statements above are preserved as historical evidence of the pre-maintenance-line state.
 
 ## Test steps
 
@@ -217,3 +217,10 @@ Targeted proofs:
 - Third-party force refusal remains (force-cli suite: third-party collision stays refused even with `--force`, both subcommands)
 - Richer master-only task-archive wording valid on current master (`ackit-workflow/SKILL.md` documents bulk `ackit task archive --completed [--dry-run]` and `TASK-COMPLETED-IN-ACTIVE`; `task archive --help` on this branch exposes `--completed`/`--dry-run`)
 - No v0.4.1 package metadata copied (`package.json` version `0.4.0`; `CHANGELOG.md` has zero `## [0.4.1]` entries; diff `master..HEAD` touches no `package.json`/`CHANGELOG.md`/`pnpm-lock.yaml`)
+
+### Exact-head CI evidence (PR #16, head `d3ab780`)
+
+- PR: `fix/skill-template-parity-0077` -> `master` (`gh pr view 16`: mergeable `MERGEABLE`, head OID `d3ab780d64316506335cf2df4d36bd6530f7f0c3`).
+- CI run `33868363573` (pull_request, branch `fix/skill-template-parity-0077`) — all jobs SUCCESS on the exact head: `verify` ubuntu/macos/windows x node 22/24 (6/6), `package-smoke` ubuntu/macos/windows (3/3), `self-scan (dogfood)`, `extension / node-22 (vsce + Electron)` (6m34s).
+- ACKit Action Dogfood run `33868363577` — `action smoke (uses ./)` SUCCESS (14s).
+- Total: 12/12 checks green, zero failures, no reruns, no gate weakening.
