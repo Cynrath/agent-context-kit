@@ -13,7 +13,7 @@ completedAt: null
 
 Fix the maintenance-line governance gap left by the v0.4.1 out-of-band maintenance release: current master still reports source version `0.4.0` in `package.json` and hard-codes `0.4.0` release truth in README badges while the latest published stable is `0.4.1`, and `scripts/check-version-parity.mjs` treats `package.json` as the single truth so it PASSES despite the stale default-branch README. Design and land a maintenance-aware release-state model that distinguishes source-checkout/development version, published stable version, historical versions, and maintenance-line versions, and teach the parity guard to understand them as separate concepts. No v0.5.0 publication occurs in this task.
 
-## Current-state evidence (verified live 2026-09-04 on master 725ed18)
+## Current-state evidence (implementation started 2026-09-04 from master f1550e4ca254f1df639a00f25cf121bd9c65e6fa; earlier observation on master 725ed18 retained below as historical evidence)
 
 - `package.json` version `0.4.0`; `extensions/vscode/package.json` version `0.4.0` (ADR-0023 coupling holds).
 - `npm view @cynrath/agent-context-kit version` → `0.4.1` (latest published stable).
@@ -58,7 +58,7 @@ Fix the maintenance-line governance gap left by the v0.4.1 out-of-band maintenan
 - [ ] Four version concepts defined, recorded, and asserted in distinct places; no concept conflated.
 - [ ] `README says 0.4.0 while npm latest is 0.4.1` class of staleness is impossible or mechanically detected (proven by positive + negative probes).
 - [ ] Parity guard green on the new model; historical references still pass; contract tests cover each concept.
-- [ ] No tag, publish, release, or version-bump side effects (`git tag --list`, `npm view` unchanged except by design docs).
+- [ ] No PUBLIC/STABLE release bump or publication side effects (`git tag --list`, `npm view`, GitHub Release, Marketplace remain 0.4.1). A source/development-version transition (e.g. to `0.5.0-dev.0`) is allowed only if selected by the ADR; it is NOT a public/stable release.
 - [ ] Decision recorded as ADR addendum/new ADR; task completed through the real gate with evidence.
 
 ## Test steps

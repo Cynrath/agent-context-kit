@@ -5,6 +5,7 @@ status: pending
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
+  - "TASK-0081"
 createdAt: "2026-09-04"
 completedAt: null
 ---
@@ -35,6 +36,7 @@ Strong multi-auditor consensus (SHOULD, two linked items): provider-surface pari
 ## Dependencies
 
 - TASK-0078 (baseline vocabulary; capability table references stable concepts).
+- TASK-0081 (canonical workflow/evidence/verdict/status snapshot this task must expose/audit; scheduling before the status model exists is prohibited).
 
 ## Affected files / expected areas
 
