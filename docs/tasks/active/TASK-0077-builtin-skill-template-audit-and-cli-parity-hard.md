@@ -1,7 +1,7 @@
 ---
 id: "TASK-0077"
 title: "Builtin skill template audit and CLI parity hardening"
-status: pending
+status: active
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-09-04"
@@ -65,13 +65,13 @@ Session authorization (exact scope for THIS task): the session goal authorizes (
 
 ## Acceptance criteria
 
-- [ ] Audit table complete for all four builtins; every command/example validated against built CLI `--help`/parser and current docs; stale/wrong items fixed; `ackit task "<title>"` shorthand removed unless intentionally supported (proven).
-- [ ] Corrected templates remain concise/progressive; no new builtin skill names added.
-- [ ] Parity tests green and fail on reintroduced stale syntax (proven by negative probe, e.g. old shorthand fixture).
-- [ ] Managed 7-scenario proof recorded with lock checksum/path evidence.
-- [ ] Package proof recorded: candidate tarball contains corrected templates; fresh isolated install shows four generated SKILL.md equal to packaged templates; `ackit --version`, `skills install`, `skills validate`, `sync --check` verified.
-- [ ] Post-v0.4.0 delta classification complete with evidence for `task archive --completed`, `TASK-COMPLETED-IN-ACTIVE`, text-hygiene, skill fixes; no new public CLI behavior hidden.
-- [ ] Exactly one SemVer decision emitted with policy citation; if 0.5.0 REQUIRED, no version-surface edits, no PR merge, no tag/npm/VS Code/Release/Action/docs publish attempted.
+- [x] Audit table complete for all four builtins; every command/example validated against built CLI `--help`/parser and current docs; stale/wrong items fixed; `ackit task "<title>"` shorthand removed unless intentionally supported (proven).
+- [x] Corrected templates remain concise/progressive; no new builtin skill names added.
+- [x] Parity tests green and fail on reintroduced stale syntax (proven by negative probe, e.g. old shorthand fixture).
+- [x] Managed 7-scenario proof recorded with lock checksum/path evidence.
+- [x] Package proof recorded: candidate tarball contains corrected templates; fresh isolated install shows four generated SKILL.md equal to packaged templates; `ackit --version`, `skills install`, `skills validate`, `sync --check` verified.
+- [x] Post-v0.4.0 delta classification complete with evidence for `task archive --completed`, `TASK-COMPLETED-IN-ACTIVE`, text-hygiene, skill fixes; no new public CLI behavior hidden.
+- [x] Exactly one SemVer decision emitted with policy citation; if 0.5.0 REQUIRED, no version-surface edits, no PR merge, no tag/npm/VS Code/Release/Action/docs publish attempted.
 - [ ] If PATCH-VALID, all version surfaces synchronized, CHANGELOG accurate, full gates green, fresh verifier zero blockers, single PR merged on exact-head green, post-merge master green, all v0.4.1 channels published and verified.
 - [ ] `SKILL-TEMPLATE-PATCH: SUCCESS` only upon completed audit+fixes+tests+proofs and (PATCH-VALID→published | 0.5.0 REQUIRED→correctly stopped); otherwise `SKILL-TEMPLATE-PATCH: NO-GO`.
 
@@ -111,4 +111,50 @@ Session authorization (exact scope for THIS task): the session goal authorizes (
 
 ## Completion notes
 
-(in progress — evidence appended as gates complete)
+Evidence 2026-09-04 on `fix/skill-template-parity-0077` (HEAD ee02c2c; base f6979fa; v0.4.0 cc44102). Status held `active` (not completed) because SemVer gate requires 0.5.0; no version-surface edits, no PR, no tag/publish attempted.
+
+### Builtin skill audit
+
+Skill | Was stale? | Wrong commands | Missing current semantics | Fix
+ackit-workflow | YES | `ackit task "<title>"` (no subcommand; parser rejects; correct is `ackit task create <title>`) | task create options, active/archive layout + ID lookup, intent, workflow set/show/advance/verify, plan/spec/decision disk-existence, checkpoints/resume/handoff, evidence, verification/verdict, drift, composed completion gate, no false completion, `task archive --completed`, `TASK-COMPLETED-IN-ACTIVE`, doctor/task doctor/scan gates, archived-not-open | Rewrote SKILL.md (8 steps + notes) + expanded references/task-lifecycle.md (archive + gate + doctor code); linked reference; kept concise/progressive; no new skill names
+ackit-scan-and-fix | PARTIAL | `ackit-ignore:ACKITnnn` (missing `# ` prefix + reason placement; correct is `# ackit-ignore:ACKITnnn <reason>` on finding line or line above, covers line+next) | exact suppression scope, ACKIT099 non-suppressible, rules reference, `--format/--baseline/--changed` sets, `policy check`/`config check`, locked-rule refusal, offline/no-secret | Rewrote SKILL.md + expanded severity-playbook.md (ACKIT001/002 critical, 003/004 high, 005/010/050/070/080 medium, 020/040 low, 099 advisory; suppression scope; config/policy sources)
+ackit-context-optimization | PARTIAL | `ackit optimize` described as generic read-only without managed-surface fence (correct is `--fix` ONLY to ACKit-managed surfaces, with `--dry-run/--diff`) | `--task/--resume`, all pack options, manifest fields, greedy `budget exhausted`, deterministic weights, safety gates (secret exclude, dedupe, path scrub), estimates as soft targets | Rewrote SKILL.md + expanded ranking.md (weights, budget, manifest, gates, task/resume)
+ackit-policy-authoring | YES | Verify via `ackit config check` / scan JSON only (omits `ackit policy check`; correct primary is `ackit policy check` chain+digest+autonomy+review+problems plus `config check` for schema) | `schemaVersion: 1`, `extends` local vs `npm:<pkg>/<file>` pre-installed-only + `POL-OFFLINE-BLOCKED`, `org`/`repo`/`pathScopes`, `locked` + `POL-LOCKED-CONFLICT` + sticky deny, suppressions `reason`/`expiresAt`, tiers tier0-4 + owned boundaries (`task complete --force`, `checkpoint export`, `verification record`) + `POLICY-TIER-DENIED` exit 4, `review:` + `VERDICT_BLOCKING`, merge order + digest | Rewrote SKILL.md + expanded merge-order.md (precedence, digest, offline/traversal refusals, locks, check commands)
+
+Root cause: static templates in `templates/skills/` are copied verbatim by `src/core/skills/install.ts` (checksum/ownership in `.ackit/skills.lock.json`); content is never synthesized from current docs/CLI, so later workflow/intent/checkpoint/evidence/verdict/drift/policy-v2/sync work never flowed into shipped instructions until this audit.
+
+### Tests
+
+- New `tests/contract/skills-parity.test.ts` (10 tests): discovers 4 builtins sorted; frontmatter/name/path; stale-shorthand negative probe; workflow/policy/scan/pack content requirements; `--help` smoke for 30+ explicit cases via `runCli`; snippet→CLI prefix mapping; packaging whitelist (`templates` in `package.json` files + all template files readable). `pnpm vitest run tests/contract/skills-parity.test.ts` → 10/10 pass. Focused `parity + install + sync` → 32/32 pass. Full `pnpm test` → 593/594 pass with 1 transient flake (`sync.test.ts` #18 dist import race with parallel `pnpm pack` build; isolated rerun 17/17 pass; tarball-smoke 3/3 pass).
+- `pnpm lint` exit 0, `pnpm format:check` exit 0, `pnpm typecheck` exit 0, `pnpm build` exit 0, `pnpm gen:schemas` idempotent, `pnpm smoke:cli` pass.
+- `node scripts/check-version-parity.mjs` PASS (current 0.4.0), `node scripts/check-text-hygiene.mjs --repo` clean, `node scripts/check-offline-egress.mjs` PASS.
+- `node dist/cli/index.js doctor` exit 0, `task doctor` integrity OK, `skills validate` 0 skills 0 issues exit 0, `scan --ci` exit 0 readiness 88/100 pass, `git diff --check` clean.
+
+### Managed sync proof
+
+API proof (`installSkills` with temp `builtinsDir`, all PASS): 1 missing→installed; 2 owned-unchanged-old-canonical→updated + content==v2; 3 owned-modified→conflict + no-clobber; 4 owned-modified+force→updated + content==v2; 5 third-party+force→refused + untouched; 6 version-only-identical→zero-write tree-same + status up-to-date + lock-unchanged; 7 canonical-change→content-driven chkOld!=chkNew + lock==source + no absolute paths + repo-relative paths. CLI proof with corrected templates: fresh `$base` missing→installed 4/4 + 8/8 files EQUAL + second run 4/4 up-to-date; local edit → `skills install` conflict exit 4; `sync --force` → updated (local edits discarded) exit 0. Lock entries show sha256 + `.agents/skills/<name>/...` forward-slash paths. Finding (out of scope, not fixed here): `skills install --force` / `skills sync --force` read force from parent opts, so CLI flag is ignored (API + `sync --force` work); filed as 0.5.0 follow-up to preserve patch discipline.
+
+### Package proof
+
+`pnpm pack --dry-run` lists all 8 template files; `pnpm pack` tarball `cynrath-agent-context-kit-0.4.0.tgz` extracts with 4/4 SKILL.md TARBALL-EQUAL to working-tree corrected templates. Fresh isolated consumer (`npm install <tarball>`): `ackit --version` 0.4.0, `skills install` 4/4 installed, `skills validate` 4 skills 0 issues, 4/4 FRESH-EQUAL, `sync --check` shows skills up-to-date (instruction shims would-create as expected for fresh repo, exit 1).
+
+### Post-v0.4.0 delta classification (v0.4.0 cc44102..f6979fa + branch ee02c2c)
+
+Change | Public? | Type | SemVer class | Evidence
+e646371 TASK-0073 bookkeeping (1 task doc) | No | docs-test-only | patch/none | `git show --stat e646371`
+e869261 `task archive --completed [--dry-run]` bulk helper (task.ts + store.ts::archiveCompleted + help + JSON + journal) | YES | new functionality (backward-compatible) | minor | `git diff v0.4.0..HEAD -- src/cli/commands/task.ts src/core/tasks/store.ts`; `task archive --help`; `docs/reference/cli.md` new row
+e869261 `TASK-COMPLETED-IN-ACTIVE` doctor finding (store.ts::doctor) | YES | new functionality | minor | `TASK-COMPLETED-IN-ACTIVE` in store + cli docs + lifecycle guard
+e869261 text-hygiene gate (scripts/check-text-hygiene.mjs/.d.mts + package.json check:text-hygiene + ci.yml step + AGENTS.md guidance + tests) | No (dev/CI, not in npm files, not CLI) | maintenance/docs-test-only | patch/none | `package.json` files excludes scripts; `pnpm pack --dry-run` omits scripts
+e869261 73 archive renames + TASK-0074/0075 docs + lifecycle guard docs | Partial (docs describe new behavior) | docs (tied to minor above) | docs/minor-tied | `git show --name-status e869261` R100 renames
+e869261 tests (archive.test.ts, text-hygiene.test.ts) | No | docs-test-only | patch/none | test files only
+f6979fa TASK-0076 bookkeeping (1 task doc) | No | docs-test-only | patch/none | `git show --stat f6979fa`
+ee02c2c skill template fixes (8 files, no new names) | YES (shipped `templates/` surface) | bugfix/maintenance | patch | template diff; parity tests
+ee02c2c parity tests | No | docs-test-only | patch/none | `tests/contract/skills-parity.test.ts`
+
+SemVer policy: CHANGELOG follows Semantic Versioning; ADR-0023 coupling (one logical release, immutable tag, no master publish); v0.4.0 precedent (`docs/evidence/TASK-0073-verification-bundle.md` § Version decision: new public CLI capability `ackit sync` + expanded behavior, backward-compatible, no breaking → minor 0.4.0); pre-1.0 additive → minor.
+
+SEMVER DECISION: 0.5.0 REQUIRED
+
+Full delta contains new public CLI functionality (`task archive --completed [--dry-run]`, `TASK-COMPLETED-IN-ACTIVE`), backward-compatible, no breaking change → minor under established precedent. Text-hygiene + skill fixes alone would be patch-valid, but FULL delta is not. No version-surface edits, no PR, no tag/npm/VS Code/Release/Action/docs publish attempted. No branch from old tag to evade classification. Browser Companion untouched. Branch `fix/skill-template-parity-0077` (plan f472944 + implementation ee02c2c + active-status evidence) left unmerged for 0.5.0 retarget.
+
+SKILL-TEMPLATE-PATCH: NO-GO (for 0.4.1; audit+fixes+tests+correct stop complete; 0.5.0 required).
