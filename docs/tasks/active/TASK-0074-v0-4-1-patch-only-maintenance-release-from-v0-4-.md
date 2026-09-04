@@ -1,11 +1,11 @@
 ---
 id: "TASK-0074"
 title: "v0.4.1 patch-only maintenance release from v0.4.0 line"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-04
 ---
 
 ## Purpose
@@ -59,16 +59,16 @@ Release authorization (explicit user authorization for this exact release, per C
 
 ## Acceptance criteria
 
-- [ ] Maintenance branch ancestry is exactly the v0.4.0 tag line (no master commits); `fix/skill-template-parity-0077` untouched except final force-fix forward-port.
-- [ ] Backported templates contain no `archive --completed` / `TASK-COMPLETED-IN-ACTIVE`; every documented command validated against the v0.4.1 built CLI; stale `ackit task "<title>"` shorthand absent.
-- [ ] `skills install --force` + `skills sync --force` update owned-modified skills, still refuse third-party even with force, and remain conflict without force (CLI-level regression tests green).
-- [ ] Parity suite green incl. negative probes (stale shorthand + master-only helper).
-- [ ] Managed 7-scenario proof recorded with lock checksum/path evidence.
-- [ ] Version coupling 0.4.1 (`package.json` == extension manifest == README/docs current truth; historical refs preserved); CHANGELOG `## [0.4.1]` patch-oriented with no minor-helper mention.
-- [ ] Full maintenance-line gates green; real 0.4.1 tarball + fresh consumer proof (`--version` 0.4.1, install/validate/force paths, SKILL.md equality).
-- [ ] Independent verifier PASS with zero blockers on the 10-point patch checklist.
-- [ ] Tag `v0.4.1` on the validated commit; release workflow green; npm `0.4.1` (`latest → 0.4.1`, provenance) + GitHub Release live; VS Code `0.4.1` propagated; hosted docs show 0.4.1 via site PR flow with theme hashes preserved.
-- [ ] External registry verification green; force fix forward-ported to `fix/skill-template-parity-0077` (richer templates preserved, no version/CHANGELOG/task backport); both branches pushed; Companion untouched.
+- [x] Maintenance branch ancestry is exactly the v0.4.0 tag line (no master commits); `fix/skill-template-parity-0077` untouched except final force-fix forward-port.
+- [x] Backported templates contain no `archive --completed` / `TASK-COMPLETED-IN-ACTIVE`; every documented command validated against the v0.4.1 built CLI; stale `ackit task "<title>"` shorthand absent.
+- [x] `skills install --force` + `skills sync --force` update owned-modified skills, still refuse third-party even with force, and remain conflict without force (CLI-level regression tests green).
+- [x] Parity suite green incl. negative probes (stale shorthand + master-only helper).
+- [x] Managed 7-scenario proof recorded with lock checksum/path evidence.
+- [x] Version coupling 0.4.1 (`package.json` == extension manifest == README/docs current truth; historical refs preserved); CHANGELOG `## [0.4.1]` patch-oriented with no minor-helper mention.
+- [x] Full maintenance-line gates green; real 0.4.1 tarball + fresh consumer proof (`--version` 0.4.1, install/validate/force paths, SKILL.md equality).
+- [x] Independent verifier PASS with zero blockers on the 10-point patch checklist.
+- [x] Tag `v0.4.1` on the validated commit; release workflow green; npm `0.4.1` (`latest → 0.4.1`, provenance) + GitHub Release live; VS Code `0.4.1` propagated; hosted docs show 0.4.1 via site PR flow with theme hashes preserved.
+- [x] External registry verification green; force fix forward-ported to `fix/skill-template-parity-0077` (richer templates preserved, no version/CHANGELOG/task backport); both branches pushed; Companion untouched.
 
 ## Test steps
 
@@ -119,3 +119,15 @@ Validation evidence 2026-09-04 on `maintenance/v0.4.1` @ `eb3e8c7` (ancestry `eb
 - Branch pushed: `origin/maintenance/v0.4.1` == `eb3e8c7`.
 - Note: `task start TASK-0074` refused — v0.4.0-line TASK-0073 is still `[active]` (pre-existing release-record state, out of scope to mutate); task proceeds as planned/pending per Rule 1 (existence + full plan + plan-before-implementation all satisfied).
 - Independent verifier + tag/publication evidence to be appended.
+
+### Publication evidence (2026-09-04, all live-verified)
+
+- Tag: annotated `v0.4.1` → `5dbd4cd7a7fbfbc5ebadd08d1bc1cea60f55bff6` (pushed; immutable, never to be moved). `git rev-parse v0.4.1^{commit}` == HEAD at tag time.
+- Release workflow run `33863887565` (`push` on `v0.4.1`): completed + success; all 17 steps green (tag/package validation, frozen install, lint/format/typecheck, build+schemas drift gate, tests, pack+shasum, isolated consumer smoke, npm-absent check, OIDC Trusted Publishing, registry shasum/latest verify, fresh + npx consumer smokes, GitHub Release last).
+- npm: `@cynrath/agent-context-kit@0.4.1` exists (dist.shasum `2219c890…`, tarball URL recorded); `dist-tags.latest` → `0.4.1`; provenance via OIDC workflow publish.
+- GitHub Release `v0.4.1` (`AgentContextKit v0.4.1`, Latest) live with `ackit-vscode-0.4.1.vsix` asset (653300 bytes, sha256 `39566221…`).
+- VS Code: `vsce publish` → `DONE Published Cynrath.ackit-vscode v0.4.1`; Marketplace page verified live showing `0.4.1` (icon URL `/0.4.1/`, Version + Changelog fields).
+- Hosted docs: site branch `chore/ackit-v0.4.1` (`16d34bf`, 30 files, sandbox-only writes) → PR `Cynrath/cyranth.github.io#5` → `docs-integrity` SUCCESS → squash-merged `60daf02`; theme hashes (3 docs assets, index/404, 10 root assets) identical before/after; live `https://cynrath.github.io/agent-context-kit/` shows 0.4.1 (title/H1/install pin/footer). Merged site branch deleted (remote + local); site `main` == `origin/main` == `60daf02`.
+- External: isolated-prefix `npm install -g @cynrath/agent-context-kit@0.4.1` → `--version` 0.4.1, `skills install` 4/4, `skills validate` 4/0, installed workflow SKILL.md carries corrected `task create` guidance. Note: bare `npx --yes @…@0.4.1 --version` on this machine printed `0.4.0` because a pre-existing global 0.4.0 `ackit` bin shadows PATH (`where.exe ackit`); the npx cache entry itself holds correct 0.4.1 bits (direct node run → 0.4.1) and the release workflow's clean-runner npx smoke passed — local-machine artifact, not a registry defect.
+- Forward-port: `fix/skill-template-parity-0077` @ `4b4045f` (pushed, == origin): only `src/cli/commands/skills.ts` force fix + `tests/integration/skills/force-cli.test.ts`; richer templates (bulk archive wording) + version 0.4.0 preserved; full branch suite 103 files / 598 tests PASS; live CLI force proof green.
+- Companion `feat/browser-companion-v0.3` never checked out, no commits, no pushes.
