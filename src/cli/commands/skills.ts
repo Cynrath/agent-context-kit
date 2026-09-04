@@ -333,16 +333,15 @@ export function registerSkillsCommands(program: Command, invocation: CliInvocati
     .command("sync")
     .description("alias for install: sync builtin skills to the current version")
     .option("--force", "discard local edits on OWNED skills", false)
-    .action(async () => {
+    .action(async (opts: { force?: boolean }) => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
-      const cmdOpts = (skillsCommand.opts() ?? {}) as { force?: boolean };
       invocation.exitCode = await runSkillsInstallCommand({
         root: parentOptions.root,
         config: parentOptions.config,
         json: parentOptions.json ?? false,
         quiet: parentOptions.quiet ?? false,
         debug: parentOptions.debug ?? false,
-        force: cmdOpts.force ?? false,
+        force: opts.force ?? false,
       });
     });
 
@@ -393,16 +392,15 @@ export function registerSkillsCommands(program: Command, invocation: CliInvocati
     .command("install")
     .description("install the four built-in ACKit skills idempotently")
     .option("--force", "discard local edits on OWNED skills (third-party names still refused)")
-    .action(async () => {
+    .action(async (opts: { force?: boolean }) => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
-      const commandOptions = (skillsCommand.opts() ?? {}) as { force?: boolean };
       invocation.exitCode = await runSkillsInstallCommand({
         root: parentOptions.root,
         config: parentOptions.config,
         json: parentOptions.json ?? false,
         quiet: parentOptions.quiet ?? false,
         debug: parentOptions.debug ?? false,
-        force: commandOptions.force ?? false,
+        force: opts.force ?? false,
       });
     });
 
