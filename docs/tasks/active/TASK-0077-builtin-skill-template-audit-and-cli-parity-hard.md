@@ -162,3 +162,58 @@ SKILL-TEMPLATE-PATCH: NO-GO (for 0.4.1; audit+fixes+tests+correct stop complete;
 ### Fresh verifier (independent, read-only)
 
 Lightweight verifier `00efcfc6` OVERALL PASS, zero blockers, no writes. Templates PASS (no stale shorthand; all required semantics present per file/line). Command correctness 15/15 `--help` exit 0. Parity suite 10/10 (`pnpm vitest run tests/contract/skills-parity.test.ts`). Sync semantics PASS with `install.ts` line citations (all 7 scenarios + version-only no-dirty + absolute-path guard). Tarball PASS via files whitelist + 4/4 TARBALL-EQUAL fallback compare (`pnpm pack --dry-run` skipped by design to avoid prepack build race). Independent SEMVER DECISION: 0.5.0 REQUIRED (v0.4.0 precedent: new backward-compatible public CLI capability → minor). Publication guard PASS (only `v0.4.0` tag, version `0.4.0`, no open PRs, fix branch clean, Companion only listed). First verifier `187d9549` stalled across 4 rounds and was interrupted with no result; replacement scope avoided builds/packs/full suite.
+
+### Cross-line TASK-ID clarification (no history rewrite, recorded 2026-09-04 v0.5 baseline)
+
+- v0.4.1 was published from a separate maintenance line (`maintenance/v0.4.1`, branched from immutable `v0.4.0` tag commit `cc44102`, never from current master).
+- The maintenance-line `TASK-0074` (`v0.4.1 patch-only maintenance release from v0.4.0 line`, branch-local under `maintenance/v0.4.1`) is branch-local historical release bookkeeping only.
+- It is distinct from current-master historical `TASK-0074` (`Repository hygiene - archive completed task docs and lifecycle guard`, completed 2026-09-03, archived under `docs/tasks/archive/` on master).
+- The ID collision is an expected consequence of branching the maintenance line from the old `v0.4.0` tag, which already contained a master `TASK-0074`.
+- Current-master ownership of the skill-template/force forward-port is `TASK-0077` on branch `fix/skill-template-parity-0077`.
+- No maintenance task document is being merged into master (verified: `git diff --name-status master..fix/skill-template-parity-0077` contains only `TASK-0077-*.md`, no `TASK-0074` doc).
+- The forward-port commit `4b4045f` message mentions maintenance-line `TASK-0074` as provenance; history is NOT rewritten (no rebase/force-push). The eventual squash-merge commit title/body must reference `TASK-0077`, not the maintenance-line `TASK-0074`.
+
+### v0.4.1 current truth update (recorded 2026-09-04, historical statements above preserved as evidence)
+
+- v0.4.1 patch release: SUCCESS on separate maintenance line (`maintenance/v0.4.1` head `ba0ab64`; release commit `5dbd4cd`; annotated tag `v0.4.1` object `a2aa0a4`).
+- Skill template corrections: public in v0.4.1 (backported from `ee02c2c` and adapted to the v0.4.x capability surface).
+- Skills install/sync `--force` fix: public in v0.4.1 (maintenance `TASK-0074` scope) and forward-ported to this branch as `4b4045f` (`src/cli/commands/skills.ts` reads subcommand action `opts.force`; `tests/integration/skills/force-cli.test.ts` regression coverage).
+- Richer current-master skill content: preserved on `TASK-0077` branch (master-only progressive guidance including `task archive --completed` and `TASK-COMPLETED-IN-ACTIVE` wording remains valid on the v0.5 line; it was intentionally excluded from the v0.4.1 backport).
+- Forward-port force fix: present on this branch (`4b4045f`, verified by `git diff master..HEAD -- src/cli/commands/skills.ts`).
+- TASK-0077 goal now: land the current-master version of these fixes cleanly onto `master` via one squash-merge PR (`fix/skill-template-parity-0077` -> `master`), with no version-surface edits, no tag/publish, and no maintenance-line merge.
+
+### v0.5-baseline re-validation (recorded 2026-09-04 on `fix/skill-template-parity-0077`)
+
+Branch-switch hygiene: switched `maintenance/v0.4.1` -> `fix/skill-template-parity-0077`, then ran `pnpm build` before any built-CLI validation (`dist/` is git-ignored and survives branch switches). Audit: no `clean`/`rebuild` helper exists in `package.json` scripts (`build`, `typecheck`, `lint`, `format:check`, `test`, `gen:schemas`, `smoke:cli`, `smoke:package` only). Smallest durable hardening applied: `docs/guides/ci.md` gains a `Local branch-switch build hygiene` note so future release/backport runbooks rebuild `dist/` after switching lines. No new build machinery, no dependency changes.
+
+Gates (all on current branch head including the TASK-ID clarification above, after rebuild):
+
+- `pnpm install --frozen-lockfile` PASS (up to date)
+- `pnpm lint` PASS (306 files, no fixes)
+- `pnpm format:check` PASS (290 files, no fixes)
+- `pnpm typecheck` PASS (exit 0)
+- `pnpm build` PASS (exit 0)
+- `pnpm test` PASS (103 files, 598 tests passed)
+- Focused `tests/contract/skills-parity.test.ts` + `tests/integration/skills/force-cli.test.ts` PASS (2 files, 14 tests: 10 parity + 4 force)
+- `pnpm gen:schemas` idempotent (`git diff --exit-code -- schemas` exit 0)
+- `pnpm smoke:cli` PASS (cli-scaffold smoke all assertions passed)
+- `pnpm run smoke:package` PASS (`cynrath-agent-context-kit-0.4.0.tgz`, v0.4.0)
+- `node scripts/check-offline-egress.mjs` PASS (194 files, no egress)
+- `node scripts/check-version-parity.mjs` PASS (current 0.4.0, 14 files clean)
+- `node scripts/check-text-hygiene.mjs --repo` clean (888 files)
+- `node dist/cli/index.js config check` PASS (`ackit.yml` OK)
+- `node dist/cli/index.js doctor` PASS (all checks passed)
+- `node dist/cli/index.js task doctor` PASS (integrity OK)
+- `node dist/cli/index.js skills validate` 0 skills 0 issues (repo root has no installed skills; installed-skill proof done in isolated temp repos)
+- `node dist/cli/index.js scan --ci` PASS (readiness 88, threshold 80)
+- `git diff --check` clean
+
+Targeted proofs:
+
+- 4 builtin skills only (`templates/skills`: `ackit-context-optimization`, `ackit-policy-authoring`, `ackit-scan-and-fix`, `ackit-workflow`)
+- Skill-CLI parity green (parity suite 10/10 plus 15/15 `--help` command correctness from prior verifier, still valid: no CLI surface changed since)
+- `skills install --force` works (live temp repo: local edit -> conflict, `--force` -> `updated - local edits discarded via --force`)
+- `skills sync --force` works (live temp repo: re-edit -> `--force` -> `updated - local edits discarded via --force`)
+- Third-party force refusal remains (force-cli suite: third-party collision stays refused even with `--force`, both subcommands)
+- Richer master-only task-archive wording valid on current master (`ackit-workflow/SKILL.md` documents bulk `ackit task archive --completed [--dry-run]` and `TASK-COMPLETED-IN-ACTIVE`; `task archive --help` on this branch exposes `--completed`/`--dry-run`)
+- No v0.4.1 package metadata copied (`package.json` version `0.4.0`; `CHANGELOG.md` has zero `## [0.4.1]` entries; diff `master..HEAD` touches no `package.json`/`CHANGELOG.md`/`pnpm-lock.yaml`)
