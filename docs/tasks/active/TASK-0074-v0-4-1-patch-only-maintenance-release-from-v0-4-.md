@@ -107,4 +107,15 @@ Release authorization (explicit user authorization for this exact release, per C
 
 ## Completion notes
 
-(in progress — evidence appended as gates complete)
+Validation evidence 2026-09-04 on `maintenance/v0.4.1` @ `eb3e8c7` (ancestry `eb3e8c7 → 380a45a → 9c0e4d3 → v0.4.0 cc44102`; no master commits).
+
+- Preflight: master == origin/master == `f6979fa`; `fix/skill-template-parity-0077` local == remote == `ef97f1c6` (4 ahead / 0 behind); `v0.4.0^{commit}` == `cc44102`; no `v0.4.1` tag; npm versions end at `0.4.0` (`@0.4.1` E404); `gh release view v0.4.1` not found; Marketplace shows `0.4.0`; no open PRs.
+- Branch from tag verified: `merge-base --is-ancestor v0.4.0 HEAD` exit 0; `diff v0.4.0...HEAD` empty pre-change.
+- Backport: `cherry-pick -n ee02c2c8` applied cleanly (9 files); adapted `ackit-workflow/SKILL.md` step 7 + `task-lifecycle.md` to singular `task archive <id>` (removed bulk `--completed` + `TASK-COMPLETED-IN-ACTIVE`); adapted parity suite (v0.4.1 required-list + master-only-helper negative probe). Grep clean: zero `archive --completed` / `TASK-COMPLETED-IN-ACTIVE` / stale `ackit task "` hits under `templates/skills/`.
+- Force bug reproduced pre-fix on v0.4.0 line (`skills install --force` left conflict + local edit); fixed `src/cli/commands/skills.ts` install + sync actions to use subcommand `opts` (mirrors `export`); live post-fix proof: no-force → conflict kept; `--force` → updated for both subcommands; third-party + force → refused (regression tests).
+- Gates: install 0, lint 0, format:check 0, typecheck 0, build 0, full `pnpm test` 101 files / 582 tests PASS exit 0, `gen:schemas` idempotent, `smoke:cli` pass, `smoke:package` → `package smoke OK — cynrath-agent-context-kit-0.4.1.tgz (v0.4.1)` exit 0, offline-egress PASS, version-parity PASS (current 0.4.1, extension coupled), doctor 0, task doctor OK, skills validate 0/0, `scan --ci` exit 0 (readiness 88 pass), `git diff --check` clean.
+- Focused re-run on final tree: parity + version-parity + readme-current/parity + force-cli + install = 44/44 PASS.
+- Tarball: `cynrath-agent-context-kit-0.4.1.tgz` (435704 bytes); 8 template files present; fresh isolated consumer: `--version` 0.4.1, `skills install` 4/4, `skills validate` 4/0, `skills install --force` + `skills sync --force` update owned, `sync --check` skills up-to-date, 4/4 SKILL.md EQUAL to tarball canonical.
+- Branch pushed: `origin/maintenance/v0.4.1` == `eb3e8c7`.
+- Note: `task start TASK-0074` refused — v0.4.0-line TASK-0073 is still `[active]` (pre-existing release-record state, out of scope to mutate); task proceeds as planned/pending per Rule 1 (existence + full plan + plan-before-implementation all satisfied).
+- Independent verifier + tag/publication evidence to be appended.
