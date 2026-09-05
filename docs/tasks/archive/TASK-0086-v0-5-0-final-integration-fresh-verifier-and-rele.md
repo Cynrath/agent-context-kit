@@ -1,7 +1,7 @@
 ---
 id: "TASK-0086"
 title: "v0.5.0 final integration, fresh verifier, and release-readiness"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
@@ -13,7 +13,7 @@ dependencies:
   - "TASK-0084"
   - "TASK-0085"
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-05
 ---
 
 ## Purpose
@@ -132,3 +132,20 @@ content pre-release, per convention — the release task owns entries).
 Evidence: chain test green + full `pnpm test` counts + all gates
 recorded below. No quality gates weakened. No tag/publish/release
 (this task forbids them; absence proven).
+
+Final validation (2026-09-05, head `231c88b`): `pnpm test` 115 files /
+703 passed / 3 skipped (2 OS-gated symlink rows + pre-existing
+conditional), 0 failed with `--maxWorkers 2`; lint, format:check,
+typecheck, build green (zero warnings); `gen:schemas` no-op;
+smoke:cli + smoke:package (`cynrath-agent-context-kit-0.5.0-dev.0.tgz`,
+nothing published) PASS; version-parity PASS (source 0.5.0-dev.0,
+stable 0.4.1); offline-egress PASS; text-hygiene repo clean (925
+files); config check, doctor, task doctor, skills validate, scan --ci
+(readiness 88) PASS; `git diff --check` clean; VS Code `tsc --noEmit`
++ esbuild green. PR #20 exact-head CI: 12/12 green on `231c88b`.
+Fresh independent verifier (whole chain): OVERALL PASS, zero blockers
+— dependencies, chain non-tautology, GO-gate scan, no-publish, all
+gates, readiness accuracy all hold. Two warning dispositions applied:
+readiness "8/8 verifiers" wording softened to the accurate
+per-lane/previous-lane split; CI-pending warning resolved (12/12
+landed before completion).
