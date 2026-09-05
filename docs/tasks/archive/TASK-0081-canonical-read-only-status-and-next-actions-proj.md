@@ -1,13 +1,13 @@
 ---
 id: "TASK-0081"
 title: "Canonical read-only status and next-actions projection"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0079"
   - "TASK-0080"
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-05
 ---
 
 ## Purpose
@@ -111,3 +111,16 @@ pre-existing gate/task/workflow suites pass unmodified (complete()
 refactor proven behavior-preserving). Full `pnpm test` counts + all
 gates recorded at completion-gate time. No quality gates weakened. No
 publish/tag/release. TASK-0082 not started.
+
+Final validation (2026-09-05, head `410e7af`): `pnpm test` 107 files /
+665 passed / 1 conditional skip (pre-existing symlink-behavior skip), 0
+failed with `--maxWorkers 2`; lint, format:check, typecheck, build
+green (zero warnings); `gen:schemas` no-op (no schema change);
+smoke:cli PASS; version-parity PASS (source 0.5.0-dev.0, stable 0.4.1);
+offline-egress PASS; text-hygiene repo clean (910 files); config check,
+doctor, task doctor, skills validate, scan --ci (readiness 88) PASS;
+`git diff --check` clean. PR #20 exact-head CI: 12/12 green on `410e7af`
+(verify 3 OS × 2 node, package-smoke 3 OS, extension, dogfood self-scan,
+action smoke). Fresh independent verifier: OVERALL PASS, zero blockers
+(zero warnings) — no-second-engine, read-only, stable-code-reuse,
+command-shape, 37/37 focused runs, live status output, docs all hold.
