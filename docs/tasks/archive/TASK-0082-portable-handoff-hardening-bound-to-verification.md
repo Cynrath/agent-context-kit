@@ -1,13 +1,13 @@
 ---
 id: "TASK-0082"
 title: "Portable handoff hardening bound to verification state"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0079"
   - "TASK-0081"
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-05
 ---
 
 ## Purpose
@@ -123,3 +123,22 @@ moved-state refusal proc C) green; pre-existing checkpoint/context/
 api-surface suites pass unmodified. Full `pnpm test` counts + all gates
 recorded at completion-gate time. No quality gates weakened. No
 publish/tag/release. TASK-0083 not started.
+
+Final validation (2026-09-05, head `41cb3c2`): `pnpm test` 110 files /
+678 passed / 1 conditional skip + 1 load-timeout (60s) in the heavy
+handoff stale test under full parallel load — 0 assertion failures;
+isolated re-run 10/10 green in 43s (known machine-contention flake
+class, same as 0080/0081 runs). During the lane run the full suite
+caught a REAL architecture-contract failure of this task's own making
+(`checkpoint.ts` 569 lines > REQ-ARCH-008 500-line limit) — fixed by
+splitting export/import handlers into `checkpoint-handoff.ts` (463 +
+168 lines), no behavior change, contract suite green; the fix rides the
+same implementation commit the verifier reviewed. Lint, format:check,
+typecheck, build green (zero warnings); `gen:schemas` hash-idempotent
+(new `handoff.schema.json`); smoke:cli PASS; version-parity PASS
+(source 0.5.0-dev.0, stable 0.4.1); offline-egress PASS; text-hygiene
+repo clean (915 files); config check, doctor, task doctor, skills
+validate, scan --ci (readiness 88) PASS; `git diff --check` clean. Fresh
+independent verifier: OVERALL PASS, zero blockers (zero warnings) —
+no-duplicate-subsystem, binding list, refusal semantics, determinism +
+redaction, v1 compat, 33/33 focused runs, docs all hold.
