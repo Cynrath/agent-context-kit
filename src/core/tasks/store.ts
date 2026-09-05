@@ -160,6 +160,31 @@ export class TaskStore {
       throw new Error(`task '${id}' is ${found.doc.meta.status}; only active tasks can complete`);
     }
     const warnings: string[] = [];
+    const blockers = await this.completionBlockers(id);
+    if (blockers.length > 0) {
+      if (options.force !== true) {
+        throw new Error(`completion gate blocked: ${blockers.join("; ")}`);
+      }
+      warnings.push(`--force overrode: ${blockers.join("; ")}`);
+    }
+    await this.writeStatus(found.doc, "completed", new Date().toISOString().slice(0, 10));
+    return { forced: options.force === true, warnings };
+  }
+
+  /**
+   * Read-only completion-gate preview (TASK-0081, ADR-0032): EXACTLY the
+   * blocker list `complete()` would enforce, without any mutation. The
+   * canonical status projection composes this (same engine, same strings,
+   * same stable codes) — never a reimplementation. Throws for unknown
+   * tasks exactly like `complete()`; non-active tasks report their status
+   * precondition as a blocker instead of throwing, so status stays total.
+   */
+  async completionBlockers(id: string): Promise<string[]> {
+    const found = await this.find(id);
+    if (found === null || found.archived) throw new Error(`unknown task '${id}'`);
+    if (found.doc.meta.status !== "active") {
+      return [`task '${id}' is ${found.doc.meta.status}; only active tasks can complete`];
+    }
     const blockers: string[] = [];
     const unchecked = acceptanceUnchecked(found.doc.body);
     if (unchecked > 0) blockers.push(`${unchecked} unchecked acceptance criteria item(s)`);
@@ -175,14 +200,7 @@ export class TaskStore {
     // legacy tasks are untouched. Blockers compose deterministically.
     const workflowBlockers = await this.workflowCompletionBlockers(id, found.doc);
     blockers.push(...workflowBlockers);
-    if (blockers.length > 0) {
-      if (options.force !== true) {
-        throw new Error(`completion gate blocked: ${blockers.join("; ")}`);
-      }
-      warnings.push(`--force overrode: ${blockers.join("; ")}`);
-    }
-    await this.writeStatus(found.doc, "completed", new Date().toISOString().slice(0, 10));
-    return { forced: options.force === true, warnings };
+    return blockers;
   }
 
   /**

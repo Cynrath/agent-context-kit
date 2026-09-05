@@ -67,6 +67,25 @@ Resources: repo://summary | instructions-graph | skills-catalog |
 tasks-active | policy. Prompts: onboarding, task-execution,
 scan-remediation, context-optimization.
 
+## Task status loop (read-only)
+
+Start agent work loops with the canonical status projection instead of
+hand-inspecting task, workflow, evidence, verdict, drift, and checkpoint
+stores separately:
+
+```bash
+ackit status             # the single active task
+ackit status TASK-0007   # explicit task
+ackit --json status TASK-0007   # stable ackit.status.v1 contract
+```
+
+One call answers what task, what stage, what blocks completion (verbatim
+gate strings with stable codes), what is stale (verification freshness +
+independence, checkpoint staleness, evidence problems), and what next
+(derived suggested commands plus the recorded checkpoint next action).
+`ackit status` never mutates: no writes, no journal, no clock reads —
+safe to poll between steps.
+
 ## Skills for agents
 
 Install the built-ins so agents follow the same workflow the tool enforces:

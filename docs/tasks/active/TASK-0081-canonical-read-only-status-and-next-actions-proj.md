@@ -1,7 +1,7 @@
 ---
 id: "TASK-0081"
 title: "Canonical read-only status and next-actions projection"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0079"
@@ -47,11 +47,11 @@ Strong multi-auditor consensus (MUST, but read-only/composed): status consolidat
 
 ## Acceptance criteria
 
-- [ ] One canonical command answers the four questions (working on / blockers / stale / next) for fixture states, in human and JSON forms.
-- [ ] Projection is proven read-only (mutation-spy test green).
-- [ ] Staleness/blocker output reuses TASK-0079/0080 stable codes (no parallel code vocabulary).
-- [ ] No second engine: implementation composes existing stores (reviewable in diff).
-- [ ] Full gates green with counts; offline/scan/hygiene hold; real-gate completion with evidence.
+- [x] One canonical command answers the four questions (working on / blockers / stale / next) for fixture states, in human and JSON forms.
+- [x] Projection is proven read-only (mutation-spy test green).
+- [x] Staleness/blocker output reuses TASK-0079/0080 stable codes (no parallel code vocabulary).
+- [x] No second engine: implementation composes existing stores (reviewable in diff).
+- [x] Full gates green with counts; offline/scan/hygiene hold; real-gate completion with evidence.
 
 ## Test steps
 
@@ -75,4 +75,39 @@ Strong multi-auditor consensus (MUST, but read-only/composed): status consolidat
 
 ## Completion notes
 
-(placeholder)
+Implemented 2026-09-05 on `release/v0.5.0` (single-lane, second commit
+chain on the same branch/PR #20).
+
+Command-shape decision (written rationale per task scope): new top-level
+`ackit status [taskId]`, NOT `doctor --task/--next` — doctor reports
+repository-health with a gate exit contract; status reports task-centric
+projection with next-actions; merging conflates subjects and churns
+doctor's contract. Full rationale: ADR-0032 §1.
+
+Implementation: `src/core/status/projection.ts` (`buildStatusReport` +
+`renderStatusReport`, stable `ackit.status.v1` JSON contract) composing
+task/workflow/intent/evidence stores, `validateEvidence`, verdict trust
+summary (0079/0080 codes surfaced verbatim), checkpoint staleness engine,
+and a NEW public read-only `TaskStore.completionBlockers()` (extracted
+from `complete()` with zero behavior change — same engine, same strings;
+`complete()` calls it, then mutates). Next-actions map the gate's STABLE
+CODES to suggested commands (presentation, not predicates) with an
+explicit inspect fallback for unknown future codes, so derivation can
+never contradict the gate by omission. `src/cli/commands/status.ts` is a
+thin read-only surface (no journal, no writes); default target is the
+single active task (`none`/`ambiguous` resolve explicitly, never a silent
+pick). No `ackit run`, no second engine, no write projections (0083 may
+project the read model outward). Docs: ADR-0032, decisions index line,
+CLI reference row, agent-integration "Task status loop" section.
+
+Evidence: 8 unit projection tests (exact-pinned legacy rendering,
+byte-deterministic JSON, stage/missing-verdict, same-context
+INDEPENDENCE-UNPROVEN, STATE-STALE with changed classes, all-green
+complete-command, checkpoint surfacing, resolution errors) + read-only
+mutation-spy test (recursive hashes + porcelain identical across
+projection/render/CLI-human/CLI-JSON) + 2 CLI integration tests
+(human/JSON/explicit/implicit/errors + porcelain clean) green; all
+pre-existing gate/task/workflow suites pass unmodified (complete()
+refactor proven behavior-preserving). Full `pnpm test` counts + all
+gates recorded at completion-gate time. No quality gates weakened. No
+publish/tag/release. TASK-0082 not started.
