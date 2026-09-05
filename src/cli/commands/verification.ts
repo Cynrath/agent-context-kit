@@ -113,20 +113,18 @@ export async function runVerificationCommand(
           return EXIT_CODES.usage;
         }
         if (args.out !== undefined) {
-          // Reject (never sanitize) traversal/absolute out paths (T19).
-          const outArg = args.out.split("\\").join("/");
-          const escapes =
-            outArg.startsWith("/") ||
-            /^[a-zA-Z]:/.test(outArg) ||
-            outArg.split("/").some((segment) => segment === "..");
-          const outPath = path.resolve(rootPath, outArg);
-          if (escapes || !outPath.startsWith(rootPath)) {
+          // Link-aware containment (TASK-0084): string checks cannot see
+          // planted links/junctions redirecting the write outside the root.
+          const { resolveContainedWritePath } = await import("../../core/filesystem/paths.js");
+          const contained = await resolveContainedWritePath(rootPath, args.out);
+          if (!contained.ok) {
             emitDiagnostic(
               { code: "verification-error", message: "bundle output path escapes repository root" },
               { quiet: base.quiet, debug: base.debug ?? false },
             );
             return EXIT_CODES.securityBoundary;
           }
+          const outPath = contained.path;
           await fsp.mkdir(path.dirname(outPath), { recursive: true });
           await fsp.writeFile(
             outPath,

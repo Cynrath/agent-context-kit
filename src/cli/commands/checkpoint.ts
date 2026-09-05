@@ -17,7 +17,7 @@ import { WorkflowStore } from "../../core/workflow/index.js";
 import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
 import type { CliInvocation, GlobalOptions } from "../context.js";
-import { resolveContainedPath, runHandoffExport, runHandoffImport } from "./checkpoint-handoff.js";
+import { runHandoffExport, runHandoffImport } from "./checkpoint-handoff.js";
 import { enforceAckitBoundary } from "./policy-boundary.js";
 
 interface CheckpointCommandBase {
@@ -261,17 +261,17 @@ export async function runCheckpointCommand(
         const metaExtra = found.doc.meta as { planRef?: string | undefined };
         void metaExtra;
         if (args.out !== undefined) {
-          // Reject (never sanitize) traversal attempts: an out path with ..
-          // segments, absolute form, or backslashes is refused outright
-          // (THREAT_MODEL T19).
-          const outPath = resolveContainedPath(rootPath, args.out);
-          if (outPath === null) {
+          // Link-aware containment (TASK-0084): see verification bundle writer.
+          const { resolveContainedWritePath } = await import("../../core/filesystem/paths.js");
+          const contained = await resolveContainedWritePath(rootPath, args.out);
+          if (!contained.ok) {
             emitDiagnostic(
               { code: "checkpoint-error", message: "export path escapes repository root" },
               { quiet: base.quiet, debug: base.debug ?? false },
             );
             return EXIT_CODES.securityBoundary;
           }
+          const outPath = contained.path;
           await fsp.mkdir(path.dirname(outPath), { recursive: true });
           await fsp.writeFile(outPath, pack, "utf8");
           if (!base.quiet) process.stdout.write(`handoff pack written to ${args.out}\n`);

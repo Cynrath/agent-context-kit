@@ -178,6 +178,20 @@ export async function runSkillsScaffoldCommand(
     );
     return EXIT_CODES.usage;
   }
+  // Fixed subpath, still link-checked (TASK-0084): a planted link anywhere
+  // above the target must not redirect the scaffold outside the root.
+  const { resolveContainedWritePath } = await import("../../core/filesystem/paths.js");
+  const containedSkill = await resolveContainedWritePath(
+    rootPath,
+    `.agents/skills/${name}/SKILL.md`,
+  );
+  if (!containedSkill.ok) {
+    emitDiagnostic(
+      { code: "skill-invalid-name", message: "scaffold path escapes repository root" },
+      { quiet: options.quiet ?? false, debug: options.debug ?? false },
+    );
+    return EXIT_CODES.securityBoundary;
+  }
   await mkdir(skillDir, { recursive: true });
   await writeFile(
     path.join(skillDir, "SKILL.md"),
@@ -229,20 +243,18 @@ export async function runSkillsExportCommand(
     return EXIT_CODES.environment;
   }
   const rootPath = rootResolution.root.canonicalPath;
-  // Out path: repository-relative POSIX, containment-checked, reject traversal.
-  const outArg = options.out.split("\\").join("/");
-  const escapes =
-    outArg.startsWith("/") ||
-    /^[a-zA-Z]:/.test(outArg) ||
-    outArg.split("/").some((segment) => segment === "..");
-  const outDir = path.resolve(rootPath, outArg);
-  if (escapes || !outDir.startsWith(rootPath)) {
+  // Out path: repository-relative POSIX, link-aware containment
+  // (TASK-0084: planted links must not redirect the export outside).
+  const { resolveContainedWritePath } = await import("../../core/filesystem/paths.js");
+  const containedOut = await resolveContainedWritePath(rootPath, options.out);
+  if (!containedOut.ok) {
     emitDiagnostic(
       { code: "skill-export-out", message: "export path escapes repository root" },
       { quiet: options.quiet, debug: options.debug },
     );
     return EXIT_CODES.securityBoundary;
   }
+  const outDir = containedOut.path;
   await mkdir(outDir, { recursive: true });
   const { readFile } = await import("node:fs/promises");
   let exported = 0;

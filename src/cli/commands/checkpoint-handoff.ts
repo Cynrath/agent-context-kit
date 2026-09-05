@@ -69,14 +69,17 @@ export async function runHandoffExport(
     return EXIT_CODES.usage;
   }
   if (args.out !== undefined) {
-    const outPath = resolveContainedPath(rootPath, args.out);
-    if (outPath === null) {
+    // Link-aware containment (TASK-0084): see verification bundle writer.
+    const { resolveContainedWritePath } = await import("../../core/filesystem/paths.js");
+    const contained = await resolveContainedWritePath(rootPath, args.out);
+    if (!contained.ok) {
       emitDiagnostic(
         { code: "checkpoint-error", message: "export path escapes repository root" },
         { quiet: base.quiet, debug: base.debug ?? false },
       );
       return EXIT_CODES.securityBoundary;
     }
+    const outPath = contained.path;
     await fsp.mkdir(path.dirname(outPath), { recursive: true });
     await fsp.writeFile(outPath, built.handoff.json, "utf8");
     if (!base.quiet) process.stdout.write(`handoff written to ${args.out}\n`);
