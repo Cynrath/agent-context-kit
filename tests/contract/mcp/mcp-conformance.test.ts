@@ -47,7 +47,7 @@ describe("ackit MCP conformance (REQ-MCP-004)", () => {
     }
   });
 
-  it("tools/list exposes the fifteen read-only tools; write tools absent", async () => {
+  it("tools/list exposes the sixteen read-only tools; write tools absent", async () => {
     const session = await connect();
     try {
       const { tools } = await session.client.listTools();
@@ -65,6 +65,7 @@ describe("ackit MCP conformance (REQ-MCP-004)", () => {
         "ackit_pack",
         "ackit_policy_check",
         "ackit_scan",
+        "ackit_status",
         "ackit_validate_skills",
         "ackit_verification_bundle",
         "ackit_workflow_status",
@@ -154,6 +155,37 @@ describe("ackit MCP conformance (REQ-MCP-004)", () => {
       });
       expect(legacyStatus.isError ?? false).toBe(false);
       expect(JSON.stringify(legacyStatus.content)).toContain("no workflow state");
+    } finally {
+      delete process.env["ACKIT_ROOT"];
+      await session.close();
+    }
+  });
+
+  it("ackit_status exposes the canonical CLI snapshot read-only (TASK-0083 parity)", async () => {
+    const { TaskStore } = await import("../../../src/core/tasks/index.js");
+    const store = new TaskStore(rootPath);
+    const created = await store.create("mcp status fixture");
+    const taskId = created.meta.id;
+    process.env["ACKIT_ROOT"] = rootPath;
+    const session = await connect();
+    try {
+      // Explicit task: same ackit.status.v1 contract as `ackit --json status`.
+      const explicit = await session.client.callTool({
+        name: "ackit_status",
+        arguments: { taskId },
+      });
+      expect(explicit.isError ?? false).toBe(false);
+      const text = JSON.stringify(explicit.content);
+      expect(text).toContain("ackit.status.v1");
+      expect(text).toContain(taskId);
+      expect(text).toContain("blockers");
+      // Unknown task: structured error, never a throw.
+      const unknown = await session.client.callTool({
+        name: "ackit_status",
+        arguments: { taskId: "TASK-9999" },
+      });
+      expect(unknown.isError ?? false).toBe(false);
+      expect(JSON.stringify(unknown.content)).toContain("error");
     } finally {
       delete process.env["ACKIT_ROOT"];
       await session.close();

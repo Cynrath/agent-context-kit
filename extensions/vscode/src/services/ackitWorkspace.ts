@@ -1,16 +1,26 @@
-import * as vscode from "vscode";
+import type { InstructionGraph, ScanResult, ScoreReport } from "@cynrath/agent-context-kit";
 import {
   analyzeOptimize,
   buildContextPack,
   buildInstructionGraph,
+  buildStatusReport,
   loadAckitConfig,
   resolveEffectiveStack,
   scanRepository,
   scoreRepository,
   validateSkills,
 } from "@cynrath/agent-context-kit";
-import type { InstructionGraph, ScoreReport } from "@cynrath/agent-context-kit";
-import type { ScanResult } from "@cynrath/agent-context-kit";
+import * as vscode from "vscode";
+
+export interface ActiveTaskStatus {
+  taskId: string;
+  title: string;
+  status: string;
+  stage: string | null;
+  blockerCount: number;
+  blockers: string[];
+  next: { action: string; command?: string; reason: string }[];
+}
 
 export interface WorkspaceSnapshot {
   root: string;
@@ -19,6 +29,8 @@ export interface WorkspaceSnapshot {
   graph: InstructionGraph | null;
   diagnostics: { config: unknown; tasks: unknown; policy: unknown } | null;
   optimize: unknown[] | null;
+  /** Canonical task status snapshot (TASK-0083 parity; null when no active task). */
+  taskStatus: ActiveTaskStatus | null;
   error: string | null;
   updatedAt: number;
 }
@@ -40,8 +52,16 @@ export class AckitWorkspaceService implements vscode.Disposable {
     watcher.onDidDelete(schedule, this, this.disposables);
     this.disposables.push(watcher);
     // Also watch active editor changes for graph
-    vscode.window.onDidChangeActiveTextEditor(() => this._onDidChange.fire("graph"), this, this.disposables);
-    vscode.workspace.onDidChangeWorkspaceFolders(() => this.scheduleRefresh(), this, this.disposables);
+    vscode.window.onDidChangeActiveTextEditor(
+      () => this._onDidChange.fire("graph"),
+      this,
+      this.disposables,
+    );
+    vscode.workspace.onDidChangeWorkspaceFolders(
+      () => this.scheduleRefresh(),
+      this,
+      this.disposables,
+    );
   }
 
   dispose() {
@@ -101,6 +121,7 @@ export class AckitWorkspaceService implements vscode.Disposable {
       graph: null,
       diagnostics: null,
       optimize: null,
+      taskStatus: null,
       error: null,
       updatedAt: 0,
     };
@@ -152,6 +173,30 @@ export class AckitWorkspaceService implements vscode.Disposable {
         };
       } catch (e) {
         snapshot.diagnostics = { config: String(e), tasks: null, policy: null };
+      }
+      if (signal.aborted) throw new DOMException("aborted", "AbortError");
+      // Canonical task status (TASK-0083 parity): same snapshot as
+      // `ackit status` via the SDK read model — null when no active task.
+      try {
+        const report = await buildStatusReport(root);
+        snapshot.taskStatus =
+          report.task === null
+            ? null
+            : {
+                taskId: report.task.id,
+                title: report.task.title,
+                status: report.task.status,
+                stage: report.task.stage,
+                blockerCount: report.blockers.length,
+                blockers: report.blockers.slice(0, 5),
+                next: report.next.slice(0, 3).map((n) => ({
+                  action: n.action,
+                  ...(n.command !== undefined ? { command: n.command } : {}),
+                  reason: n.reason,
+                })),
+              };
+      } catch {
+        snapshot.taskStatus = null;
       }
       snapshot.error = null;
     } catch (e) {

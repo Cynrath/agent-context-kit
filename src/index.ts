@@ -9,10 +9,16 @@
 export type { AckitErrorCode } from "./api/errors.js";
 export { AckitError } from "./api/errors.js";
 export { scanRepository } from "./api/scan-repository.js";
+export type { BuiltHandoff, HandoffV2, ValidatedHandoff } from "./core/checkpoint/index.js";
 export {
+  buildHandoff,
   CheckpointStore,
+  HANDOFF_SCHEMA_ID_V2,
+  HandoffError,
+  parseHandoffFile,
   renderHandoffPack,
   renderResumeContext,
+  validateHandoff,
 } from "./core/checkpoint/index.js";
 export type { Checkpoint, NextAction } from "./core/checkpoint/types.js";
 export { loadAckitConfig } from "./core/config/load.js";
@@ -75,6 +81,12 @@ export type {
 } from "./core/scanner/types.js";
 export type { SkillIssue, SkillRecord } from "./core/skills/types.js";
 export { validateSkills } from "./core/skills/validate.js";
+export type { StatusNextAction, StatusReport } from "./core/status/projection.js";
+export {
+  buildStatusReport,
+  renderStatusReport,
+  STATUS_SCHEMA_ID,
+} from "./core/status/projection.js";
 export { TaskStore } from "./core/tasks/store.js";
 // ---------------------------------------------------------------------------
 // Workflow expansion SDK surface (TASK-0059, ADR-0025..0028): focused, typed
@@ -86,18 +98,23 @@ export type {
   BindingComponentName,
   BoundVerdict,
   ComputedStateBinding,
+  IndependenceAssessment,
+  IndependenceBasis,
   StateBindingComponents,
   Verdict,
   VerdictFreshness,
   VerdictRecord,
 } from "./core/verification/index.js";
 export {
+  assessVerdictIndependence,
   buildVerificationBundle,
   compareStoredBinding,
   computeStateBinding,
   isBoundVerdict,
+  projectVerdictAuthoring,
   StateBindingError,
   VerdictStore,
+  verdictContentDigest,
 } from "./core/verification/index.js";
 export {
   BUILTIN_PROFILES,

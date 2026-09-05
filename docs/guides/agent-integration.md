@@ -62,10 +62,19 @@ Client snippet (Claude-style config):
 
 Read-only tools: ackit_scan, ackit_doctor, ackit_pack,
 ackit_instruction_graph, ackit_list_skills, ackit_validate_skills,
-ackit_list_tasks, ackit_get_task, ackit_policy_check.
+ackit_list_tasks, ackit_get_task, ackit_policy_check,
+ackit_workflow_status, ackit_get_intent, ackit_get_checkpoint,
+ackit_verification_bundle, ackit_drift_check, ackit_list_roles,
+ackit_status (canonical task snapshot; MCP stays read-only — no
+mutation surface by explicit decision).
 Resources: repo://summary | instructions-graph | skills-catalog |
 tasks-active | policy. Prompts: onboarding, task-execution,
 scan-remediation, context-optimization.
+
+Provider surfaces: capability table, sources with freshness dates, and
+the per-surface parity statement live in
+`docs/reference/provider-surfaces.md` (machine-readable:
+`tests/fixtures/provider-capabilities.json`).
 
 ## Task status loop (read-only)
 

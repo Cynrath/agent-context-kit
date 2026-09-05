@@ -1,7 +1,7 @@
 ---
 id: "TASK-0083"
 title: "Provider-surface and integration parity audit and implementation"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
@@ -47,10 +47,10 @@ Strong multi-auditor consensus (SHOULD, two linked items): provider-surface pari
 
 ## Acceptance criteria
 
-- [ ] Capability table covers the listed surfaces, each material difference cites an official/current primary source with date; non-differences explicitly recorded as such.
-- [ ] Proven projection drift closed; all surfaces expose the same canonical snapshot (fixture-proven per surface).
-- [ ] No new engines; MCP remains read-only (offline-egress + capability review).
-- [ ] Full gates green with counts; offline/scan/hygiene hold; real-gate completion with evidence.
+- [x] Capability table covers the listed surfaces, each material difference cites an official/current primary source with date; non-differences explicitly recorded as such.
+- [x] Proven projection drift closed; all surfaces expose the same canonical snapshot (fixture-proven per surface).
+- [x] No new engines; MCP remains read-only (offline-egress + capability review).
+- [x] Full gates green with counts; offline/scan/hygiene hold; real-gate completion with evidence.
 
 ## Test steps
 
@@ -75,4 +75,49 @@ Strong multi-auditor consensus (SHOULD, two linked items): provider-surface pari
 
 ## Completion notes
 
-(placeholder)
+Implemented 2026-09-05 on `release/v0.5.0` (single-lane, fourth chain on
+the same branch/PR #20).
+
+Provider audit (fresh official primary sources, fetched directly
+2026-09-05 — vendor docs + vendor doc repos; directory search API was
+unavailable, recorded honestly in the fixture; no community sources, no
+live calls): 7 surfaces audited (Codex CLI, Claude Code, Gemini CLI,
+Copilot Chat, Copilot coding agent, Copilot review, VS Code agent mode)
+→ 10 material differences D1–D10 (canonical filenames, foreign-file
+reading, skills roots, conflict resolution, scoped syntax, precedence,
+review channels, caps, packaging, VS Code settings gates), each citing
+URLs + access dates, plus 5 pinned non-differences N1–N5 (notably N2
+SKILL.md convergence) and 5 UNSPECIFIED items (never inferred).
+Machine-readable: `tests/fixtures/provider-capabilities.json`
+(`ackit.provider-capabilities.v1`), pinned by
+`tests/contract/provider-capabilities.test.ts` (surface coverage, dated
+https sources, no-drop D1–D10, N2 pin, ACKit projection mapping for
+D1–D3). Deliberate non-change, reviewed: NO new codex/gemini skill
+export targets — identical SKILL.md bytes would be provider-count
+inflation (N2); roots stay caller-chosen via `--out`, documented as
+data in the fixture mapping.
+
+Projection parity (one canonical snapshot, no new engines): SDK gains
+the v0.5 read models (status report/render + contract id, handoff
+build/parse/validate + error + contract id, independence assessment +
+replay digest helpers; allowlist + function/shape contract updated);
+MCP gains ONE read-only `ackit_status` (composed 0081 projection —
+evidence/verdict/drift answers ride one tool, no per-entity sprawl; no
+mutation surface, guarded by a tool-name test); Action proven
+passthrough (spawns CLI; description now documents read-only
+status/drift; no bundle change); VS Code Tasks view renders the SDK
+status snapshot (blockers + next actions; tsc + esbuild green, host
+suite runs in CI). Parity proven per surface:
+`tests/contract/projection-parity.test.ts` (CLI ≡ SDK ≡ MCP
+byte-equality, MCP read-only guard, Action bundle spawn asserting the
+snapshot in findings-json). Docs: `docs/reference/provider-surfaces.md`
+(capability summary + sources/dates + parity matrix + deferred items),
+agent-integration MCP list refreshed (9 → 16 + status note) with
+provider doc link, SDK reference v0.5 rows, action.yml description.
+
+Evidence: capability contract 4/4 + parity 3/3 + MCP conformance (16
+tools) + api-surface allowlist green; pre-existing skills/instruction/
+contract suites pass unmodified. Full `pnpm test` counts + all gates
+recorded at completion-gate time. MCP stays read-only (offline-egress +
+capability review hold). No quality gates weakened. No publish/tag/
+release. TASK-0084 not started.

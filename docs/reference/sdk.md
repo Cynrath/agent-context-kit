@@ -46,6 +46,14 @@ The programmatic SDK is the single supported import for embedding ACKit in Node.
 | `listRoles`, `loadRole` | functions | Portable role contracts (`ackit.role.v1`). |
 | `WorkflowStore`, `BUILTIN_PROFILES`, `listWorkflowProfiles`, `requiredArtifacts` | class/constants | Workflow engine (`ackit.workflow.v1`); profiles are frozen catalogs. |
 
+**v0.5 read-model additions (TASK-0080…0083, parity surfaces):**
+
+| Symbol | Kind | Description |
+|---|---|---|
+| `assessVerdictIndependence`, `verdictContentDigest`, `projectVerdictAuthoring` | functions | Structural independence assessment + replay content digest (no identity crypto). |
+| `buildHandoff`, `parseHandoffFile`, `validateHandoff`, `HandoffError`, `HANDOFF_SCHEMA_ID_V2` | functions/class/constant | Portable verification-bound handoff (`ackit.handoff.v2`); import validates read-only. |
+| `buildStatusReport`, `renderStatusReport`, `STATUS_SCHEMA_ID` | functions/constant | Canonical read-only status projection (`ackit.status.v1`, same snapshot as CLI/MCP). |
+
 Additions require ADR + contract test update; the allowlist test fails on accidental export.
 
 ## Package contract

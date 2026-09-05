@@ -1,0 +1,211 @@
+{
+  "schemaVersion": "ackit.provider-capabilities.v1",
+  "researchedAt": "2026-09-05",
+  "researchNote": "Official primary sources only (direct fetch of vendor docs and vendor doc repos; directory search API unavailable at research time). Anything not stated in official docs is marked UNSPECIFIED. No community sources used; no live-provider calls.",
+  "surfaces": {
+    "codex-cli": {
+      "alwaysOn": ["AGENTS.md"],
+      "alwaysOnNotes": "Global ~/.codex/AGENTS.md or AGENTS.override.md; per-directory AGENTS.override.md > AGENTS.md > configured fallback filenames; root-down concatenation; combined cap 32KiB.",
+      "skillsRoots": [".agents/skills", "$HOME/.agents/skills", "/etc/codex/skills"],
+      "skillFormat": "SKILL.md (Agent Skills open standard)",
+      "scopedSyntax": "nested AGENTS.md files (no globs)",
+      "precedence": "deeper file loads later and overrides; one file per directory, override kills base",
+      "reviewChannel": "## Code Review Rules section in nearest AGENTS.md; root + file-specific both apply per changed file",
+      "foreignFiles": "only via configured fallback filenames or one-time /import",
+      "packaging": ["codex plugins"],
+      "caps": { "agentsMdCombined": "32KiB", "skillsList": "2% or 8000 chars" }
+    },
+    "claude-code": {
+      "alwaysOn": ["CLAUDE.md"],
+      "alwaysOnNotes": "Managed policy -> ~/.claude/CLAUDE.md -> ./CLAUDE.md or ./.claude/CLAUDE.md -> CLAUDE.local.md; ancestor chain plus on-demand subdir loads; @path imports. AGENTS.md is NOT read natively.",
+      "skillsRoots": ["~/.claude/skills", ".claude/skills"],
+      "skillFormat": "SKILL.md (Agent Skills open standard)",
+      "scopedSyntax": ".claude/rules/*.md with paths: frontmatter array",
+      "precedence": "concatenation root-down (ordering only, no override); enterprise > personal > project for skills",
+      "reviewChannel": "UNSPECIFIED (no dedicated review-instruction channel documented)",
+      "foreignFiles": "never native; needs @AGENTS.md import/symlink or one-time /init|/import",
+      "packaging": ["claude plugins"],
+      "caps": { "memorySkip": "4MiB hard skip", "fileGuidance": "<200 lines per file", "skillsList": "1% of window, 1536-char entry cap" }
+    },
+    "gemini-cli": {
+      "alwaysOn": ["GEMINI.md"],
+      "alwaysOnNotes": "Global ~/.gemini/GEMINI.md -> workspace + parents -> JIT discovery on tool access; concatenation; @file imports; filename configurable via context.fileName (any name, including AGENTS.md).",
+      "skillsRoots": ["~/.gemini/skills", "~/.agents/skills (alias)", ".gemini/skills", ".agents/skills (alias)"],
+      "skillFormat": "SKILL.md (Agent Skills open standard)",
+      "scopedSyntax": "JIT GEMINI.md discovery (no globs)",
+      "precedence": "UNSPECIFIED between concatenated GEMINI.md levels (load order stated, no override rule)",
+      "reviewChannel": "UNSPECIFIED (no dedicated review-instruction channel documented)",
+      "foreignFiles": "any filename via context.fileName",
+      "packaging": ["gemini extensions (prompts + MCP + commands + hooks + skills)"],
+      "caps": {}
+    },
+    "copilot-chat": {
+      "alwaysOn": [".github/copilot-instructions.md", "AGENTS.md"],
+      "alwaysOnNotes": "Repo: .github/copilot-instructions.md + .github/instructions/**/*.instructions.md + agent files (VS Code chat reads AGENTS.md; github.com chat reads agents-only set). Personal/org instructions on github.com only.",
+      "skillsRoots": [".github/skills"],
+      "skillFormat": "SKILL.md (Agent Skills open standard)",
+      "scopedSyntax": ".github/instructions/**/*.instructions.md with applyTo glob (+frontmatter name/description)",
+      "precedence": "personal > path-specific > repo-wide > agent files > org (all supplied, nondeterministic merge)",
+      "reviewChannel": "not applicable (chat surface)",
+      "foreignFiles": "VS Code chat reads AGENTS.md and CLAUDE.md natively",
+      "packaging": ["vscode chatSkills contribution"],
+      "caps": {}
+    },
+    "copilot-coding-agent": {
+      "alwaysOn": ["AGENTS.md", "CLAUDE.md", "GEMINI.md"],
+      "alwaysOnNotes": "Repo-wide + path-specific + agent-ALL set (AGENTS.md + CLAUDE.md + GEMINI.md) + org; nested AGENTS.md anywhere with nearest-wins; single root CLAUDE.md/GEMINI.md as the alternative.",
+      "skillsRoots": [".github/skills"],
+      "skillFormat": "SKILL.md (Agent Skills open standard)",
+      "scopedSyntax": ".github/instructions/**/*.instructions.md with applyTo glob",
+      "precedence": "personal > path-specific > repo-wide > agent files > org (all supplied)",
+      "reviewChannel": "not applicable (implementation surface)",
+      "foreignFiles": "multi-native (AGENTS.md + CLAUDE.md + GEMINI.md)",
+      "packaging": ["vscode chatSkills contribution"],
+      "caps": {}
+    },
+    "copilot-review": {
+      "alwaysOn": ["AGENTS.md"],
+      "alwaysOnNotes": "Repo-wide + path-specific + agent-ONLY set (AGENTS.md; CLAUDE.md/GEMINI.md are NOT eligible); repo settings toggle; instructions and skills sourced from the HEAD branch (testable in-PR).",
+      "skillsRoots": [".github/skills"],
+      "skillFormat": "SKILL.md (Agent Skills open standard)",
+      "scopedSyntax": ".github/instructions/**/*.instructions.md with applyTo glob",
+      "precedence": "personal > path-specific > repo-wide > agent files > org (all supplied)",
+      "reviewChannel": "AGENTS.md-only channel with repo toggle + HEAD-branch sourcing",
+      "foreignFiles": "AGENTS.md only (CLAUDE.md/GEMINI.md excluded by rule)",
+      "packaging": ["vscode chatSkills contribution"],
+      "caps": { "fileGuidance": "~1000 lines per file" }
+    },
+    "vscode-agent-mode": {
+      "alwaysOn": [".github/copilot-instructions.md", "AGENTS.md", "CLAUDE.md"],
+      "alwaysOnNotes": "Combines copilot-instructions.md + AGENTS.md (nested, experimental, setting-gated) + CLAUDE.md + *.instructions.md (applyTo) + .claude/rules (paths) + org; NO merge order guaranteed; user > repo > org on conflict; per-type settings toggles.",
+      "skillsRoots": [".github/skills", ".claude/skills", ".agents/skills", "~/.copilot/skills", "~/.claude/skills", "~/.agents/skills"],
+      "skillFormat": "SKILL.md (Agent Skills open standard)",
+      "scopedSyntax": ".github/instructions/**/*.instructions.md with applyTo glob; .claude/rules with paths array",
+      "precedence": "combined with NO guaranteed order; conflicting rules are unsafe here",
+      "reviewChannel": "review/commit/PR-description instruction text via settings",
+      "foreignFiles": "multi-native (AGENTS.md + CLAUDE.md), setting-gated",
+      "packaging": ["vscode chatSkills contribution"],
+      "caps": {},
+      "settingsGates": [
+        "chat.useAgentsMdFile",
+        "chat.useClaudeMdFile",
+        "chat.useNestedAgentsMdFiles",
+        "instructionsFilesLocations",
+        "useCustomizationsInParentRepositories",
+        "github.copilot.chat.reviewSelection.instructions",
+        "github.copilot.chat.commitMessageGeneration.instructions",
+        "github.copilot.chat.pullRequestDescriptionGeneration.instructions"
+      ]
+    }
+  },
+  "ackitProjection": {
+    "managedFiles": ["AGENTS.md", "CLAUDE.md", "GEMINI.md", ".github/copilot-instructions.md"],
+    "skillExportTargets": ["claude", "copilot", "generic"],
+    "skillRootsByTarget": {
+      "claude": [".claude/skills"],
+      "copilot": [".github/skills", ".github/instructions"],
+      "generic": [".agents/skills"]
+    },
+    "notes": [
+      "One managed file does not cover all CLIs natively (D1); ACKit emits the per-provider set.",
+      "Codex/Gemini skill content equals the SKILL.md open standard (N2); roots differ (D3) and are caller-chosen via --out, so no separate codex/gemini export targets exist.",
+      "Scoped rules are authored once and projected to applyTo (copilot/vscode) and paths (claude) dialects where the surface requires it (D5)."
+    ]
+  },
+  "differences": [
+    {
+      "id": "D1",
+      "statement": "The canonical always-on filename is provider-specific (AGENTS.md vs CLAUDE.md vs GEMINI.md vs .github/copilot-instructions.md); one file does not cover all CLIs natively.",
+      "sources": [
+        { "surface": "codex-cli", "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md", "accessed": "2026-09-05" },
+        { "surface": "claude-code", "url": "https://code.claude.com/docs/en/memory.md", "accessed": "2026-09-05" },
+        { "surface": "gemini-cli", "url": "https://geminicli.com/docs/cli/gemini-md/", "accessed": "2026-09-05" },
+        { "surface": "vscode-agent-mode", "url": "https://code.visualstudio.com/docs/agent-customization/custom-instructions", "accessed": "2026-09-05" }
+      ]
+    },
+    {
+      "id": "D2",
+      "statement": "Foreign-file reading differs: Claude never reads AGENTS.md natively; Codex only via fallback filenames or import; Gemini reads any filename via context.fileName; VS Code and the Copilot cloud agent are multi-native.",
+      "sources": [
+        { "surface": "claude-code", "url": "https://code.claude.com/docs/en/memory.md", "accessed": "2026-09-05" },
+        { "surface": "codex-cli", "url": "https://learn.chatgpt.com/docs/import.md", "accessed": "2026-09-05" },
+        { "surface": "gemini-cli", "url": "https://geminicli.com/docs/cli/gemini-md/", "accessed": "2026-09-05" }
+      ]
+    },
+    {
+      "id": "D3",
+      "statement": "Skills discovery roots differ (.agents/skills vs .claude/skills vs .gemini/skills vs .github/skills); one payload directory does not serve every provider.",
+      "sources": [
+        { "surface": "codex-cli", "url": "https://learn.chatgpt.com/docs/build-skills.md", "accessed": "2026-09-05" },
+        { "surface": "claude-code", "url": "https://code.claude.com/docs/en/skills.md", "accessed": "2026-09-05" },
+        { "surface": "gemini-cli", "url": "https://geminicli.com/docs/cli/skills/", "accessed": "2026-09-05" },
+        { "surface": "vscode-agent-mode", "url": "https://raw.githubusercontent.com/microsoft/vscode-docs/main/docs/agent-customization/agent-skills.md", "accessed": "2026-09-05" }
+      ]
+    },
+    {
+      "id": "D4",
+      "statement": "Skills name-conflict resolution differs (Codex shows both; Gemini higher tier wins; Claude enterprise > personal > project with dir-qualified nested names).",
+      "sources": [
+        { "surface": "codex-cli", "url": "https://learn.chatgpt.com/docs/build-skills.md", "accessed": "2026-09-05" },
+        { "surface": "gemini-cli", "url": "https://geminicli.com/docs/cli/skills/", "accessed": "2026-09-05" },
+        { "surface": "claude-code", "url": "https://code.claude.com/docs/en/skills.md", "accessed": "2026-09-05" }
+      ]
+    },
+    {
+      "id": "D5",
+      "statement": "Scoped-instruction syntax differs (paths: array vs applyTo: glob vs nested files vs JIT discovery); one scoped rule needs per-surface rendering.",
+      "sources": [
+        { "surface": "claude-code", "url": "https://code.claude.com/docs/en/memory.md", "accessed": "2026-09-05" },
+        { "surface": "vscode-agent-mode", "url": "https://code.visualstudio.com/docs/agent-customization/custom-instructions", "accessed": "2026-09-05" },
+        { "surface": "codex-cli", "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md", "accessed": "2026-09-05" }
+      ]
+    },
+    {
+      "id": "D6",
+      "statement": "Precedence semantics differ (Codex deeper-overrides; Claude concat-ordering; Copilot personal > path > wide > agent > org; VS Code no guaranteed order), so conflicting rules are unsafe on VS Code but ordered elsewhere.",
+      "sources": [
+        { "surface": "codex-cli", "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md", "accessed": "2026-09-05" },
+        { "surface": "claude-code", "url": "https://code.claude.com/docs/en/memory.md", "accessed": "2026-09-05" },
+        { "surface": "vscode-agent-mode", "url": "https://code.visualstudio.com/docs/agent-customization/custom-instructions", "accessed": "2026-09-05" }
+      ]
+    },
+    {
+      "id": "D7",
+      "statement": "The code-review instruction channel differs (Codex ## Code Review Rules section in AGENTS.md vs Copilot review AGENTS.md-only channel with repo toggle and HEAD-branch sourcing).",
+      "sources": [
+        { "surface": "codex-cli", "url": "https://learn.chatgpt.com/docs/third-party/github.md", "accessed": "2026-09-05" },
+        { "surface": "copilot-review", "url": "https://raw.githubusercontent.com/github/docs/main/content/copilot/tutorials/customize-code-review.md", "accessed": "2026-09-05" }
+      ]
+    },
+    {
+      "id": "D8",
+      "statement": "Size caps differ and bound emission (Codex 32KiB combined AGENTS.md; Claude 4MiB skip with <200-line guidance; Copilot review ~1000-line guidance).",
+      "sources": [
+        { "surface": "codex-cli", "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md", "accessed": "2026-09-05" },
+        { "surface": "claude-code", "url": "https://code.claude.com/docs/en/memory.md", "accessed": "2026-09-05" }
+      ]
+    },
+    {
+      "id": "D9",
+      "statement": "Distribution packaging differs (Gemini extensions vs Codex plugins vs VS Code chatSkills contribution vs Claude plugins); one manifest does not install everywhere.",
+      "sources": [
+        { "surface": "gemini-cli", "url": "https://geminicli.com/docs/extensions/", "accessed": "2026-09-05" },
+        { "surface": "vscode-agent-mode", "url": "https://code.visualstudio.com/docs/agent-customization/custom-instructions", "accessed": "2026-09-05" }
+      ]
+    },
+    {
+      "id": "D10",
+      "statement": "VS Code file support is settings-gated (useAgentsMdFile/useClaudeMdFile/nested/locations toggles plus review/commit/PR instruction settings); repo files alone are insufficient there.",
+      "sources": [
+        { "surface": "vscode-agent-mode", "url": "https://code.visualstudio.com/docs/agent-customization/custom-instructions", "accessed": "2026-09-05" }
+      ]
+    }
+  ],
+  "nonDifferences": [
+    { "id": "N1", "statement": "All surfaces load instructions as context; none enforces them (Copilot nondeterministic; Claude context-not-config; Codex review guides but never replaces tests/approvals). Same caveat everywhere." },
+    { "id": "N2", "statement": "Skill authoring converged on the Agent Skills open standard (SKILL.md with required name+description) across Claude, Codex, Gemini, and VS Code/Copilot: author once, project to multiple roots." },
+    { "id": "N3", "statement": "Frontmatter invocation controls (user-invocable / disable-model-invocation, fork context) are shared Claude/VS Code/Copilot vocabulary, not differentiators." },
+    { "id": "N4", "statement": "All surfaces share the two-tier shape (user/global + repo/project always-on, concatenated); differences are only filenames, ordering semantics (D6), and caps (D8)." },
+    { "id": "N5", "statement": "Progressive disclosure for skills (metadata first, body on activation) is universal." }
+  ]
+}
