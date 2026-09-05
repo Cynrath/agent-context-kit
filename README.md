@@ -18,7 +18,7 @@
 </p>
 
 <h3 align="center">Turn any repository into an <em>agent-ready</em> repository.</h3>
-<p align="center">Instruction graph · Skills · Scanning · Context packs · Tasks · Policy · Readiness · MCP<br><strong>Offline-first · Deterministic · Task-first</strong> — <code>ackit</code> on Node&nbsp;≥&nbsp;22</p>
+<p align="center">Evidence-backed completion · Independent verification · Cross-agent handoff · Deterministic drift · Provider-independent contract · Offline-first<br>Instruction graph · Skills · Scanning · Context packs · Tasks · Policy · Readiness · MCP<br><strong>Offline-first · Deterministic · Task-first</strong> — <code>ackit</code> on Node&nbsp;≥&nbsp;22</p>
 
 <p align="center">
   <a href="#quickstart"><strong>Quickstart →</strong></a> ·
@@ -60,6 +60,37 @@ $ ackit pack --profile codex --max-tokens 50000 | head -5
 $ ackit dashboard --port 0 --open   # localhost-only, CSP, live polling
 → http://127.0.0.1:54321
 ```
+
+### 🔐 Trust flow (60 seconds)
+
+```bash
+$ ackit task complete TASK-0007
+completion gate blocked: MISSING_VERIFIER_VERDICT: profile 'standard'
+requires an independent verdict (run 'ackit verification bundle' + record)
+
+$ ackit evidence verify TASK-0007 --criterion AC-001 --type test --ref "pnpm vitest run (green)"
+$ ackit verification bundle TASK-0007 --format json --out .ackit/reviews/bundle.json
+$ ackit verification record TASK-0007 --verdict .ackit/reviews/verdict.yaml --bundle .ackit/reviews/bundle.json
+TASK-0007: verdict VR-0001 registered (PASS)
+
+$ ackit status TASK-0007
+blockers: (none — completion eligible)
+- verdict VR-0001 (PASS): fresh; independent
+
+$ ackit task complete TASK-0007
+TASK-0007: completed
+
+$ ackit checkpoint export TASK-0007 --format json --out .ackit/reviews/handoff.json
+# ... second process, zero shared memory ...
+$ ackit checkpoint import .ackit/reviews/handoff.json
+TASK-0007: handoff CP-0001 fresh (bundle 9f2c…); resume context renders
+```
+
+Stale state blocks with `VERDICT-STATE-STALE` (naming what changed);
+a fresh bundle + verdict restores eligibility. The full flow runs as a
+test (`tests/e2e/trust-flow-demo.test.ts`) and is walked through in
+[`docs/guides/demo-trust-flow.md`](docs/guides/demo-trust-flow.md) —
+offline, no API key.
 
 ---
 
@@ -126,7 +157,7 @@ OpenCode, Copilot, Gemini, Cursor, Cline, any MCP-capable agent).
 <tr><td style="border:1px solid #d0d7de; padding:8px;">⚡</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Benchmarks</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>benchmarks/run.mjs</code></td><td style="border:1px solid #d0d7de; padding:8px;">7 deterministic fixtures, 8 metrics (<code>coldScanMs</code>/<code>warmScanMs</code>/<code>incrementalMs</code>/<code>peakRssMb</code>/<code>filesPerSec</code>/<code>packMs</code>/<code>graphMs</code>/<code>cacheHitRatio</code>), median-of-3</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🔌</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>SDK v1</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>import { scanRepository } from "@cynrath/agent-context-kit"</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>sideEffects:false</code>, <code>type:module</code>, <code>exports {".","./mcp"}</code>, <code>AbortSignal</code> &lt;200ms, <code>AckitError</code></td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>VS Code</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>extensions/vscode</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>0.4.1</code>, <code>Cynrath</code>, <code>lints</code> Linters, <code>onStartupFinished</code>, readiness tree + Problems <code>ACKITxxx</code>, <code>&lt;2MB</code> VSIX — <strong>Marketplace: <code>Cynrath.ackit-vscode</code></strong></td></tr>
-<tr><td style="border:1px solid #d0d7de; padding:8px;">🤖</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>MCP</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit mcp serve</code></td><td style="border:1px solid #d0d7de; padding:8px;">Official SDK stdio, 15 read-only tools (incl. workflow status, intent, checkpoint, verification bundle, drift, roles), 5 resources, 4 prompts, <code>InMemoryTransport</code> cancellation</td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🤖</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>MCP</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit mcp serve</code></td><td style="border:1px solid #d0d7de; padding:8px;">Official SDK stdio, 16 read-only tools (incl. task status, workflow status, intent, checkpoint, verification bundle, drift, roles), 5 resources, 4 prompts, <code>InMemoryTransport</code> cancellation</td></tr>
 </tbody>
 </table>
 
