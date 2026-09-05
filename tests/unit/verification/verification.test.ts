@@ -9,6 +9,7 @@ import { syncRegistry } from "../../../src/core/evidence/sync.js";
 import type { RepositoryRoot } from "../../../src/core/filesystem/root.js";
 import { resolveRepositoryRoot } from "../../../src/core/filesystem/root.js";
 import { serialize, TaskStore } from "../../../src/core/tasks/index.js";
+import { computeStateBinding } from "../../../src/core/verification/binding.js";
 import { buildVerificationBundle } from "../../../src/core/verification/bundle.js";
 import { VerdictStore } from "../../../src/core/verification/store.js";
 import { VERDICT_PROBLEM_CODES } from "../../../src/core/verification/verdict.js";
@@ -54,6 +55,10 @@ async function evidenceRegistryFor(taskId: string): Promise<EvidenceRegistry | n
   return new EvidenceStore(await resolvedRoot()).load(taskId);
 }
 
+async function bindingFor(taskId: string) {
+  return computeStateBinding(rootPath, taskId);
+}
+
 async function setupTaskWithEvidence(): Promise<string> {
   const store = new TaskStore(rootPath);
   const created = await store.create("verification fixture");
@@ -97,6 +102,7 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
     const verdicts = new VerdictStore(rootPath);
     const registered = await verdicts.register(taskId, verdictInput(), {
       evidenceRegistry: await evidenceRegistryFor(taskId),
+      binding: await bindingFor(taskId),
     });
     expect(registered.id).toBe("VR-0001");
     expect(registered.verdict).toBe("PASS");
@@ -121,13 +127,13 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
           },
         ],
       }),
-      { evidenceRegistry: registry },
+      { evidenceRegistry: registry, binding: await bindingFor(taskId) },
     );
     expect(rework.verdict).toBe("REWORK_REQUIRED");
     const pass = await verdicts.register(
       taskId,
       verdictInput({ verdict: "PASS_WITH_WARNINGS", checkedCriteria: ["AC-001", "AC-002"] }),
-      { evidenceRegistry: registry },
+      { evidenceRegistry: registry, binding: await bindingFor(taskId) },
     );
     const all = await verdicts.list(taskId);
     expect(all.map((v) => v.id)).toEqual(["VR-0001", "VR-0002"]);
@@ -141,11 +147,13 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
     await expect(
       verdicts.register(taskId, verdictInput({ schemaId: "evil.verdict.v9" }), {
         evidenceRegistry: registry,
+        binding: await bindingFor(taskId),
       }),
     ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.schema });
     await expect(
       verdicts.register(taskId, verdictInput({ injected: true }), {
         evidenceRegistry: registry,
+        binding: await bindingFor(taskId),
       }),
     ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.schema });
     await expect(
@@ -154,7 +162,7 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
         verdictInput({
           findings: [{ severity: "blocking", criterion: "AC-001", code: "X_FAIL", message: "m" }],
         }),
-        { evidenceRegistry: registry },
+        { evidenceRegistry: registry, binding: await bindingFor(taskId) },
       ),
     ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.blockingOnPass });
   });
@@ -166,6 +174,7 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
     await expect(
       verdicts.register(taskId, verdictInput({ checkedCriteria: ["AC-999"] }), {
         evidenceRegistry: registry,
+        binding: await bindingFor(taskId),
       }),
     ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.criterionUnknown });
   });
@@ -184,7 +193,10 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
     const taskId = await setupTaskWithEvidence();
     const verdicts = new VerdictStore(rootPath);
     const registry = await evidenceRegistryFor(taskId);
-    await verdicts.register(taskId, verdictInput(), { evidenceRegistry: registry });
+    await verdicts.register(taskId, verdictInput(), {
+      evidenceRegistry: registry,
+      binding: await bindingFor(taskId),
+    });
     const file = path.join(rootPath, ".ackit", "workflow", taskId, "verdicts", "VR-0001.yaml");
     const { readFile, writeFile } = await import("node:fs/promises");
     const raw = await readFile(file, "utf8");
@@ -200,13 +212,16 @@ describe("verification bundle (ADR-0026 §3)", () => {
     const taskId = await setupTaskWithEvidence();
     const verdicts = new VerdictStore(rootPath);
     const registry = await evidenceRegistryFor(taskId);
-    await verdicts.register(taskId, verdictInput(), { evidenceRegistry: registry });
+    await verdicts.register(taskId, verdictInput(), {
+      evidenceRegistry: registry,
+      binding: await bindingFor(taskId),
+    });
     const root = await resolvedRoot();
     const first = await buildVerificationBundle(root, taskId);
     expect(first.ok).toBe(true);
     if (!first.ok) return;
     const md = first.bundle.markdown;
-    expect(md).toContain("ackit.verification-bundle.v1");
+    expect(md).toContain("ackit.verification-bundle.v2");
     expect(md).toContain("You are an INDEPENDENT verifier");
     expect(md).toContain("## Task document");
     expect(md).toContain("## Acceptance criteria + evidence");

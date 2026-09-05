@@ -25,8 +25,8 @@ Exit codes: see `docs/reference/exit-codes.md`.
 | `ackit checkpoint create <id> --next-objective text [--next-path p] [--next-command c] [--next-expected e]` | record a checkpoint with the exact next action |
 | `ackit checkpoint show <id> [cpId] \| validate <id> \| export <id> [--out file]` | checkpoint inspection, staleness validation, handoff pack |
 | `ackit evidence sync <id> \| show <id> \| verify <id> --criterion AC-n --type t --ref text \| validate <id>` | evidence contract (criteria linked to typed proof) |
-| `ackit verification bundle <id> [--out file] [--diff] [--format md\|json]` | deterministic bundle for a fresh independent verifier |
-| `ackit verification record <id> --verdict <file> \| show <id>` | append-only verdict registration + inspection |
+| `ackit verification bundle <id> [--out file] [--diff] [--format md\|json]` | deterministic state-bound bundle (v2) for a fresh independent verifier |
+| `ackit verification record <id> --verdict <file> [--bundle bundle.json] \| show <id>` | append-only state-bound verdict registration + inspection (`--bundle` replay-checks the reviewed bundle; stale bundles refused) |
 | `ackit drift check <id> [--ci]` \| `drift check-active [--ci]` | deterministic workflow drift findings; gate the active workflow task |
 | `ackit role list \| show <role> \| validate` | portable role contracts (`ackit.role.v1`) |
 | `ackit journal show [--limit n] [--task id] \| validate` | local sanitized execution journal |

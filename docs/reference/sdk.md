@@ -39,7 +39,8 @@ The programmatic SDK is the single supported import for embedding ACKit in Node.
 | `IntentStore`, `intentFingerprint`, `normalizeIntent` | class/functions | Intent artifacts (`docs/intent/`, `ackit.intent.v1`); machine-path-independent fingerprints. |
 | `CheckpointStore`, `renderResumeContext`, `renderHandoffPack` | class/functions | Checkpoints (`ackit.checkpoint.v1`) + deterministic resume/handoff renderers. |
 | `EvidenceStore`, `validateEvidence` | class/function | Evidence registry (`ackit.evidence.v2`) + completeness validation. |
-| `VerdictStore`, `buildVerificationBundle` | class/function | Append-only verdicts (`ackit.verdict.v1`) + deterministic verification bundles. |
+| `VerdictStore`, `buildVerificationBundle` | class/function | Append-only verdicts (stored `ackit.verdict.v2`, state-bound; legacy `v1` readable) + deterministic state-bound verification bundles (`ackit.verification-bundle.v2`). |
+| `computeStateBinding`, `compareStoredBinding`, `isBoundVerdict`, `StateBindingError` | functions/class | State-binding contract (ADR-0030): compute current binding, compare stored-vs-current freshness, narrow bound records. |
 | `detectWorkflowDrift` | function | Deterministic drift findings (eight frozen codes). |
 | `resolveAutonomy`, `resolveReview` | functions | Policy v2 risk-tiered autonomy + review resolution (deny wins). |
 | `listRoles`, `loadRole` | functions | Portable role contracts (`ackit.role.v1`). |

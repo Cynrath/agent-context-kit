@@ -10,10 +10,15 @@ import { TaskStore } from "../tasks/index.js";
 import type { TaskDoc } from "../tasks/types.js";
 import { resolveLifecycleGates } from "../workflow/gates.js";
 import { WorkflowStore } from "../workflow/index.js";
+import { type ComputedStateBinding, computeStateBinding, StateBindingError } from "./binding.js";
 import { VerdictStore } from "./store.js";
+import { isBoundVerdict, type VerdictRecord } from "./verdict.js";
 
-/** Bundle header schema id (ADR-0026 §3). */
-export const VERIFICATION_BUNDLE_SCHEMA_ID = "ackit.verification-bundle.v1";
+/** Bundle header schema id (ADR-0026 §3, bound extension ADR-0030). */
+export const VERIFICATION_BUNDLE_SCHEMA_ID = "ackit.verification-bundle.v2";
+
+/** Legacy unbound bundle header (pre-TASK-0079 readers). */
+export const VERIFICATION_BUNDLE_SCHEMA_ID_V1 = "ackit.verification-bundle.v1";
 
 export interface BuildBundleOptions {
   /** Include the full diff (byte-capped) instead of omitting it. */
@@ -26,6 +31,8 @@ export interface BuildBundleOptions {
 export interface VerificationBundle {
   markdown: string;
   json: string;
+  /** Structured state binding (v2): the trust anchor of this bundle. */
+  binding: ComputedStateBinding;
 }
 
 interface BundleParts {
@@ -73,6 +80,19 @@ export async function buildVerificationBundle(
   const workflowStore = new WorkflowStore(root);
   const wf = await workflowStore.load(taskId);
 
+  // State binding first (fail-closed): a bundle is only meaningful with the
+  // digests its verdict will be bound to. Missing referenced artifacts or
+  // unavailable binding inputs refuse the bundle with a stable code instead
+  // of emitting a silently unbound document.
+  let binding: ComputedStateBinding;
+  try {
+    binding = await computeStateBinding(rootPath, taskId);
+  } catch (error) {
+    const code =
+      error instanceof StateBindingError ? error.code : "VERIFICATION-BINDING-UNAVAILABLE";
+    return { ok: false, diagnostic: { code, message: (error as Error).message } };
+  }
+
   let intentBlock = "(no intent referenced)";
   const metaExtra = found.doc.meta as { intentRef?: string | undefined };
   if (metaExtra.intentRef !== undefined) {
@@ -113,14 +133,18 @@ export async function buildVerificationBundle(
           .join("\n");
 
   const verdictStore = new VerdictStore(rootPath);
-  const verdicts = await verdictStore.list(taskId);
+  const verdicts: VerdictRecord[] = await verdictStore.list(taskId);
   const verdictBlock =
     verdicts.length === 0
       ? "(no verdicts registered yet — you are the fresh verifier)"
       : verdicts
           .map(
             (v) =>
-              `${v.id} ${v.verdict} by ${v.verifier.agent} (${v.verifier.context}, ${v.verifier.issuedAt})${
+              `${v.id} ${v.verdict} by ${v.verifier.agent} (${v.verifier.context}, ${v.verifier.issuedAt}) [${
+                isBoundVerdict(v)
+                  ? `state-bound ${v.binding.stateDigest.slice(0, 12)}`
+                  : "legacy unbound"
+              }]${
                 v.findings.length > 0
                   ? `\n    findings: ${v.findings
                       .map(
@@ -243,13 +267,36 @@ export async function buildVerificationBundle(
       relativePath: found.doc.relativePath,
     },
   };
-  return { ok: true, bundle: render(parts) };
+  return { ok: true, bundle: render(parts, binding) };
 }
 
-function render(parts: BundleParts): VerificationBundle {
+function render(parts: BundleParts, binding: ComputedStateBinding): VerificationBundle {
+  const bindingLines = [
+    "## State binding",
+    "",
+    "Registration binds your verdict to EXACTLY this state (ADR-0030).",
+    "Re-verify (new bundle + new verdict) after any implementation,",
+    "criteria, intent, plan/spec/decision, workflow, config/policy, or",
+    "evidence change — a stale verdict cannot satisfy completion.",
+    "",
+    `- binding version: ${binding.version}`,
+    `- bundle digest: ${binding.bundleDigest}`,
+    `- state digest: ${binding.stateDigest}`,
+    `- source state: ${binding.components.sourceState}`,
+    `- task contract: ${binding.components.taskContract}`,
+    `- intent: ${binding.components.intent}`,
+    `- artifact refs: ${binding.components.artifacts}`,
+    `- workflow: ${binding.components.workflow}`,
+    `- config: ${binding.components.config}`,
+    `- policy: ${binding.components.policy}`,
+    `- evidence: ${binding.components.evidence}`,
+    `- git unavailable at bundle time: ${binding.gitUnavailable ? "yes (degraded)" : "no"}`,
+    "",
+  ];
   const lines: string[] = [
     `schema: ${VERIFICATION_BUNDLE_SCHEMA_ID}`,
     `task: ${parts.taskId}`,
+    `bundle-digest: ${binding.bundleDigest}`,
     "",
     "# ACKit Verification Bundle",
     "",
@@ -258,6 +305,7 @@ function render(parts: BundleParts): VerificationBundle {
     "an ackit.verdict.v1 verdict (PASS | PASS_WITH_WARNINGS | REWORK_REQUIRED |",
     "BLOCKED). You should not implement the feature you are judging.",
     "",
+    ...bindingLines,
     "## Intent",
     "",
     parts.intentBlock,
@@ -311,15 +359,30 @@ function render(parts: BundleParts): VerificationBundle {
     "- Compare the implementation surface, diff, and evidence against every criterion.",
     "- Blocking findings must carry the criterion id and a stable upper-snake code.",
     "- PASS-family verdicts cannot carry blocking findings (registration rejects them).",
+    "- Author a binding-free ackit.verdict.v1 verdict file; ACKit attaches",
+    "  the state binding at registration (self-declared bindings are refused).",
     "- Register your verdict with: ackit verification record <task> --verdict <file>",
+    "- Replay-check a reviewed bundle with: ackit verification record <task>",
+    "  --verdict <file> --bundle <bundle.json> (refused when state moved on).",
   ];
   const markdown = `${lines.join("\n")}\n`;
   assertNoSecretShapes(markdown);
+  // Structured binding in JSON (machine surface); the bundle digest is
+  // computed from the canonical binding representation only — Markdown
+  // formatting-only changes never alter the semantic digest, and the digest
+  // preimage excludes its own digest field (no recursive self-hashing).
   const json = JSON.stringify(
     {
       schemaVersion: VERIFICATION_BUNDLE_SCHEMA_ID,
       tool: "ackit",
       task: parts.taskId,
+      binding: {
+        version: binding.version,
+        stateDigest: binding.stateDigest,
+        bundleDigest: binding.bundleDigest,
+        components: binding.components,
+        gitUnavailable: binding.gitUnavailable,
+      },
       intent: parts.intentBlock,
       workflow: parts.workflow,
       taskDocument: {
@@ -337,5 +400,5 @@ function render(parts: BundleParts): VerificationBundle {
     2,
   );
   assertNoSecretShapes(json);
-  return { markdown, json };
+  return { markdown, json, binding };
 }
