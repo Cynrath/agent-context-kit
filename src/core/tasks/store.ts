@@ -470,7 +470,9 @@ export class TaskStore {
     const detail =
       assessment.basis === "same-context"
         ? `context '${latest.verifier.context}' is same-process review`
-        : "no reviewed bundle proves independent review";
+        : assessment.reviewedBundleDigest === null
+          ? "no reviewed bundle proves independent review"
+          : `reviewed bundle '${assessment.reviewedBundleDigest.slice(0, 12)}…' does not match the bound bundle (ledger tampering suspected)`;
     return [
       `${VERDICT_PROBLEM_CODES.independenceUnproven}: latest verdict ${latest.id} is not independently verified (${detail}) — have a fresh verifier review 'ackit verification bundle ${latest.taskId} --format json' and register with '--bundle <file>'`,
     ];

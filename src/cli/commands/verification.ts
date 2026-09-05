@@ -278,6 +278,7 @@ export async function runVerificationCommand(
             stateDigest: registered.binding.stateDigest,
             reviewedBundleDigest: registered.reviewedBundleDigest ?? null,
             independent: independence.independent,
+            independenceCode: independence.problemCode,
           });
         } else if (!base.quiet) {
           process.stdout.write(
