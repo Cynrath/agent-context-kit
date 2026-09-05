@@ -2,9 +2,11 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-// Post-release closure, release-proof: current public entry points must state
-// current release truth (never a stale line), without hard-coding any version
-// here. Exact stale-vs-historical classification lives in
+// Post-release closure, release-proof: stable public entry points must state
+// the PUBLISHED STABLE truth (never a stale line), without hard-coding any
+// version here. The source/development version is intentionally NOT required
+// in these files (TASK-0078 split model). Exact stale-vs-historical
+// classification lives in
 // scripts/check-version-parity.mjs + tests/contract/version-parity.test.ts.
 const VERSIONED_CURRENT_FILES = ["README.md", "docs/guides/getting-started.md"];
 
@@ -14,14 +16,14 @@ function readRepo(file: string): string {
   return readFileSync(path.join(process.cwd(), file), "utf8");
 }
 
-function packageVersion(): string {
-  const pkg = JSON.parse(readRepo("package.json")) as { version: string };
-  return pkg.version;
+function publishedStable(): string {
+  const state = JSON.parse(readRepo("release-state.json")) as { publishedStable: string };
+  return state.publishedStable;
 }
 
 describe("current docs advertise the current release (post-release closure)", () => {
-  it.each(VERSIONED_CURRENT_FILES)("%s names the package version", (file) => {
-    expect(readRepo(file)).toContain(packageVersion());
+  it.each(VERSIONED_CURRENT_FILES)("%s names the published stable version", (file) => {
+    expect(readRepo(file)).toContain(publishedStable());
   });
 
   it.each(VERSION_AGNOSTIC_FILES)(
@@ -39,7 +41,7 @@ describe("current docs advertise the current release (post-release closure)", ()
         .join("")
         .split("v0.2.0 historical contract")
         .join("");
-      const [major = 0, minor = 0, patch = 0] = packageVersion().split(".").map(Number);
+      const [major = 0, minor = 0, patch = 0] = publishedStable().split(".").map(Number);
       const refs = stripped.match(/\bv?0\.(\d+)\.(\d+)\b/g) ?? [];
       for (const ref of refs) {
         const nums = ref.replace(/^v/, "").split(".").map(Number);

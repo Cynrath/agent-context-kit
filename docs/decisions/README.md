@@ -38,3 +38,7 @@ TASK-0044 … TASK-0062):
 - ADR-0026 evidence contract v2 + independent verification protocol + verdicts
 - ADR-0027 checkpoints, resumability, local workflow store, task-aware packs
 - ADR-0028 policy v2 autonomy tiers + review policy + declarative gates + roles + skills projections
+
+v0.5 line additions (Accepted 2026-09-05, governing TASK-0078 … TASK-0086):
+
+- ADR-0029 maintenance-aware release-state model (amends ADR-0023: source/dev vs published-stable vs maintenance vs historical)

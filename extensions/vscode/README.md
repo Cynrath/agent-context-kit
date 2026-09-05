@@ -3,7 +3,7 @@
 Offline-first agent readiness for your repository — directly inside VS Code.
 
 - **Publisher:** `Cynrath` (`Cynrath.ackit-vscode`)
-- **Version:** `0.4.0`
+- **Version:** `0.4.1` (Marketplace stable; source checkouts build `0.5.0-dev.0`)
 - **Engine:** `VS Code ^1.90.0`
 - **Activation:** `onStartupFinished` (debounced, lazy refresh)
 - **Category:** `Linters`
@@ -70,7 +70,7 @@ All commands support multi-root: `getRootForActiveEditor()` → active editor's 
 - Docs: https://cynrath.github.io/agent-context-kit/
 - Guides: https://cynrath.github.io/agent-context-kit/vscode/
 - Marketplace: https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode
-- Changelog: `CHANGELOG.md` (v0.4.0)
+- Changelog: `CHANGELOG.md` (see CHANGELOG for the version history)
 
 ## Screenshots
 
