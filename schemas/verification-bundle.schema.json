@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cynrath.github.io/agent-context-kit/schemas/verification-bundle.schema.json",
-  "title": "Verification Bundle Header",
-  "description": "Bounded verification bundle header (ackit.verification-bundle.v1) consumed by a fresh-context verifier.",
+  "title": "Verification Bundle",
+  "description": "State-bound verification bundle (ackit.verification-bundle.v2) consumed by a fresh-context verifier. The binding digests are the trust anchor; Markdown rendering never participates in the bundle digest.",
   "type": "object",
   "properties": {
     "schemaVersion": {
-      "const": "ackit.verification-bundle.v1",
+      "const": "ackit.verification-bundle.v2",
       "type": "string"
     },
     "tool": {
@@ -16,12 +16,89 @@
     "task": {
       "type": "string",
       "pattern": "^TASK-\\d{4}$"
+    },
+    "binding": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1,
+          "type": "number"
+        },
+        "stateDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bundleDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "components": {
+          "type": "object",
+          "properties": {
+            "sourceState": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "taskContract": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "intent": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifacts": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "workflow": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "config": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "policy": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "evidence": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "sourceState",
+            "taskContract",
+            "intent",
+            "artifacts",
+            "workflow",
+            "config",
+            "policy",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        "gitUnavailable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "version",
+        "stateDigest",
+        "bundleDigest",
+        "components",
+        "gitUnavailable"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
     "schemaVersion",
     "tool",
-    "task"
+    "task",
+    "binding"
   ],
   "additionalProperties": true
 }

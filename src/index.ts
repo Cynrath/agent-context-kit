@@ -82,11 +82,23 @@ export { TaskStore } from "./core/tasks/store.js";
 // where IO-bound; no process.exit; internal modules stay internal.
 // ---------------------------------------------------------------------------
 export type { TaskDoc, TaskMeta } from "./core/tasks/types.js";
+export type {
+  BindingComponentName,
+  BoundVerdict,
+  ComputedStateBinding,
+  StateBindingComponents,
+  Verdict,
+  VerdictFreshness,
+  VerdictRecord,
+} from "./core/verification/index.js";
 export {
   buildVerificationBundle,
+  compareStoredBinding,
+  computeStateBinding,
+  isBoundVerdict,
+  StateBindingError,
   VerdictStore,
 } from "./core/verification/index.js";
-export type { Verdict } from "./core/verification/verdict.js";
 export {
   BUILTIN_PROFILES,
   listWorkflowProfiles,

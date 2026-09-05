@@ -243,6 +243,7 @@ describe("offline-runtime deny-egress harness", () => {
       "../../src/core/verification/index.js"
     );
     const { detectWorkflowDrift } = await import("../../src/core/drift/index.js");
+    const { computeStateBinding } = await import("../../src/core/verification/binding.js");
     const { listRoles } = await import("../../src/core/roles/index.js");
     const { JournalStore } = await import("../../src/core/journal/index.js");
     const { resolveAutonomy, resolveReview } = await import("../../src/core/policy/index.js");
@@ -254,6 +255,8 @@ describe("offline-runtime deny-egress harness", () => {
       planRef: "docs/plans/p.md",
     });
     const taskId = created.meta.id;
+    await fsp.mkdir(path.join(tmpRepo, "docs", "plans"), { recursive: true });
+    await fsp.writeFile(path.join(tmpRepo, "docs", "plans", "p.md"), "# plan\n", "utf8");
     await new IntentStore(tmpRepo).create("offline intent fixture");
     const workflow = new WorkflowStore(root);
     await workflow.setProfile(taskId, "quick");
@@ -272,14 +275,18 @@ describe("offline-runtime deny-egress harness", () => {
     await evidenceStore.save(taskId, registry);
     validateEvidence(registry);
     const verdicts = new VerdictStore(tmpRepo);
-    await verdicts.register(taskId, {
-      schemaId: "ackit.verdict.v1",
-      verdict: "PASS",
-      verifier: { agent: "offline-verifier", context: "fresh", issuedAt: "2026-08-31" },
-      findings: [],
-      checkedCriteria: registry.criteria.map((c) => c.id),
-      summary: "offline",
-    });
+    await verdicts.register(
+      taskId,
+      {
+        schemaId: "ackit.verdict.v1",
+        verdict: "PASS",
+        verifier: { agent: "offline-verifier", context: "fresh", issuedAt: "2026-08-31" },
+        findings: [],
+        checkedCriteria: registry.criteria.map((c) => c.id),
+        summary: "offline",
+      },
+      { binding: await computeStateBinding(tmpRepo, taskId) },
+    );
     const bundle = await buildVerificationBundle(root, taskId);
     expect(bundle.ok).toBe(true);
     detectWorkflowDrift({

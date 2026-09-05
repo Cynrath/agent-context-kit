@@ -1,7 +1,7 @@
 ---
 id: "TASK-0079"
 title: "Verification state-binding and evidence provenance contract"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
@@ -75,6 +75,101 @@ Strong multi-auditor consensus (external audits normalized against post-v0.4.1 s
 ## Rollback plan
 
 - Focused revert of contract commit(s) on the task branch before merge; after merge, forward fix.
+
+## Audit (recorded 2026-09-05 on feat/task-0079-verification-state-binding)
+
+Live behavior verified on master `d3195e7`: bundle schema
+`ackit.verification-bundle.v1` (no canonical identity); verdict schema
+`ackit.verdict.v1` (task/verifier/findings/checkedCriteria/summary, no
+bundle/state digest binding); store validates task existence, criterion
+references, blocking-on-PASS; `latestVerdictSummary()` returns only
+`{ verdict }`; bundle embeds task, intent (+fingerprint), workflow,
+evidence, prior verdicts, checkpoint, implementation surface (names only),
+optional diff, verification-gate requirements, verifier role.
+
+State matrix (class | current source | semantic? | must invalidate? |
+canonical form | risk/reason):
+
+- repository/worktree state | bundle: changed file NAMES only;
+  checkpoint: short HEAD + changed names | YES | YES | sorted
+  repo-relative paths + streaming content digests + full HEAD (staged,
+  unstaged, untracked) | name-only binding under-binds (same name, new
+  bytes would pass)
+- task contract | bundle embeds whole task Markdown incl. notes | PARTIAL
+  (criteria/refs/scope yes; status/notes no) | criteria/refs/scope YES,
+  bookkeeping NO | id/title/requirements(document order)/deps/refs/scope
+  | hashing whole Markdown makes completion stale its own verdict
+- intent | bundle intent block + `intentFingerprint` | YES | YES |
+  normalized subset minus status/source | status flips (draft→accepted)
+  must not self-invalidate
+- plan/spec/decision refs + contents | drift checks existence only;
+  contents NOT bound | YES | YES | repo-relative identity + content
+  digests; missing/escape fails closed | unjudged compliance material
+- workflow profile/stage | bundle shows profile/stage | YES | YES |
+  `{profile, stage}` | history/attempts/timestamps are loop bookkeeping
+- resolved config | NOT in bundle; gate uses `resolveLifecycleGates([])`
+  with NO config layers | PARTIAL (workflow/review/autonomy) | those
+  sections YES | parsed subset in canonical form | formatting must not
+  stale; scan/limits/etc. cannot affect acceptance
+- resolved policy | NOT in bundle | PARTIAL (autonomy tier2 + review) |
+  YES | effective `{autonomy, review}` tables | rules/suppressions are
+  scan hygiene, not acceptance
+- evidence registry | bundle shows criteria text | YES | YES |
+  `{id, requirement, status, evidence[{type, ref}]}` sorted; dates
+  excluded | `recordedAt`/`updatedAt` record WHEN, not WHAT
+- verification bundle | v1 has no identity | YES (as input) | YES |
+  `bundleDigest = H(bundle, {task, stateDigest})`; preimage excludes its
+  own digest; rendering never participates | recursive self-hashing +
+  formatting fragility
+- checkpoint | bundle shows latest summary | NO | NO | excluded |
+  resume aid, not reviewed state; binding it self-invalidates on every
+  checkpoint write
+- prior verdict history | bundle lists verdicts | NO | NO | excluded |
+  outcomes, not reviewed state; binding is self-referential
+- timestamps (issuedAt/updatedAt/recordedAt/mtimes/clock) | bookkeeping |
+  NO | NO | excluded | time passage must not stale; determinism §16
+- task status/completedAt | lifecycle | NO | NO | excluded | circular
+  gate prevention (§6)
+- completion notes / checkbox marks | written after verification | NO |
+  NO | excluded (evidence registry is the bound verified signal) |
+  normal flow verify → notes → complete must stay possible
+- staged/unstaged/untracked files | partial (names only) | YES | YES |
+  covered by sourceState byte coverage | HEAD-only binding misses
+  pre-commit work
+
+## Implementation record (2026-09-05, branch feat/task-0079-verification-state-binding)
+
+- New: `src/core/verification/canonical.ts` (sole hashing module:
+  SHA-256/UTF-8, stable key ordering, domain-separated payloads),
+  `src/core/verification/binding.ts` (`computeStateBinding`,
+  `compareStoredBinding`, `StateBindingError`; reuses
+  `expandChangedFiles`, `criteriaFromTaskDoc`, `declaredScopeGlobs`,
+  `normalizeIntent`, `normalizeRelativePath`/`isInsideRoot` — no duplicated
+  containment logic; no new dependencies).
+- Bundle → `ackit.verification-bundle.v2` (structured `binding` in JSON,
+  digest display in Markdown; digest from canonical machine
+  representation). Verdict: authoring shape unchanged (v1, binding-free);
+  store persists `ackit.verdict.v2`; v1 files stay readable as legacy
+  history, never silently fresh-bound.
+- Registration: `verification record` recomputes CURRENT state and binds
+  it; `--bundle` replay-checks the reviewed bundle
+  (`VERDICT-BUNDLE-MISMATCH` on drift). Self-declared bindings refused
+  (`VERDICT-INVALID` via strict input schema).
+- Completion: PASS-family latest verdicts recompute CURRENT binding;
+  stale → `VERDICT-STATE-STALE` (with changed classes); legacy v1 →
+  `VERDICT-BINDING-MISSING`. Drift codes frozen (existence-based);
+  freshness enforced at completion + shown via `verification show --json`.
+- Codes (contract-tested): `VERDICT-BINDING-MISSING`,
+  `VERDICT-BUNDLE-MISMATCH`, `VERDICT-STATE-STALE`,
+  `VERIFICATION-BINDING-UNAVAILABLE`, `VERIFICATION-ARTIFACT-MISSING`.
+- Schemas regenerated (`verdict.schema.json` → v2,
+  `verification-bundle.schema.json` → v2 + binding); SDK gains only the
+  four symbols the new registration contract requires
+  (`computeStateBinding`, `compareStoredBinding`, `isBoundVerdict`,
+  `StateBindingError`; allowlist updated); MCP tools unchanged (read-only).
+- Docs: ADR-0030 + `docs/concepts/evidence-verification.md` +
+  `docs/reference/cli.md` + `docs/reference/sdk.md` (behavior line).
+- Full decision/rationale: ADR-0030.
 
 ## Completion notes
 

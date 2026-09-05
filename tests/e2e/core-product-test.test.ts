@@ -286,7 +286,7 @@ Fixed separators; evidence + verdict below.
     const bundle = await agentB(["verification", "bundle", taskId, "--out", "docs/bundle.yaml.md"]);
     expect(bundle.code).toBe(EXIT_CODES.ok);
     const bundleContent = await readFile(path.join(rootPath, "docs", "bundle.yaml.md"), "utf8");
-    expect(bundleContent).toContain("ackit.verification-bundle.v1");
+    expect(bundleContent).toContain("ackit.verification-bundle.v2");
     expect(bundleContent).toContain("INTENT-0001");
     expect(bundleContent).toContain("AC-001");
     expect(bundleContent).toContain("Verifier role contract");

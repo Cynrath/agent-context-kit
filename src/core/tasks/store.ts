@@ -1,5 +1,6 @@
 import { type Dirent, promises as fsp } from "node:fs";
 import path from "node:path";
+import type { VerdictRecord } from "../verification/index.js";
 import {
   acceptanceUnchecked,
   extractSection,
@@ -265,6 +266,13 @@ export class TaskStore {
         for (const problem of reviewProblems) {
           blockers.push(`VERDICT_BLOCKING: ${problem}`);
         }
+        // 2c. State-binding freshness (ADR-0030 §14): registration-time
+        // validation alone is insufficient — state may change after a valid
+        // verdict is recorded. Recompute the CURRENT binding; a stale
+        // PASS-family verdict must not satisfy completion, and a legacy
+        // unbound v1 verdict never silently satisfies a state-bound
+        // requirement. Deterministic and read-only.
+        blockers.push(...(await this.verdictFreshnessProblems(id, latest)));
       }
     }
 
@@ -402,6 +410,41 @@ export class TaskStore {
       // Review-policy resolution failures never fabricate blockers.
       return [];
     }
+  }
+
+  /**
+   * State-binding freshness problems for a PASS-family latest verdict
+   * (ADR-0030 §14): recompute the CURRENT binding and compare it against
+   * the stored one. Returns [] only when the verdict is bound AND fresh.
+   */
+  private async verdictFreshnessProblems(taskId: string, latest: VerdictRecord): Promise<string[]> {
+    const { isBoundVerdict, VERDICT_PROBLEM_CODES, VerdictStore } = await import(
+      "../verification/index.js"
+    );
+    if (!isBoundVerdict(latest)) {
+      return [
+        `${VERDICT_PROBLEM_CODES.bindingMissing}: latest verdict ${latest.id} is a legacy unbound verdict (ackit.verdict.v1) — re-verify with a state-bound verdict`,
+      ];
+    }
+    const verdicts = new VerdictStore(this.repositoryRoot);
+    const summary = await verdicts.latestVerdictSummary(taskId);
+    // A vanished record between reads (deleted verdict file) is never fresh:
+    // completing with no verdict on disk would bypass the verdict gate.
+    if (summary === null) {
+      return [
+        `${VERDICT_PROBLEM_CODES.bindingMissing}: latest verdict ${latest.id} has no readable verdict record — re-verify against current state`,
+      ];
+    }
+    if (summary.fresh) return [];
+    if (summary.problemCode === VERDICT_PROBLEM_CODES.stateStale) {
+      const changed = summary.changed.length > 0 ? ` (changed: ${summary.changed.join(", ")})` : "";
+      return [
+        `${summary.problemCode}: latest verdict ${latest.id} is stale${changed} — re-verify against current state`,
+      ];
+    }
+    return [
+      `${summary.problemCode ?? VERDICT_PROBLEM_CODES.bindingMissing}: latest verdict ${latest.id} cannot be freshness-checked — re-verify against current state`,
+    ];
   }
 
   async archive(id: string): Promise<string> {

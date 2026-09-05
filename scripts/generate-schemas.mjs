@@ -14,7 +14,7 @@ import { JOURNAL_SCHEMA_ID, JournalEventSchema } from "../dist/core/journal/inde
 import { POLICY_SCHEMA_VERSION, PolicyDocumentSchema } from "../dist/core/policy/index.js";
 import { ROLE_SCHEMA_ID, RoleContractSchema } from "../dist/core/roles/index.js";
 import { TASK_SCHEMA_VERSION, TaskMetaSchema } from "../dist/core/tasks/index.js";
-import { VERDICT_SCHEMA_ID, VerdictSchema } from "../dist/core/verification/index.js";
+import { VERDICT_SCHEMA_ID_V2, VerdictV2Schema } from "../dist/core/verification/index.js";
 import { WORKFLOW_SCHEMA_ID, WorkflowStateSchema } from "../dist/core/workflow/index.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -125,9 +125,9 @@ writeFileSync(
   "utf8",
 );
 
-// verdict (ackit.verdict.v1, ADR-0026)
-const verdictSchema = z.toJSONSchema(VerdictSchema, { io: "input", unrepresentable: "any" });
-verdictSchema.$comment = `ACKit verdict schema (${VERDICT_SCHEMA_ID}).`;
+// verdict (ackit.verdict.v2, ADR-0030; v1 stays readable as legacy history)
+const verdictSchema = z.toJSONSchema(VerdictV2Schema, { io: "input", unrepresentable: "any" });
+verdictSchema.$comment = `ACKit state-bound verdict schema (${VERDICT_SCHEMA_ID_V2}).`;
 writeFileSync(
   path.join(schemasDir, "verdict.schema.json"),
   `${JSON.stringify(verdictSchema, null, 2)}\n`,
@@ -155,20 +155,56 @@ writeFileSync(
   "utf8",
 );
 
-// verification bundle header contract (ackit.verification-bundle.v1, ADR-0026)
+// verification bundle header contract (ackit.verification-bundle.v2, ADR-0030)
+const hex64 = { type: "string", pattern: "^[0-9a-f]{64}$" };
 const bundleSchema = {
   $schema: "https://json-schema.org/draft/2020-12/schema",
   $id: "https://cynrath.github.io/agent-context-kit/schemas/verification-bundle.schema.json",
-  title: "Verification Bundle Header",
+  title: "Verification Bundle",
   description:
-    "Bounded verification bundle header (ackit.verification-bundle.v1) consumed by a fresh-context verifier.",
+    "State-bound verification bundle (ackit.verification-bundle.v2) consumed by a fresh-context verifier. The binding digests are the trust anchor; Markdown rendering never participates in the bundle digest.",
   type: "object",
   properties: {
-    schemaVersion: { const: "ackit.verification-bundle.v1", type: "string" },
+    schemaVersion: { const: "ackit.verification-bundle.v2", type: "string" },
     tool: { const: "ackit", type: "string" },
     task: { type: "string", pattern: "^TASK-\\d{4}$" },
+    binding: {
+      type: "object",
+      properties: {
+        version: { const: 1, type: "number" },
+        stateDigest: hex64,
+        bundleDigest: hex64,
+        components: {
+          type: "object",
+          properties: {
+            sourceState: hex64,
+            taskContract: hex64,
+            intent: hex64,
+            artifacts: hex64,
+            workflow: hex64,
+            config: hex64,
+            policy: hex64,
+            evidence: hex64,
+          },
+          required: [
+            "sourceState",
+            "taskContract",
+            "intent",
+            "artifacts",
+            "workflow",
+            "config",
+            "policy",
+            "evidence",
+          ],
+          additionalProperties: false,
+        },
+        gitUnavailable: { type: "boolean" },
+      },
+      required: ["version", "stateDigest", "bundleDigest", "components", "gitUnavailable"],
+      additionalProperties: false,
+    },
   },
-  required: ["schemaVersion", "tool", "task"],
+  required: ["schemaVersion", "tool", "task", "binding"],
   additionalProperties: true,
 };
 writeFileSync(

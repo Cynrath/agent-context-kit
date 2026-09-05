@@ -6,6 +6,11 @@ import { EvidenceStore } from "../../core/evidence/index.js";
 import { resolveRepositoryRoot } from "../../core/filesystem/root.js";
 import { TaskStore } from "../../core/tasks/index.js";
 import { buildVerificationBundle } from "../../core/verification/bundle.js";
+import {
+  computeStateBinding,
+  HEX64_PATTERN,
+  StateBindingError,
+} from "../../core/verification/index.js";
 import { VerdictStore, VerdictStoreError } from "../../core/verification/store.js";
 import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
@@ -34,6 +39,39 @@ function emitJson(command: string, payload: Record<string, unknown>): void {
   );
 }
 
+/** Read a repository-relative file with traversal/absolute containment. */
+async function readContainedFile(
+  rootPath: string,
+  arg: string,
+): Promise<{ ok: true; content: string } | { ok: false; message: string; security: boolean }> {
+  const normalized = arg.split("\\").join("/");
+  const escapes =
+    normalized.startsWith("/") ||
+    /^[a-zA-Z]:/.test(normalized) ||
+    normalized.split("/").some((segment) => segment === "..");
+  const filePath = path.resolve(rootPath, normalized);
+  if (escapes || !filePath.startsWith(rootPath)) {
+    return { ok: false, message: "bundle file path escapes repository root", security: true };
+  }
+  try {
+    return { ok: true, content: await fsp.readFile(filePath, "utf8") };
+  } catch {
+    return { ok: false, message: `bundle file '${arg}' not found`, security: false };
+  }
+}
+
+/** Extract the v2 bundle digest from bundle JSON (null when absent). */
+function extractBundleDigest(content: string): string | null {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    return null;
+  }
+  const digest = (parsed as { binding?: { bundleDigest?: unknown } } | null)?.binding?.bundleDigest;
+  return typeof digest === "string" && HEX64_PATTERN.test(digest) ? digest : null;
+}
+
 export async function runVerificationCommand(
   base: VerificationCommandBase,
   subcommand: "bundle" | "record" | "show",
@@ -41,6 +79,7 @@ export async function runVerificationCommand(
     taskId?: string | undefined;
     out?: string | undefined;
     verdictFile?: string | undefined;
+    bundleFile?: string | undefined;
     diff?: boolean | undefined;
     format?: string | undefined;
   },
@@ -157,9 +196,60 @@ export async function runVerificationCommand(
           return EXIT_CODES.usage;
         }
         const evidence = await new EvidenceStore(root).load(taskId);
+        // Registration-time validation (ADR-0030 §13): recompute CURRENT
+        // state and bind it. A self-declared binding in the verdict file is
+        // never trusted (strict input validation refuses it); an explicitly
+        // submitted bundle (--bundle) must match current state or the
+        // registration is refused with a stable stale/mismatch code.
+        let binding: Awaited<ReturnType<typeof computeStateBinding>>;
+        try {
+          binding = await computeStateBinding(rootPath, taskId);
+        } catch (error) {
+          const code =
+            error instanceof StateBindingError
+              ? error.code.toLowerCase()
+              : "verification-binding-unavailable";
+          emitDiagnostic(
+            { code, message: (error as Error).message },
+            { quiet: base.quiet, debug: base.debug ?? false },
+          );
+          return EXIT_CODES.usage;
+        }
+        if (args.bundleFile !== undefined) {
+          const replay = await readContainedFile(rootPath, args.bundleFile);
+          if (!replay.ok) {
+            emitDiagnostic(
+              { code: "verification-error", message: replay.message },
+              { quiet: base.quiet, debug: base.debug ?? false },
+            );
+            return replay.security ? EXIT_CODES.securityBoundary : EXIT_CODES.usage;
+          }
+          const submitted = extractBundleDigest(replay.content);
+          if (submitted === null) {
+            emitDiagnostic(
+              {
+                code: "verification-error",
+                message: `bundle file '${args.bundleFile}' has no v2 bundle digest — generate it with 'ackit verification bundle ${taskId} --format json --out <file>'`,
+              },
+              { quiet: base.quiet, debug: base.debug ?? false },
+            );
+            return EXIT_CODES.usage;
+          }
+          if (submitted !== binding.bundleDigest) {
+            emitDiagnostic(
+              {
+                code: "verdict-bundle-mismatch",
+                message: `bundle digest mismatch: submitted bundle '${submitted}' does not match current state '${binding.bundleDigest}' — re-verify against current state`,
+              },
+              { quiet: base.quiet, debug: base.debug ?? false },
+            );
+            return EXIT_CODES.usage;
+          }
+        }
         const registered = await verdicts.register(taskId, input, {
           taskExists: async (id: string) => (await tasks.find(id)) !== null,
           evidenceRegistry: evidence,
+          binding,
         });
         try {
           const { JournalStore } = await import("../../core/journal/index.js");
@@ -176,6 +266,8 @@ export async function runVerificationCommand(
             task: taskId,
             verdict: registered.id,
             value: registered.verdict,
+            bundleDigest: registered.binding.bundleDigest,
+            stateDigest: registered.binding.stateDigest,
           });
         } else if (!base.quiet) {
           process.stdout.write(
@@ -196,7 +288,18 @@ export async function runVerificationCommand(
           return EXIT_CODES.ok;
         }
         if (base.json) {
-          emitJson("show", { task: taskId, verdict: latest });
+          // Trust state rides along: consumers learn bound/fresh without a
+          // second call (completion rechecks independently — this is
+          // informational, never the gate itself).
+          const summary = await verdicts.latestVerdictSummary(taskId);
+          emitJson("show", {
+            task: taskId,
+            verdict: latest,
+            bound: summary?.bound ?? false,
+            fresh: summary?.fresh ?? false,
+            problemCode: summary?.problemCode ?? null,
+            gitUnavailable: summary?.gitUnavailable ?? false,
+          });
         } else {
           const { stringify } = await import("yaml");
           process.stdout.write(stringify(latest, { lineWidth: 0 }));
@@ -241,10 +344,14 @@ export function registerVerificationCommands(program: Command, invocation: CliIn
     });
   verificationCommand
     .command("record")
-    .description("validate + register a verifier verdict file (append-only)")
+    .description("validate + register a verifier verdict file (append-only, state-bound)")
     .argument("<taskId>")
     .requiredOption("--verdict <file>", "verdict file (repository-relative, ackit.verdict.v1)")
-    .action(async (taskId: string, opts: { verdict: string }) => {
+    .option(
+      "--bundle <file>",
+      "v2 bundle JSON the verifier reviewed (repository-relative; refused when stale)",
+    )
+    .action(async (taskId: string, opts: { verdict: string; bundle?: string }) => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
       invocation.exitCode = await runVerificationCommand(
         {
@@ -253,7 +360,7 @@ export function registerVerificationCommands(program: Command, invocation: CliIn
           quiet: parentOptions.quiet ?? false,
         },
         "record",
-        { taskId, verdictFile: opts.verdict },
+        { taskId, verdictFile: opts.verdict, bundleFile: opts.bundle },
       );
     });
   verificationCommand

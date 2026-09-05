@@ -79,7 +79,7 @@ describe("ackit verification CLI integration (ADR-0026)", () => {
 
     const bundle = await cli(["verification", "bundle", taskId]);
     expect(bundle.code).toBe(EXIT_CODES.ok);
-    expect(bundle.stdout).toContain("ackit.verification-bundle.v1");
+    expect(bundle.stdout).toContain("ackit.verification-bundle.v2");
     expect(bundle.stdout).toContain("You are an INDEPENDENT verifier");
     expect(bundle.stdout).toContain("AC-001 [verified]");
 
@@ -87,7 +87,7 @@ describe("ackit verification CLI integration (ADR-0026)", () => {
     expect(bundleFile.code).toBe(EXIT_CODES.ok);
     const { readFile } = await import("node:fs/promises");
     const written = await readFile(path.join(rootPath, "docs", "bundle.md"), "utf8");
-    expect(written).toContain("ackit.verification-bundle.v1");
+    expect(written).toContain("ackit.verification-bundle.v2");
 
     const escapeAttempt = await cli(["verification", "bundle", taskId, "--out", "../escape.md"]);
     expect(escapeAttempt.code).toBe(EXIT_CODES.securityBoundary);

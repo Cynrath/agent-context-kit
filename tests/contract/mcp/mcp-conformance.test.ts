@@ -146,7 +146,7 @@ describe("ackit MCP conformance (REQ-MCP-004)", () => {
       });
       expect(bundle.isError ?? false).toBe(false);
       const bundleText = JSON.stringify(bundle.content);
-      expect(bundleText).toContain("ackit.verification-bundle.v1");
+      expect(bundleText).toContain("ackit.verification-bundle.v2");
 
       const legacyStatus = await session.client.callTool({
         name: "ackit_workflow_status",

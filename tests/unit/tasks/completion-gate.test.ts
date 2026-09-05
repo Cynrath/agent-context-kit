@@ -7,6 +7,7 @@ import { EvidenceStore } from "../../../src/core/evidence/index.js";
 import { syncRegistry } from "../../../src/core/evidence/sync.js";
 import { resolveRepositoryRoot } from "../../../src/core/filesystem/root.js";
 import { serialize, TaskStore } from "../../../src/core/tasks/index.js";
+import { computeStateBinding } from "../../../src/core/verification/binding.js";
 import { VerdictStore } from "../../../src/core/verification/store.js";
 import { WorkflowStore } from "../../../src/core/workflow/index.js";
 
@@ -149,7 +150,7 @@ async function registerVerdict(taskId: string, verdict: string): Promise<void> {
       checkedCriteria: ["AC-001", "AC-002"],
       summary: "s",
     },
-    { evidenceRegistry: registry },
+    { evidenceRegistry: registry, binding: await computeStateBinding(rootPath, taskId) },
   );
 }
 
@@ -350,9 +351,23 @@ describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", 
     expect(reviewBlocker).toBeDefined();
     expect(reviewBlocker?.includes("VERDICT_BLOCKING")).toBe(true);
 
-    // Remove the review policy → the same state completes (no regression for
-    // unconfigured repositories).
+    // Remove the review policy → the verdict bound under the old config is
+    // stale by design (config is a bound class); a fresh bundle/verdict
+    // restores eligibility with no regression for unconfigured repositories.
     await wf(path.join(rootPath, "ackit.yml"), "schemaVersion: 1\n", "utf8");
+    const freshRegistry = await new EvidenceStore(await resolvedRoot()).load(taskId);
+    await new VerdictStore(rootPath).register(
+      taskId,
+      {
+        schemaId: "ackit.verdict.v1",
+        verdict: "PASS",
+        verifier: { agent: "fresh-verifier/1.0", context: "fresh", issuedAt: today },
+        findings: [],
+        checkedCriteria: ["AC-001", "AC-002"],
+        summary: "s",
+      },
+      { evidenceRegistry: freshRegistry, binding: await computeStateBinding(rootPath, taskId) },
+    );
     const result = await store.complete(taskId);
     expect(result.forced).toBe(false);
   });
@@ -382,7 +397,7 @@ describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", 
         checkedCriteria: ["AC-001", "AC-002"],
         summary: "s",
       },
-      { evidenceRegistry: registry },
+      { evidenceRegistry: registry, binding: await computeStateBinding(rootPath, taskId) },
     );
     const ok = await store.complete(taskId);
     expect(ok.forced).toBe(false);
@@ -405,7 +420,7 @@ describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", 
         checkedCriteria: ["AC-001", "AC-002"],
         summary: "s",
       },
-      { evidenceRegistry: registry2 },
+      { evidenceRegistry: registry2, binding: await computeStateBinding(rootPath, taskId2) },
     );
     let blockers: string[] = [];
     await expect(store.complete(taskId2)).rejects.toThrow();

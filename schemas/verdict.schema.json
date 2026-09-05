@@ -4,7 +4,7 @@
   "properties": {
     "schemaId": {
       "type": "string",
-      "const": "ackit.verdict.v1"
+      "const": "ackit.verdict.v2"
     },
     "id": {
       "type": "string",
@@ -95,6 +95,82 @@
     "summary": {
       "type": "string",
       "maxLength": 2000
+    },
+    "binding": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "number",
+          "const": 1
+        },
+        "stateDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bundleDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "components": {
+          "type": "object",
+          "properties": {
+            "sourceState": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "taskContract": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "intent": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifacts": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "workflow": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "config": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "policy": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "evidence": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "sourceState",
+            "taskContract",
+            "intent",
+            "artifacts",
+            "workflow",
+            "config",
+            "policy",
+            "evidence"
+          ],
+          "additionalProperties": false
+        },
+        "gitUnavailable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "version",
+        "stateDigest",
+        "bundleDigest",
+        "components",
+        "gitUnavailable"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
@@ -105,8 +181,9 @@
     "verifier",
     "findings",
     "checkedCriteria",
-    "summary"
+    "summary",
+    "binding"
   ],
   "additionalProperties": false,
-  "$comment": "ACKit verdict schema (ackit.verdict.v1)."
+  "$comment": "ACKit state-bound verdict schema (ackit.verdict.v2)."
 }
