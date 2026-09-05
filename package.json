@@ -1,6 +1,6 @@
 {
   "name": "@cynrath/agent-context-kit",
-  "version": "0.5.0-dev.0",
+  "version": "0.5.0",
   "description": "ACKit turns any repository into an agent-ready repository: instruction graph, agent skills, security scanning, context budgeting, task-first workflow, policy-as-code, and MCP integration. Offline-first and deterministic.",
   "keywords": [
     "ackit",

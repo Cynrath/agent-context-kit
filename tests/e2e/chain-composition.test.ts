@@ -294,12 +294,12 @@ describe("v0.5 chain composition (TASK-0086)", () => {
     const completed = await cli(["task", "complete", taskId]);
     expect(completed.code).toBe(EXIT_CODES.ok);
 
-    // ---- Release truth holds (0078 model): dev unfinalized, stable
-    // pointer untouched, no v0.5.0 tag anywhere near this lane.
+    // ---- Release truth holds (0078 model): source finalized to the
+    // release line, stable pointer untouched pre-publish, no v0.5.0 tag.
     const pkg = JSON.parse(await readFile(path.join(repoRoot, "package.json"), "utf8")) as {
       version: string;
     };
-    expect(pkg.version).toBe("0.5.0-dev.0");
+    expect(pkg.version).toBe("0.5.0");
     const releaseState = JSON.parse(
       await readFile(path.join(repoRoot, "release-state.json"), "utf8"),
     ) as { publishedStable: string };
