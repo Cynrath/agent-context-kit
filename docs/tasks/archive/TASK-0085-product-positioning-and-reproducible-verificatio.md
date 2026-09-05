@@ -1,13 +1,13 @@
 ---
 id: "TASK-0085"
 title: "Product positioning and reproducible verification-handoff demo"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0081"
   - "TASK-0082"
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-05
 ---
 
 ## Purpose
@@ -114,3 +114,17 @@ Evidence: demo test green (11 stages, ~12s) + full `pnpm test` counts +
 all gates recorded at completion-gate time. Fixtures synthetic,
 offline, scrubbed (review artifacts under `.ackit/`). No quality gates
 weakened. No publish/tag/release. TASK-0086 not started.
+
+Final validation (2026-09-05, head `3353deb`): `pnpm test` 114 files /
+702 passed / 3 skipped (2 OS-gated symlink rows + pre-existing symlink
+conditional), 0 failed with `--maxWorkers 2`; lint, format:check,
+typecheck, build green (zero warnings); `gen:schemas` no-op; smoke:cli
++ smoke:package (`cynrath-agent-context-kit-0.5.0-dev.0.tgz`, nothing
+published) PASS; version-parity PASS (source 0.5.0-dev.0, stable
+0.4.1); offline-egress PASS; text-hygiene repo clean (923 files);
+config check, doctor, task doctor, skills validate, scan --ci
+(readiness 88) PASS; `git diff --check` clean. PR #20 exact-head CI:
+12/12 green on `3353deb`. Fresh independent verifier: OVERALL PASS,
+zero blockers (4 infos, all benign — pre-existing scan findings,
+managed-asset note, canonical-vs-demo path narration, replay refusal
+covered in 0080 suites).
