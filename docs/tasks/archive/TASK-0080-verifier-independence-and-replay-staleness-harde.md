@@ -1,13 +1,13 @@
 ---
 id: "TASK-0080"
 title: "Verifier independence and replay-staleness hardening"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
   - "TASK-0079"
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-05
 ---
 
 ## Purpose
@@ -118,3 +118,31 @@ existing suites moved to the new contract (same-process tests declare
 `same` or carry proof; re-verdict tests author new content); full `pnpm
 test` counts + all gates recorded at completion-gate time. No quality
 gates weakened. No publish/tag/release. TASK-0081 not started.
+
+Final validation (2026-09-05, head `a781a8c` unless noted):
+`pnpm test` 105 files / 655 passed / 1 conditional skip (pre-existing
+symlink-behavior skip), 0 failed with `--maxWorkers 2` (full-parallel runs
+showed rotating 60s load-timeouts in heavy git-fixture tests, passing
+isolated in seconds — known machine-contention flake class, zero assertion
+failures in every run); lint, format:check, typecheck, build green;
+`gen:schemas` hash-idempotent; smoke:cli + smoke:package
+(`cynrath-agent-context-kit-0.5.0-dev.0.tgz`, nothing published) PASS;
+version-parity PASS (source 0.5.0-dev.0, stable 0.4.1); offline-egress
+PASS; text-hygiene repo clean; config check, doctor, task doctor, skills
+validate, scan --ci (readiness 88) PASS; `git diff --check` clean.
+PR #20 (`release/v0.5.0` → `master`) exact-head CI: 12/12 green on
+`cc15d6a` (verify 3 OS × 2 node, package-smoke 3 OS, extension, dogfood
+self-scan, action smoke). Fresh independent verifier: OVERALL PASS, zero
+blockers (31/31 focused suites, doctor/task-doctor/scan green,
+schema-idempotent, tree clean). Two verifier follow-ups applied on top
+(`record --json` gains `independenceCode` per ADR-0031 §4; gate tamper
+message made exact). Two accepted-risk notes recorded, not implemented:
+replay digest covers volatile `verifier.issuedAt`/`agent` (exact-byte
+replay — the criterion — refused; date-bump fabrication equals
+local-operator fabrication, explicitly out of scope); gate dual-blocker
+wording was fixed, record/show parity confirmed.
+Process note (Rule 9 transparency): one commit message on this lane
+contained stray non-ASCII characters from shell input handling; caught
+pre-push hygiene review, fixed by amending the UNPUSHED local commit only
+(pushed history `cc15d6a` untouched; amended text re-checked with
+text-hygiene PASS). No quality gates weakened. No publish/tag/release.
