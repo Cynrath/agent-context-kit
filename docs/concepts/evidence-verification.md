@@ -86,13 +86,49 @@ the verdict file): with `--bundle <bundle.json>`, a bundle generated
 before the state moved on is refused with `VERDICT-BUNDLE-MISMATCH`. The
 store is append-only: a REWORK verdict is never overwritten, only
 superseded by a later registered verdict. Stored verdicts are
-`ackit.verdict.v2` (v1 fields + binding); pre-existing v1 files stay
-readable as legacy history but never satisfy a state-bound completion.
+`ackit.verdict.v2` (v1 fields + binding + reviewed-bundle reference);
+pre-existing v1 files stay readable as legacy history but never satisfy a
+state-bound completion.
 
 ```
-ackit verification record TASK-0007 --verdict docs/verdict-7.yaml [--bundle docs/bundle-7.json]
-ackit verification show TASK-0007            # --json adds bound/fresh/problemCode
+ackit verification bundle TASK-0007 --format json --out .ackit/reviews/bundle-7.json
+# ... fresh verifier reviews the bundle, authors .ackit/reviews/verdict-7.yaml ...
+ackit verification record TASK-0007 --verdict .ackit/reviews/verdict-7.yaml --bundle .ackit/reviews/bundle-7.json
+ackit verification show TASK-0007            # --json adds bound/fresh/problemCode + independent/reviewedBundleDigest/independenceCode
 ```
+
+## Verifier independence (ADR-0031)
+
+`context: "fresh"` in the verdict file is a claim; the reviewed bundle is
+the proof. A verdict is **independent** iff it claims a fresh context AND
+references the exact bundle digest it is bound to
+(`reviewedBundleDigest`). Everything else is flagged, never silently
+accepted where independence is required:
+
+- fresh claim without `--bundle` proof → registration refused with
+  `VERDICT-INDEPENDENCE-UNPROVEN` (self-issued artifacts cannot silently
+  qualify as independent);
+- `context: "same"` verdicts register fine without proof but are marked
+  non-independent — and block `task complete` with
+  `VERDICT-INDEPENDENCE-UNPROVEN` wherever the effective profile requires
+  a verdict;
+- re-presenting already-registered verdict content is refused with
+  `VERDICT-REPLAY-REJECTED` (replay is about content, not staleness — an
+  unchanged state does not make a duplicate a re-verification);
+- a genuine re-verification authors new content and registers normally.
+
+Review-artifact lifecycle: files written after a bundle export — including
+the bundle JSON and verdict YAML themselves — are working-set state and
+move the digest. Keep transient review artifacts under `.ackit/`
+(excluded from source-state binding, gitignored): export → review →
+author → register → complete then stays fresh. The mismatch diagnostic
+says so explicitly.
+
+What independence is NOT: no proof of verifier identity, no PKI, no
+signing infrastructure, no proof that a person/model actually read the
+bundle. Deterministic local proof-of-review linkage only — a fresh
+verdict provably references the exact bundle its reviewer saw, across
+processes, offline.
 
 ## State binding (ADR-0030)
 
@@ -114,7 +150,10 @@ completion while mandatory evidence is missing or the required verdict is
 absent or blocking. A legacy unbound v1 verdict, or a bound verdict whose
 state moved on, blocks with `VERDICT-BINDING-MISSING` /
 `VERDICT-STATE-STALE` — re-verify (fresh bundle + fresh verdict) to restore
-eligibility. The verifier role contract says it plainly: the verifier
-may inspect intent/spec/plan/diff/tests/evidence, should not implement the
-feature it judges, and must emit `ackit.verdict.v1`. ACKit validates structure
-and references; semantic judgment belongs to the fresh verifier.
+eligibility. Where the effective profile requires a verdict, it requires an
+INDEPENDENT one: a same-context or otherwise unproven latest verdict blocks
+with `VERDICT-INDEPENDENCE-UNPROVEN`. The verifier role contract says it
+plainly: the verifier may inspect intent/spec/plan/diff/tests/evidence,
+should not implement the feature it judges, and must emit
+`ackit.verdict.v1`. ACKit validates structure and references; semantic
+judgment belongs to the fresh verifier.

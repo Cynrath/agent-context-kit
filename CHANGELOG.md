@@ -4,6 +4,53 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.5.0] - 2026-09-05
+
+Provider-independent repository contract with evidence-backed completion:
+deterministic verification state binding, structural verifier
+independence with replay/staleness hardening, a canonical read-only
+status projection, portable verification-bound handoffs, provider-surface
+and integration parity (CLI/SDK/read-only MCP/Action/VS Code), a live
+adversarial containment audit with a link-aware write guard, and a
+reproducible trust-flow demo. Offline-first, no API key. The Browser
+Companion experiment remains paused on its separate branch and is **not**
+part of this release.
+
+### Added
+
+- Verification state binding (`ackit.verification-bundle.v2`,
+  `ackit.verdict.v2`): every verdict bound to the exact approved state;
+  stale/replayed verdicts cannot satisfy completion
+  (`VERDICT-STATE-STALE`, `VERDICT-BUNDLE-MISMATCH`,
+  `VERDICT-BINDING-MISSING`).
+- Verifier independence: fresh-context verdicts prove review with the
+  reviewed-bundle digest (`VERDICT-INDEPENDENCE-UNPROVEN` otherwise);
+  identical-content re-registration refused (`VERDICT-REPLAY-REJECTED`);
+  cross-process verifier fixture.
+- `ackit status [id]`: canonical read-only projection (task/stage,
+  verbatim completion blockers, verification + checkpoint staleness,
+  derived next actions) in human and stable `ackit.status.v1` JSON.
+- Portable handoff (`ackit.handoff.v2`): `checkpoint export --format
+  json` binds digests, staleness, the status contract, a redaction
+  manifest, and provider-neutral instructions; read-only `checkpoint
+  import` refuses stale handoffs (`VERDICT-STATE-STALE`).
+- Integration parity: v0.5 read models on the SDK (allowlist-pinned),
+  read-only `ackit_status` MCP tool (16 tools, still zero mutation
+  surface), Action pass-through documentation, VS Code Tasks view over
+  the status snapshot, provider-capability fixtures with dated official
+  sources.
+- Adversarial containment: link-aware write guard for all
+  root-contained `--out` writers (planted symlink/junction escape
+  closed); preventive MCP path allow-list rejected on evidence.
+- Trust-flow demo: 11 asserted stages end to end plus a second-process
+  resume (`tests/e2e/trust-flow-demo.test.ts`,
+  `docs/guides/demo-trust-flow.md`).
+
+### Security
+
+- Threat-model delta T27 (`docs/security/THREAT_MODEL.md`): CLI `--out`
+  write escape via planted links closed; allow-list decision recorded.
+
 ## [0.4.0] - 2026-09-03
 
 Managed-asset sync, post-0.3.0 limitation closure, and version hygiene (minor

@@ -17,6 +17,7 @@ import { WorkflowStore } from "../../core/workflow/index.js";
 import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
 import type { CliInvocation, GlobalOptions } from "../context.js";
+import { runHandoffExport, runHandoffImport } from "./checkpoint-handoff.js";
 import { enforceAckitBoundary } from "./policy-boundary.js";
 
 interface CheckpointCommandBase {
@@ -25,6 +26,8 @@ interface CheckpointCommandBase {
   quiet: boolean;
   debug?: boolean | undefined;
 }
+
+export type { CheckpointCommandBase };
 
 interface NextActionArgs {
   objective: string;
@@ -69,6 +72,8 @@ async function resolveStores(base: CheckpointCommandBase) {
   };
 }
 
+export type CheckpointStores = NonNullable<Awaited<ReturnType<typeof resolveStores>>>;
+
 async function intentSummaryFor(
   intents: IntentStore,
   intentRef: string | undefined,
@@ -86,11 +91,13 @@ async function intentSummaryFor(
 
 export async function runCheckpointCommand(
   base: CheckpointCommandBase,
-  subcommand: "create" | "show" | "validate" | "export",
+  subcommand: "create" | "show" | "validate" | "export" | "import",
   args: {
     taskId?: string | undefined;
     cpId?: string | undefined;
     out?: string | undefined;
+    format?: string | undefined;
+    handoffFile?: string | undefined;
     nextAction?: NextActionArgs | undefined;
   },
 ): Promise<ExitCodeValue> {
@@ -215,6 +222,21 @@ export async function runCheckpointCommand(
           debug: base.debug,
         });
         if (boundary !== null) return boundary;
+        if (args.format !== undefined && args.format !== "md" && args.format !== "json") {
+          emitDiagnostic(
+            {
+              code: "checkpoint-error",
+              message: `unknown handoff format '${args.format}' (md|json)`,
+            },
+            { quiet: base.quiet, debug: base.debug ?? false },
+          );
+          return EXIT_CODES.usage;
+        }
+        // Machine-readable bound handoff (TASK-0082): handled in
+        // checkpoint-handoff.ts (module size contract REQ-ARCH-008).
+        if (args.format === "json") {
+          return runHandoffExport(base, stores, { taskId, out: args.out });
+        }
         const found = await tasks.find(taskId);
         const checkpoint = await checkpoints.latest(taskId);
         if (found === null || checkpoint === null) {
@@ -239,22 +261,17 @@ export async function runCheckpointCommand(
         const metaExtra = found.doc.meta as { planRef?: string | undefined };
         void metaExtra;
         if (args.out !== undefined) {
-          // Reject (never sanitize) traversal attempts: an out path with ..
-          // segments, absolute form, or backslashes is refused outright
-          // (THREAT_MODEL T19).
-          const outArg = args.out.split("\\").join("/");
-          const escapes =
-            outArg.startsWith("/") ||
-            /^[a-zA-Z]:/.test(outArg) ||
-            outArg.split("/").some((segment) => segment === "..");
-          const outPath = path.resolve(rootPath, outArg);
-          if (escapes || !outPath.startsWith(rootPath)) {
+          // Link-aware containment (TASK-0084): see verification bundle writer.
+          const { resolveContainedWritePath } = await import("../../core/filesystem/paths.js");
+          const contained = await resolveContainedWritePath(rootPath, args.out);
+          if (!contained.ok) {
             emitDiagnostic(
               { code: "checkpoint-error", message: "export path escapes repository root" },
               { quiet: base.quiet, debug: base.debug ?? false },
             );
             return EXIT_CODES.securityBoundary;
           }
+          const outPath = contained.path;
           await fsp.mkdir(path.dirname(outPath), { recursive: true });
           await fsp.writeFile(outPath, pack, "utf8");
           if (!base.quiet) process.stdout.write(`handoff pack written to ${args.out}\n`);
@@ -262,6 +279,12 @@ export async function runCheckpointCommand(
         }
         process.stdout.write(pack);
         return EXIT_CODES.ok;
+      }
+      case "import": {
+        // Read-only by construction (handled in checkpoint-handoff.ts):
+        // validates against CURRENT disk state and renders resume, or
+        // refuses with a stable code. Never mutates ledger state.
+        return runHandoffImport(base, stores, { handoffFile: args.handoffFile ?? "" });
       }
       default:
         return EXIT_CODES.internal;
@@ -406,7 +429,8 @@ export function registerCheckpointCommands(program: Command, invocation: CliInvo
     .description("write a self-contained handoff pack")
     .argument("<taskId>")
     .option("--out <file>", "output path inside the repository (stdout when omitted)")
-    .action(async (taskId: string, opts: { out?: string }) => {
+    .option("--format <fmt>", "handoff format: md (v1 pack) | json (verification-bound v2)", "md")
+    .action(async (taskId: string, opts: { out?: string; format?: string }) => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
       invocation.exitCode = await runCheckpointCommand(
         {
@@ -415,7 +439,25 @@ export function registerCheckpointCommands(program: Command, invocation: CliInvo
           quiet: parentOptions.quiet ?? false,
         },
         "export",
-        { taskId, out: opts.out },
+        { taskId, out: opts.out, format: opts.format },
+      );
+    });
+  checkpointCommand
+    .command("import")
+    .description(
+      "validate a bound handoff against current state and render its resume context (read-only)",
+    )
+    .argument("<file>", "handoff file inside the repository")
+    .action(async (file: string) => {
+      const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;
+      invocation.exitCode = await runCheckpointCommand(
+        {
+          root: parentOptions.root,
+          json: parentOptions.json ?? false,
+          quiet: parentOptions.quiet ?? false,
+        },
+        "import",
+        { handoffFile: file },
       );
     });
 }

@@ -292,6 +292,10 @@ Fixed separators; evidence + verdict below.
     expect(bundleContent).toContain("Verifier role contract");
 
     // ---- Fresh verifier (a REWORK first, then the corrected PASS).
+    // TASK-0080: fresh-context verdicts prove review with the bundle JSON.
+    // Review artifacts live under .ackit/ (excluded from state binding —
+    // ADR-0031 §5), so exporting/authoring them never stales the proof.
+    await mkdir(path.join(rootPath, ".ackit", "reviews"), { recursive: true });
     const reworkYaml = [
       'schemaId: "ackit.verdict.v1"',
       `taskId: "${taskId}"`,
@@ -310,13 +314,29 @@ Fixed separators; evidence + verdict below.
       '  - "AC-002"',
       'summary: "rework"',
     ].join("\n");
-    await writeFile(path.join(rootPath, "docs", "verdict-rework.yaml"), reworkYaml, "utf8");
+    await writeFile(
+      path.join(rootPath, ".ackit", "reviews", "verdict-rework.yaml"),
+      reworkYaml,
+      "utf8",
+    );
+    const reworkBundle = await agentB([
+      "verification",
+      "bundle",
+      taskId,
+      "--format",
+      "json",
+      "--out",
+      ".ackit/reviews/bundle-rework.json",
+    ]);
+    expect(reworkBundle.code).toBe(EXIT_CODES.ok);
     const rework = await agentB([
       "verification",
       "record",
       taskId,
       "--verdict",
-      "docs/verdict-rework.yaml",
+      ".ackit/reviews/verdict-rework.yaml",
+      "--bundle",
+      ".ackit/reviews/bundle-rework.json",
     ]);
     expect(rework.code).toBe(EXIT_CODES.ok);
 
@@ -335,6 +355,8 @@ Fixed separators; evidence + verdict below.
     expect(denial2.stderr).toContain("VERDICT_BLOCKING");
 
     // Fresh verifier re-reviews with the matrix ids attached and passes.
+    // The criterion tick moved state, so a FRESH bundle (exported after the
+    // new verdict file is authored) proves the review.
     const passYaml = [
       'schemaId: "ackit.verdict.v1"',
       `taskId: "${taskId}"`,
@@ -349,13 +371,29 @@ Fixed separators; evidence + verdict below.
       '  - "AC-002"',
       'summary: "matrix run ids verified; criteria met"',
     ].join("\n");
-    await writeFile(path.join(rootPath, "docs", "verdict-pass.yaml"), passYaml, "utf8");
+    await writeFile(
+      path.join(rootPath, ".ackit", "reviews", "verdict-pass.yaml"),
+      passYaml,
+      "utf8",
+    );
+    const passBundle = await agentB([
+      "verification",
+      "bundle",
+      taskId,
+      "--format",
+      "json",
+      "--out",
+      ".ackit/reviews/bundle-pass.json",
+    ]);
+    expect(passBundle.code).toBe(EXIT_CODES.ok);
     const pass = await agentB([
       "verification",
       "record",
       taskId,
       "--verdict",
-      "docs/verdict-pass.yaml",
+      ".ackit/reviews/verdict-pass.yaml",
+      "--bundle",
+      ".ackit/reviews/bundle-pass.json",
     ]);
     expect(pass.code).toBe(EXIT_CODES.ok);
     expect(pass.stdout).toContain("PASS");

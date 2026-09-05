@@ -130,6 +130,9 @@ async function evidenceComplete(taskId: string): Promise<void> {
 async function registerVerdict(taskId: string, verdict: string): Promise<void> {
   const verdicts = new VerdictStore(rootPath);
   const registry = await new EvidenceStore(await resolvedRoot()).load(taskId);
+  // Fresh-context verdicts carry the CURRENT bundle digest as reviewed proof
+  // (TASK-0080), so gate success paths exercise independent verdicts.
+  const binding = await computeStateBinding(rootPath, taskId);
   await verdicts.register(
     taskId,
     {
@@ -150,7 +153,7 @@ async function registerVerdict(taskId: string, verdict: string): Promise<void> {
       checkedCriteria: ["AC-001", "AC-002"],
       summary: "s",
     },
-    { evidenceRegistry: registry, binding: await computeStateBinding(rootPath, taskId) },
+    { evidenceRegistry: registry, binding, reviewedBundleDigest: binding.bundleDigest },
   );
 }
 
@@ -356,6 +359,9 @@ describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", 
     // restores eligibility with no regression for unconfigured repositories.
     await wf(path.join(rootPath, "ackit.yml"), "schemaVersion: 1\n", "utf8");
     const freshRegistry = await new EvidenceStore(await resolvedRoot()).load(taskId);
+    const freshBinding = await computeStateBinding(rootPath, taskId);
+    // Fresh re-verdict = NEW judged content (distinct summary): replaying the
+    // byte-identical first verdict would be VERDICT-REPLAY-REJECTED.
     await new VerdictStore(rootPath).register(
       taskId,
       {
@@ -364,9 +370,13 @@ describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", 
         verifier: { agent: "fresh-verifier/1.0", context: "fresh", issuedAt: today },
         findings: [],
         checkedCriteria: ["AC-001", "AC-002"],
-        summary: "s",
+        summary: "re-verified after review policy removal",
       },
-      { evidenceRegistry: freshRegistry, binding: await computeStateBinding(rootPath, taskId) },
+      {
+        evidenceRegistry: freshRegistry,
+        binding: freshBinding,
+        reviewedBundleDigest: freshBinding.bundleDigest,
+      },
     );
     const result = await store.complete(taskId);
     expect(result.forced).toBe(false);
@@ -387,6 +397,7 @@ describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", 
     const verdicts = new VerdictStore(rootPath);
     const registry = await new EvidenceStore(await resolvedRoot()).load(taskId);
     // severity "info" is BELOW the medium threshold → completes fine.
+    const infoBinding = await computeStateBinding(rootPath, taskId);
     await verdicts.register(
       taskId,
       {
@@ -397,7 +408,11 @@ describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", 
         checkedCriteria: ["AC-001", "AC-002"],
         summary: "s",
       },
-      { evidenceRegistry: registry, binding: await computeStateBinding(rootPath, taskId) },
+      {
+        evidenceRegistry: registry,
+        binding: infoBinding,
+        reviewedBundleDigest: infoBinding.bundleDigest,
+      },
     );
     const ok = await store.complete(taskId);
     expect(ok.forced).toBe(false);
@@ -408,6 +423,7 @@ describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", 
     await evidenceComplete(taskId2);
     await workflowStore2.advanceTo(taskId2, "verify");
     const registry2 = await new EvidenceStore(await resolvedRoot()).load(taskId2);
+    const warnBinding = await computeStateBinding(rootPath, taskId2);
     await verdicts.register(
       taskId2,
       {
@@ -420,7 +436,11 @@ describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", 
         checkedCriteria: ["AC-001", "AC-002"],
         summary: "s",
       },
-      { evidenceRegistry: registry2, binding: await computeStateBinding(rootPath, taskId2) },
+      {
+        evidenceRegistry: registry2,
+        binding: warnBinding,
+        reviewedBundleDigest: warnBinding.bundleDigest,
+      },
     );
     let blockers: string[] = [];
     await expect(store.complete(taskId2)).rejects.toThrow();
@@ -437,5 +457,47 @@ describe("review-policy completion-gate integration (ADR-0028 §2, TASK-0064)", 
 
     // Cleanup: remove the review policy for subsequent tests.
     await wf(path.join(rootPath, "ackit.yml"), "schemaVersion: 1\n", "utf8");
+  });
+
+  it("TASK-0080 — same-process PASS verdict cannot silently satisfy independence (VERDICT-INDEPENDENCE-UNPROVEN)", async () => {
+    const taskId = await makeCheckedTask("standard");
+    const store = new TaskStore(rootPath);
+    const workflowStore = new WorkflowStore(await resolvedRoot());
+    await evidenceComplete(taskId);
+    await workflowStore.advanceTo(taskId, "verify");
+    // Same-context verdict: fresh and bound, but with no reviewed bundle.
+    const verdicts = new VerdictStore(rootPath);
+    const registry = await new EvidenceStore(await resolvedRoot()).load(taskId);
+    const registered = await verdicts.register(
+      taskId,
+      {
+        schemaId: "ackit.verdict.v1",
+        verdict: "PASS",
+        verifier: { agent: "implementer/1.0", context: "same", issuedAt: today },
+        findings: [],
+        checkedCriteria: ["AC-001", "AC-002"],
+        summary: "self-review",
+      },
+      { evidenceRegistry: registry, binding: await computeStateBinding(rootPath, taskId) },
+    );
+    expect(registered.reviewedBundleDigest).toBeNull();
+    await expect(store.complete(taskId)).rejects.toThrow(/VERDICT-INDEPENDENCE-UNPROVEN/);
+    // A fresh independent re-verdict (new content + bundle proof) restores
+    // eligibility — the refusal is about proof, not punishment.
+    const proof = await computeStateBinding(rootPath, taskId);
+    await verdicts.register(
+      taskId,
+      {
+        schemaId: "ackit.verdict.v1",
+        verdict: "PASS",
+        verifier: { agent: "fresh-verifier/2.0", context: "fresh", issuedAt: today },
+        findings: [],
+        checkedCriteria: ["AC-001", "AC-002"],
+        summary: "independent re-review with bundle proof",
+      },
+      { evidenceRegistry: registry, binding: proof, reviewedBundleDigest: proof.bundleDigest },
+    );
+    const result = await store.complete(taskId);
+    expect(result.forced).toBe(false);
   });
 });

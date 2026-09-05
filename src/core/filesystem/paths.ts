@@ -1,3 +1,4 @@
+import { promises as fsp } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
@@ -78,4 +79,72 @@ export function isInsideRoot(
   }
   const rootPrefix = normRoot.endsWith("/") ? normRoot : `${normRoot}/`;
   return normCandidate.startsWith(rootPrefix);
+}
+
+export type ContainedWriteResult =
+  | { ok: true; path: string }
+  | { ok: false; reason: "absolute" | "escapes-root" | "link-escape" };
+
+/**
+ * Link-aware containment for paths ACKit is about to WRITE (TASK-0084).
+ *
+ * String-level checks (`..`, absolute form, UNC, NUL) cannot see links: a
+ * planted directory link (or Windows junction) inside the repository
+ * redirects a lexically-contained `--out` path outside the root, and the
+ * write follows it (proven live, TASK-0084 matrix R12/R13). This helper
+ * additionally resolves the nearest existing ancestor (plus the final
+ * path itself when it already exists, covering planted file links) with
+ * `realpath` and requires the result to live inside the real repository
+ * root — the same realpath-then-contain pattern the binding layer already
+ * uses for artifact reads.
+ *
+ * Pure check (never creates): callers mkdir/write only on `ok`. The
+ * non-existent remainder below the ancestor is created fresh by the
+ * caller, so no link can hide there. TOCTOU between check and write is
+ * out of scope (local single-operator CLI, same as all local file ops).
+ */
+export async function resolveContainedWritePath(
+  repositoryRoot: string,
+  arg: string,
+): Promise<ContainedWriteResult> {
+  const normalized = normalizeRelativePath(arg);
+  if (!normalized.ok) {
+    return { ok: false, reason: normalized.reason === "absolute" ? "absolute" : "escapes-root" };
+  }
+  if (normalized.value.length === 0) {
+    return { ok: false, reason: "escapes-root" };
+  }
+  const resolved = path.resolve(repositoryRoot, ...normalized.value.split("/"));
+  if (!isInsideRoot(repositoryRoot, resolved)) {
+    return { ok: false, reason: "escapes-root" };
+  }
+  let realRoot: string;
+  try {
+    realRoot = await fsp.realpath(repositoryRoot);
+  } catch {
+    realRoot = repositoryRoot;
+  }
+  // Final path itself when it exists (planted file link), else the nearest
+  // existing ancestor (planted dir link / junction above the target).
+  let probe = resolved;
+  for (;;) {
+    try {
+      await fsp.lstat(probe);
+      break;
+    } catch {
+      const parent = path.dirname(probe);
+      if (parent === probe) return { ok: false, reason: "link-escape" };
+      probe = parent;
+    }
+  }
+  let realProbe: string;
+  try {
+    realProbe = await fsp.realpath(probe);
+  } catch {
+    return { ok: false, reason: "link-escape" };
+  }
+  if (!isInsideRoot(realRoot, realProbe)) {
+    return { ok: false, reason: "link-escape" };
+  }
+  return { ok: true, path: resolved };
 }

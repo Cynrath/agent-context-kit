@@ -32,6 +32,8 @@ ackit checkpoint create TASK-0007 \
 ackit checkpoint show TASK-0007          # latest (or a specific CP-####)
 ackit checkpoint validate TASK-0007      # staleness detection
 ackit checkpoint export TASK-0007 --out docs/handoff-7.md
+ackit checkpoint export TASK-0007 --format json --out .ackit/reviews/handoff-7.json
+ackit checkpoint import .ackit/reviews/handoff-7.json   # validate + resume (read-only)
 ackit task resume TASK-0007              # concise deterministic resume context
 ackit pack --task TASK-0007 --resume     # task-aware context pack + resume section
 ```
@@ -57,4 +59,31 @@ reads identical state with zero conversation dependence.
 `checkpoint export --out` writes a single self-contained markdown document
 (resume context + full task document + checkpoint summary) for a fresh
 implementer or verifier on any machine. Output paths are containment-checked;
-traversal attempts exit 4.
+traversal attempts exit 4. The markdown shape is the v1 handoff: readers
+keep working unchanged.
+
+## Portable bound handoff (`ackit.handoff.v2`)
+
+`checkpoint export --format json` wraps the v1 pack with a machine-readable
+section binding the full handoff list: task/workflow state, the checkpoint
+record, evidence presence + problems, the verification binding
+(state/bundle/component digests) with the latest verdict's trust summary,
+checkpoint staleness at export time, the TASK-0081 status contract
+(verbatim blockers + derived next actions), a redaction manifest, and
+provider-neutral resume instructions. Same state exports byte-identical
+handoffs (deterministic).
+
+`checkpoint import <file>` validates a handoff against CURRENT disk state
+and renders its resume context — read-only: it never mutates
+task/workflow/evidence/verdict/ledger state (no auto-execution, no cloud
+sync). Fresh handoffs exit 0; moved state refuses with
+`VERDICT-STATE-STALE` (naming the changed classes, exit 1); v1 markdown
+carries no digests and is refused with `HANDOFF-V1-UNBOUND` (re-export as
+JSON — the migration); malformed files refuse with `HANDOFF-INVALID`;
+unknown tasks with `HANDOFF-TASK-UNKNOWN` (exit 2).
+
+Redaction: rendered surfaces pass the canonical secret gate (fail-closed)
+and machine-local absolute paths are scrubbed with the shared pack
+scrubber; the manifest states the scrub count. Review files written after
+a handoff export change state like any other file — keep transient review
+artifacts under `.ackit/` as usual.

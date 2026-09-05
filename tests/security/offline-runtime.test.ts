@@ -275,6 +275,9 @@ describe("offline-runtime deny-egress harness", () => {
     await evidenceStore.save(taskId, registry);
     validateEvidence(registry);
     const verdicts = new VerdictStore(tmpRepo);
+    // Reviewed-bundle proof rides along (TASK-0080); this test owns the
+    // offline invariant, not independence, so the proof is the current state.
+    const offlineBinding = await computeStateBinding(tmpRepo, taskId);
     await verdicts.register(
       taskId,
       {
@@ -285,7 +288,7 @@ describe("offline-runtime deny-egress harness", () => {
         checkedCriteria: registry.criteria.map((c) => c.id),
         summary: "offline",
       },
-      { binding: await computeStateBinding(tmpRepo, taskId) },
+      { binding: offlineBinding, reviewedBundleDigest: offlineBinding.bundleDigest },
     );
     const bundle = await buildVerificationBundle(root, taskId);
     expect(bundle.ok).toBe(true);

@@ -8,16 +8,22 @@ const ALLOWLIST = [
   "BUILTIN_PROFILES",
   "CheckpointStore",
   "EvidenceStore",
+  "HANDOFF_SCHEMA_ID_V2",
+  "HandoffError",
   "IntentStore",
   "ProfileSchema",
   "READINESS_ENGINE_VERSION",
+  "STATUS_SCHEMA_ID",
   "StateBindingError",
   "TaskStore",
   "VerdictStore",
   "WorkflowStore",
   "analyzeOptimize",
+  "assessVerdictIndependence",
   "buildContextPack",
+  "buildHandoff",
   "buildInstructionGraph",
+  "buildStatusReport",
   "buildVerificationBundle",
   "compareStoredBinding",
   "computeStateBinding",
@@ -33,8 +39,11 @@ const ALLOWLIST = [
   "loadRole",
   "loadRulePacks",
   "normalizeIntent",
+  "parseHandoffFile",
+  "projectVerdictAuthoring",
   "renderHandoffPack",
   "renderResumeContext",
+  "renderStatusReport",
   "requiredArtifacts",
   "resolveAutonomy",
   "resolveEffectiveStack",
@@ -43,7 +52,9 @@ const ALLOWLIST = [
   "scanRepository",
   "scoreRepository",
   "validateEvidence",
+  "validateHandoff",
   "validateSkills",
+  "verdictContentDigest",
 ].sort();
 
 // All extension points shipped in v0.2.0+ (scoreRepository, evaluateRulePack,
@@ -60,7 +71,13 @@ describe("public API surface (REQ-API-001)", () => {
   });
 
   it("exposes functions/classes, not mutable state", () => {
-    const nonFunctions = new Set(["ProfileSchema", "READINESS_ENGINE_VERSION"]);
+    const nonFunctions = new Set([
+      "ProfileSchema",
+      "READINESS_ENGINE_VERSION",
+      // v0.5 read-model contract ids (TASK-0083 parity): frozen strings.
+      "HANDOFF_SCHEMA_ID_V2",
+      "STATUS_SCHEMA_ID",
+    ]);
     // BUILTIN_PROFILES is a frozen catalog constant (documented, read-only).
     const frozenConstants = new Set(["BUILTIN_PROFILES"]);
     for (const name of ALLOWLIST) {

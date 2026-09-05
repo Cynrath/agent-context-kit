@@ -23,10 +23,11 @@ Exit codes: see `docs/reference/exit-codes.md`.
 | `ackit workflow show [id]` \| `advance <id> [--to stage]` \| `verify <id> --outcome pass\|fail` | stage machine + verify/fix-loop state |
 | `ackit intent new <title> \| list \| show <id> \| validate [id] \| fingerprint <id>` | intent artifacts (`docs/intent/`) |
 | `ackit checkpoint create <id> --next-objective text [--next-path p] [--next-command c] [--next-expected e]` | record a checkpoint with the exact next action |
-| `ackit checkpoint show <id> [cpId] \| validate <id> \| export <id> [--out file]` | checkpoint inspection, staleness validation, handoff pack |
+| `ackit checkpoint show <id> [cpId] \| validate <id> \| export <id> [--out file] [--format md\|json] \| import <file>` | checkpoint inspection, staleness validation, handoff pack (md = v1) / verification-bound portable handoff (json = `ackit.handoff.v2`), read-only handoff import with stale refusal |
 | `ackit evidence sync <id> \| show <id> \| verify <id> --criterion AC-n --type t --ref text \| validate <id>` | evidence contract (criteria linked to typed proof) |
-| `ackit verification bundle <id> [--out file] [--diff] [--format md\|json]` | deterministic state-bound bundle (v2) for a fresh independent verifier |
-| `ackit verification record <id> --verdict <file> [--bundle bundle.json] \| show <id>` | append-only state-bound verdict registration + inspection (`--bundle` replay-checks the reviewed bundle; stale bundles refused) |
+| `ackit verification bundle <id> [--out file] [--diff] [--format md\|json]` | deterministic state-bound bundle (v2) for a fresh independent verifier (keep review artifacts under `.ackit/` so exporting/authoring them never stales the proof) |
+| `ackit verification record <id> --verdict <file> [--bundle bundle.json] \| show <id>` | append-only state-bound verdict registration + inspection (fresh-context verdicts REQUIRE `--bundle` proof — `VERDICT-INDEPENDENCE-UNPROVEN` otherwise; stale bundles `VERDICT-BUNDLE-MISMATCH`; replayed content `VERDICT-REPLAY-REJECTED`; `show --json` reports `independent`/`independenceCode`) |
+| `ackit status [id]` | canonical read-only status: task/stage, verbatim completion blockers, verification + checkpoint staleness, derived next actions (human + stable `ackit.status.v1` JSON; defaults to the single active task; never mutates) |
 | `ackit drift check <id> [--ci]` \| `drift check-active [--ci]` | deterministic workflow drift findings; gate the active workflow task |
 | `ackit role list \| show <role> \| validate` | portable role contracts (`ackit.role.v1`) |
 | `ackit journal show [--limit n] [--task id] \| validate` | local sanitized execution journal |

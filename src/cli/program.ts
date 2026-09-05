@@ -21,6 +21,7 @@ import { runReportServeCommand } from "./commands/report.js";
 import { registerRoleCommands } from "./commands/role.js";
 import { runScanCommand } from "./commands/scan.js";
 import { registerSkillsCommands } from "./commands/skills.js";
+import { registerStatusCommand } from "./commands/status.js";
 import { runSummary } from "./commands/summary.js";
 import { runSyncCommand } from "./commands/sync.js";
 import { registerTaskCommands } from "./commands/task.js";
@@ -197,6 +198,8 @@ function buildProgram(invocation: CliInvocation): Command {
   registerVerificationCommands(program, invocation);
 
   registerRoleCommands(program, invocation);
+
+  registerStatusCommand(program, invocation);
 
   registerJournalCommands(program, invocation);
 

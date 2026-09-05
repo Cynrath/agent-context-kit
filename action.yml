@@ -6,7 +6,7 @@ branding:
   color: "blue"
 inputs:
   command:
-    description: "ackit subcommand (scan|doctor|optimize|pack|instructions|policy)"
+    description: "ackit subcommand (scan|doctor|optimize|pack|instructions|policy; read-only task surfaces status|drift also supported)"
     required: false
     default: "scan"
   args:

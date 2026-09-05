@@ -1,7 +1,7 @@
 ---
 id: "TASK-0086"
 title: "v0.5.0 final integration, fresh verifier, and release-readiness"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
@@ -13,7 +13,7 @@ dependencies:
   - "TASK-0084"
   - "TASK-0085"
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-05
 ---
 
 ## Purpose
@@ -75,11 +75,11 @@ Source audits (pre-v0.4.1 reports normalized against post-v0.4.1 live state; sou
 
 ## Acceptance criteria
 
-- [ ] Every dependency completed with real evidence; GO-gate scan finds no missing evidence, pending tests, TODOs, weakened gates, or unresolved security findings.
-- [ ] Chain composition proven end-to-end (status over bound state, cross-process handoff resume, surfaces agreeing, demo green, matrix green).
-- [ ] Fresh independent verifier: OVERALL PASS, zero blockers, exact-head CI green recorded.
-- [ ] No tag/publish/release side effects proven (`git tag`, `npm view`, `gh release` unchanged).
-- [ ] Full gates green with counts; task completed through the real gate.
+- [x] Every dependency completed with real evidence; GO-gate scan finds no missing evidence, pending tests, TODOs, weakened gates, or unresolved security findings.
+- [x] Chain composition proven end-to-end (status over bound state, cross-process handoff resume, surfaces agreeing, demo green, matrix green).
+- [x] Fresh independent verifier: OVERALL PASS, zero blockers, exact-head CI green recorded.
+- [x] No tag/publish/release side effects proven (`git tag`, `npm view`, `gh release` unchanged).
+- [x] Full gates green with counts; task completed through the real gate.
 
 ## Test steps
 
@@ -104,4 +104,48 @@ Source audits (pre-v0.4.1 reports normalized against post-v0.4.1 live state; sou
 
 ## Completion notes
 
-(placeholder)
+Implemented 2026-09-05 on `release/v0.5.0` (single-lane, seventh and
+final pre-release chain on the same branch/PR #20).
+
+Dependency audit: TASK-0078..0085 all archived with completion notes +
+evidence; active dir holds only this task. New-code TODO grep clean;
+no disabled tests (skips are the OS-gated symlink convention +
+pre-existing conditional); no weakened gates (contracts only added);
+no unresolved findings (hardlink residual accepted + recorded).
+
+Chain proof (`tests/e2e/chain-composition.test.ts`, green): one fixture
+proves CLI ≡ SDK ≡ MCP ≡ Action byte-equality on `ackit.status.v1`
+(blockers [] + fresh/independent verdict), the handoff carrying that
+same status contract with fresh import, completion succeeding, and
+release truth holding in-test (package `0.5.0-dev.0`,
+`publishedStable` `0.4.1`, no `v0.5*` tag). One test-expectation bug
+found during development (handoff embeds export-time status incl. the
+new checkpoint action — corrected to compare against the rebuilt live
+baseline, a stronger composition assertion). No integration glue beyond
+the test was necessary; no owning-task mismatch found.
+
+Readiness record: `docs/v0.5.0-readiness.md` (chain evidence table,
+composition proofs, GO-gate scan, no-publish proof, remaining release
+scope). CHANGELOG: deliberately untouched (no Unreleased/v0.5.0
+content pre-release, per convention — the release task owns entries).
+
+Evidence: chain test green + full `pnpm test` counts + all gates
+recorded below. No quality gates weakened. No tag/publish/release
+(this task forbids them; absence proven).
+
+Final validation (2026-09-05, head `231c88b`): `pnpm test` 115 files /
+703 passed / 3 skipped (2 OS-gated symlink rows + pre-existing
+conditional), 0 failed with `--maxWorkers 2`; lint, format:check,
+typecheck, build green (zero warnings); `gen:schemas` no-op;
+smoke:cli + smoke:package (`cynrath-agent-context-kit-0.5.0-dev.0.tgz`,
+nothing published) PASS; version-parity PASS (source 0.5.0-dev.0,
+stable 0.4.1); offline-egress PASS; text-hygiene repo clean (925
+files); config check, doctor, task doctor, skills validate, scan --ci
+(readiness 88) PASS; `git diff --check` clean; VS Code `tsc --noEmit`
++ esbuild green. PR #20 exact-head CI: 12/12 green on `231c88b`.
+Fresh independent verifier (whole chain): OVERALL PASS, zero blockers
+— dependencies, chain non-tautology, GO-gate scan, no-publish, all
+gates, readiness accuracy all hold. Two warning dispositions applied:
+readiness "8/8 verifiers" wording softened to the accurate
+per-lane/previous-lane split; CI-pending warning resolved (12/12
+landed before completion).

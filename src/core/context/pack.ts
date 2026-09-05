@@ -49,6 +49,24 @@ const ABSOLUTE_PATH_PATTERNS: readonly RegExp[] = [
 ];
 
 /**
+ * Scrub machine-local absolute paths (REQ-GOV-004) — the shared G4
+ * scrubber behind pack rendering, exported for handoff redaction
+ * (TASK-0082): same patterns, same `<local-path>` marker, counted so the
+ * redaction manifest can state exactly what was scrubbed. Deterministic.
+ */
+export function scrubAbsolutePaths(content: string): { content: string; scrubbed: number } {
+  let scrubbed = 0;
+  let next = content;
+  for (const pattern of ABSOLUTE_PATH_PATTERNS) {
+    next = next.replace(pattern, () => {
+      scrubbed += 1;
+      return "<local-path>";
+    });
+  }
+  return { content: next, scrubbed };
+}
+
+/**
  * Canonical secret safety gate for emitted artifacts.
  *
  * Single source of truth: the SAME catalog rules that power `ackit scan`
@@ -317,14 +335,11 @@ export async function buildContextPack(
       continue;
     }
 
-    // G4: scrub machine-local absolute paths (REQ-GOV-004).
-    let scrubbed = 0;
-    for (const pattern of ABSOLUTE_PATH_PATTERNS) {
-      content = content.replace(pattern, () => {
-        scrubbed += 1;
-        return "<local-path>";
-      });
-    }
+    // G4: scrub machine-local absolute paths (REQ-GOV-004) via the
+    // shared scrubber (same patterns/marker as handoff redaction).
+    const scrubResult = scrubAbsolutePaths(content);
+    content = scrubResult.content;
+    const scrubbed = scrubResult.scrubbed;
 
     let score =
       (includeMatch?.(target.relativePath) ? RANKING_WEIGHTS.explicitInclude : 0) +

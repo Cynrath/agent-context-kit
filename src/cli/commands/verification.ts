@@ -7,6 +7,7 @@ import { resolveRepositoryRoot } from "../../core/filesystem/root.js";
 import { TaskStore } from "../../core/tasks/index.js";
 import { buildVerificationBundle } from "../../core/verification/bundle.js";
 import {
+  assessVerdictIndependence,
   computeStateBinding,
   HEX64_PATTERN,
   StateBindingError,
@@ -112,20 +113,18 @@ export async function runVerificationCommand(
           return EXIT_CODES.usage;
         }
         if (args.out !== undefined) {
-          // Reject (never sanitize) traversal/absolute out paths (T19).
-          const outArg = args.out.split("\\").join("/");
-          const escapes =
-            outArg.startsWith("/") ||
-            /^[a-zA-Z]:/.test(outArg) ||
-            outArg.split("/").some((segment) => segment === "..");
-          const outPath = path.resolve(rootPath, outArg);
-          if (escapes || !outPath.startsWith(rootPath)) {
+          // Link-aware containment (TASK-0084): string checks cannot see
+          // planted links/junctions redirecting the write outside the root.
+          const { resolveContainedWritePath } = await import("../../core/filesystem/paths.js");
+          const contained = await resolveContainedWritePath(rootPath, args.out);
+          if (!contained.ok) {
             emitDiagnostic(
               { code: "verification-error", message: "bundle output path escapes repository root" },
               { quiet: base.quiet, debug: base.debug ?? false },
             );
             return EXIT_CODES.securityBoundary;
           }
+          const outPath = contained.path;
           await fsp.mkdir(path.dirname(outPath), { recursive: true });
           await fsp.writeFile(
             outPath,
@@ -196,11 +195,14 @@ export async function runVerificationCommand(
           return EXIT_CODES.usage;
         }
         const evidence = await new EvidenceStore(root).load(taskId);
-        // Registration-time validation (ADR-0030 §13): recompute CURRENT
-        // state and bind it. A self-declared binding in the verdict file is
-        // never trusted (strict input validation refuses it); an explicitly
-        // submitted bundle (--bundle) must match current state or the
-        // registration is refused with a stable stale/mismatch code.
+        // Registration-time validation (ADR-0030 §13, ADR-0031 §2):
+        // recompute CURRENT state and bind it. A self-declared binding in
+        // the verdict file is never trusted (strict input validation
+        // refuses it); an explicitly submitted bundle (--bundle) must match
+        // current state or the registration is refused with a stable
+        // stale/mismatch code. The submitted digest is also the reviewed-
+        // bundle proof the store requires for fresh-context verdicts
+        // (self-issued artifacts cannot silently qualify as independent).
         let binding: Awaited<ReturnType<typeof computeStateBinding>>;
         try {
           binding = await computeStateBinding(rootPath, taskId);
@@ -215,6 +217,7 @@ export async function runVerificationCommand(
           );
           return EXIT_CODES.usage;
         }
+        let reviewedBundleDigest: string | null = null;
         if (args.bundleFile !== undefined) {
           const replay = await readContainedFile(rootPath, args.bundleFile);
           if (!replay.ok) {
@@ -239,17 +242,19 @@ export async function runVerificationCommand(
             emitDiagnostic(
               {
                 code: "verdict-bundle-mismatch",
-                message: `bundle digest mismatch: submitted bundle '${submitted}' does not match current state '${binding.bundleDigest}' — re-verify against current state`,
+                message: `bundle digest mismatch: submitted bundle '${submitted}' does not match current state '${binding.bundleDigest}' — re-verify against current state (note: files written after the bundle export change state, including the bundle and verdict files themselves — keep review artifacts under .ackit/, which is excluded from state binding)`,
               },
               { quiet: base.quiet, debug: base.debug ?? false },
             );
             return EXIT_CODES.usage;
           }
+          reviewedBundleDigest = submitted;
         }
         const registered = await verdicts.register(taskId, input, {
           taskExists: async (id: string) => (await tasks.find(id)) !== null,
           evidenceRegistry: evidence,
           binding,
+          reviewedBundleDigest,
         });
         try {
           const { JournalStore } = await import("../../core/journal/index.js");
@@ -262,12 +267,16 @@ export async function runVerificationCommand(
           // journal best-effort
         }
         if (base.json) {
+          const independence = assessVerdictIndependence(registered);
           emitJson("record", {
             task: taskId,
             verdict: registered.id,
             value: registered.verdict,
             bundleDigest: registered.binding.bundleDigest,
             stateDigest: registered.binding.stateDigest,
+            reviewedBundleDigest: registered.reviewedBundleDigest ?? null,
+            independent: independence.independent,
+            independenceCode: independence.problemCode,
           });
         } else if (!base.quiet) {
           process.stdout.write(
@@ -288,9 +297,9 @@ export async function runVerificationCommand(
           return EXIT_CODES.ok;
         }
         if (base.json) {
-          // Trust state rides along: consumers learn bound/fresh without a
-          // second call (completion rechecks independently — this is
-          // informational, never the gate itself).
+          // Trust state rides along: consumers learn bound/fresh/independent
+          // without a second call (completion rechecks independently — this
+          // is informational, never the gate itself).
           const summary = await verdicts.latestVerdictSummary(taskId);
           emitJson("show", {
             task: taskId,
@@ -299,6 +308,9 @@ export async function runVerificationCommand(
             fresh: summary?.fresh ?? false,
             problemCode: summary?.problemCode ?? null,
             gitUnavailable: summary?.gitUnavailable ?? false,
+            independent: summary?.independent ?? false,
+            reviewedBundleDigest: summary?.reviewedBundleDigest ?? null,
+            independenceCode: summary?.independenceCode ?? null,
           });
         } else {
           const { stringify } = await import("yaml");
@@ -349,7 +361,7 @@ export function registerVerificationCommands(program: Command, invocation: CliIn
     .requiredOption("--verdict <file>", "verdict file (repository-relative, ackit.verdict.v1)")
     .option(
       "--bundle <file>",
-      "v2 bundle JSON the verifier reviewed (repository-relative; refused when stale)",
+      "v2 bundle JSON the verifier reviewed (repository-relative; required for fresh-context verdicts; refused when stale)",
     )
     .action(async (taskId: string, opts: { verdict: string; bundle?: string }) => {
       const parentOptions = (program.opts() ?? {}) as Partial<GlobalOptions>;

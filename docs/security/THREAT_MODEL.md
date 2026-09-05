@@ -55,3 +55,29 @@ The product/runtime never initiates outbound network access. Distribution/mainta
 Permanent CI enforcement: `scripts/check-offline-egress.mjs` + `tests/security/offline-*` run in normal `ci.yml` verify job, not release-only. A future commit introducing outbound primitives fails CI (allowlisted loopback servers excluded). Manual verification: `node scripts/check-offline-egress.mjs` must show `PASS` and `pnpm test` must show 21 offline tests green.
 
 Reporting: see SECURITY.md for private vulnerability disclosure.
+
+## v0.5 adversarial containment delta (TASK-0084)
+
+Live adversarial matrix (`tests/security/adversarial-paths.test.ts`,
+executed against the built CLI/MCP on Windows; symlink-file rows are
+OS-gated and additionally execute on Linux/macOS CI): absolute paths,
+`../`/nested/backslash traversal, NUL bytes, file-symlink reads, dir
+symlink/junction writes, Windows case semantics, repo-root boundary,
+task-title injection, MCP hostile ids, and the explicit-output contract.
+
+| # | Threat | Mitigation | Regression coverage |
+|---|--------|------------|---------------------|
+| T27 | CLI `--out` write escape via planted links/junctions (lexically contained path redirected outside the root) | Link-aware write containment (`resolveContainedWritePath`: string-level refusal plus realpath of the nearest existing ancestor and of pre-existing final paths against the real root), wired into all root-contained `--out` writers (verification bundle, checkpoint md/json export, skills export) and the skills scaffold fixed path | Matrix R12/R13 refusal rows + helper regression suite (dir/junction/file-link refusal, legit nested writes) |
+| — | Preventive MCP path allow-list (contested proposal) | REJECTED on evidence: string containment + link-aware writes + strict id patterns + schema validation on every read already close the matrix; a parallel allow-list would be redundant configuration with its own bypass surface | Matrix negative findings R1–R11/R15–R20 + allow-list decision record in TASK-0084 |
+
+Negative findings (contained, no change): file-symlink reads
+(schema validation is the boundary — attacker-owned bytes cannot become
+verdicts/bundles/handoffs); `scan`/`diagnostics` free `--output` paths
+(operator-explicit contract relied upon by CI runner-temp recipes);
+task titles (slug folding makes traversal unrepresentable); MCP free
+paths (none exist — root confined at construction, ids pattern-guarded).
+Known residual (accepted, out of scope): hardlinks aliasing outside
+files are invisible to any realpath-then-contain scheme — low
+exploitability (git cannot transport hardlinks; requires a local plant
+plus an operator `--out` through the exact path). No new config surface
+was added.

@@ -197,13 +197,16 @@ describe("policy v2 export/registration boundaries (ADR-0028 §1 wiring, TASK-00
     const taskId = /TASK-\d{4}/.exec(created.stdout)?.[0] ?? "";
     await cli(["task", "start", taskId]);
     const verdictPath = path.join(rootPath, "docs", "verdict-boundary.yaml");
+    // Same-context verdict: this test owns the policy boundary, not
+    // independence (fresh-context verdicts additionally require --bundle
+    // proof since TASK-0080).
     const verdictYaml = [
       'schemaId: "ackit.verdict.v1"',
       `taskId: "${taskId}"`,
       'verdict: "PASS"',
       "verifier:",
       '  agent: "boundary-test/1.0"',
-      '  context: "fresh"',
+      '  context: "same"',
       '  issuedAt: "2026-09-02"',
       "findings: []",
       "checkedCriteria: []",

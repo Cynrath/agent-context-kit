@@ -160,6 +160,31 @@ export class TaskStore {
       throw new Error(`task '${id}' is ${found.doc.meta.status}; only active tasks can complete`);
     }
     const warnings: string[] = [];
+    const blockers = await this.completionBlockers(id);
+    if (blockers.length > 0) {
+      if (options.force !== true) {
+        throw new Error(`completion gate blocked: ${blockers.join("; ")}`);
+      }
+      warnings.push(`--force overrode: ${blockers.join("; ")}`);
+    }
+    await this.writeStatus(found.doc, "completed", new Date().toISOString().slice(0, 10));
+    return { forced: options.force === true, warnings };
+  }
+
+  /**
+   * Read-only completion-gate preview (TASK-0081, ADR-0032): EXACTLY the
+   * blocker list `complete()` would enforce, without any mutation. The
+   * canonical status projection composes this (same engine, same strings,
+   * same stable codes) — never a reimplementation. Throws for unknown
+   * tasks exactly like `complete()`; non-active tasks report their status
+   * precondition as a blocker instead of throwing, so status stays total.
+   */
+  async completionBlockers(id: string): Promise<string[]> {
+    const found = await this.find(id);
+    if (found === null || found.archived) throw new Error(`unknown task '${id}'`);
+    if (found.doc.meta.status !== "active") {
+      return [`task '${id}' is ${found.doc.meta.status}; only active tasks can complete`];
+    }
     const blockers: string[] = [];
     const unchecked = acceptanceUnchecked(found.doc.body);
     if (unchecked > 0) blockers.push(`${unchecked} unchecked acceptance criteria item(s)`);
@@ -175,14 +200,7 @@ export class TaskStore {
     // legacy tasks are untouched. Blockers compose deterministically.
     const workflowBlockers = await this.workflowCompletionBlockers(id, found.doc);
     blockers.push(...workflowBlockers);
-    if (blockers.length > 0) {
-      if (options.force !== true) {
-        throw new Error(`completion gate blocked: ${blockers.join("; ")}`);
-      }
-      warnings.push(`--force overrode: ${blockers.join("; ")}`);
-    }
-    await this.writeStatus(found.doc, "completed", new Date().toISOString().slice(0, 10));
-    return { forced: options.force === true, warnings };
+    return blockers;
   }
 
   /**
@@ -273,6 +291,11 @@ export class TaskStore {
         // unbound v1 verdict never silently satisfies a state-bound
         // requirement. Deterministic and read-only.
         blockers.push(...(await this.verdictFreshnessProblems(id, latest)));
+        // 2d. Verifier independence (ADR-0031 §4): where the effective
+        // profile requires a verdict, it requires an INDEPENDENT one — a
+        // self-issued/same-process artifact cannot silently satisfy it.
+        // Deterministic and read-only (pure function of the stored record).
+        blockers.push(...(await this.verdictIndependenceProblems(latest)));
       }
     }
 
@@ -444,6 +467,32 @@ export class TaskStore {
     }
     return [
       `${summary.problemCode ?? VERDICT_PROBLEM_CODES.bindingMissing}: latest verdict ${latest.id} cannot be freshness-checked — re-verify against current state`,
+    ];
+  }
+
+  /**
+   * Verifier-independence problems for a PASS-family latest verdict
+   * (ADR-0031 §4): where the effective profile requires a verdict, only an
+   * independent one (fresh-context claim proven by the reviewed bundle)
+   * satisfies completion. Legacy unbound verdicts are owned by the
+   * freshness check above (no double-reporting); same-context and
+   * self-issued records are refused here with a stable code.
+   */
+  private async verdictIndependenceProblems(latest: VerdictRecord): Promise<string[]> {
+    const { assessVerdictIndependence, isBoundVerdict, VERDICT_PROBLEM_CODES } = await import(
+      "../verification/index.js"
+    );
+    if (!isBoundVerdict(latest)) return [];
+    const assessment = assessVerdictIndependence(latest);
+    if (assessment.independent) return [];
+    const detail =
+      assessment.basis === "same-context"
+        ? `context '${latest.verifier.context}' is same-process review`
+        : assessment.reviewedBundleDigest === null
+          ? "no reviewed bundle proves independent review"
+          : `reviewed bundle '${assessment.reviewedBundleDigest.slice(0, 12)}…' does not match the bound bundle (ledger tampering suspected)`;
+    return [
+      `${VERDICT_PROBLEM_CODES.independenceUnproven}: latest verdict ${latest.id} is not independently verified (${detail}) — have a fresh verifier review 'ackit verification bundle ${latest.taskId} --format json' and register with '--bundle <file>'`,
     ];
   }
 

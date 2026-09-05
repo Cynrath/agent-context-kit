@@ -371,6 +371,23 @@ export async function createAckitMcpServer(requestedRoot?: string | undefined): 
     }
   });
 
+  server.tool(
+    "ackit_status",
+    "Canonical read-only task status: stage, blockers, staleness, next actions (same snapshot as `ackit status`)",
+    { taskId: z.string().optional() },
+    async (args: { taskId?: string | undefined }) => {
+      try {
+        // TASK-0083 parity: the composed 0081 projection, read-only —
+        // no mutation surface is added (MCP stays read-only by decision).
+        const { buildStatusReport } = await import("../core/status/projection.js");
+        const report = await buildStatusReport(repositoryRoot, args.taskId);
+        return textResult(JSON.stringify(report));
+      } catch (error) {
+        return textResult(JSON.stringify({ error: (error as Error).message }));
+      }
+    },
+  );
+
   // ---- Resources (REQ-MCP-003) -------------------------------------------
   server.resource("repository-summary", "repo://summary", async () => {
     const graph = await buildInstructionGraph({ canonicalPath: repositoryRoot });

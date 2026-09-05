@@ -9,8 +9,10 @@ import {
   StateBindingError,
 } from "./binding.js";
 import {
+  assessVerdictIndependence,
   type BoundVerdict,
   isBoundVerdict,
+  projectVerdictAuthoring,
   VERDICT_PROBLEM_CODES,
   VERDICT_SCHEMA_ID_V2,
   type Verdict,
@@ -18,6 +20,7 @@ import {
   type VerdictRecord,
   VerdictSchema,
   VerdictV2Schema,
+  verdictContentDigest,
 } from "./verdict.js";
 
 const TASK_ID_PATTERN = /^TASK-\d{4}$/;
@@ -128,6 +131,17 @@ export class VerdictStore {
    * v2 record with the next sequential VR id. The INPUT verdict carries no
    * id and no binding (agents author binding-free v1 verdicts); the store
    * allocates both deterministically.
+   *
+   * Verifier independence (TASK-0080, ADR-0031): `reviewedBundleDigest`
+   * carries the digest of the v2 bundle JSON the verifier reviewed (the
+   * CLI supplies it from `--bundle` after proving it matches CURRENT
+   * state). A fresh-context claim without that proof is refused with
+   * VERDICT-INDEPENDENCE-UNPROVEN (self-issued artifacts cannot silently
+   * qualify as independent); same-context verdicts register with a `null`
+   * reference and are flagged non-independent at every consumption point.
+   * Re-presenting already-registered verdict content is refused with
+   * VERDICT-REPLAY-REJECTED, even when the state moved on (the new binding
+   * would otherwise launder an old judgment as current).
    */
   async register(
     taskId: string,
@@ -137,6 +151,11 @@ export class VerdictStore {
       evidenceRegistry?: EvidenceRegistry | null | undefined;
       /** CURRENT state binding (required: new registrations are bound). */
       binding?: ComputedStateBinding | undefined;
+      /**
+       * Digest of the reviewed v2 bundle JSON (null/absent = no bundle
+       * proof supplied; required for fresh-context verdicts).
+       */
+      reviewedBundleDigest?: string | null | undefined;
     } = {},
   ): Promise<BoundVerdict> {
     requireTaskId(taskId);
@@ -144,7 +163,8 @@ export class VerdictStore {
     // The input schema is strict v1: a self-declared `binding` (or any other
     // unknown key) fails here with VERDICT-INVALID — self-declared hashes
     // are never trusted.
-    const nextId = `VR-${String((await this.list(taskId)).length + 1).padStart(4, "0")}`;
+    const existing = await this.list(taskId);
+    const nextId = `VR-${String(existing.length + 1).padStart(4, "0")}`;
     const candidate = { ...(input as Record<string, unknown>), id: nextId, taskId };
     const result = VerdictSchema.safeParse(candidate);
     if (!result.success) {
@@ -180,6 +200,30 @@ export class VerdictStore {
         `state binding targets '${options.binding.taskId}', not '${taskId}' (cross-task bindings are refused)`,
       );
     }
+    // Reviewed-bundle proof (ADR-0031 §2): a supplied proof must equal the
+    // CURRENT bundle digest — defense in depth behind the CLI's --bundle
+    // match check, so programmatic callers cannot launder a stale review.
+    const reviewed = options.reviewedBundleDigest ?? null;
+    if (reviewed !== null && reviewed !== options.binding.bundleDigest) {
+      throw new VerdictStoreError(
+        VERDICT_PROBLEM_CODES.bundleMismatch,
+        `reviewed bundle '${reviewed}' does not match current state '${options.binding.bundleDigest}' — re-verify against current state (files written after the bundle export, including the review artifacts themselves, change state; keep them under .ackit/)`,
+      );
+    }
+    // Replay rejection (ADR-0031 §3): identical verdict content already on
+    // file is refused with a stable code. The authoring digest excludes
+    // registration facts (id, binding, reviewed reference), so replaying an
+    // old judgment after state moved on is caught even though a fresh
+    // binding would otherwise be attached.
+    const candidateContent = verdictContentDigest(projectVerdictAuthoring(verdict));
+    for (const record of existing) {
+      if (verdictContentDigest(projectVerdictAuthoring(record)) === candidateContent) {
+        throw new VerdictStoreError(
+          VERDICT_PROBLEM_CODES.replayRejected,
+          `verdict content already registered as ${record.id} — already-judged content cannot be re-registered (re-verify and author a new verdict)`,
+        );
+      }
+    }
     // Reference validation: criterion ids must exist in the evidence registry
     // when a registry exists (forged criteria rejected).
     if (options.evidenceRegistry !== null && options.evidenceRegistry !== undefined) {
@@ -206,6 +250,16 @@ export class VerdictStore {
         `verdict '${verdict.verdict}' cannot carry blocking findings — emit REWORK_REQUIRED instead`,
       );
     }
+    // Independence precondition (ADR-0031 §2): a fresh-context claim is a
+    // claim of independent review — without the reviewed-bundle proof it
+    // is refused (explicit, actionable), never silently recorded as
+    // independent. Same-context verdicts proceed with a null reference.
+    if (verdict.verifier.context === "fresh" && reviewed === null) {
+      throw new VerdictStoreError(
+        VERDICT_PROBLEM_CODES.independenceUnproven,
+        `verdict claims fresh-context verification without the reviewed bundle — self-issued artifacts cannot silently qualify as independent (generate it with 'ackit verification bundle ${taskId} --format json --out <file>' and re-register with '--bundle <file>', or declare context 'same' for same-process review)`,
+      );
+    }
     const dir = this.dir(taskId);
     await fsp.mkdir(dir, { recursive: true });
     const bound: BoundVerdict = VerdictV2Schema.parse({
@@ -218,6 +272,7 @@ export class VerdictStore {
         components: options.binding.components,
         gitUnavailable: options.binding.gitUnavailable,
       },
+      reviewedBundleDigest: reviewed,
     });
     const { stringify } = await import("yaml");
     await fsp.writeFile(
@@ -234,6 +289,9 @@ export class VerdictStore {
    * valid verdict is recorded), so consumers recompute the CURRENT binding
    * here and learn whether the latest verdict is still fresh. Read-only and
    * deterministic. A stale PASS-family verdict must not satisfy completion.
+   * Independence (ADR-0031) rides along from the stored record so gates can
+   * enforce it without a second lookup — informational here, never the gate
+   * itself (completion rechecks independently).
    */
   async latestVerdictSummary(taskId: string): Promise<VerdictFreshness | null> {
     const latest = await this.latest(taskId);
@@ -247,8 +305,12 @@ export class VerdictStore {
         problemCode: VERDICT_PROBLEM_CODES.bindingMissing,
         changed: [],
         gitUnavailable: false,
+        independent: false,
+        reviewedBundleDigest: null,
+        independenceCode: VERDICT_PROBLEM_CODES.bindingMissing,
       };
     }
+    const independence = assessVerdictIndependence(latest);
     let current: ComputedStateBinding;
     try {
       current = await computeStateBinding(this.repositoryRoot, taskId);
@@ -262,6 +324,9 @@ export class VerdictStore {
         problemCode: code,
         changed: [],
         gitUnavailable: latest.binding.gitUnavailable,
+        independent: independence.independent,
+        reviewedBundleDigest: independence.reviewedBundleDigest,
+        independenceCode: independence.problemCode,
       };
     }
     const { fresh, changed } = compareStoredBinding(latest.binding, current);
@@ -272,6 +337,9 @@ export class VerdictStore {
       problemCode: fresh ? null : VERDICT_PROBLEM_CODES.stateStale,
       changed,
       gitUnavailable: latest.binding.gitUnavailable,
+      independent: independence.independent,
+      reviewedBundleDigest: independence.reviewedBundleDigest,
+      independenceCode: independence.problemCode,
     };
   }
 }
@@ -289,6 +357,12 @@ export interface VerdictFreshness {
   changed: BindingComponentName[];
   /** Registration-time degraded-git marker from the stored binding. */
   gitUnavailable: boolean;
+  /** True only for a fresh-context claim proven by the reviewed bundle. */
+  independent: boolean;
+  /** Reviewed bundle digest (`null` when no bundle proof was supplied). */
+  reviewedBundleDigest: string | null;
+  /** Stable independence diagnostic code, or null when independent. */
+  independenceCode: string | null;
 }
 
 export type { BoundVerdict, Verdict, VerdictProblem, VerdictRecord };

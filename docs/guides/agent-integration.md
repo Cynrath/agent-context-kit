@@ -62,10 +62,38 @@ Client snippet (Claude-style config):
 
 Read-only tools: ackit_scan, ackit_doctor, ackit_pack,
 ackit_instruction_graph, ackit_list_skills, ackit_validate_skills,
-ackit_list_tasks, ackit_get_task, ackit_policy_check.
+ackit_list_tasks, ackit_get_task, ackit_policy_check,
+ackit_workflow_status, ackit_get_intent, ackit_get_checkpoint,
+ackit_verification_bundle, ackit_drift_check, ackit_list_roles,
+ackit_status (canonical task snapshot; MCP stays read-only — no
+mutation surface by explicit decision).
 Resources: repo://summary | instructions-graph | skills-catalog |
 tasks-active | policy. Prompts: onboarding, task-execution,
 scan-remediation, context-optimization.
+
+Provider surfaces: capability table, sources with freshness dates, and
+the per-surface parity statement live in
+`docs/reference/provider-surfaces.md` (machine-readable:
+`tests/fixtures/provider-capabilities.json`).
+
+## Task status loop (read-only)
+
+Start agent work loops with the canonical status projection instead of
+hand-inspecting task, workflow, evidence, verdict, drift, and checkpoint
+stores separately:
+
+```bash
+ackit status             # the single active task
+ackit status TASK-0007   # explicit task
+ackit --json status TASK-0007   # stable ackit.status.v1 contract
+```
+
+One call answers what task, what stage, what blocks completion (verbatim
+gate strings with stable codes), what is stale (verification freshness +
+independence, checkpoint staleness, evidence problems), and what next
+(derived suggested commands plus the recorded checkpoint next action).
+`ackit status` never mutates: no writes, no journal, no clock reads —
+safe to poll between steps.
 
 ## Skills for agents
 
