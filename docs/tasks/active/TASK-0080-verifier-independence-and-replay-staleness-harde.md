@@ -1,7 +1,7 @@
 ---
 id: "TASK-0080"
 title: "Verifier independence and replay-staleness hardening"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
@@ -48,11 +48,11 @@ Strong multi-auditor consensus (MUST): verifier independence is declarative toda
 
 ## Acceptance criteria
 
-- [ ] Every accepted verdict references its exact bundle digest; mismatch is refused with a stable error code (proven).
-- [ ] Self-issued verifier artifacts cannot silently qualify as independent (proven by negative fixture, stable code).
-- [ ] Replay/stale verdict rejected end-to-end via the cross-process fixture.
-- [ ] Documentation states the non-claims (no identity crypto) alongside the proven properties.
-- [ ] Full gates green with counts; offline/scan/hygiene gates hold; real-gate completion with evidence.
+- [x] Every accepted verdict references its exact bundle digest; mismatch is refused with a stable error code (proven).
+- [x] Self-issued verifier artifacts cannot silently qualify as independent (proven by negative fixture, stable code).
+- [x] Replay/stale verdict rejected end-to-end via the cross-process fixture.
+- [x] Documentation states the non-claims (no identity crypto) alongside the proven properties.
+- [x] Full gates green with counts; offline/scan/hygiene gates hold; real-gate completion with evidence.
 
 ## Test steps
 
@@ -79,4 +79,42 @@ Strong multi-auditor consensus (MUST): verifier independence is declarative toda
 
 ## Completion notes
 
-(placeholder)
+Implemented 2026-09-05 on `release/v0.5.0` (single-lane; no per-task
+branch/PR per v0.5.0 execution mode).
+
+Audit: `verifier.context: fresh|same` was purely declarative (any same-
+process author could claim fresh); `--bundle` was optional and its success
+path unproven; re-presenting a verdict file re-bound it to current state
+with a new id (old judgments laundered as current); the completion gate
+already said it requires an *independent* verdict but checked nothing of
+the kind. Real defect found in the TASK-0079 contract surface (not the
+digests): the `--bundle` success path is unreachable when review artifacts
+live under bound paths, because the bundle/verdict files themselves are
+working-set state (proven by manual repro: exit 2 mismatch with zero
+implementation change). Fixed WITHOUT altering any TASK-0079 digest rule:
+review-artifact lifecycle documented (transient artifacts under `.ackit/`,
+excluded from binding by design), `VERDICT-BUNDLE-MISMATCH` diagnostics
+made actionable, all end-to-end flows model the honest protocol. Digest
+contract, drift codes, `--force` semantics, v1 readability unchanged.
+
+Implementation: `reviewedBundleDigest` (hex|null, optional for 0079-era
+compat) on `ackit.verdict.v2`; pure `assessVerdictIndependence` classifier
+(reviewed-bundle | self-issued | same-context | legacy-unbound);
+canonical `verdict-content` digest (new domain in the 0079 module) for
+replay detection; store refuses fresh-without-proof
+(`VERDICT-INDEPENDENCE-UNPROVEN`), mismatched proof
+(`VERDICT-BUNDLE-MISMATCH`), and identical-content re-registration
+(`VERDICT-REPLAY-REJECTED`); completion gate requires independence where
+it requires a verdict (freshness first, no double-reporting for legacy);
+`verification show/record --json` expose
+independent/reviewedBundleDigest/independenceCode. Docs: ADR-0031 (+ index
+line, incl. previously unindexed ADR-0030), concept independence section +
+review-artifact lifecycle + non-claims, CLI reference rows.
+
+Evidence: 7 new unit independence tests + 5-test real-subprocess
+cross-process fixture (accept / stale-refusal / unproven-refusal / replay-
+refusal / same-context-register-but-blocked) + gate negative test green;
+existing suites moved to the new contract (same-process tests declare
+`same` or carry proof; re-verdict tests author new content); full `pnpm
+test` counts + all gates recorded at completion-gate time. No quality
+gates weakened. No publish/tag/release. TASK-0081 not started.

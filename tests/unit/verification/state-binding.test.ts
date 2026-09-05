@@ -196,9 +196,14 @@ async function bindingFor(taskId: string): Promise<ComputedStateBinding> {
 async function registerBound(taskId: string, overrides: Record<string, unknown> = {}) {
   const verdicts = new VerdictStore(rootPath);
   const registry = await new EvidenceStore(root).load(taskId);
+  // Fresh-context inputs carry the CURRENT bundle digest as reviewed-bundle
+  // proof (TASK-0080) — exactly what the CLI supplies after a `--bundle`
+  // match — so binding/staleness tests exercise independent verdicts.
+  const binding = await bindingFor(taskId);
   return verdicts.register(taskId, verdictInput(overrides), {
     evidenceRegistry: registry,
-    binding: await bindingFor(taskId),
+    binding,
+    reviewedBundleDigest: binding.bundleDigest,
   });
 }
 
@@ -785,9 +790,14 @@ describe("completion-gate proof (ADR-0030 §14)", () => {
     const fresh = await buildVerificationBundle(root, taskId2);
     expect(fresh.ok).toBe(true);
     const registry = await new EvidenceStore(root).load(taskId2);
-    await verdicts.register(taskId2, verdictInput(), {
+    // A fresh re-verdict is NEW judged content (distinct summary): replaying
+    // the byte-identical VR-0001 file would be refused with
+    // VERDICT-REPLAY-REJECTED (proven in the TASK-0080 suite), not restored.
+    const reverify = await bindingFor(taskId2);
+    await verdicts.register(taskId2, verdictInput({ summary: "re-verified after source change" }), {
       evidenceRegistry: registry,
-      binding: await bindingFor(taskId2),
+      binding: reverify,
+      reviewedBundleDigest: reverify.bundleDigest,
     });
     const summary = await verdicts.latestVerdictSummary(taskId2);
     expect(summary?.fresh).toBe(true);
@@ -1004,6 +1014,7 @@ describe("security boundaries (ADR-0030 §17)", () => {
       const registered = await verdicts.register(taskId, verdictInput(), {
         evidenceRegistry: registry,
         binding,
+        reviewedBundleDigest: binding.bundleDigest,
       });
       expect(isBoundVerdict(registered)).toBe(true);
       // B1: the degraded marker persists on the long-lived record (never a
@@ -1074,5 +1085,8 @@ describe("stable diagnostic vocabulary (ADR-0030 §12)", () => {
     expect(VERDICT_PROBLEM_CODES.taskUnknown).toBe("VERDICT-TASK-UNKNOWN");
     expect(VERDICT_PROBLEM_CODES.criterionUnknown).toBe("VERDICT-CRITERION-UNKNOWN");
     expect(VERDICT_PROBLEM_CODES.blockingOnPass).toBe("VERDICT-BLOCKING-ON-PASS");
+    // TASK-0080 independence codes.
+    expect(VERDICT_PROBLEM_CODES.independenceUnproven).toBe("VERDICT-INDEPENDENCE-UNPROVEN");
+    expect(VERDICT_PROBLEM_CODES.replayRejected).toBe("VERDICT-REPLAY-REJECTED");
   });
 });

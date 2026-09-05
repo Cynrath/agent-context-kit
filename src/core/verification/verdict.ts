@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { domainDigest } from "./canonical.js";
 
 /** Schema id for registered verdicts (ADR-0026 §4). */
 export const VERDICT_SCHEMA_ID = "ackit.verdict.v1";
@@ -117,6 +118,14 @@ export const VerdictV2Schema = z.strictObject({
   checkedCriteria: z.array(criterionId).max(128),
   summary: z.string().trim().max(2000),
   binding: VerdictBindingSchema,
+  /**
+   * Digest of the v2 bundle JSON the verifier reviewed (TASK-0080,
+   * ADR-0031): the exact bundle/state reference for this verdict. `null`
+   * for same-context verdicts registered without bundle proof. Optional
+   * (not required) so TASK-0079-era v2 records stay readable — absent is
+   * classified exactly like `null` (no proof, never independent).
+   */
+  reviewedBundleDigest: hex64.nullable().optional(),
 });
 
 export type BoundVerdict = z.infer<typeof VerdictV2Schema>;
@@ -127,6 +136,118 @@ export type VerdictRecord = Verdict | BoundVerdict;
 /** True for state-bound v2 records (type narrow for freshness checks). */
 export function isBoundVerdict(record: VerdictRecord): record is BoundVerdict {
   return (record as BoundVerdict).schemaId === VERDICT_SCHEMA_ID_V2;
+}
+
+/** Domain for verdict-content digests (replay detection, ADR-0031 §3). */
+export const VERDICT_CONTENT_DOMAIN = "verdict-content";
+
+/**
+ * Project the authoring subset of a verdict candidate or stored record:
+ * exactly what a verifier judged (store-allocated id/taskId, the binding,
+ * and the reviewed-bundle reference never participate — they describe
+ * registration, not judgment, so re-registering the same judgment after
+ * state moved on is detected as replay even though the new binding would
+ * differ).
+ */
+export function projectVerdictAuthoring(value: {
+  verdict: unknown;
+  verifier: unknown;
+  findings: unknown;
+  checkedCriteria: unknown;
+  summary: unknown;
+}): {
+  verdict: unknown;
+  verifier: unknown;
+  findings: unknown;
+  checkedCriteria: unknown;
+  summary: unknown;
+} {
+  return {
+    verdict: value.verdict,
+    verifier: value.verifier,
+    findings: value.findings,
+    checkedCriteria: value.checkedCriteria,
+    summary: value.summary,
+  };
+}
+
+/**
+ * Canonical content digest of a verdict's authoring subset (TASK-0080
+ * replay detection, wired to the TASK-0079 canonical module: same content
+ * in any process yields the identical digest — no timestamps of our own,
+ * no paths, no insertion-order dependence).
+ */
+export function verdictContentDigest(
+  authoring: ReturnType<typeof projectVerdictAuthoring>,
+): string {
+  return domainDigest(VERDICT_CONTENT_DOMAIN, authoring);
+}
+
+/** How a verdict relates to independent verification (ADR-0031 §2). */
+export type IndependenceBasis =
+  | "reviewed-bundle"
+  | "self-issued"
+  | "same-context"
+  | "legacy-unbound";
+
+export interface IndependenceAssessment {
+  /** True only for a fresh-context claim proven by the reviewed bundle. */
+  independent: boolean;
+  basis: IndependenceBasis;
+  /** Reviewed bundle digest (`null` when no bundle proof was supplied). */
+  reviewedBundleDigest: string | null;
+  /** Stable diagnostic code, or null when independent. */
+  problemCode: string | null;
+}
+
+/**
+ * Structural independence assessment (TASK-0080, ADR-0031 §2): pure
+ * function of the stored record — no IO, no clock, no identity crypto.
+ * A verdict is independent iff it claims a fresh context AND references
+ * the exact bundle digest it is bound to (proof the verifier reviewed
+ * that bundle). Everything else is flagged explicitly and never silently
+ * qualifies where independence is required.
+ */
+export function assessVerdictIndependence(record: VerdictRecord): IndependenceAssessment {
+  if (!isBoundVerdict(record)) {
+    return {
+      independent: false,
+      basis: "legacy-unbound",
+      reviewedBundleDigest: null,
+      problemCode: VERDICT_PROBLEM_CODES.bindingMissing,
+    };
+  }
+  const reviewed = record.reviewedBundleDigest ?? null;
+  if (record.verifier.context !== "fresh") {
+    return {
+      independent: false,
+      basis: "same-context",
+      reviewedBundleDigest: reviewed,
+      problemCode: VERDICT_PROBLEM_CODES.independenceUnproven,
+    };
+  }
+  if (reviewed === null) {
+    return {
+      independent: false,
+      basis: "self-issued",
+      reviewedBundleDigest: null,
+      problemCode: VERDICT_PROBLEM_CODES.independenceUnproven,
+    };
+  }
+  if (reviewed !== record.binding.bundleDigest) {
+    return {
+      independent: false,
+      basis: "self-issued",
+      reviewedBundleDigest: reviewed,
+      problemCode: VERDICT_PROBLEM_CODES.bundleMismatch,
+    };
+  }
+  return {
+    independent: true,
+    basis: "reviewed-bundle",
+    reviewedBundleDigest: reviewed,
+    problemCode: null,
+  };
 }
 
 export interface VerdictProblem {
@@ -145,4 +266,15 @@ export const VERDICT_PROBLEM_CODES = {
   bundleMismatch: "VERDICT-BUNDLE-MISMATCH",
   /** Stored binding differs from recomputed current state. */
   stateStale: "VERDICT-STATE-STALE",
+  /**
+   * Independence unproven (TASK-0080, ADR-0031): a fresh-context verdict
+   * without reviewed-bundle proof at registration, or a non-independent
+   * latest verdict where the effective profile requires an independent one.
+   */
+  independenceUnproven: "VERDICT-INDEPENDENCE-UNPROVEN",
+  /**
+   * Replay refused (TASK-0080, ADR-0031): byte-identical verdict content
+   * (canonical authoring digest) is already registered for this task.
+   */
+  replayRejected: "VERDICT-REPLAY-REJECTED",
 } as const;

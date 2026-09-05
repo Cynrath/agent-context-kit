@@ -42,3 +42,5 @@ TASK-0044 … TASK-0062):
 v0.5 line additions (Accepted 2026-09-05, governing TASK-0078 … TASK-0086):
 
 - ADR-0029 maintenance-aware release-state model (amends ADR-0023: source/dev vs published-stable vs maintenance vs historical)
+- ADR-0030 deterministic verification state binding (verdict ↔ bundle/state digests, staleness + replay at the binding layer)
+- ADR-0031 structural verifier independence + replay hardening (reviewed-bundle proof, independence gate, review-artifact lifecycle)

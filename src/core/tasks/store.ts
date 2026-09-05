@@ -273,6 +273,11 @@ export class TaskStore {
         // unbound v1 verdict never silently satisfies a state-bound
         // requirement. Deterministic and read-only.
         blockers.push(...(await this.verdictFreshnessProblems(id, latest)));
+        // 2d. Verifier independence (ADR-0031 §4): where the effective
+        // profile requires a verdict, it requires an INDEPENDENT one — a
+        // self-issued/same-process artifact cannot silently satisfy it.
+        // Deterministic and read-only (pure function of the stored record).
+        blockers.push(...(await this.verdictIndependenceProblems(latest)));
       }
     }
 
@@ -444,6 +449,30 @@ export class TaskStore {
     }
     return [
       `${summary.problemCode ?? VERDICT_PROBLEM_CODES.bindingMissing}: latest verdict ${latest.id} cannot be freshness-checked — re-verify against current state`,
+    ];
+  }
+
+  /**
+   * Verifier-independence problems for a PASS-family latest verdict
+   * (ADR-0031 §4): where the effective profile requires a verdict, only an
+   * independent one (fresh-context claim proven by the reviewed bundle)
+   * satisfies completion. Legacy unbound verdicts are owned by the
+   * freshness check above (no double-reporting); same-context and
+   * self-issued records are refused here with a stable code.
+   */
+  private async verdictIndependenceProblems(latest: VerdictRecord): Promise<string[]> {
+    const { assessVerdictIndependence, isBoundVerdict, VERDICT_PROBLEM_CODES } = await import(
+      "../verification/index.js"
+    );
+    if (!isBoundVerdict(latest)) return [];
+    const assessment = assessVerdictIndependence(latest);
+    if (assessment.independent) return [];
+    const detail =
+      assessment.basis === "same-context"
+        ? `context '${latest.verifier.context}' is same-process review`
+        : "no reviewed bundle proves independent review";
+    return [
+      `${VERDICT_PROBLEM_CODES.independenceUnproven}: latest verdict ${latest.id} is not independently verified (${detail}) — have a fresh verifier review 'ackit verification bundle ${latest.taskId} --format json' and register with '--bundle <file>'`,
     ];
   }
 

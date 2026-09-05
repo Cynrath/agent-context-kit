@@ -92,7 +92,10 @@ describe("ackit verification CLI integration (ADR-0026)", () => {
     const escapeAttempt = await cli(["verification", "bundle", taskId, "--out", "../escape.md"]);
     expect(escapeAttempt.code).toBe(EXIT_CODES.securityBoundary);
 
-    // Author a verdict file and register it.
+    // Review artifacts live under .ackit/ (excluded from state binding):
+    // bundle → author verdict → record, in chronological review order.
+    // (Files written after the bundle export otherwise change state and
+    // stale the proof — ADR-0031 §5.)
     const verdictYaml = [
       'schemaId: "ackit.verdict.v1"',
       `taskId: "${taskId}"`,
@@ -107,16 +110,70 @@ describe("ackit verification CLI integration (ADR-0026)", () => {
       '  - "AC-002"',
       'summary: "criteria verified with recorded evidence"',
     ].join("\n");
-    await mkdir(path.join(rootPath, "docs"), { recursive: true });
-    await writeFile(path.join(rootPath, "docs", "verdict.yaml"), verdictYaml, "utf8");
-    const record = await cli(["verification", "record", taskId, "--verdict", "docs/verdict.yaml"]);
+    const reviewsDir = path.join(rootPath, ".ackit", "reviews");
+    await mkdir(reviewsDir, { recursive: true });
+    const jsonBundle = await cli([
+      "verification",
+      "bundle",
+      taskId,
+      "--format",
+      "json",
+      "--out",
+      ".ackit/reviews/bundle.json",
+    ]);
+    expect(jsonBundle.code).toBe(EXIT_CODES.ok);
+    await writeFile(path.join(reviewsDir, "verdict.yaml"), verdictYaml, "utf8");
+    const record = await cli([
+      "verification",
+      "record",
+      taskId,
+      "--verdict",
+      ".ackit/reviews/verdict.yaml",
+      "--bundle",
+      ".ackit/reviews/bundle.json",
+    ]);
     expect(record.code).toBe(EXIT_CODES.ok);
     expect(record.stdout).toContain("VR-0001 registered (PASS)");
+
+    // A fresh-context claim WITHOUT the reviewed bundle is refused with a
+    // stable code (self-issued artifacts cannot silently qualify).
+    const unprovenYaml = verdictYaml.replace(
+      'summary: "criteria verified with recorded evidence"',
+      'summary: "unproven fresh claim"',
+    );
+    await writeFile(path.join(reviewsDir, "verdict-unproven.yaml"), unprovenYaml, "utf8");
+    const unproven = await cli([
+      "verification",
+      "record",
+      taskId,
+      "--verdict",
+      ".ackit/reviews/verdict-unproven.yaml",
+    ]);
+    expect(unproven.code).toBe(EXIT_CODES.usage);
+    expect(unproven.stderr).toContain("verdict-independence-unproven");
+
+    // Replaying the already-registered verdict content is refused, even
+    // though the state is unchanged (replay is about content, not staleness).
+    const replay = await cli([
+      "verification",
+      "record",
+      taskId,
+      "--verdict",
+      ".ackit/reviews/verdict.yaml",
+      "--bundle",
+      ".ackit/reviews/bundle.json",
+    ]);
+    expect(replay.code).toBe(EXIT_CODES.usage);
+    expect(replay.stderr).toContain("verdict-replay-rejected");
 
     const show = await cli(["verification", "show", taskId]);
     expect(show.code).toBe(EXIT_CODES.ok);
     expect(show.stdout).toContain("verdict: PASS");
     expect(show.stdout).toContain("fresh-verifier/1.0");
+
+    const showJson = await cli(["--json", "verification", "show", taskId]);
+    expect(showJson.code).toBe(EXIT_CODES.ok);
+    expect(showJson.stdout).toContain('"independent": true');
 
     // Blocking-on-PASS is rejected with a stable code.
     const badYaml = verdictYaml
@@ -131,8 +188,14 @@ describe("ackit verification CLI integration (ADR-0026)", () => {
           '    message: "should not parse with PASS"',
         ].join("\n"),
       );
-    await writeFile(path.join(rootPath, "docs", "verdict-bad.yaml"), badYaml, "utf8");
-    const bad = await cli(["verification", "record", taskId, "--verdict", "docs/verdict-bad.yaml"]);
+    await writeFile(path.join(reviewsDir, "verdict-bad.yaml"), badYaml, "utf8");
+    const bad = await cli([
+      "verification",
+      "record",
+      taskId,
+      "--verdict",
+      ".ackit/reviews/verdict-bad.yaml",
+    ]);
     expect(bad.code).toBe(EXIT_CODES.usage);
     expect(bad.stderr).toContain("verdict-blocking-on-pass");
   });

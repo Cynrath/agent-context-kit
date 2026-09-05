@@ -12,7 +12,10 @@ import { serialize, TaskStore } from "../../../src/core/tasks/index.js";
 import { computeStateBinding } from "../../../src/core/verification/binding.js";
 import { buildVerificationBundle } from "../../../src/core/verification/bundle.js";
 import { VerdictStore } from "../../../src/core/verification/store.js";
-import { VERDICT_PROBLEM_CODES } from "../../../src/core/verification/verdict.js";
+import {
+  assessVerdictIndependence,
+  VERDICT_PROBLEM_CODES,
+} from "../../../src/core/verification/verdict.js";
 
 let rootPath = "";
 const today = "2026-08-31";
@@ -59,6 +62,18 @@ async function bindingFor(taskId: string) {
   return computeStateBinding(rootPath, taskId);
 }
 
+/**
+ * Registration proof for fresh-context inputs (TASK-0080): the CURRENT
+ * binding plus its bundle digest as the reviewed-bundle proof — exactly
+ * what the CLI supplies after a `--bundle` match, so unit tests exercise
+ * genuinely independent verdicts. Negative independence tests bypass this
+ * helper deliberately.
+ */
+async function proofFor(taskId: string) {
+  const binding = await bindingFor(taskId);
+  return { binding, reviewedBundleDigest: binding.bundleDigest };
+}
+
 async function setupTaskWithEvidence(): Promise<string> {
   const store = new TaskStore(rootPath);
   const created = await store.create("verification fixture");
@@ -102,7 +117,7 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
     const verdicts = new VerdictStore(rootPath);
     const registered = await verdicts.register(taskId, verdictInput(), {
       evidenceRegistry: await evidenceRegistryFor(taskId),
-      binding: await bindingFor(taskId),
+      ...(await proofFor(taskId)),
     });
     expect(registered.id).toBe("VR-0001");
     expect(registered.verdict).toBe("PASS");
@@ -127,13 +142,13 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
           },
         ],
       }),
-      { evidenceRegistry: registry, binding: await bindingFor(taskId) },
+      { evidenceRegistry: registry, ...(await proofFor(taskId)) },
     );
     expect(rework.verdict).toBe("REWORK_REQUIRED");
     const pass = await verdicts.register(
       taskId,
       verdictInput({ verdict: "PASS_WITH_WARNINGS", checkedCriteria: ["AC-001", "AC-002"] }),
-      { evidenceRegistry: registry, binding: await bindingFor(taskId) },
+      { evidenceRegistry: registry, ...(await proofFor(taskId)) },
     );
     const all = await verdicts.list(taskId);
     expect(all.map((v) => v.id)).toEqual(["VR-0001", "VR-0002"]);
@@ -147,13 +162,13 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
     await expect(
       verdicts.register(taskId, verdictInput({ schemaId: "evil.verdict.v9" }), {
         evidenceRegistry: registry,
-        binding: await bindingFor(taskId),
+        ...(await proofFor(taskId)),
       }),
     ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.schema });
     await expect(
       verdicts.register(taskId, verdictInput({ injected: true }), {
         evidenceRegistry: registry,
-        binding: await bindingFor(taskId),
+        ...(await proofFor(taskId)),
       }),
     ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.schema });
     await expect(
@@ -162,7 +177,7 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
         verdictInput({
           findings: [{ severity: "blocking", criterion: "AC-001", code: "X_FAIL", message: "m" }],
         }),
-        { evidenceRegistry: registry, binding: await bindingFor(taskId) },
+        { evidenceRegistry: registry, ...(await proofFor(taskId)) },
       ),
     ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.blockingOnPass });
   });
@@ -174,7 +189,7 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
     await expect(
       verdicts.register(taskId, verdictInput({ checkedCriteria: ["AC-999"] }), {
         evidenceRegistry: registry,
-        binding: await bindingFor(taskId),
+        ...(await proofFor(taskId)),
       }),
     ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.criterionUnknown });
   });
@@ -195,7 +210,7 @@ describe("VerdictStore registration validation (ADR-0026 §4)", () => {
     const registry = await evidenceRegistryFor(taskId);
     await verdicts.register(taskId, verdictInput(), {
       evidenceRegistry: registry,
-      binding: await bindingFor(taskId),
+      ...(await proofFor(taskId)),
     });
     const file = path.join(rootPath, ".ackit", "workflow", taskId, "verdicts", "VR-0001.yaml");
     const { readFile, writeFile } = await import("node:fs/promises");
@@ -214,7 +229,7 @@ describe("verification bundle (ADR-0026 §3)", () => {
     const registry = await evidenceRegistryFor(taskId);
     await verdicts.register(taskId, verdictInput(), {
       evidenceRegistry: registry,
-      binding: await bindingFor(taskId),
+      ...(await proofFor(taskId)),
     });
     const root = await resolvedRoot();
     const first = await buildVerificationBundle(root, taskId);
@@ -242,5 +257,145 @@ describe("verification bundle (ADR-0026 §3)", () => {
     const result = await buildVerificationBundle(root, "TASK-9999");
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.diagnostic.code).toBe("BUNDLE-TASK-UNKNOWN");
+  });
+});
+
+describe("verifier independence (TASK-0080, ADR-0031)", () => {
+  it("fresh verdict + matching bundle proof registers as independent", async () => {
+    const taskId = await setupTaskWithEvidence();
+    const verdicts = new VerdictStore(rootPath);
+    const registered = await verdicts.register(taskId, verdictInput(), {
+      evidenceRegistry: await evidenceRegistryFor(taskId),
+      ...(await proofFor(taskId)),
+    });
+    expect(registered.reviewedBundleDigest).toBe(registered.binding.bundleDigest);
+    const assessment = assessVerdictIndependence(registered);
+    expect(assessment).toMatchObject({ independent: true, basis: "reviewed-bundle" });
+    expect(assessment.problemCode).toBeNull();
+    const summary = await verdicts.latestVerdictSummary(taskId);
+    expect(summary).toMatchObject({ independent: true, bound: true, fresh: true });
+    expect(summary?.independenceCode).toBeNull();
+  });
+
+  it("fresh verdict WITHOUT bundle proof is refused (VERDICT-INDEPENDENCE-UNPROVEN)", async () => {
+    const taskId = await setupTaskWithEvidence();
+    const verdicts = new VerdictStore(rootPath);
+    await expect(
+      verdicts.register(taskId, verdictInput(), {
+        evidenceRegistry: await evidenceRegistryFor(taskId),
+        binding: await bindingFor(taskId),
+      }),
+    ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.independenceUnproven });
+    // Refused registrations leave no record behind.
+    expect(await verdicts.latest(taskId)).toBeNull();
+  });
+
+  it("mismatched reviewed-bundle proof is refused (VERDICT-BUNDLE-MISMATCH)", async () => {
+    const taskId = await setupTaskWithEvidence();
+    const verdicts = new VerdictStore(rootPath);
+    await expect(
+      verdicts.register(taskId, verdictInput(), {
+        evidenceRegistry: await evidenceRegistryFor(taskId),
+        binding: await bindingFor(taskId),
+        reviewedBundleDigest: "0".repeat(64),
+      }),
+    ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.bundleMismatch });
+  });
+
+  it("same-context verdict registers without proof but is flagged non-independent", async () => {
+    const taskId = await setupTaskWithEvidence();
+    const verdicts = new VerdictStore(rootPath);
+    const registered = await verdicts.register(
+      taskId,
+      verdictInput({ verifier: { agent: "implementer/1.0", context: "same", issuedAt: today } }),
+      { evidenceRegistry: await evidenceRegistryFor(taskId), binding: await bindingFor(taskId) },
+    );
+    expect(registered.reviewedBundleDigest).toBeNull();
+    expect(assessVerdictIndependence(registered)).toMatchObject({
+      independent: false,
+      basis: "same-context",
+      problemCode: VERDICT_PROBLEM_CODES.independenceUnproven,
+    });
+    const summary = await verdicts.latestVerdictSummary(taskId);
+    expect(summary).toMatchObject({ independent: false, fresh: true });
+    expect(summary?.independenceCode).toBe(VERDICT_PROBLEM_CODES.independenceUnproven);
+  });
+
+  it("replayed verdict content is refused (VERDICT-REPLAY-REJECTED)", async () => {
+    const taskId = await setupTaskWithEvidence();
+    const verdicts = new VerdictStore(rootPath);
+    const registry = await evidenceRegistryFor(taskId);
+    await verdicts.register(taskId, verdictInput(), {
+      evidenceRegistry: registry,
+      ...(await proofFor(taskId)),
+    });
+    // Byte-identical content re-presented (even with a fresh proof — state
+    // is unchanged so the proof matches) is replay, not re-verification.
+    await expect(
+      verdicts.register(taskId, verdictInput(), {
+        evidenceRegistry: registry,
+        ...(await proofFor(taskId)),
+      }),
+    ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.replayRejected });
+    // New judged content (distinct summary) registers as the next id.
+    const second = await verdicts.register(taskId, verdictInput({ summary: "second review" }), {
+      evidenceRegistry: registry,
+      ...(await proofFor(taskId)),
+    });
+    expect(second.id).toBe("VR-0002");
+  });
+
+  it("replay is detected across state change (old judgment cannot launder a new binding)", async () => {
+    const taskId = await setupTaskWithEvidence();
+    const verdicts = new VerdictStore(rootPath);
+    const registry = await evidenceRegistryFor(taskId);
+    await verdicts.register(taskId, verdictInput(), {
+      evidenceRegistry: registry,
+      ...(await proofFor(taskId)),
+    });
+    // State moves on; the attacker re-presents the old verdict file. The
+    // fresh binding would differ, but the CONTENT digest matches VR-0001.
+    const { writeFile: wf } = await import("node:fs/promises");
+    const probe = (await import("node:path")).join(rootPath, `src-replay-80-${taskId.slice(5)}.js`);
+    await wf(probe, "export const replay = true;\n", "utf8");
+    try {
+      await expect(
+        verdicts.register(taskId, verdictInput(), {
+          evidenceRegistry: registry,
+          binding: await bindingFor(taskId),
+          reviewedBundleDigest: (await bindingFor(taskId)).bundleDigest,
+        }),
+      ).rejects.toMatchObject({ code: VERDICT_PROBLEM_CODES.replayRejected });
+    } finally {
+      const { unlink } = await import("node:fs/promises");
+      await unlink(probe);
+    }
+  });
+
+  it("legacy unbound verdicts classify as non-independent (VERDICT-BINDING-MISSING)", async () => {
+    const taskId = await setupTaskWithEvidence();
+    const { stringify } = await import("yaml");
+    const { mkdir: mk, writeFile: wf } = await import("node:fs/promises");
+    const taskPath = (await import("node:path")).join(
+      rootPath,
+      ".ackit",
+      "workflow",
+      taskId,
+      "verdicts",
+    );
+    await mk(taskPath, { recursive: true });
+    await wf(
+      (await import("node:path")).join(taskPath, "VR-0001.yaml"),
+      stringify({ ...(verdictInput() as Record<string, unknown>), id: "VR-0001", taskId }),
+      "utf8",
+    );
+    const verdicts = new VerdictStore(rootPath);
+    const latest = await verdicts.latest(taskId);
+    if (latest === null) throw new Error("legacy record missing");
+    expect(assessVerdictIndependence(latest)).toMatchObject({
+      independent: false,
+      basis: "legacy-unbound",
+      problemCode: VERDICT_PROBLEM_CODES.bindingMissing,
+    });
   });
 });

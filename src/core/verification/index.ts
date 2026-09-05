@@ -25,8 +25,13 @@ export {
 } from "./canonical.js";
 export { type VerdictFreshness, VerdictStore, VerdictStoreError } from "./store.js";
 export {
+  assessVerdictIndependence,
   type BoundVerdict,
+  type IndependenceAssessment,
+  type IndependenceBasis,
   isBoundVerdict,
+  projectVerdictAuthoring,
+  VERDICT_CONTENT_DOMAIN,
   VERDICT_ID_PATTERN,
   VERDICT_PROBLEM_CODES,
   VERDICT_SCHEMA_ID,
@@ -38,4 +43,5 @@ export {
   type VerdictRecord,
   VerdictSchema,
   VerdictV2Schema,
+  verdictContentDigest,
 } from "./verdict.js";
