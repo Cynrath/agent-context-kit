@@ -193,10 +193,44 @@ describe("adversarial matrix: string-level attacks (live CLI)", () => {
     }
   });
 
-  it("R8 NUL byte refused without crashing (exit 2)", async () => {
-    // ATTACK: embedded NUL — path.resolve would throw; handlers must fail closed.
-    const r = await spawnCli(["checkpoint", "export", "TASK-0001", "--out", "a\0b.md"]);
-    expect(r.code).not.toBe(0);
+  it("R8 NUL byte refused without crashing (exit 4)", async () => {
+    // ATTACK: embedded NUL — unrepresentable in real argv (the OS and the
+    // Node spawn layer both forbid it), so this row calls the built CLI
+    // in-process to reach the handler with true NUL bytes intact.
+    // RESULT: link-aware containment refuses via the NUL rule.
+    // VERDICT: contained — normalizeRelativePath rejects before any fs
+    // access (paths.ts), surfaced as a root-escape refusal.
+    const { runCli } = await import("../../src/cli/index.js");
+    const chunks: string[] = [];
+    const errChunks: string[] = [];
+    const originalWrite = process.stdout.write;
+    const originalErr = process.stderr.write;
+    process.stdout.write = ((chunk: string) => {
+      chunks.push(String(chunk));
+      return true;
+    }) as typeof process.stdout.write;
+    process.stderr.write = ((chunk: string) => {
+      errChunks.push(String(chunk));
+      return true;
+    }) as typeof process.stderr.write;
+    try {
+      const code = await runCli([
+        "node",
+        "ackit",
+        "--root",
+        repo,
+        "checkpoint",
+        "export",
+        "TASK-0001",
+        "--out",
+        "a\0b.md",
+      ]);
+      expect(code).toBe(4);
+      expect(errChunks.join("")).toContain("escapes repository root");
+    } finally {
+      process.stdout.write = originalWrite;
+      process.stderr.write = originalErr;
+    }
   });
 
   it("R15/R16 root boundary: root-level file allowed, directory-as-file fails closed", async () => {

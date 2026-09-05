@@ -1,12 +1,12 @@
 ---
 id: "TASK-0084"
 title: "Security adversarial audit and proven-gap repairs"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-05
 ---
 
 ## Purpose
@@ -117,3 +117,22 @@ completion-gate time. Internal ledger/scaffold-fixed-path scoping
 recorded (user-steered writes fixed; store-managed state dirs
 unchanged). No quality gates weakened. No publish/tag/release.
 TASK-0085 not started.
+
+Final validation (2026-09-05, head `9f8ebda` + review follow-ups):
+`pnpm test` 113 files / 701 passed / 3 skipped, 0 failed with
+`--maxWorkers 2`; lint, format:check, typecheck, build green (zero
+warnings); `gen:schemas` no-op; smoke:cli + smoke:package
+(`cynrath-agent-context-kit-0.5.0-dev.0.tgz`, nothing published) PASS;
+version-parity PASS (source 0.5.0-dev.0, stable 0.4.1); offline-egress
+PASS; text-hygiene repo clean (921 files); config check, doctor, task
+doctor, skills validate, scan --ci (readiness 88) PASS; `git
+diff --check` clean. PR #20 exact-head CI: 12/12 green on `9f8ebda`.
+Fresh independent verifier (adversarial brief): OVERALL PASS, zero
+blockers — matrix rigor, gap reality, fix correctness (12 bypass
+vectors blocked on paper + live /tmp probe), no redundant config, gates
+all green. Three finding dispositions applied: R8 row rebuilt to call
+the built CLI in-process with true NUL bytes (spawn layers forbid NUL
+in argv, so the old row proved the harness, not the handler — now
+asserts the genuine exit-4 refusal); hardlink-alias residual recorded
+as accepted/out-of-scope in the threat delta; TOCTOU + darwin-case
+posture documented as designed.

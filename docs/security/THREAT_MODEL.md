@@ -76,4 +76,8 @@ verdicts/bundles/handoffs); `scan`/`diagnostics` free `--output` paths
 (operator-explicit contract relied upon by CI runner-temp recipes);
 task titles (slug folding makes traversal unrepresentable); MCP free
 paths (none exist — root confined at construction, ids pattern-guarded).
-No new config surface was added.
+Known residual (accepted, out of scope): hardlinks aliasing outside
+files are invisible to any realpath-then-contain scheme — low
+exploitability (git cannot transport hardlinks; requires a local plant
+plus an operator `--out` through the exact path). No new config surface
+was added.
