@@ -5,7 +5,12 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
-import { CHECKPOINT_SCHEMA_ID, CheckpointSchema } from "../dist/core/checkpoint/index.js";
+import {
+  CHECKPOINT_SCHEMA_ID,
+  CheckpointSchema,
+  HANDOFF_SCHEMA_ID_V2,
+  HandoffV2Schema,
+} from "../dist/core/checkpoint/index.js";
 import { ackitConfigJsonSchema } from "../dist/core/config/json-schema.js";
 import { EVIDENCE_SCHEMA_ID, EvidenceRegistrySchema } from "../dist/core/evidence/index.js";
 import { InstructionNodeSchema } from "../dist/core/instructions/types.js";
@@ -110,6 +115,15 @@ checkpointSchema.$comment = `ACKit checkpoint schema (${CHECKPOINT_SCHEMA_ID}).`
 writeFileSync(
   path.join(schemasDir, "checkpoint.schema.json"),
   `${JSON.stringify(checkpointSchema, null, 2)}\n`,
+  "utf8",
+);
+
+// portable handoff (ackit.handoff.v2, TASK-0082; v1 markdown stays reader-compatible)
+const handoffSchema = z.toJSONSchema(HandoffV2Schema, { io: "input", unrepresentable: "any" });
+handoffSchema.$comment = `ACKit portable handoff schema (${HANDOFF_SCHEMA_ID_V2}).`;
+writeFileSync(
+  path.join(schemasDir, "handoff.schema.json"),
+  `${JSON.stringify(handoffSchema, null, 2)}\n`,
   "utf8",
 );
 

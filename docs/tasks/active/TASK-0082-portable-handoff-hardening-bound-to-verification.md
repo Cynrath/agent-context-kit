@@ -1,7 +1,7 @@
 ---
 id: "TASK-0082"
 title: "Portable handoff hardening bound to verification state"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0079"
@@ -47,11 +47,11 @@ Strong multi-auditor consensus (SHOULD): checkpoint/resume/handoff already exist
 
 ## Acceptance criteria
 
-- [ ] Handoff binds the full list (state, evidence/verdict pointers+digests, staleness, next-action contract, redaction manifest, provider-neutral instructions) or records an explicit justified exception per item.
-- [ ] Stale/invalid handoff refused with TASK-0079 stable codes (proven).
-- [ ] Determinism fixture green; v1 handoffs still readable; redaction fixture green.
-- [ ] No duplicate subsystem (diff reviewable as extension).
-- [ ] Full gates green with counts; offline/scan/hygiene hold; real-gate completion with evidence.
+- [x] Handoff binds the full list (state, evidence/verdict pointers+digests, staleness, next-action contract, redaction manifest, provider-neutral instructions) or records an explicit justified exception per item.
+- [x] Stale/invalid handoff refused with TASK-0079 stable codes (proven).
+- [x] Determinism fixture green; v1 handoffs still readable; redaction fixture green.
+- [x] No duplicate subsystem (diff reviewable as extension).
+- [x] Full gates green with counts; offline/scan/hygiene hold; real-gate completion with evidence.
 
 ## Test steps
 
@@ -77,4 +77,49 @@ Strong multi-auditor consensus (SHOULD): checkpoint/resume/handoff already exist
 
 ## Completion notes
 
-(placeholder)
+Implemented 2026-09-05 on `release/v0.5.0` (single-lane, third chain on
+the same branch/PR #20).
+
+Audit: v1 handoff was markdown-only (no digests, no machine import, no
+staleness refusal surface); the checkpoint record, status contract, and
+binding engines existed but uncomposed. No duplicate subsystem created:
+`renderHandoffPack`/`renderResumeContext` untouched (SDK allowlist
+signatures frozen; default `export` output byte-identical).
+
+Implementation: `src/core/checkpoint/handoff.ts` — `ackit.handoff.v2`
+(strict zod, `handoff.schema.json` generated idempotently) wrapping the
+v1 pack with task/workflow, full checkpoint record + export-time
+staleness, evidence presence/problems, verification binding
+(state/bundle/components) + latest-verdict trust summary, the TASK-0081
+status contract embedded verbatim (`blockers` + `next`), a redaction
+manifest, and provider-neutral resume steps. `buildHandoff` composes
+stores + `buildStatusReport` + binding/summary engines, deep-scrubs all
+free text with the shared G4 scrubber (new `scrubAbsolutePaths` export;
+pack's inline loop unified onto it, behavior-identical), and fails
+closed on secrets. `parseHandoffFile` identifies v1 markdown by content
+(`HANDOFF-V1-UNBOUND` migration code: v1 was never machine-readable, so
+there is nothing deterministic to read back — re-export is the
+migration) and re-gates secrets on input. `validateHandoff` recomputes
+current binding via the TASK-0079 engine (`compareStoredBinding` →
+`VERDICT-STATE-STALE` with changed classes), consistency-checks the
+bundle reference (tamper → `HANDOFF-INVALID`), re-validates checkpoint
+staleness, and renders the validated embedded pack (resume equivalence).
+CLI: `checkpoint export --format md|json` (md default unchanged),
+read-only `checkpoint import <file>` (fresh → 0 with resume;
+stale → 1 with 0079 codes like `validate`; shape/version/task → 2;
+traversal → 4). Import mutates nothing (no autonomy gate, like
+show/validate). Docs: `docs/concepts/checkpoints.md` v2 section,
+workflow-example transfer snippet, CLI reference row.
+
+Evidence: 10 unit tests (round-trip + resume equivalence, v1-embed
+fidelity, stale refusal with changed classes, bundle-flip INVALID vs
+component-flip STALE, unknown-task, v1/garbage shape codes,
+determinism byte-equality, redaction scrub-count + secret fail-closed,
+pre-verification handoff, unknown export) + 3 CLI integration tests
+(accept/resume/porcelain-clean, stale exit-1 + v1 exit-2, md-default +
+traversal/garbage/format guards) + cross-process fixture (export proc A
+→ import proc B resume equivalence incl. `task resume` agreement →
+moved-state refusal proc C) green; pre-existing checkpoint/context/
+api-surface suites pass unmodified. Full `pnpm test` counts + all gates
+recorded at completion-gate time. No quality gates weakened. No
+publish/tag/release. TASK-0083 not started.

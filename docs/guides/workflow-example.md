@@ -134,6 +134,20 @@ Expected result: bundle emitted
 `ackit pack --task TASK-0001 --resume` builds the full task-aware context pack
 with this resume section embedded.
 
+For a portable, verification-bound transfer (digests travel with the
+context), export and re-validate instead of copying prose:
+
+```
+$ ackit checkpoint export TASK-0001 --format json --out .ackit/reviews/handoff-1.json
+handoff written to .ackit/reviews/handoff-1.json
+$ ackit checkpoint import .ackit/reviews/handoff-1.json
+TASK-0001: handoff CP-0001 fresh (bundle 9f2c…)
+# ... resume context renders ...
+```
+
+The import refuses moved state with `VERDICT-STATE-STALE` (exit 1) instead
+of resuming silently stale work; see `docs/concepts/checkpoints.md`.
+
 ## 7. Verification + fresh verdict
 
 ```
