@@ -1,13 +1,13 @@
 ---
 id: "TASK-0083"
 title: "Provider-surface and integration parity audit and implementation"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
   - "TASK-0081"
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-05
 ---
 
 ## Purpose
@@ -121,3 +121,17 @@ contract suites pass unmodified. Full `pnpm test` counts + all gates
 recorded at completion-gate time. MCP stays read-only (offline-egress +
 capability review hold). No quality gates weakened. No publish/tag/
 release. TASK-0084 not started.
+
+Final validation (2026-09-05, head `3dbc896`): `pnpm test` 112 files /
+687 passed / 1 conditional skip (pre-existing symlink-behavior skip), 0
+failed with `--maxWorkers 2`; lint, format:check, typecheck, build
+green (zero warnings); `gen:schemas` no-op (no schema change);
+smoke:cli + smoke:package (`cynrath-agent-context-kit-0.5.0-dev.0.tgz`,
+nothing published) PASS; version-parity PASS (source 0.5.0-dev.0,
+stable 0.4.1); offline-egress PASS; text-hygiene repo clean (920
+files); config check, doctor, task doctor, skills validate, scan --ci
+(readiness 88) PASS; `git diff --check` clean; VS Code `tsc --noEmit`
++ esbuild bundle green. PR #20 exact-head CI: 12/12 green on `3dbc896`.
+Fresh independent verifier: OVERALL PASS, zero blockers (zero warnings)
+— capability table, no-new-engines, parity proofs, scope discipline,
+docs, CLI verdicts all hold.
