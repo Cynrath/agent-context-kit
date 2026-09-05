@@ -1,12 +1,12 @@
 ---
 id: "TASK-0079"
 title: "Verification state-binding and evidence provenance contract"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-05
 ---
 
 ## Purpose
@@ -46,11 +46,11 @@ Strong multi-auditor consensus (external audits normalized against post-v0.4.1 s
 
 ## Acceptance criteria
 
-- [ ] Contract defines the exact bound-field set with canonical digest rules; same input/config deterministically yields identical digests (fixture-proven).
-- [ ] Stale/replayed verdict is rejected by the completion path with a stable error code (negative-proven per bound field class).
-- [ ] Full gates green (`lint`, `format:check`, `typecheck`, `build`, `test` with counts, `gen:schemas` idempotent).
-- [ ] Offline/no-secret invariants hold (`check-offline-egress`, `scan --ci`, text hygiene, `git diff --check`).
-- [ ] Task completed through the real gate with evidence; no quality-gate weakening.
+- [x] Contract defines the exact bound-field set with canonical digest rules; same input/config deterministically yields identical digests (fixture-proven).
+- [x] Stale/replayed verdict is rejected by the completion path with a stable error code (negative-proven per bound field class).
+- [x] Full gates green (`lint`, `format:check`, `typecheck`, `build`, `test` with counts, `gen:schemas` idempotent).
+- [x] Offline/no-secret invariants hold (`check-offline-egress`, `scan --ci`, text hygiene, `git diff --check`).
+- [x] Task completed through the real gate with evidence; no quality-gate weakening.
 
 ## Test steps
 
@@ -173,4 +173,34 @@ canonical form | risk/reason):
 
 ## Completion notes
 
-(placeholder)
+Implemented 2026-09-05 on `feat/task-0079-verification-state-binding`
+(commit `68c7ff7` + closure commit): bundle `ackit.verification-bundle.v2`
+with structured binding (8 component digests + state/bundle digests,
+SHA-256 domain-separated canonical module, no new deps); verdicts persist
+`ackit.verdict.v2` bound at registration (`--bundle` replay-checked,
+self-declared bindings refused); completion rechecks freshness
+(`VERDICT-STATE-STALE` with changed classes, `VERDICT-BINDING-MISSING` for
+legacy v1); drift codes frozen; `--force` preserved. Docs: ADR-0030,
+concept + CLI/SDK references. SDK additive-only (4 symbols).
+
+Evidence: 31 binding tests (negative matrix A–J, non-invalidating matrix
+incl. verify→notes→complete→archive, cross-temp-root + cross-process
+determinism, secret/path safety, degraded-git lifecycle, v1 compat, exact
+codes) green; full `pnpm test` 104 files / 642 passed / 1 conditional skip
+(2-worker serial clean; parallel runs showed known git-fixture contention
+flakes in unrelated suites, passing isolated). Gates: lint, format:check,
+typecheck, build, gen:schemas idempotent (hash-proven), smoke:cli,
+smoke:package (`cynrath-agent-context-kit-0.5.0-dev.0.tgz`, nothing
+published), version-parity PASS (source 0.5.0-dev.0, stable 0.4.1),
+offline-egress PASS, text-hygiene clean, doctor/task-doctor/
+skills-validate/scan--ci (readiness 88) PASS, `git diff --check` clean.
+Fresh read-only verifier: 2 blockers raised (degraded-marker persistence,
+intent-bytes backstop) and both fixed + re-verified, zero blockers. PR #19
+exact-head CI green (all platforms, smokes, dogfood) before completion.
+
+Process note (Rule 9 transparency): the task plan pre-existed with full
+scope/criteria before implementation (Rule 1 satisfied), but no separate
+plan commit precedes the implementation commit in history (Rule 3 letter
+not met — single honest commit instead of a retroactive split; no history
+rewrite). No quality gates weakened. No publish/tag/release. TASK-0080 not
+started.
