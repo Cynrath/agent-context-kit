@@ -19,30 +19,37 @@ describe("npm README parity", () => {
     expect(pkg.files).toContain("README.md");
   });
 
-  it("root README contains current-version badges and examples (not stale older lines)", async () => {
+  it("root README tracks stable pins with version-agnostic badges (split release-state model)", async () => {
     const readme = await fsp.readFile(path.join(repoRoot, "README.md"), "utf8");
     const pkg = JSON.parse(await fsp.readFile(path.join(repoRoot, "package.json"), "utf8")) as {
       version: string;
     };
-    const ver = pkg.version; // single source of truth, dynamic across releases
-    expect(ver).toMatch(/^\d+\.\d+\.\d+$/);
-    expect(readme).toContain(`v${ver}`);
-    expect(readme).toContain(`npm%20v${ver}`);
-    expect(readme).toContain(`release-v${ver}`);
-    expect(readme).toContain(`npx --yes @cynrath/agent-context-kit@${ver}`);
-    expect(readme).toContain(`Cynrath/agent-context-kit@v${ver}`);
-    // Ensure old version not present in badge areas (allow docs/v0.2.0 folder reference)
-    // The only allowed old line there is in docs/v0.2.0 paths and legacy notes
+    const state = JSON.parse(
+      await fsp.readFile(path.join(repoRoot, "release-state.json"), "utf8"),
+    ) as { publishedStable: string };
+    const source = pkg.version; // source/development version (may be a prerelease)
+    const stable = state.publishedStable; // published stable (always exact X.Y.Z)
+    expect(source).toMatch(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
+    expect(stable).toMatch(/^\d+\.\d+\.\d+$/);
+    // Badges are version-agnostic: the npm badge renders the registry latest
+    // dynamically and the release badge follows /releases/latest — no
+    // hard-coded version may remain in badge labels/links.
+    expect(readme).toContain("npm/v/@cynrath/agent-context-kit?label=npm");
+    expect(readme).toContain("github/v/release/Cynrath/agent-context-kit");
+    expect(readme).toContain("github.com/Cynrath/agent-context-kit/releases/latest");
     const withoutDocs = readme.replaceAll("docs/v0.2.0", "");
-    // Check that npm badge not stale
-    expect(withoutDocs).not.toContain("npm%20v0.2.0");
-    expect(withoutDocs).not.toContain("release-v0.2.0");
-    // Ensure the previous minor's stale badges are gone (dynamic across releases)
-    const [badgeMajor = 0, badgeMinor = 0] = ver.split(".").map(Number);
-    if (badgeMinor > 0) {
-      const prevMinor = `${badgeMajor}.${badgeMinor - 1}`;
-      expect(withoutDocs).not.toContain(`npm%20v${prevMinor}`);
-      expect(withoutDocs).not.toContain(`release-v${prevMinor}`);
+    expect(withoutDocs).not.toContain("npm%20v0.");
+    expect(withoutDocs).not.toContain("release-v0.");
+    expect(withoutDocs).not.toContain("releases/tag/v0.");
+    // Pinned install/action references track the STABLE pointer, not source.
+    expect(readme).toContain(`npx --yes @cynrath/agent-context-kit@${stable}`);
+    expect(readme).toContain(`Cynrath/agent-context-kit@v${stable}`);
+    expect(readme).toContain(`ackit --version  # ${stable}`);
+    // The development version must never be presented as an installable
+    // stable reference when it is a prerelease.
+    if (source.includes("-")) {
+      expect(readme).not.toContain(`@cynrath/agent-context-kit@${source}`);
+      expect(readme).not.toContain(`agent-context-kit@v${source}`);
     }
   });
 

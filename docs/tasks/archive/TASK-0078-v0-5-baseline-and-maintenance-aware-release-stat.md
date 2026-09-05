@@ -1,12 +1,12 @@
 ---
 id: "TASK-0078"
 title: "v0.5 baseline and maintenance-aware release-state model"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   []
 createdAt: "2026-09-04"
-completedAt: null
+completedAt: 2026-09-05
 ---
 
 ## Purpose
@@ -54,12 +54,12 @@ Fix the maintenance-line governance gap left by the v0.4.1 out-of-band maintenan
 
 ## Acceptance criteria
 
-- [ ] Release-policy audit recorded (ADR-0023, parity script, release workflow, current-facing surfaces, npm latest) with live evidence.
-- [ ] Four version concepts defined, recorded, and asserted in distinct places; no concept conflated.
-- [ ] `README says 0.4.0 while npm latest is 0.4.1` class of staleness is impossible or mechanically detected (proven by positive + negative probes).
-- [ ] Parity guard green on the new model; historical references still pass; contract tests cover each concept.
-- [ ] No PUBLIC/STABLE release bump or publication side effects (`git tag --list`, `npm view`, GitHub Release, Marketplace remain 0.4.1). A source/development-version transition (e.g. to `0.5.0-dev.0`) is allowed only if selected by the ADR; it is NOT a public/stable release.
-- [ ] Decision recorded as ADR addendum/new ADR; task completed through the real gate with evidence.
+- [x] Release-policy audit recorded (ADR-0023, parity script, release workflow, current-facing surfaces, npm latest) with live evidence.
+- [x] Four version concepts defined, recorded, and asserted in distinct places; no concept conflated.
+- [x] `README says 0.4.0 while npm latest is 0.4.1` class of staleness is impossible or mechanically detected (proven by positive + negative probes).
+- [x] Parity guard green on the new model; historical references still pass; contract tests cover each concept.
+- [x] No PUBLIC/STABLE release bump or publication side effects (`git tag --list`, `npm view`, GitHub Release, Marketplace remain 0.4.1). A source/development-version transition (e.g. to `0.5.0-dev.0`) is allowed only if selected by the ADR; it is NOT a public/stable release.
+- [x] Decision recorded as ADR addendum/new ADR; task completed through the real gate with evidence.
 
 ## Test steps
 
@@ -83,6 +83,28 @@ Fix the maintenance-line governance gap left by the v0.4.1 out-of-band maintenan
 
 - Focused revert of the model/guard commit(s) on the task branch before merge; after merge, a forward fix (never history rewrite).
 
+## Audit (recorded 2026-09-05 on feat/task-0078-release-state; live evidence)
+
+- ADR-0023 (`docs/decisions/ADR-0023-*`): one logical release, `package.json` source-of-truth, tag == package version, tags-only `v*.*.*` OIDC publish; no maintenance-line concept (gap).
+- Parity guard (`scripts/check-version-parity.mjs`): `package.json` single truth; `MUST_SHOW_CURRENT` forces stable surfaces to name the source version verbatim; `findStaleRefs` only flags older-than-source. Live: `node scripts/check-version-parity.mjs` → PASS on `0.4.0` while npm/GitHub latest is `0.4.1` (false negative, reproduced).
+- `release.yml`: trigger tags-only `v*.*.*` (ll.25-28); step-1 validator `^v[0-9]+\.[0-9]+\.[0-9]+$` + tag==package.json + name check (ll.57-90). Master push/PR can never publish.
+- `ci.yml` extension job hard-codes source `0.4.0` (manifest contract, `vsce package --out ackit-vscode-0.4.0.vsix`, file checks).
+- Source surfaces: `package.json`, `extensions/vscode/package.json`, source-checkout `--version`, MCP `serverInfo.version`, SARIF driver version (dynamic), VSIX filename, `ci.yml` extension job. Stable surfaces: README badges/install/Action pins/Versioning, getting-started one-shot pin, VS Code README Version/Marketplace claim, `examples/demo-github-action` pins.
+- Q1 npm + `0.5.0-dev.0`: SAFE. Temp-dir `npm pack --dry-run` with `0.5.0-dev.0` → `probe-pkg-0.5.0-dev.0.tgz` OK. `scripts/package-smoke.mjs` ll.82-84 compares dynamically; `tests/contract/version-single-source.test.ts:29` allows prerelease; `prepack` version-agnostic.
+- Q2 TS/smoke: SAFE. `src/shared/version.ts` dynamic; `tests/e2e/cli-scaffold.smoke.mjs:30,38` dynamic/prefix match.
+- Q3 VS Code: SAFE for CI scope. CI runs only `vsce ls` + `vsce package` (never `publish`); `0.5.0-dev.0` is semver-valid; version flows to `--out` filename. Empirical `vsce package` proof runs post-bump in validation.
+- Q4 master prerelease publish: IMPOSSIBLE (tags-only trigger; version string irrelevant).
+- Q5 tag `v0.5.0-dev.0`: trigger glob MATCHES (third `*` eats `0-dev.0`) but step-1 validator REJECTS (exit 1) before install/publish — fail-closed, no silent stable publish. No workflow change needed; validator pinned by contract test.
+- Q6: see source/stable surface lists above.
+- Q7 badges dynamic: YES. Shields `npm/v/` renders registry latest without a hard-coded label; `github/v/release` + `/releases/latest` destination version-agnostic; pinned installs stay explicit but track the stable pointer. Guard checks static text → determinism preserved.
+- Decision: adopt split model — source `0.5.0-dev.0` (both manifests), stable pointer `release-state.json` (`publishedStable 0.4.1`, `maintenanceSeries ["0.4.x"]`), history untouched. Full rationale in ADR-0029.
+
 ## Completion notes
 
-(placeholder)
+Implemented 2026-09-05 on `feat/task-0078-release-state` (plan-fix commit `e1810ee` first, then this implementation).
+
+Model landed (ADR-0029): source `0.5.0-dev.0` (`package.json` + `extensions/vscode/package.json`, coupled); stable `0.4.1` (`release-state.json`); maintenance `["0.4.x"]`; history allowlisted. README badges version-agnostic (`npm/v/` dynamic, `github/v/release` + `/releases/latest`); install/Action/Marketplace pins track stable `0.4.1`; `ci.yml` extension job tracks source.
+
+Evidence: `node scripts/check-version-parity.mjs` → PASS (source 0.5.0-dev.0, stable 0.4.1, 14 files); negative probes A-E in `tests/contract/version-parity.test.ts` (26 tests) + `readme-current` (11) + `readme-parity` (4, incl. real `npm pack` tarball README equality) + `version-single-source` (3) + `ci-pinning` (19, prerelease-tag rejection pinned) all green; full `pnpm test` 103 files / 612 tests green (serial clean run; two earlier parallel runs hit git-fixture timeout flakes that pass isolated and serially). Gates: lint, format:check, typecheck, build, gen:schemas idempotent, smoke:cli, smoke:package (`cynrath-agent-context-kit-0.5.0-dev.0.tgz`, nothing published), `vsce package` → `ackit-vscode-0.5.0-dev.0.vsix` 653263 bytes <2MB file-list clean (artifact removed), offline-egress PASS, text-hygiene clean, doctor/task-doctor/skills-validate/scan--ci (readiness 88) PASS, `git diff --check` clean.
+
+No-publication proof: `git tag --list v0.5*` empty; `npm view` → `0.4.1`; `gh release list` latest `v0.4.1`; no Marketplace publish; `maintenance/v0.4.1` and `feat/browser-companion-v0.3` untouched; TASK-0079..0086 not started. Fresh-verifier + squash-merge gate happens on the PR.
