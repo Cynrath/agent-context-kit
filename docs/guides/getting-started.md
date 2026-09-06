@@ -14,17 +14,17 @@ npm install --global @cynrath/agent-context-kit
 ackit --version
 ```
 
-One-shot usage: `npx --yes @cynrath/agent-context-kit@0.5.1 --help` (pinned to stable `0.5.1`).
+One-shot usage: `npx --yes @cynrath/agent-context-kit@0.5.2 --help` (pinned to stable `0.5.2`).
 
 From a source checkout instead:
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm build
-node dist/cli/index.js --version  # 0.5.1
+node dist/cli/index.js --version  # 0.5.2
 ```
 
-## 30-second tour (verified commands — stable v0.5.1)
+## 30-second tour (verified commands — stable v0.5.2)
 
 ```bash
 ackit init --dry-run          # plan instruction shims + builtin skills

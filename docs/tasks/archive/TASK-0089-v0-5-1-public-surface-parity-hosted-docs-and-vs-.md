@@ -1,11 +1,11 @@
 ---
 id: "TASK-0089"
 title: "v0.5.1 public surface parity, hosted docs and VS Code distribution audit"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-09-06"
-completedAt: null
+completedAt: 2026-09-06
 ---
 
 ## Purpose
@@ -58,7 +58,7 @@ Explicit user authorization (this task only): open exactly ONE product PR `chore
 - [x] Root `index.html` has zero stale `0.4.1` in current surfaces (JSON-LD/hero/featured/install/docs), shows 0.5.1, and covers the v0.5 trust chain while keeping offline-first/deterministic/no-key/MCP-read-only visible; design preserved.
 - [x] `verify-site.mjs` asserts dynamic version parity + hosted v0.5 markers; `verify-site.mjs` green.
 - [x] Product validation (§21) fully green with no version bump (package 0.5.1, stable 0.5.1, npm latest 0.5.1); site validation (§24) green; rendered HTML inspected.
-- [ ] Exactly one product PR merged (exact-head CI/Dogfood green, squash) + one site PR merged (`docs-integrity` green); branches cleaned to `master` + `feat/browser-companion-v0.3` and `main`; live verification (§26) recorded.
+- [x] Exactly one product PR merged (exact-head CI/Dogfood green, squash) + one site PR merged (`docs-integrity` green); branches cleaned to `master` + `feat/browser-companion-v0.3` and `main`; live verification (§26) recorded.
 
 ## Test steps
 
@@ -120,3 +120,28 @@ INTERIM (10/11 criteria evidenced; PR merges + live verification pending):
   task-doctor/skills/scan(88/100)/diff-check green; no version bump.
 - Remaining: product PR → merge; site re-sync from merged master;
   site PR → merge; live verification (§26); branch cleanup (§27).
+
+## Final closure (v0.5.2 public verification, 2026-09-06/07)
+
+PR #23 corrected master docs, but the immutable v0.5.1 VSIX still
+carried the stale Marketplace README (`Version: 0.4.1` /
+`0.5.0-dev.0`) and CHANGELOG (top `0.4.0`, no `0.5.1`/`0.4.1`, `0.3.0`
+heading missing) — Marketplace Overview/Changelog drifted from version
+metadata. The v0.5.2 forward patch (TASK-0090, product PR #24) closed
+the final public-surface drift with zero v0.5.1 mutation. TASK-0089
+closes only now, after v0.5.2 public verification:
+
+- Product PR #24 squash-merged (`b0c9de1`, exact-head CI 12/12 +
+  Dogfood green); tag `v0.5.2` on the validated commit; release
+  workflow success (npm `@cynrath/agent-context-kit@0.5.2`, latest
+  `0.5.2` + provenance; GitHub Release `v0.5.2` Latest).
+- Marketplace `Cynrath.ackit-vscode 0.5.2` published once; live verified
+  separately: version metadata `0.5.2`, Overview `Version 0.5.2` with
+  canonical status wording (no `0.4.1`/`0.5.0-dev.0`), served VSIX
+  audited (manifest/README/CHANGELOG `0.5.2`, full repaired history,
+  SHA-256 `5475365A…E744`, identical to the GitHub Release asset).
+- GitHub Release `v0.5.2` carries `ackit-vscode-0.5.2.vsix`; the
+  historical `v0.5.1` asset is untouched.
+- Site PR #12 (Cynrath.github.io) merged (`45152e7`,
+  `docs-integrity` green): hosted docs + root UI `0.5.2`,
+  `verify-site.mjs` PASS; temp branches deleted both repos.
