@@ -169,12 +169,12 @@ jobs:
           test -f "$vsix"
           manver=$(unzip -p "$vsix" extension/package.json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).version))")
           if [ "$manver" != "$pkgver" ]; then echo "::error::VSIX manifest $manver != $pkgver"; exit 1; fi
-          unzip -p "$vsix" extension/README.md > /tmp/vsix-readme.md
+          unzip -p "$vsix" extension/readme.md > /tmp/vsix-readme.md
           grep -q "\*\*Version:\*\* \`$pkgver\`" /tmp/vsix-readme.md || { echo "::error::VSIX README Version != $pkgver"; exit 1; }
           grep -q "ackit.status.v1" /tmp/vsix-readme.md || { echo "::error::VSIX README missing ackit.status.v1"; exit 1; }
           grep -qi "verification freshness" /tmp/vsix-readme.md || { echo "::error::VSIX README missing verification freshness"; exit 1; }
           grep -qi "checkpoint freshness" /tmp/vsix-readme.md || { echo "::error::VSIX README missing checkpoint freshness"; exit 1; }
-          unzip -p "$vsix" extension/CHANGELOG.md > /tmp/vsix-changelog.md
+          unzip -p "$vsix" extension/changelog.md > /tmp/vsix-changelog.md
           latest=$(grep -m1 -o '^## \[[^]]*\]' /tmp/vsix-changelog.md)
           echo "VSIX CHANGELOG latest: $latest"
           echo "$latest" | grep -q "## \[$pkgver\]" || { echo "::error::VSIX CHANGELOG latest != $pkgver"; exit 1; }
