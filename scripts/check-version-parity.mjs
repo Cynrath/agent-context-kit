@@ -20,6 +20,14 @@
  *    markers, SARIF 2.1.0. Allowlisted and never scanned, so legitimate
  *    history can never fail the guard.
  *
+ * Marketplace content parity (TASK-0090): `extensions/vscode/README.md`
+ * (`**Version:**` header + `source checkouts build` copy) and the latest
+ * `## [X.Y.Z]` section of `extensions/vscode/CHANGELOG.md` must equal the
+ * extension manifest — the exact content the Marketplace Overview and
+ * Changelog tabs render. Packaged-VSIX parity (the same assertions against
+ * the built artifact) lives in the CI `extension` job, which inspects the
+ * VSIX itself instead of only grepping source.
+ *
  * Offline, deterministic, repository-native: no registry/network lookup.
  * The published-stable pointer is a committed file, never a live query.
  *
@@ -55,12 +63,17 @@ export const CURRENT_FILES = [
  * Files in this set make PUBLIC/STABLE claims outright, so they must name
  * the published stable version somewhere (install pins, release labels).
  * They MUST NOT be forced to name the source/development version.
+ *
+ * NOTE (TASK-0090): `extensions/vscode/README.md` is deliberately NOT in
+ * this set. The Marketplace renders it verbatim, so it must name the
+ * release-line version only — and that claim is now pinned STRICTER than a
+ * substring check: the Marketplace-parity assertions below require its
+ * `**Version:**` header AND `source checkouts build` copy to EQUAL the
+ * extension manifest exactly. Keeping it here would force the old stable
+ * string into shipped Marketplace content during the release window (the
+ * exact drift class v0.5.2 fixes).
  */
-export const MUST_SHOW_STABLE = [
-  "README.md",
-  "docs/guides/getting-started.md",
-  "extensions/vscode/README.md",
-];
+export const MUST_SHOW_STABLE = ["README.md", "docs/guides/getting-started.md"];
 
 /** Legacy alias (pre-TASK-0078 name for the same file set, now stable-scoped). */
 export const MUST_SHOW_CURRENT = MUST_SHOW_STABLE;
@@ -141,6 +154,34 @@ export function stripAllowed(content) {
   let out = content;
   for (const needle of STRIP_ALLOWLIST) out = out.split(needle).join("");
   return out;
+}
+
+/**
+ * Marketplace content parity (TASK-0090): the old CI allowed
+ * `manifest = 0.5.1 / README = 0.4.1 / CHANGELOG latest = 0.4.0` to pass.
+ * These helpers read the versions the Marketplace actually renders so the
+ * guard can pin them to the extension manifest.
+ */
+
+/**
+ * Extract the Marketplace-rendered versions from the extension README:
+ * `{ version, build }` where `version` is the `**Version:** `X.Y.Z``
+ * header and `build` is the `source checkouts build `X.Y.Z`` copy.
+ * Either field is `null` when its marker is absent.
+ */
+export function readExtensionReadmeVersion(content) {
+  const versionMatch = /\*\*Version:\*\* `([^`]+)`/.exec(String(content));
+  const buildMatch = /source checkouts build `([^`]+)`/.exec(String(content));
+  return {
+    version: versionMatch?.[1] ?? null,
+    build: buildMatch?.[1] ?? null,
+  };
+}
+
+/** Latest `## [X.Y.Z]` section of the extension CHANGELOG (`null` when absent). */
+export function readExtensionChangelogLatest(content) {
+  const match = /^## \[([^\]]+)\]/m.exec(String(content));
+  return match?.[1] ?? null;
 }
 
 /**
@@ -286,6 +327,49 @@ export function checkParity(overrides = {}) {
       failures.push(
         `extensions/vscode/package.json version '${extensionVersion}' != package.json '${source}' (ADR-0023 coupling)`,
       );
+    }
+
+    if (extensionVersion !== undefined) {
+      let extensionReadme = "";
+      try {
+        extensionReadme = readFile("extensions/vscode/README.md");
+      } catch (error) {
+        failures.push(`extension README unreadable: ${error.message}`);
+      }
+      if (extensionReadme !== "") {
+        const { version, build } = readExtensionReadmeVersion(extensionReadme);
+        if (version === null) {
+          failures.push("extensions/vscode/README.md has no '**Version:** `X.Y.Z`' header");
+        } else if (version !== extensionVersion) {
+          failures.push(
+            `extensions/vscode/README.md Version '${version}' != extension manifest '${extensionVersion}' (Marketplace parity)`,
+          );
+        }
+        if (build === null) {
+          failures.push("extensions/vscode/README.md has no 'source checkouts build `X.Y.Z`' copy");
+        } else if (build !== extensionVersion) {
+          failures.push(
+            `extensions/vscode/README.md source-build copy '${build}' != extension manifest '${extensionVersion}' (Marketplace parity)`,
+          );
+        }
+      }
+
+      let extensionChangelog = "";
+      try {
+        extensionChangelog = readFile("extensions/vscode/CHANGELOG.md");
+      } catch (error) {
+        failures.push(`extension CHANGELOG unreadable: ${error.message}`);
+      }
+      if (extensionChangelog !== "") {
+        const latest = readExtensionChangelogLatest(extensionChangelog);
+        if (latest === null) {
+          failures.push("extensions/vscode/CHANGELOG.md has no '## [X.Y.Z]' section");
+        } else if (latest !== extensionVersion) {
+          failures.push(
+            `extensions/vscode/CHANGELOG.md latest section '${latest}' != extension manifest '${extensionVersion}' (Marketplace parity)`,
+          );
+        }
+      }
     }
 
     let ci = "";

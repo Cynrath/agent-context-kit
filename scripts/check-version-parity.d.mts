@@ -23,6 +23,12 @@ export declare function parseVersion(version: string): {
 export declare function isPrereleaseVersion(version: string): boolean;
 export declare function isStableReleaseTag(tag: string): boolean;
 export declare function stripAllowed(content: string): string;
+export interface ExtensionReadmeVersion {
+  version: string | null;
+  build: string | null;
+}
+export declare function readExtensionReadmeVersion(content: string): ExtensionReadmeVersion;
+export declare function readExtensionChangelogLatest(content: string): string | null;
 export declare function findStaleRefs(content: string, baseline: string): StaleRef[];
 export declare function validateReleaseState(state: unknown): string[];
 export declare function readReleaseState(): ReleaseState;

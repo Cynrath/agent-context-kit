@@ -1,7 +1,7 @@
 ---
 id: "TASK-0090"
 title: "v0.5.2 VS Code Marketplace content parity patch release"
-status: active
+status: pending
 schemaVersion: 2
 dependencies:
   - TASK-0089
@@ -167,3 +167,22 @@ new patch release task with fresh user authorization.
 (pending — filled with real evidence at closure: product PR + merge SHA,
 tag, release workflow run, npm/GitHub/Marketplace proofs, VSIX SHA-256,
 site PR + merge SHA, stable-pointer PR, task closures)
+
+## Status note (single-active rule, recorded 2026-09-06)
+
+This task was allocated (`task create`) and fully planned before any
+implementation, and briefly `start`ed. It is held at `pending` (not
+`active`) for the product-PR window ON PURPOSE, with full transparency:
+
+- The repository enforces exactly one `active` task (`task doctor` fails
+  on 2 simultaneously active; CI self-scan runs `task doctor`, so a PR
+  carrying two active tasks can never reach exact-head green).
+- The session brief mandates TASK-0089 stays `active` until v0.5.2 live
+  parity, so TASK-0089 keeps the single active slot through the PR.
+- Implementation proceeds under this committed plan with TASK-0089 as the
+  active owner; TASK-0090 is `start`ed post-merge when the release phase
+  (tag → publish → site sync → closures) begins, and both tasks are
+  completed + archived together at the end (`task doctor` green again).
+- No gate is weakened: no test/typecheck/lint rule changed for this; the
+  status value is truthful (planned, implementation in review, execution
+  pending merge).
