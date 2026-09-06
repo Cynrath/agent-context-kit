@@ -48,16 +48,16 @@ Explicit user authorization (this task only): open exactly ONE product PR `chore
 
 ## Acceptance criteria
 
-- [ ] 4.x matrix proves every intended v0.5 capability present (source + contract + tests) or reports PUBLIC-SURFACE-PARITY: NO-GO with the missing item.
-- [ ] README exposes State-Bound Verification, Verifier Independence, Canonical Status, Portable Handoff v2, Provider/Surface Parity, Security Containment Hardening, Trust-Flow Demo; commands include `status`, `checkpoint import`, `verification bundle/record --bundle`; architecture shows trust chain; docs index links status/provider/trust-flow.
-- [ ] Current docs audit classified every v1/0.4.1 hit; only CURRENT-STALE changed; valid v1-authoring/legacy/historical retained.
-- [ ] Parity regression tests guard README/CLI/verification/checkpoint v0.5 markers; historical v1 still allowed.
-- [ ] VS Code 0.5.1 implementation verified (status snapshot, blockers/next-actions, no mutation, offline); build+tests green; live Marketplace truth recorded; publish iff behind; VSIX from `v0.5.1` tag worktree audited (manifest 0.5.1, publisher Cynrath, no node_modules/secrets, size < limit, status integration present); temp worktree removed.
-- [ ] GitHub Release `v0.5.1` carries audited `ackit-vscode-0.5.1.vsix` (or pre-existing asset verified, no blind duplicate); SHA-256 recorded; no new tag/release.
-- [ ] Site generator fixed at source, safety contract preserved; Status/Provider-Surfaces/Trust-Flow pages + nav exist; Overview/CLI/Verification/Checkpoints/Security/llms.txt current; generator 2-run idempotent; theme hashes preserved.
-- [ ] Root `index.html` has zero stale `0.4.1` in current surfaces (JSON-LD/hero/featured/install/docs), shows 0.5.1, and covers the v0.5 trust chain while keeping offline-first/deterministic/no-key/MCP-read-only visible; design preserved.
-- [ ] `verify-site.mjs` asserts dynamic version parity + hosted v0.5 markers; `verify-site.mjs` green.
-- [ ] Product validation (§21) fully green with no version bump (package 0.5.1, stable 0.5.1, npm latest 0.5.1); site validation (§24) green; rendered HTML inspected.
+- [x] 4.x matrix proves every intended v0.5 capability present (source + contract + tests) or reports PUBLIC-SURFACE-PARITY: NO-GO with the missing item.
+- [x] README exposes State-Bound Verification, Verifier Independence, Canonical Status, Portable Handoff v2, Provider/Surface Parity, Security Containment Hardening, Trust-Flow Demo; commands include `status`, `checkpoint import`, `verification bundle/record --bundle`; architecture shows trust chain; docs index links status/provider/trust-flow.
+- [x] Current docs audit classified every v1/0.4.1 hit; only CURRENT-STALE changed; valid v1-authoring/legacy/historical retained.
+- [x] Parity regression tests guard README/CLI/verification/checkpoint v0.5 markers; historical v1 still allowed.
+- [x] VS Code 0.5.1 implementation verified (status snapshot, blockers/next-actions, no mutation, offline); build+tests green; live Marketplace truth recorded; publish iff behind; VSIX from `v0.5.1` tag worktree audited (manifest 0.5.1, publisher Cynrath, no node_modules/secrets, size < limit, status integration present); temp worktree removed.
+- [x] GitHub Release `v0.5.1` carries audited `ackit-vscode-0.5.1.vsix` (or pre-existing asset verified, no blind duplicate); SHA-256 recorded; no new tag/release.
+- [x] Site generator fixed at source, safety contract preserved; Status/Provider-Surfaces/Trust-Flow pages + nav exist; Overview/CLI/Verification/Checkpoints/Security/llms.txt current; generator 2-run idempotent; theme hashes preserved.
+- [x] Root `index.html` has zero stale `0.4.1` in current surfaces (JSON-LD/hero/featured/install/docs), shows 0.5.1, and covers the v0.5 trust chain while keeping offline-first/deterministic/no-key/MCP-read-only visible; design preserved.
+- [x] `verify-site.mjs` asserts dynamic version parity + hosted v0.5 markers; `verify-site.mjs` green.
+- [x] Product validation (§21) fully green with no version bump (package 0.5.1, stable 0.5.1, npm latest 0.5.1); site validation (§24) green; rendered HTML inspected.
 - [ ] Exactly one product PR merged (exact-head CI/Dogfood green, squash) + one site PR merged (`docs-integrity` green); branches cleaned to `master` + `feat/browser-companion-v0.3` and `main`; live verification (§26) recorded.
 
 ## Test steps
@@ -93,4 +93,30 @@ Explicit user authorization (this task only): open exactly ONE product PR `chore
 
 ## Completion notes
 
-(pending — filled with §28 report evidence on completion)
+INTERIM (10/11 criteria evidenced; PR merges + live verification pending):
+
+- Capability matrix (§4): all seven v0.5 capabilities proven in source +
+  contract + tests (bundle v2 / verdict v2 / digests / stale codes;
+  independence + replay; status v1 read-only; handoff v2 + import;
+  provider fixture + CLI≡SDK≡MCP≡Action≡VS Code; T27 link-aware guard;
+  trust-flow demo test + guide). No NO-GO.
+- Product docs: README + 8 current-facing docs corrected; v1-authoring/
+  legacy/historical retained; `docs-gate` +4 parity tests green (8/8).
+- VS Code: source 0.5.1 verified (status snapshot, blockers/next,
+  no mutation, offline); typechecks + bundle green; Marketplace live
+  0.5.1 (Case A, NOT republished); VSIX from `v0.5.1` tag worktree
+  audited (12 files, 828574 bytes, manifest 0.5.1/Cynrath, status
+  bundled); SHA-256
+  AF31C61E5831F3B939D63FA00B13245F2AEF65F72A0FE0BF9FDB7DB7B37F9784;
+  uploaded to existing Release `v0.5.1`; worktree removed.
+- Site (branch `chore/ackit-v0.5.1-public-surface-parity`): generator
+  fixed at source; 30 pages (Status/Provider-Surfaces/Trust-Flow new);
+  idempotence proven (0-diff); theme hashes preserved;
+  `verify-site.mjs` extended + PASS (30 pages, 0.5.1, nav 30);
+  root `index.html` 0.4.1→0.5.1 (6/6 surfaces) + v0.5 cards.
+- Product validation §21: lint/format/typecheck/build green;
+  `pnpm test` 116 files 709 passed/3 skipped; schemas idempotent;
+  smokes green; version-parity/offline/hygiene/config/doctor/
+  task-doctor/skills/scan(88/100)/diff-check green; no version bump.
+- Remaining: product PR → merge; site re-sync from merged master;
+  site PR → merge; live verification (§26); branch cleanup (§27).
