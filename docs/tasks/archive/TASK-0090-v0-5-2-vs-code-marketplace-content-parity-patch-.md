@@ -1,12 +1,12 @@
 ---
 id: "TASK-0090"
 title: "v0.5.2 VS Code Marketplace content parity patch release"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - TASK-0089
 createdAt: "2026-09-06"
-completedAt: null
+completedAt: 2026-09-06
 ---
 
 ## Purpose
@@ -103,31 +103,31 @@ force-push/rebase/history rewrite/workflow dispatch, extra branches.
 
 ## Acceptance criteria
 
-- [ ] Defect reproduced and recorded: Marketplace version metadata 0.5.1
+- [x] Defect reproduced and recorded: Marketplace version metadata 0.5.1
   CURRENT, Overview content STALE (0.4.1/0.5.0-dev.0); master README 0.5.1
   correct; v0.5.1 README/CHANGELOG stale as tagged.
-- [ ] Extension README header names 0.5.2 + all §5 UI/Tasks terms present,
+- [x] Extension README header names 0.5.2 + all §5 UI/Tasks terms present,
   zero false VS Code feature claims (fresh-verifier inspected).
-- [ ] Extension CHANGELOG has 0.5.2/0.5.1/0.4.1/0.4.0/0.3.0/0.2.2/0.2.1/
+- [x] Extension CHANGELOG has 0.5.2/0.5.1/0.4.1/0.4.0/0.3.0/0.2.2/0.2.1/
   0.2.0 sections with correct dates; 0.4.1 + 0.3.0 text verbatim from
   immutable tags; 0.5.1/0.5.2 entries factual.
-- [ ] `package.json` + `extensions/vscode/package.json` both 0.5.2;
+- [x] `package.json` + `extensions/vscode/package.json` both 0.5.2;
   description/keywords refreshed; `publishedStable` still 0.5.1 pre-publish.
-- [ ] New guards fail on the old defect shape (manifest 0.5.1 + README
+- [x] New guards fail on the old defect shape (manifest 0.5.1 + README
   0.4.1 + CHANGELOG 0.4.0) at source level AND packaged-VSIX level.
-- [ ] Full validation green (§11 incl. extension typecheck/build/test,
+- [x] Full validation green (§11 incl. extension typecheck/build/test,
   `vsce ls`, real 0.5.2 VSIX audited: manifest/README/CHANGELOG 0.5.2,
   publisher Cynrath, size < 2MB, SHA-256 recorded, no secrets).
-- [ ] ONE product PR merged (squash, exact-head CI/Dogfood green); post-merge
+- [x] ONE product PR merged (squash, exact-head CI/Dogfood green); post-merge
   RC rebuilt from master proves 7-way 0.5.2 parity.
-- [ ] npm `@cynrath/agent-context-kit@0.5.2` + latest 0.5.2; GitHub Release
+- [x] npm `@cynrath/agent-context-kit@0.5.2` + latest 0.5.2; GitHub Release
   v0.5.2 (+ VSIX asset, SHA-256); Marketplace `Cynrath.ackit-vscode` 0.5.2
   with current Overview/Changelog content verified live.
-- [ ] Site PR merged, `verify-site.mjs` green, hosted docs + root site 0.5.2.
-- [ ] `publishedStable` flipped to 0.5.2 only after all surfaces verified.
-- [ ] TASK-0090 completed (no force) + archived with evidence; `task doctor`
+- [x] Site PR merged, `verify-site.mjs` green, hosted docs + root site 0.5.2.
+- [x] `publishedStable` flipped to 0.5.2 only after all surfaces verified.
+- [x] TASK-0090 completed (no force) + archived with evidence; `task doctor`
   green; then TASK-0089 completed (no force) + archived with §20 notes.
-- [ ] Final branches: product `master` + `feat/browser-companion-v0.3`;
+- [x] Final branches: product `master` + `feat/browser-companion-v0.3`;
   site `main`. Final matrix + SUCCESS decision reported.
 
 ## Test steps
@@ -164,9 +164,45 @@ new patch release task with fresh user authorization.
 
 ## Completion notes
 
-(pending — filled with real evidence at closure: product PR + merge SHA,
-tag, release workflow run, npm/GitHub/Marketplace proofs, VSIX SHA-256,
-site PR + merge SHA, stable-pointer PR, task closures)
+v0.5.2 Marketplace content parity patch: SUCCESS. All acceptance
+criteria evidenced with real artifacts (no force at any gate):
+
+- Defect: Marketplace version metadata 0.5.1 CURRENT, Overview content
+  STALE (README `0.4.1`/`0.5.0-dev.0`, CHANGELOG top `0.4.0`, no
+  `0.5.1`/`0.4.1`, `0.3.0` heading missing) — recorded before any change.
+- Product PR #24 (`release/v0.5.2` → `master`), squash-merged `b0c9de1`
+  with exact-head CI 12/12 + Dogfood green. Commits: plan `210a061`,
+  extension fix `5a2d5d9`, guards/sync `2605158`, CI path fix `b822de3`
+  (vsce lowercases README/CHANGELOG in the VSIX — caught by CI, fixed,
+  re-verified).
+- Tag `v0.5.2` (annotated, on `b0c9de1`); release workflow `34064084820`
+  success: npm `@cynrath/agent-context-kit@0.5.2` + `latest 0.5.2` with
+  provenance, fresh consumer smoke (`0.5.2`), GitHub Release `v0.5.2`
+  (Latest). npx-on-Windows shim fails locally (environment), workflow
+  npx smoke green + fresh `npm install` consumer smoke `0.5.2`.
+- Marketplace `Cynrath.ackit-vscode 0.5.2` published once (user-executed
+  `vsce publish`, PAT never in repo/env); live verified separately:
+  version metadata `0.5.2`, Overview `Version 0.5.2` + canonical status
+  wording, no `0.4.1`/`0.5.0-dev.0`; Marketplace-served VSIX audited
+  (manifest/README/CHANGELOG `0.5.2`, full repaired history,
+  SHA-256 `5475365A0194DF3B1263DA1B48C148DB8A839D8A20E929174992843EB573E744`
+  identical to the GitHub Release asset `ackit-vscode-0.5.2.vsix`,
+  830356 bytes; `v0.5.1` asset untouched).
+- Site PR #12 merged (`45152e7`, `docs-integrity` green): 30 generated
+  pages + `llms` + sitemap re-synced (idempotent), root UI 6/6 surfaces
+  `0.5.2`, `verify-site.mjs` PASS; temp branches deleted both repos.
+- Stable pointer flipped `0.5.1 → 0.5.2` (+ stable-bound pins) in the
+  minimal bookkeeping flip PR only after every surface above verified.
+- Validation: lint/format/typecheck/build green; `pnpm test` green
+  (116 files, 715 passed — one clean run; earlier Windows runs showed
+  worker-contention timeouts in git-init hooks, every failed file
+  re-passed in isolation, pristine-master baseline green, CI ubuntu
+  green throughout); schemas idempotent; smokes green; parity/
+  offline/hygiene/config/doctor/task-doctor/skills/scan(88)/diff green;
+  extension typechecks + build + 16/16 Electron tests on VS Code
+  1.136.1; 7-way 0.5.2 parity proven on merged master.
+- No v0.5.1 mutation (tag/package/asset), no tag moves, no Browser
+  Companion changes, no force-push/rebase.
 
 ## Status note (single-active rule, recorded 2026-09-06)
 
@@ -186,3 +222,10 @@ implementation, and briefly `start`ed. It is held at `pending` (not
 - No gate is weakened: no test/typecheck/lint rule changed for this; the
   status value is truthful (planned, implementation in review, execution
   pending merge).
+
+Addendum (closure sequence, recorded on the flip branch): the freshly
+built CLI additionally refuses `task start` while another task is
+active (`TaskStore.start` single-active guard — the earlier successful
+start ran under a stale pre-session `dist/`). Closure therefore runs
+in CLI-legal order: complete TASK-0089 first (acceptance met), then
+start TASK-0090, complete it, archive both. No manual status edits.
