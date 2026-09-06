@@ -3,7 +3,7 @@
 Offline-first agent readiness for your repository — directly inside VS Code.
 
 - **Publisher:** `Cynrath` (`Cynrath.ackit-vscode`)
-- **Version:** `0.4.1` (Marketplace stable; source checkouts build `0.5.0-dev.0`)
+- **Version:** `0.5.1` (Marketplace stable; source checkouts build `0.5.1`)
 - **Engine:** `VS Code ^1.90.0`
 - **Activation:** `onStartupFinished` (debounced, lazy refresh)
 - **Category:** `Linters`
