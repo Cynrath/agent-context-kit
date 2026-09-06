@@ -25,6 +25,7 @@ truth).
 | ackit_get_checkpoint | taskId | latest checkpoint + resume context |
 | ackit_verification_bundle | taskId | deterministic verification bundle (markdown) |
 | ackit_drift_check | taskId | deterministic drift findings (same canonical evaluator as CLI `drift check`) |
+| ackit_status | taskId? | canonical read-only task status snapshot (same `ackit.status.v1` contract as CLI `status`) |
 | ackit_list_roles | — | portable role contracts |
 
 Write tools are intentionally absent (state mutation stays CLI-only by

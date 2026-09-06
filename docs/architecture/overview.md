@@ -87,9 +87,10 @@ src/core/
   evidence/      evidence contract v2 (ackit.evidence.v2): criteria synced
                  from the task doc, typed evidence entries, completeness
                  validation (structure only — never semantic judgment)
-  verification/  verification bundle (ackit.verification-bundle.v1) +
-                 verdict registration/validation (ackit.verdict.v1,
-                 append-only, latest governs)
+  verification/  verification bundle (ackit.verification-bundle.v2,
+                 state-bound) + verdict registration/validation
+                  (v1-authored, persisted as ackit.verdict.v2 bound
+                 verdicts, append-only, latest governs)
   drift/         deterministic drift findings (frozen code list:
                  UNPLANNED_FILE_CHANGE, MISSING_REQUIRED_ARTIFACT, ...)
   roles/         portable role contracts (templates/roles/, ackit.role.v1,
@@ -117,10 +118,17 @@ deterministic provider projections.
 - **Evidence** — typed, referenced proof linked to an acceptance criterion
   (`ackit.evidence.v2`). Implementation existing ≠ criterion verified.
 - **Verdict** — a fresh-context verifier's structured judgment
-  (`ackit.verdict.v1`): PASS / PASS_WITH_WARNINGS / REWORK_REQUIRED / BLOCKED.
+  (v1-authored, persisted as `ackit.verdict.v2` bound verdicts):
+  PASS / PASS_WITH_WARNINGS / REWORK_REQUIRED / BLOCKED.
 - **Checkpoint** — deterministic per-task snapshot enabling resume after
   compaction, chat/model/provider switch, restart, or handoff
-  (`ackit.checkpoint.v1`).
+  (`ackit.checkpoint.v1` + verification-bound portable handoff
+  `ackit.handoff.v2` via `checkpoint export --format json` /
+  `checkpoint import`).
+- **Status** — canonical read-only projection (`ackit status [id]` →
+  `ackit.status.v1`): task/stage, verbatim blockers, verification +
+  checkpoint freshness, derived next actions; never mutates.
+  CLI ≡ SDK ≡ read-only MCP ≡ Action ≡ VS Code share the snapshot.
 - **Resume / handoff pack** — deterministic rendered context (concise resume
   block; self-contained handoff document) for a fresh agent.
 - **Drift finding** — deterministic machine check result with a frozen code
@@ -128,7 +136,22 @@ deterministic provider projections.
 - **Autonomy tier** — risk classification (0–4) of an action with an
   allow/ask/deny policy; enforced only at ACKit-owned boundaries (ADR-0028).
 - **Role contract** — portable, data-only YAML contract a provider may use when
-  spawning subagents (verifier must emit `ackit.verdict.v1`); ACKit never
+  spawning subagents (verifier authors `ackit.verdict.v1`, persisted by ACKit
+  as `ackit.verdict.v2`); ACKit never
   spawns or routes agents.
 - **Execution journal** — sanitized local-only event log of ACKit-observable
   transitions; not telemetry; never uploaded.
+
+## v0.5 trust chain
+
+Task/intent/workflow → evidence → bound verification
+(`ackit.verification-bundle.v2` + persisted `ackit.verdict.v2`) →
+verdict independence/freshness (`reviewedBundleDigest`,
+`VERDICT-INDEPENDENCE-UNPROVEN` / `VERDICT-REPLAY-REJECTED` /
+`VERDICT-STATE-STALE`) → canonical status (`ackit.status.v1`,
+read-only) → portable handoff/resume (`ackit.handoff.v2`) →
+CLI / SDK / MCP (read-only) / Action / VS Code.
+
+The existing filesystem/scanner/context architecture above is unchanged;
+the trust chain is the verification-to-surface projection built on it.
+See `docs/guides/demo-trust-flow.md` for the reproducible flow.

@@ -92,4 +92,38 @@ describe("canonical docs gate (REQ-DOC-002/003)", () => {
       expect(threatModel.includes(threat.toLowerCase()), `threat missing: ${threat}`).toBe(true);
     }
   });
+
+  it("v0.5 public-surface parity: README exposes the current trust chain", () => {
+    const readme = readRepo("README.md");
+    expect(readme).toContain("ackit status");
+    expect(readme).toMatch(/ackit\.handoff\.v2|portable handoff/i);
+    expect(readme).toMatch(/state-bound verification/i);
+    expect(readme).toMatch(/verifier independence|Verifier Independence/i);
+    // Historical v1 authoring references remain allowed elsewhere; the
+    // CURRENT feature table must not present v1 as the stored contract.
+    expect(readme).not.toMatch(/append-only <code>ackit\.verdict\.v1<\/code> verdicts/);
+  });
+
+  it("v0.5 public-surface parity: CLI reference covers status/import/bundle proof", () => {
+    const cli = readRepo("docs/reference/cli.md");
+    expect(cli).toContain("ackit status [id]");
+    expect(cli).toContain("checkpoint import");
+    expect(cli).toContain("import <file>");
+    expect(cli).toContain("--bundle");
+  });
+
+  it("v0.5 public-surface parity: verification concept covers v2 binding", () => {
+    const concept = readRepo("docs/concepts/evidence-verification.md");
+    expect(concept).toContain("ackit.verification-bundle.v2");
+    expect(concept).toContain("ackit.verdict.v2");
+    expect(concept).toContain("VERDICT-STATE-STALE");
+    expect(concept).toMatch(/independence/i);
+    expect(concept).toContain("VERDICT-REPLAY-REJECTED");
+  });
+
+  it("v0.5 public-surface parity: checkpoint concept covers handoff v2 + import", () => {
+    const concept = readRepo("docs/concepts/checkpoints.md");
+    expect(concept).toContain("ackit.handoff.v2");
+    expect(concept).toContain("checkpoint import");
+  });
 });
