@@ -4,6 +4,30 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.5.1] - 2026-09-06
+
+Release recovery: v0.5.0 failed its tag-trigger release gate before any
+npm/GitHub Release publication (release workflow `34036439113` failed at
+`pnpm test` because `tests/e2e/chain-composition.test.ts` asserted the
+absence of `v0.5*` tags — impossible on the exact tagged checkout the
+workflow validates; npm v0.5.0 was never published and no GitHub Release
+`v0.5.0` was created). The immutable `v0.5.0` tag is preserved untouched
+as the failed-release marker. v0.5.1 contains the intended v0.5 feature
+set plus the release-context test correction.
+
+### Fixed
+
+- Chain-composition proof (`tests/e2e/chain-composition.test.ts`) no
+  longer asserts tag absence or hard-coded published-stable versions; it
+  proves status/projection parity (CLI ≡ SDK ≡ MCP ≡ Action),
+  verification-bound handoff round-trip, and completion — identically on
+  untagged and tagged checkouts. Release lifecycle assertions live in
+  the release/version contract tests.
+- New regression (`tests/contract/release-tag-context.test.ts`) proves
+  release/tagged-checkout execution cannot fail merely because the
+  triggering release tag exists (fixture repository carries a
+  release-shaped tag through status parity, handoff, and completion).
+
 ## [0.5.0] - 2026-09-05
 
 Provider-independent repository contract with evidence-backed completion:

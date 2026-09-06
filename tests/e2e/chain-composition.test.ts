@@ -1,12 +1,23 @@
 /**
- * v0.5 chain-composition proof (TASK-0086).
+ * v0.5 chain-composition proof (TASK-0086, corrected TASK-0088).
  *
  * One fixture, every surface, one canonical snapshot: status projection
  * over bound verification state (0079/0080/0081) agrees byte-for-byte
  * across CLI ≡ SDK ≡ MCP ≡ Action; the portable handoff (0082) carries
- * that same status contract and validates fresh; release truth (0078)
- * holds (dev version unfinalized, stable pointer untouched, no v0.5.0
- * tag). No tag/publish/release side effects anywhere in this flow.
+ * that same status contract and validates fresh; the chain ends with
+ * task completion on the composed state.
+ *
+ * Release lifecycle assertions (source version, stable pointer, tag
+ * shape) belong in the release/version contract tests
+ * (tests/contract/version-parity.test.ts,
+ * tests/contract/version-single-source.test.ts,
+ * tests/contract/release-notes.test.ts,
+ * tests/contract/ci-pinning.test.ts,
+ * tests/contract/release-tag-context.test.ts) — never here. This test
+ * MUST pass on ordinary checkouts and on exact tagged checkouts alike
+ * (the release workflow validates the tagged commit); it asserts nothing
+ * about repository tags. No tag/publish/release side effects anywhere in
+ * this flow.
  */
 import { execFile as execFileCallback, execFileSync } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
@@ -91,7 +102,7 @@ async function mcpStatus(taskId: string): Promise<unknown> {
 }
 
 describe("v0.5 chain composition (TASK-0086)", () => {
-  it("one snapshot on every surface, handoff carrying it, release truth holding", async () => {
+  it("one snapshot on every surface, handoff carrying it, completion on the composed state", async () => {
     const { TaskStore, serialize } = await import("../../src/core/tasks/index.js");
     const { mkdir: mk } = await import("node:fs/promises");
     await cli(["intent", "new", "Chain the v0.5 line"]);
@@ -291,23 +302,12 @@ describe("v0.5 chain composition (TASK-0086)", () => {
     expect(imported.stdout).toContain("fresh");
 
     // ---- Chain end: completion succeeds on the composed state.
+    // NOTE (TASK-0088): release lifecycle assertions (source version,
+    // stable pointer, tag presence/absence) intentionally live in the
+    // release/version contract tests, not here — this composition proof
+    // must pass identically on untagged checkouts and on the exact
+    // tagged checkout the release workflow validates.
     const completed = await cli(["task", "complete", taskId]);
     expect(completed.code).toBe(EXIT_CODES.ok);
-
-    // ---- Release truth holds (0078 model): source finalized to the
-    // release line, stable pointer untouched pre-publish, no v0.5.0 tag.
-    const pkg = JSON.parse(await readFile(path.join(repoRoot, "package.json"), "utf8")) as {
-      version: string;
-    };
-    expect(pkg.version).toBe("0.5.0");
-    const releaseState = JSON.parse(
-      await readFile(path.join(repoRoot, "release-state.json"), "utf8"),
-    ) as { publishedStable: string };
-    expect(releaseState.publishedStable).toBe("0.4.1");
-    const tags = execFileSync("git", ["-C", repoRoot, "tag", "--list", "v0.5*"], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    expect(tags.trim()).toBe("");
   }, 180_000);
 });

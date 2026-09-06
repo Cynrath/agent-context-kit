@@ -1,7 +1,7 @@
 ---
 id: "TASK-0087"
 title: "v0.5.0 release: version finalization, merge, tag, publish, and post-publish bookkeeping"
-status: active
+status: blocked
 schemaVersion: 2
 dependencies:
   - "TASK-0078"
@@ -87,12 +87,12 @@ TASK-0080..0086 are green (see goal execution record).
 
 ## Acceptance criteria
 
-- [ ] Source `0.5.0` + coupled VSIX version proven on the RC head; PR exact-head CI + verifier zero blockers before READY.
-- [ ] PR #20 squash-merged; post-merge master CI + Dogfood green before tag.
-- [ ] Immutable annotated `v0.5.0` on the validated master commit; OIDC publish + provenance; npm `latest` → `0.5.0`; npx + fresh-consumer smoke green; GitHub Release `v0.5.0` last.
-- [ ] Marketplace `Cynrath.ackit-vscode 0.5.0` published + verified.
-- [ ] Hosted docs updated via the protected flow with integrity green.
-- [ ] Post-publish pointer flipped (`0.5.0`) only after public verification; branches cleaned (`master` + Companion only); final public truth matches the goal record.
+- [!] Source `0.5.0` + coupled VSIX version proven on the RC head; PR exact-head CI + verifier zero blockers before READY. (BLOCKED: met pre-merge; release gate failed post-tag — see Completion notes.)
+- [!] PR #20 squash-merged; post-merge master CI + Dogfood green before tag. (BLOCKED: merged and tagged, but tag-trigger release workflow failed — see Completion notes.)
+- [!] Immutable annotated `v0.5.0` on the validated master commit; OIDC publish + provenance; npm `latest` → `0.5.0`; npx + fresh-consumer smoke green; GitHub Release `v0.5.0` last. (BLOCKED: never published — release workflow 34036439113 failed at `pnpm test` before npm/GitHub publication.)
+- [!] Marketplace `Cynrath.ackit-vscode 0.5.0` published + verified. (BLOCKED: never attempted — gated behind the failed release workflow.)
+- [!] Hosted docs updated via the protected flow with integrity green. (BLOCKED: never attempted for v0.5.0.)
+- [!] Post-publish pointer flipped (`0.5.0`) only after public verification; branches cleaned (`master` + Companion only); final public truth matches the goal record. (BLOCKED: `publishedStable` correctly remains `0.4.1`; superseded by TASK-0088 v0.5.1 recovery.)
 
 ## Test steps
 
@@ -121,4 +121,23 @@ TASK-0080..0086 are green (see goal execution record).
 
 ## Completion notes
 
-(placeholder — filled with per-surface evidence at gate time)
+BLOCKED / SUPERSEDED — v0.5.0 failed its release gate before any public
+publication; preserved as historical failed-release attempt. NOT completed.
+
+- Pre-merge lane completed: PR #20 squash-merged to `master` as
+  `aee1ddc8229b6878b281d8b60a49b2112bd5eee7`; post-merge master CI +
+  Dogfood green; immutable annotated `v0.5.0` created on that commit
+  (tag object `361a92e`, commit `aee1ddc`; never moved/deleted).
+- Tag-trigger release workflow `34036439113` (tag `v0.5.0`) FAILED at
+  `pnpm test`: `tests/e2e/chain-composition.test.ts:311` —
+  `AssertionError: expected 'v0.5.0' to be ''`. Root cause: the test
+  asserted `git tag --list v0.5*` is empty, which cannot hold on the
+  exact tagged checkout the release workflow validates. No npm publish,
+  no GitHub Release, no Marketplace publish occurred for v0.5.0
+  (verified: npm `0.5.0` 404, `latest` = `0.4.1`; `gh release view
+  v0.5.0` = not found; `release-state.json.publishedStable` = `0.4.1`).
+- Immutable `v0.5.0` tag left untouched per recovery rule (failed-release
+  marker, not a public release).
+- Superseded by TASK-0088 (v0.5.1 recovery: release-context test
+  correction + `0.5.0` → `0.5.1` bump + publication). This task is never
+  to be marked completed.
