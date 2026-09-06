@@ -163,7 +163,8 @@ verification bundle written to docs/bundle-1.md
 
 A **fresh-context verifier** consumes the bundle (intent + fingerprint,
 workflow + gate requirements, task doc, criteria + evidence, verifier role
-contract) and emits `ackit.verdict.v1`:
+contract) and authors `ackit.verdict.v1` (the verifier-authored input shape;
+ACKit persists it as a state-bound `ackit.verdict.v2`):
 
 ```yaml
 schemaId: "ackit.verdict.v1"
@@ -176,7 +177,7 @@ summary: "both criteria verified with recorded evidence"
 ```
 
 ```
-$ ackit verification record TASK-0001 --verdict docs/verdict-1.yaml
+$ ackit verification record TASK-0001 --verdict docs/verdict-1.yaml --bundle docs/bundle-1.json
 TASK-0001: verdict VR-0001 registered (PASS)
 ```
 

@@ -47,9 +47,10 @@ that do not adopt it — this is proven by the legacy-compatibility tests.
 6. Verify independently:
 
    ```
-   ackit verification bundle TASK-0007
-   # fresh verifier reviews + authors ackit.verdict.v1
-   ackit verification record TASK-0007 --verdict docs/verdict-7.yaml
+   ackit verification bundle TASK-0007 --format json --out .ackit/reviews/bundle.json
+   # fresh verifier reviews the bundle + authors ackit.verdict.v1
+   ackit verification record TASK-0007 --verdict docs/verdict-7.yaml --bundle .ackit/reviews/bundle.json
+   # stored as ackit.verdict.v2 (state-bound); fresh-context verdicts REQUIRE --bundle proof
    ```
 
 7. Complete. The gate now enforces evidence + verdict + stage + drift

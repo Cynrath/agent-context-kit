@@ -91,7 +91,7 @@ A required dimension with no covering finding produces
 
 ### blockingSeverity mapping
 
-Verdict finding severities (`ackit.verdict.v1`: `blocking | warning | info`)
+Verdict finding severities (`ackit.verdict.v2`, v1-compatible: `blocking | warning | info`)
 map onto the review severity ladder (`critical | high | medium` =
 threshold ranks 3 | 2 | 1) deterministically:
 
