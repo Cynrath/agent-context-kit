@@ -1,8 +1,8 @@
 {
   "name": "ackit-vscode",
   "displayName": "ACKit Toolkit",
-  "description": "Offline-first agent readiness toolkit for VS Code",
-  "version": "0.5.1",
+  "description": "Offline-first repository readiness, task status, verification-aware workflow and developer tooling for AI-assisted development in VS Code.",
+  "version": "0.5.2",
   "publisher": "Cynrath",
   "engines": {
     "vscode": "^1.90.0"
@@ -13,9 +13,13 @@
   "keywords": [
     "ackit",
     "agent-readiness",
-    "context",
+    "ai-coding",
+    "repository",
+    "verification",
+    "workflow",
+    "status",
     "offline-first",
-    "linter"
+    "developer-tools"
   ],
   "activationEvents": [
     "onStartupFinished"

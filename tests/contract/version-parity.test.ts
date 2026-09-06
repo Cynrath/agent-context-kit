@@ -9,6 +9,8 @@ import {
   isPrereleaseVersion,
   isStableReleaseTag,
   MUST_SHOW_STABLE,
+  readExtensionChangelogLatest,
+  readExtensionReadmeVersion,
   readPublishedStable,
   readReleaseState,
   readSourceVersion,
@@ -28,6 +30,12 @@ function readTree(): Record<string, string> {
   for (const file of CURRENT_FILES) {
     files[file] = readFileSync(path.join(process.cwd(), file), "utf8");
   }
+  // Marketplace parity fixture (TASK-0090): not a CURRENT_FILES entry, but
+  // the guard pins its latest section to the extension manifest.
+  files["extensions/vscode/CHANGELOG.md"] = readFileSync(
+    path.join(process.cwd(), "extensions/vscode/CHANGELOG.md"),
+    "utf8",
+  );
   return files;
 }
 
@@ -223,6 +231,16 @@ describe("version-parity guard probes (TASK-0078 A-E)", () => {
         files[file] = "no version claims here";
       }
     }
+    // Marketplace parity fixtures (TASK-0090): the extension README must
+    // carry the manifest version in both copy spots (it names the
+    // release-line version by construction, pinned by equality — not by the
+    // MUST_SHOW_STABLE substring rule), and the extension CHANGELOG must
+    // top at the manifest version.
+    files["extensions/vscode/README.md"] =
+      `stable install @cynrath/agent-context-kit@${stable}\n` +
+      `- **Version:** \`${source}\` (Marketplace stable; source checkouts build \`${source}\`)\n`;
+    files["extensions/vscode/CHANGELOG.md"] =
+      `# Changelog — VS Code Extension\n\n## [${source}] - 2026-09-06\n`;
     const { failures } = checkParity({ files });
     expect(failures).toEqual([]);
   });
@@ -246,6 +264,71 @@ describe("version-parity guard probes (TASK-0078 A-E)", () => {
       failures.some((failure) => failure.includes("published-stable")),
       `expected a stable-pointer failure, got: ${failures.join("; ")}`,
     ).toBe(true);
+  });
+
+  it("probe F: stale extension README FAILS (v0.5.1 defect shape)", () => {
+    // The exact shipped defect: manifest current, packaged README stale.
+    const files = readTree();
+    files["extensions/vscode/README.md"] =
+      "- **Version:** `0.4.1` (Marketplace stable; source checkouts build `0.5.0-dev.0`)\n";
+    const { failures } = checkParity({ files });
+    expect(
+      failures.some(
+        (failure) =>
+          failure.includes("extensions/vscode/README.md") && failure.includes("extension manifest"),
+      ),
+      `expected a README parity failure, got: ${failures.join("; ")}`,
+    ).toBe(true);
+  });
+
+  it("probe G: stale extension CHANGELOG FAILS (v0.5.1 defect shape)", () => {
+    const files = readTree();
+    files["extensions/vscode/CHANGELOG.md"] =
+      "# Changelog — VS Code Extension\n\n## [0.4.0] - 2026-09-03\n";
+    const { failures } = checkParity({ files });
+    expect(
+      failures.some(
+        (failure) =>
+          failure.includes("extensions/vscode/CHANGELOG.md") &&
+          failure.includes("extension manifest"),
+      ),
+      `expected a CHANGELOG parity failure, got: ${failures.join("; ")}`,
+    ).toBe(true);
+  });
+});
+
+describe("marketplace content parity helpers (TASK-0090)", () => {
+  it("reads the README Version header and source-build copy", () => {
+    expect(
+      readExtensionReadmeVersion(
+        "- **Version:** `0.5.2` (Marketplace stable; source checkouts build `0.5.2`)",
+      ),
+    ).toEqual({ version: "0.5.2", build: "0.5.2" });
+  });
+
+  it("reports null markers when the README copy is absent", () => {
+    expect(readExtensionReadmeVersion("no version claims here")).toEqual({
+      version: null,
+      build: null,
+    });
+  });
+
+  it("reads the latest extension CHANGELOG section", () => {
+    expect(
+      readExtensionChangelogLatest("# Changelog — VS Code Extension\n\n## [0.5.2] - 2026-09-06\n"),
+    ).toBe("0.5.2");
+    expect(readExtensionChangelogLatest("no sections here")).toBe(null);
+  });
+
+  it("live extension README/CHANGELOG match the coupled source version", () => {
+    const source = readSourceVersion();
+    const readme = readFileSync(path.join(process.cwd(), "extensions/vscode/README.md"), "utf8");
+    expect(readExtensionReadmeVersion(readme)).toEqual({ version: source, build: source });
+    const changelog = readFileSync(
+      path.join(process.cwd(), "extensions/vscode/CHANGELOG.md"),
+      "utf8",
+    );
+    expect(readExtensionChangelogLatest(changelog)).toBe(source);
   });
 });
 

@@ -4,6 +4,31 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.5.2] - 2026-09-06
+
+VS Code Marketplace content parity patch (no runtime feature behavior
+beyond 0.5.1). The immutable `v0.5.1` release carries current
+manifest/version metadata (npm/GitHub/Marketplace all `0.5.1`), but its
+packaged VSIX shipped stale Marketplace content: the extension README
+said `Version: 0.4.1` (`0.5.0-dev.0`) and the extension CHANGELOG topped
+at `0.4.0` with the `0.4.1` section lost and the `0.3.0` heading missing —
+so Marketplace Overview/Changelog drifted from version metadata. Fixed
+forward in `0.5.2`; `v0.5.1` is preserved untouched.
+
+### Fixed
+
+- Extension README now ships `Version: 0.5.2` with the canonical status
+  snapshot documented (`buildStatusReport`, `ackit.status.v1`, verbatim
+  completion blockers, verification + checkpoint freshness, derived next
+  actions, read-only); extension description/keywords refreshed.
+- Extension CHANGELOG history repaired: `0.5.1`/`0.4.1` sections
+  present, missing `0.3.0` heading restored (`0.4.1`/`0.3.0` text verbatim
+  from the immutable tags; no history invented).
+- Permanent parity guards: source parity (extension README Version and
+  CHANGELOG latest pinned to the extension manifest) plus packaged-VSIX
+  parity (CI inspects the built VSIX itself), so stale Marketplace
+  content can never pass again.
+
 ## [0.5.1] - 2026-09-06
 
 Release recovery: v0.5.0 failed its tag-trigger release gate before any

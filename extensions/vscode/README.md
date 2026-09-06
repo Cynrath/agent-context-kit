@@ -3,7 +3,7 @@
 Offline-first agent readiness for your repository — directly inside VS Code.
 
 - **Publisher:** `Cynrath` (`Cynrath.ackit-vscode`)
-- **Version:** `0.5.1` (Marketplace stable; source checkouts build `0.5.1`)
+- **Version:** `0.5.2` (Marketplace stable; source checkouts build `0.5.2`)
 - **Engine:** `VS Code ^1.90.0`
 - **Activation:** `onStartupFinished` (debounced, lazy refresh)
 - **Category:** `Linters`
@@ -16,7 +16,12 @@ All views are backed by the shared deterministic SDK (`scanRepository`, `scoreRe
 - **Readiness** (`ackit.readiness`) — Overall `88/100` + 6 categories (Instructions, Security, Context Efficiency, Tasks, Skills, Policy) with weighted renormalization, N/A handling, and expandable deductions. Uses real `scoreRepository` inputs, tooltip evidence, refresh on change.
 - **Findings** (`ackit.findings`) — Grouped by severity (`critical`/`high`/`medium`/`low`), rule ID, path, message. Click to open file at exact line/column. Uses real `scanRepository` findings.
 - **Instruction Graph** (`ackit.graph`) — Nodes `instr:codex:AGENTS.md`, `instr:claude:CLAUDE.md`, etc., with provider, precedence, provenance, shadowing. Uses `buildInstructionGraph` + `resolveEffectiveStack`.
-- **Tasks** (`ackit.tasks`) — Canonical status snapshot via the shared SDK (`buildStatusReport`, same `ackit.status.v1` contract as `ackit status`): task/stage, verbatim blockers, verification + checkpoint freshness, derived next actions. Read-only: no write paths added. Tasks/policy/optimize summaries also available (see Diagnostics for details). If you prefer commands only, use `ACKit: Diagnostics`.
+- **Tasks** (`ackit.tasks`) — Canonical status snapshot via the shared SDK (`buildStatusReport`, same `ackit.status.v1` contract as `ackit status`). Read-only: no write paths added. Tasks/policy/optimize summaries also available (see Diagnostics for details). If you prefer commands only, use `ACKit: Diagnostics`.
+  - **Canonical Task Status** — Tree header shows the active task id/title with its workflow `task`/`stage` from the snapshot (`ackit.status.v1`, same contract as `ackit status`).
+  - **Completion Blockers** — Expandable list of verbatim completion-gate blockers (same engine, same strings, same stable codes as `ackit task complete` would enforce).
+  - **Verification Freshness** — Verdict binding/freshness composed in the same snapshot; stale, unbound, missing, or non-independent verdicts surface as verbatim blockers (`VERDICT-STATE-STALE`, `VERDICT-BINDING-MISSING`, `MISSING_VERIFIER_VERDICT`, …).
+  - **Checkpoint Freshness** — Checkpoint staleness composed in the same snapshot; the checkpoint's recorded next action surfaces under Derived Next Actions.
+  - **Derived Next Actions** — Suggested commands derived from blocker codes (evidence sync, fresh verification bundle, workflow advance, dependency completion), plus `complete task` when all gates pass.
 - **Policy** (`ackit.policy`) — Policy chain/digest (see Diagnostics).
 - **Optimize** (`ackit.optimize`) — 8-class taxonomy, severity, token-waste estimates, evidence paths, remediation. Via `analyzeOptimize` (SDK), preview diff, no silent writes.
 
