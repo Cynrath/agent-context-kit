@@ -128,33 +128,41 @@ describe("release workflow hardening", () => {
     expect(raw).toContain("is not an exact vX.Y.Z release tag");
   });
 
-  it("runs gates and registry-absence check BEFORE npm publish", () => {
+  it("runs gates, VSIX build + preflight, and registry-absence check BEFORE npm publish", () => {
     const order = (marker: string): number => {
       const index = raw.indexOf(marker);
       expect(index, `release.yml missing marker '${marker}'`).toBeGreaterThan(-1);
       return index;
     };
     const tests = order("run: pnpm test");
+    const vsixBuild = order("Build exact VSIX from tagged source");
+    const preflight = order("- name: VSIX preflight");
     const smoke = order("run: pnpm run smoke:package");
     const absence = order("Confirm exact version is absent from the npm registry");
     const publish = order('run: npm publish "' + "$" + "{TARBALL_PATH}" + '" --access public');
-    expect(tests).toBeLessThan(publish);
+    expect(tests).toBeLessThan(vsixBuild);
+    expect(vsixBuild).toBeLessThan(preflight);
+    expect(preflight).toBeLessThan(publish);
     expect(smoke).toBeLessThan(publish);
     expect(absence).toBeLessThan(publish);
   });
 
-  it("creates the GitHub Release only AFTER publish + registry + npx verification", () => {
+  it("creates the GitHub Release only AFTER npm + Marketplace publish + verifications", () => {
     const publish = raw.indexOf(
       'run: npm publish "' + "$" + "{TARBALL_PATH}" + '" --access public',
     );
     const verify = raw.indexOf("Verify registry metadata, shasum, and dist-tag");
     const npxSmoke = raw.indexOf("npx consumer smoke");
+    const mktPublish = raw.indexOf("Publish to VS Code Marketplace via OIDC");
+    const mktVerify = raw.indexOf("Verify Marketplace publication");
     const release = raw.indexOf("gh release create");
     expect(publish).toBeGreaterThan(-1);
     expect(npxSmoke).toBeGreaterThan(publish);
     expect(verify).toBeGreaterThan(publish);
-    expect(release).toBeGreaterThan(npxSmoke);
-    expect(release).toBeGreaterThan(verify);
+    expect(mktPublish).toBeGreaterThan(npxSmoke);
+    expect(mktPublish).toBeGreaterThan(verify);
+    expect(mktVerify).toBeGreaterThan(mktPublish);
+    expect(release).toBeGreaterThan(mktVerify);
   });
 
   it("publishes the recorded tarball and parses registry metadata safely", () => {
@@ -164,13 +172,74 @@ describe("release workflow hardening", () => {
     expect(raw).toMatch(/seq 1 30/);
   });
 
-  it("keeps GitHub Release creation as the strictly-last job step (failed publish aborts first)", () => {
-    const releaseStep = raw.indexOf(
-      "- name: Create GitHub Release (strictly after successful publish + verification)",
-    );
+  it("keeps GitHub Release after every publish and final verification last (failed publish aborts first)", () => {
+    const releaseStep = raw.indexOf("- name: Create GitHub Release and attach audited VSIX");
     expect(releaseStep).toBeGreaterThan(-1);
-    expect(releaseStep).toBe(raw.lastIndexOf("- name:"));
+    const finalStep = raw.indexOf("- name: Final public-surface verification");
+    expect(finalStep).toBeGreaterThan(releaseStep);
+    expect(finalStep).toBe(raw.lastIndexOf("- name:"));
+    // No publish may occur after the Release (verification-only tail).
+    const tail = raw.slice(releaseStep);
+    const releaseCreateAt = tail.indexOf("gh release create");
+    const afterRelease = tail.slice(releaseCreateAt + "gh release create".length);
+    expect(afterRelease).not.toMatch(/npm publish/);
+    expect(afterRelease).not.toMatch(/vsce publish/);
     expect(raw).toContain("set -euo pipefail");
+  });
+
+  it("publishes the Marketplace VSIX via OIDC trusted publishing with no PAT fallback", () => {
+    expect(raw).toContain("publish --oidc");
+    expect(raw).toContain("--packagePath");
+    expect(raw).toContain('"' + "$" + '{VSIX_PATH}"');
+    // Duplicate-safe recovery where supported, without hiding mismatches.
+    expect(raw).toContain("--skipDuplicate");
+    // Forbidden credential mechanisms must never be used.
+    expect(raw).not.toContain("secrets.VSCE_PAT");
+    expect(raw).not.toContain("--azure-credential");
+    expect(raw).not.toMatch(/--pat(\s|=|$)/);
+    expect(raw).not.toMatch(/\bvsce login\b/i);
+    // Fail-closed guard that rejects a stray VSCE_PAT instead of using it.
+    expect(raw).toContain("VSCE_PAT must not be set for OIDC trusted publishing");
+    // OIDC audience boundary documented for the manual policy step.
+    expect(raw).toContain("marketplace.visualstudio.com");
+  });
+
+  it("verifies Marketplace live state with bounded read-only retries and no second publish", () => {
+    const mktPublish = raw.indexOf("Publish to VS Code Marketplace via OIDC");
+    const mktVerify = raw.indexOf("Verify Marketplace publication");
+    expect(mktPublish).toBeGreaterThan(-1);
+    expect(mktVerify).toBeGreaterThan(mktPublish);
+    expect(raw).toContain("vsce show Cynrath.ackit-vscode --json");
+    expect(raw).toMatch(/seq 1 30/);
+    // Verification loop is read-only: it must not publish again after visibility.
+    const verifyBlock =
+      raw.slice(mktVerify, raw.indexOf("Create GitHub Release and attach audited VSIX")) || "";
+    expect(verifyBlock).not.toMatch(/vsce publish/);
+    expect(verifyBlock).not.toMatch(/npm publish/);
+    expect(raw).toContain("no further publish attempted");
+  });
+
+  it("audits the exact VSIX before any publish and binds its SHA-256 to publish + Release", () => {
+    const preflight = raw.indexOf("- name: VSIX preflight");
+    const npmPublish = raw.indexOf(
+      'run: npm publish "' + "$" + "{TARBALL_PATH}" + '" --access public',
+    );
+    expect(preflight).toBeGreaterThan(-1);
+    expect(preflight).toBeLessThan(npmPublish);
+    expect(raw).toContain("VSIX_SHA256");
+    expect(raw).toContain('sha256sum "' + "$" + '{VSIX_PATH}"');
+    expect(raw).toContain("extension/package.json");
+    expect(raw).toContain("extension/readme.md");
+    expect(raw).toContain("extension/changelog.md");
+    expect(raw).toContain("publisher");
+    expect(raw).toContain("Cynrath");
+    expect(raw).toContain("node_modules");
+    expect(raw).toContain("2097152");
+    expect(raw).toContain("check-offline-egress.mjs");
+    // Release attaches the exact audited artifact and proves SHA equality.
+    expect(raw).toContain('"' + "$" + '{VSIX_PATH}"');
+    expect(raw).toContain("gh release download");
+    expect(raw).toContain("Release asset SHA");
   });
 
   it("prevents duplicate simultaneous releases via a concurrency group", () => {

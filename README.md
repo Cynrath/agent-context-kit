@@ -367,6 +367,8 @@ ESM-only, `sideEffects:false`, `AbortSignal` cancellable, no `process.exit`. Ref
 
 Extension is **published on the VS Code Marketplace** — [`Cynrath.ackit-vscode`](https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode) (`0.5.2`, `<2MB` VSIX, offline-first, no telemetry).
 
+Releases are **one automated tag-triggered chain**: tag `vX.Y.Z` → `release.yml` builds + audits the exact VSIX → npm OIDC publish + verification → Marketplace OIDC publish (`vsce publish --oidc --packagePath`, no PAT) + bounded live verification → GitHub Release with the exact audited VSIX attached (SHA-256 bound) → final verification. See ADR-0033.
+
 From source:
 
 ```bash
@@ -422,7 +424,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the docs-first workflow.
 
 ### 🔖 Versioning
 
-Development: **`0.5.2`** on `master` · Latest stable: **`0.5.2`** · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases/latest) · `latest → 0.5.2` via OIDC Trusted Publishing with provenance. Stable pointer: [`release-state.json`](release-state.json). Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
+Development: **`0.5.2`** on `master` · Latest stable: **`0.5.2`** · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases/latest) · `latest → 0.5.2` via OIDC Trusted Publishing with provenance. One tag-triggered release publishes **npm + GitHub Release + VSIX + VS Code Marketplace** (`release.yml` npm OIDC + `@vscode/vsce` OIDC, no PAT; ADR-0033). Stable pointer: [`release-state.json`](release-state.json). Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
 
 ---
 

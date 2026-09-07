@@ -1,26 +1,57 @@
 name: Release
 
-# Controlled npm release automation — the user-authorized tag boundary.
+# Controlled automated release — the user-authorized tag boundary.
 #
 # A normal master push NEVER publishes; only CI (.github/workflows/ci.yml)
 # runs. The deliberate human/maintainer action is creating and pushing an
 # annotated vX.Y.Z tag AFTER explicit user authorization recorded in the
-# active task. This workflow then:
+# active task. This workflow then publishes ALL release surfaces in one
+# deterministic chain:
 #   1. checks out the exact tagged commit,
-#   2. validates tag <-> package.json <-> package-name identity,
-#   3. confirms the exact version is absent from the npm registry,
-#   4. runs the full quality gate (install/lint/format/typecheck/build/tests/
+#   2. validates tag <-> package.json <-> extensions/vscode/package.json
+#      <-> package-name identity (+ npm CLI capability),
+#   3. runs the full quality gate (install/lint/format/typecheck/build/tests/
 #      schema-drift/real-tarball consumer smoke),
-#   5. publishes to npm via OIDC Trusted Publishing (short-lived credentials;
+#   4. builds the exact VSIX from the tagged source and records its SHA-256,
+#   5. runs the deterministic VSIX preflight (root == extension == tag;
+#      VSIX manifest == release; packaged README == release; packaged
+#      CHANGELOG latest == release; publisher == Cynrath; no node_modules;
+#      size limit; no secrets; offline-egress gate) BEFORE any publish,
+#   6. confirms the exact version is absent from the npm registry,
+#   7. publishes to npm via OIDC Trusted Publishing (short-lived credentials;
 #      NO long-lived npm token lives in GitHub Secrets),
-#   6. verifies registry metadata/shasum/dist-tag with bounded retries plus a
+#   8. verifies registry metadata/shasum/dist-tag with bounded retries plus a
 #      fresh isolated consumer (mktemp + unique npm_config_cache, no global mutation)
 #      and a secondary npx smoke,
-#   7. and ONLY THEN creates the immutable GitHub Release.
+#   9. publishes the exact audited VSIX to the VS Code Marketplace via
+#      @vscode/vsce OIDC Trusted Publishing (short-lived Marketplace
+#      credential for audience marketplace.visualstudio.com; NO VSCE_PAT,
+#      NO stored vsce credentials, NO GitHub PAT secret, NO Azure
+#      long-lived PAT; `npx --yes @vscode/vsce publish --oidc
+#      --packagePath <exact-vsix>`; duplicate-safe `--skipDuplicate`
+#      for recovery, never hiding a mismatched existing version/artifact;
+#      fails closed with no PAT fallback),
+#  10. verifies Marketplace live state with bounded read-only retries
+#      (`vsce show Cynrath.ackit-vscode --json`; latest == RELEASE_VERSION;
+#      publisher/extension identity checked where mechanically verifiable;
+#      NO second publish attempt after successful visibility),
+#  11. and ONLY THEN creates the immutable GitHub Release with the exact
+#      audited VSIX attached, verifies the attached asset SHA-256 equals
+#      the audited/published SHA-256, and runs final public-surface
+#      verification (npm latest + Marketplace latest + Release + VSIX).
 #
-# If publish succeeds but the GitHub Release step fails, do not republish npm:
-# the version-absence gate makes a rerun fail safely at step 3; repair only the
-# GitHub Release state manually.
+# If npm publish succeeds but a later step fails, do not republish npm:
+# the version-absence gate makes a rerun fail safely; repair only the
+# failed downstream state manually (never move/delete the tag).
+# If Marketplace publish succeeds but verification times out on
+# propagation, do NOT publish again during the delay; the bounded
+# verification fails closed and the duplicate-safe publish covers a
+# genuine recovery retry (verification must still pass).
+#
+# One-time manual prerequisite (cannot be automated here): the
+# Marketplace publisher `Cynrath` must have a Trusted Publishing policy
+# for repository `Cynrath/agent-context-kit` + workflow `release.yml`
+# (see ADR-0033). Without it the Marketplace OIDC step fails closed.
 
 on:
   push:
@@ -37,7 +68,7 @@ concurrency:
 
 jobs:
   release:
-    name: validated publish + registry verify + GitHub Release
+    name: validated publish (npm + Marketplace) + verify + GitHub Release + VSIX
     runs-on: ubuntu-latest
     steps:
       # actions/checkout@v4 (f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a)
@@ -78,11 +109,21 @@ jobs:
             echo "::error::unexpected package name '${PKG_NAME}'"
             exit 4
           fi
+          EXT_VERSION="$(node -p "require('./extensions/vscode/package.json').version")"
+          if [ "${EXT_VERSION}" != "${TAG_NAME#v}" ]; then
+            echo "::error::extensions/vscode/package.json version '${EXT_VERSION}' does not match tag '${TAG_NAME}' (ADR-0023 coupling)"
+            exit 5
+          fi
+          EXT_PUBLISHER="$(node -p "require('./extensions/vscode/package.json').publisher")"
+          if [ "${EXT_PUBLISHER}" != "Cynrath" ]; then
+            echo "::error::extension publisher '${EXT_PUBLISHER}' != 'Cynrath'"
+            exit 6
+          fi
           NPM_VERSION="$(npm --version)"
           SMALLEST="$(printf '%s\n' '11.5.1' "${NPM_VERSION}" | sort -V | head -n1)"
           if [ "${SMALLEST}" != '11.5.1' ]; then
             echo "::error::npm ${NPM_VERSION} lacks Trusted Publishing support (requires >= 11.5.1)"
-            exit 5
+            exit 7
           fi
           {
             echo "RELEASE_TAG=${TAG_NAME}"
@@ -106,6 +147,122 @@ jobs:
 
       - name: Tests
         run: pnpm test
+
+      - name: Build exact VSIX from tagged source
+        run: |
+          set -euo pipefail
+          if [ "${EXT_VERSION:-}" != "" ]; then
+            echo "extension version already validated: ${EXT_VERSION}"
+          fi
+          ROOT_VER="$(node -p "require('./package.json').version")"
+          EXT_VER="$(node -p "require('./extensions/vscode/package.json').version")"
+          if [ "${ROOT_VER}" != "${RELEASE_VERSION}" ]; then
+            echo "::error::root version '${ROOT_VER}' != release version '${RELEASE_VERSION}'"
+            exit 50
+          fi
+          if [ "${EXT_VER}" != "${RELEASE_VERSION}" ]; then
+            echo "::error::extension version '${EXT_VER}' != release version '${RELEASE_VERSION}' (ADR-0023 coupling)"
+            exit 51
+          fi
+          EXT_PUB="$(node -p "require('./extensions/vscode/package.json').publisher")"
+          if [ "${EXT_PUB}" != "Cynrath" ]; then
+            echo "::error::extension publisher '${EXT_PUB}' != 'Cynrath'"
+            exit 52
+          fi
+          pnpm --filter ackit-vscode exec esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=dist/extension.js --external:vscode --sourcemap
+          test -f extensions/vscode/dist/extension.js
+          cd extensions/vscode
+          npx --yes @vscode/vsce package --no-dependencies --no-yarn --out "ackit-vscode-${RELEASE_VERSION}.vsix"
+          test -f "ackit-vscode-${RELEASE_VERSION}.vsix"
+          VSIX_ABS="$(pwd)/ackit-vscode-${RELEASE_VERSION}.vsix"
+          VSIX_SHA256="$(sha256sum "${VSIX_ABS}" | cut -d' ' -f1)"
+          {
+            echo "VSIX_PATH=${VSIX_ABS}"
+            echo "VSIX_FILENAME=ackit-vscode-${RELEASE_VERSION}.vsix"
+            echo "VSIX_SHA256=${VSIX_SHA256}"
+          } >> "${GITHUB_ENV}"
+          ls -lh "${VSIX_ABS}"
+          echo "exact VSIX built: ackit-vscode-${RELEASE_VERSION}.vsix SHA-256 ${VSIX_SHA256}"
+
+      - name: VSIX preflight — parity, security, offline audit (fail-closed, before any publish)
+        run: |
+          set -euo pipefail
+          echo "VSIX_PATH=${VSIX_PATH}"
+          echo "RELEASE_VERSION=${RELEASE_VERSION} RELEASE_TAG=${RELEASE_TAG}"
+          test -f "${VSIX_PATH}"
+          ROOT_VER="$(node -p "require('./package.json').version")"
+          EXT_VER="$(node -p "require('./extensions/vscode/package.json').version")"
+          if [ "${ROOT_VER}" != "${RELEASE_VERSION}" ]; then
+            echo "::error::root version '${ROOT_VER}' != release version '${RELEASE_VERSION}'"
+            exit 53
+          fi
+          if [ "${EXT_VER}" != "${RELEASE_VERSION}" ]; then
+            echo "::error::extension version '${EXT_VER}' != release version '${RELEASE_VERSION}'"
+            exit 54
+          fi
+          if [ "v${RELEASE_VERSION}" != "${RELEASE_TAG}" ]; then
+            echo "::error::tag '${RELEASE_TAG}' != 'v${RELEASE_VERSION}'"
+            exit 55
+          fi
+          MAN_VER="$(unzip -p "${VSIX_PATH}" extension/package.json | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).version")"
+          if [ "${MAN_VER}" != "${RELEASE_VERSION}" ]; then
+            echo "::error::VSIX manifest version '${MAN_VER}' != release version '${RELEASE_VERSION}'"
+            exit 56
+          fi
+          MAN_PUB="$(unzip -p "${VSIX_PATH}" extension/package.json | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).publisher")"
+          if [ "${MAN_PUB}" != "Cynrath" ]; then
+            echo "::error::VSIX publisher '${MAN_PUB}' != 'Cynrath'"
+            exit 57
+          fi
+          unzip -p "${VSIX_PATH}" extension/readme.md > /tmp/vsix-readme.md
+          if ! grep -q "\*\*Version:\*\* \`${RELEASE_VERSION}\`" /tmp/vsix-readme.md; then
+            echo "::error::packaged README Version != ${RELEASE_VERSION}"
+            exit 58
+          fi
+          if ! grep -q "ackit.status.v1" /tmp/vsix-readme.md; then
+            echo "::error::packaged README missing ackit.status.v1 marker"
+            exit 59
+          fi
+          unzip -p "${VSIX_PATH}" extension/changelog.md > /tmp/vsix-changelog.md
+          CHANGELOG_LATEST="$(grep -m1 -o '^## \[[^]]*\]' /tmp/vsix-changelog.md || true)"
+          echo "packaged CHANGELOG latest: ${CHANGELOG_LATEST}"
+          if ! echo "${CHANGELOG_LATEST}" | grep -q "## \[${RELEASE_VERSION}\]"; then
+            echo "::error::packaged CHANGELOG latest '${CHANGELOG_LATEST}' != '## [${RELEASE_VERSION}]'"
+            exit 60
+          fi
+          if unzip -l "${VSIX_PATH}" | grep -q "node_modules"; then
+            echo "::error::VSIX contains node_modules"
+            exit 61
+          fi
+          cd extensions/vscode
+          npx --yes @vscode/vsce ls --no-dependencies --no-yarn > /tmp/vsce-ls.txt
+          cat /tmp/vsce-ls.txt
+          if grep -q "node_modules" /tmp/vsce-ls.txt; then
+            echo "::error::vsce ls lists node_modules"
+            exit 62
+          fi
+          cd ../..
+          VSIX_SIZE="$(stat -c%s "${VSIX_PATH}")"
+          echo "VSIX size ${VSIX_SIZE} bytes"
+          if [ "${VSIX_SIZE}" -gt 2097152 ]; then
+            echo "::error::VSIX size ${VSIX_SIZE} exceeds 2MB limit"
+            exit 63
+          fi
+          if unzip -p "${VSIX_PATH}" extension/package.json | grep -q "AKIA"; then
+            echo "::error::secret pattern in VSIX manifest"
+            exit 64
+          fi
+          node scripts/check-offline-egress.mjs
+          if grep -R "fetch.*http" extensions/vscode/src; then
+            echo "::error::extension source contains remote fetch"
+            exit 65
+          fi
+          CURRENT_SHA="$(sha256sum "${VSIX_PATH}" | cut -d' ' -f1)"
+          if [ "${CURRENT_SHA}" != "${VSIX_SHA256}" ]; then
+            echo "::error::VSIX SHA changed during preflight ${VSIX_SHA256} != ${CURRENT_SHA}"
+            exit 66
+          fi
+          echo "VSIX preflight PASS ackit-vscode-${RELEASE_VERSION}.vsix SHA-256 ${VSIX_SHA256}"
 
       - name: Pack tarball and record shasum
         run: |
@@ -138,6 +295,24 @@ jobs:
           done
           echo "::error::could not confirm version absence on npm"
           exit 11
+
+      - name: Probe Marketplace pre-publish state (informational, never gates publish)
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            if npx --yes @vscode/vsce show Cynrath.ackit-vscode --json > /tmp/mkt-pre.json 2> /tmp/mkt-pre.err; then
+              PRE_VER="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/mkt-pre.json','utf8')).versions?.[0]?.version ?? 'unknown'")"
+              echo "Marketplace pre-publish latest: ${PRE_VER} (release target ${RELEASE_VERSION})"
+              if [ "${PRE_VER}" = "${RELEASE_VERSION}" ]; then
+                echo "::notice::Marketplace already reports ${RELEASE_VERSION} pre-publish; publish step is duplicate-safe recovery, verification must still pass"
+              fi
+              exit 0
+            fi
+            echo "pre-publish probe attempt ${attempt}/3 failed; retrying after 5s"
+            cat /tmp/mkt-pre.err || true
+            sleep 5
+          done
+          echo "::warning::Marketplace pre-publish probe unavailable; proceeding to OIDC publish (verification remains fail-closed)"
 
       - name: Publish to npm via OIDC Trusted Publishing
         run: npm publish "${TARBALL_PATH}" --access public --provenance
@@ -214,7 +389,75 @@ jobs:
           echo "::warning::npx smoke failed but fresh isolated consumer already passed; continuing"
           # do not fail the release — fresh consumer is the hard gate; npx cache may be stale
 
-      - name: Create GitHub Release (strictly after successful publish + verification)
+      - name: Publish to VS Code Marketplace via OIDC Trusted Publishing
+        run: |
+          set -euo pipefail
+          # Fail closed on forbidden credential mechanisms (never use PAT/secrets/stored credentials).
+          if [ -n "${VSCE_PAT:-}" ]; then
+            echo "::error::VSCE_PAT must not be set for OIDC trusted publishing"
+            exit 60
+          fi
+          test -f "${VSIX_PATH}"
+          CURRENT_SHA="$(sha256sum "${VSIX_PATH}" | cut -d' ' -f1)"
+          if [ "${CURRENT_SHA}" != "${VSIX_SHA256}" ]; then
+            echo "::error::VSIX SHA changed since audit ${VSIX_SHA256} != ${CURRENT_SHA}; refusing to publish"
+            exit 61
+          fi
+          # Single OIDC publish from the exact audited VSIX. Duplicate-safe for
+          # recovery (--skipDuplicate): a rerun after a successful publish skips
+          # instead of failing, but verification below must still pass and any
+          # mismatched existing version/artifact fails closed there.
+          set +e
+          PUBLISH_OUT="$(mktemp)"
+          npx --yes @vscode/vsce publish --oidc --packagePath "${VSIX_PATH}" --skipDuplicate 2>&1 | tee "${PUBLISH_OUT}"
+          PUBLISH_CODE="${PIPESTATUS[0]}"
+          set -e
+          if [ "${PUBLISH_CODE}" -ne 0 ]; then
+            echo "::error::Marketplace OIDC publish failed (exit ${PUBLISH_CODE}); failing closed with no PAT fallback"
+            exit 62
+          fi
+          if grep -qi "already published\|Skipping publish\|already exists" "${PUBLISH_OUT}"; then
+            echo "::notice::Marketplace publish reported duplicate/skip; proceeding to bounded live verification (mismatch still fails closed)"
+          else
+            echo "Marketplace OIDC publish accepted for Cynrath.ackit-vscode ${RELEASE_VERSION}"
+          fi
+
+      - name: Verify Marketplace publication (bounded live verification, read-only)
+        run: |
+          set -euo pipefail
+          seen=0
+          for attempt in $(seq 1 30); do
+            if npx --yes @vscode/vsce show Cynrath.ackit-vscode --json > /tmp/mkt-show.json 2> /tmp/mkt-show.err; then
+              MKT_VER="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/mkt-show.json','utf8')).versions?.[0]?.version ?? ''")"
+              if [ "${MKT_VER}" = "${RELEASE_VERSION}" ]; then
+                seen=1
+                echo "Marketplace reports ${MKT_VER} (attempt ${attempt}/30)"
+                break
+              fi
+              echo "attempt ${attempt}/30: Marketplace latest '${MKT_VER}' != '${RELEASE_VERSION}'; waiting 20s"
+            else
+              echo "attempt ${attempt}/30: vsce show failed; waiting 20s"
+              cat /tmp/mkt-show.err || true
+            fi
+            sleep 20
+          done
+          if [ "${seen}" -ne 1 ]; then
+            echo "::error::Marketplace version ${RELEASE_VERSION} never became visible for Cynrath.ackit-vscode"
+            exit 70
+          fi
+          node -e "
+            const m = JSON.parse(require('fs').readFileSync('/tmp/mkt-show.json','utf8'));
+            const pub = m.publisher?.publisherName ?? m.publisherName ?? '';
+            const ext = m.extensionName ?? '';
+            const ver = m.versions?.[0]?.version ?? '';
+            if (pub && pub !== 'Cynrath') { console.error('::error::Marketplace publisher mismatch: ' + pub); process.exit(71); }
+            if (ext && ext !== 'ackit-vscode') { console.error('::error::Marketplace extension mismatch: ' + ext); process.exit(72); }
+            if (ver !== process.env.RELEASE_VERSION) { console.error('::error::Marketplace version mismatch: ' + ver); process.exit(73); }
+            console.log('Marketplace identity verified - Cynrath.ackit-vscode ' + ver);
+          "
+          echo "Marketplace live verification PASS — no further publish attempted"
+
+      - name: Create GitHub Release and attach audited VSIX (strictly after npm + Marketplace verification)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -226,6 +469,12 @@ jobs:
           if [ ! -s "${RELEASE_NOTES_TMP}.section" ]; then
             echo "::error::CHANGELOG section for ${RELEASE_VERSION} is missing or empty"
             exit 40
+          fi
+          test -f "${VSIX_PATH}"
+          CURRENT_SHA="$(sha256sum "${VSIX_PATH}" | cut -d' ' -f1)"
+          if [ "${CURRENT_SHA}" != "${VSIX_SHA256}" ]; then
+            echo "::error::VSIX SHA changed before Release ${VSIX_SHA256} != ${CURRENT_SHA}"
+            exit 41
           fi
           # Prepend header/install block
           {
@@ -240,15 +489,64 @@ jobs:
             echo "npx --yes @cynrath/agent-context-kit@${RELEASE_VERSION} --version"
             echo '```'
             echo ""
+            echo "## VS Code extension"
+            echo ""
+            echo '```bash'
+            echo "code --install-extension ackit-vscode-${RELEASE_VERSION}.vsix"
+            echo '```'
+            echo ""
+            echo "Marketplace: Cynrath.ackit-vscode@${RELEASE_VERSION}"
+            echo "VSIX: ackit-vscode-${RELEASE_VERSION}.vsix (SHA-256 ${VSIX_SHA256})"
+            echo ""
             cat "${RELEASE_NOTES_TMP}.section"
             echo ""
             echo "## Distribution"
             echo "- npm: @cynrath/agent-context-kit@${RELEASE_VERSION}"
+            echo "- VS Code Marketplace: Cynrath.ackit-vscode@${RELEASE_VERSION}"
+            echo "- VSIX: ackit-vscode-${RELEASE_VERSION}.vsix (SHA-256 ${VSIX_SHA256})"
             echo "- Node >= 22"
             echo "- npm/npx distribution via OIDC Trusted Publishing + provenance"
+            echo "- VSIX/Marketplace distribution via @vscode/vsce OIDC Trusted Publishing (no PAT)"
             echo "- legacy .NET/NuGet line unchanged"
           } > "${RELEASE_NOTES_TMP}"
           gh release create "${RELEASE_TAG}" \
             --verify-tag \
             --title "AgentContextKit ${RELEASE_TAG}" \
-            --notes-file "${RELEASE_NOTES_TMP}"
+            --notes-file "${RELEASE_NOTES_TMP}" \
+            "${VSIX_PATH}"
+          ASSET_TMP="$(mktemp -d)"
+          trap 'rm -rf "${ASSET_TMP}"' EXIT
+          gh release download "${RELEASE_TAG}" --pattern "${VSIX_FILENAME}" --dir "${ASSET_TMP}"
+          DOWN_SHA="$(sha256sum "${ASSET_TMP}/${VSIX_FILENAME}" | cut -d' ' -f1)"
+          if [ "${DOWN_SHA}" != "${VSIX_SHA256}" ]; then
+            echo "::error::Release asset SHA ${DOWN_SHA} != audited VSIX SHA ${VSIX_SHA256}"
+            exit 80
+          fi
+          echo "GitHub Release asset PASS ${VSIX_FILENAME} SHA-256 ${DOWN_SHA}"
+
+      - name: Final public-surface verification (npm + Marketplace + Release + VSIX)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          NPM_LATEST="$(npm view @cynrath/agent-context-kit dist-tags.latest)"
+          if [ "${NPM_LATEST}" != "${RELEASE_VERSION}" ]; then
+            echo "::error::npm latest='${NPM_LATEST}' != '${RELEASE_VERSION}'"
+            exit 90
+          fi
+          npx --yes @vscode/vsce show Cynrath.ackit-vscode --json > /tmp/mkt-final.json
+          MKT_FINAL="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/mkt-final.json','utf8')).versions?.[0]?.version ?? ''")"
+          if [ "${MKT_FINAL}" != "${RELEASE_VERSION}" ]; then
+            echo "::error::Marketplace latest='${MKT_FINAL}' != '${RELEASE_VERSION}'"
+            exit 91
+          fi
+          VIEW_TAG="$(gh release view "${RELEASE_TAG}" --json tagName --jq '.tagName')"
+          if [ "${VIEW_TAG}" != "${RELEASE_TAG}" ]; then
+            echo "::error::GitHub Release tag '${VIEW_TAG}' != '${RELEASE_TAG}'"
+            exit 92
+          fi
+          if ! gh release view "${RELEASE_TAG}" --json assets --jq '.assets[].name' | grep -qx "${VSIX_FILENAME}"; then
+            echo "::error::GitHub Release missing VSIX asset ${VSIX_FILENAME}"
+            exit 93
+          fi
+          echo "final public-surface verification PASS npm=${NPM_LATEST} marketplace=${MKT_FINAL} release=${RELEASE_TAG} vsix=${VSIX_FILENAME} sha=${VSIX_SHA256}"
