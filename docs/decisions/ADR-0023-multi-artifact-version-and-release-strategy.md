@@ -1,6 +1,6 @@
 # ADR-0023: Multi-Artifact Version & Release Strategy
 
-Status: Accepted · Date: 2026-08-27
+Status: Accepted · Date: 2026-08-27 · Amended by ADR-0033 (2026-09-07) for Marketplace OIDC automation only; all other governance remains in force.
 
 ## Context
 

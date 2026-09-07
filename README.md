@@ -365,7 +365,8 @@ ESM-only, `sideEffects:false`, `AbortSignal` cancellable, no `process.exit`. Ref
 
 ### 🧩 VS Code
 
-Extension is **published on the VS Code Marketplace** — [`Cynrath.ackit-vscode`](https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode) (`0.5.2`, `<2MB` VSIX, offline-first, no telemetry).
+ACKit is available on the VS Code Marketplace as
+[`Cynrath.ackit-vscode`](https://marketplace.visualstudio.com/items?itemName=Cynrath.ackit-vscode).
 
 From source:
 

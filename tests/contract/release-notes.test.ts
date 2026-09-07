@@ -15,11 +15,18 @@ describe("release workflow uses --notes-file from CHANGELOG", () => {
     expect(raw).toContain("CHANGELOG.md");
     // Must fail if section absent/empty
     expect(raw).toContain("is missing or empty");
-    // GitHub Release must be after publish + verification + npx
+    // GitHub Release must be after npm publish + Marketplace publish/verification + npx
     const publishIdx = raw.indexOf("Publish to npm via OIDC");
+    const mktPublishIdx = raw.indexOf("Publish to VS Code Marketplace via OIDC");
+    const mktVerifyIdx = raw.indexOf("Verify Marketplace publication");
     const releaseIdx = raw.indexOf("Create GitHub Release");
     expect(publishIdx).toBeGreaterThan(-1);
-    expect(releaseIdx).toBeGreaterThan(publishIdx);
+    expect(mktPublishIdx).toBeGreaterThan(publishIdx);
+    expect(mktVerifyIdx).toBeGreaterThan(mktPublishIdx);
+    expect(releaseIdx).toBeGreaterThan(mktVerifyIdx);
+    // Release must attach the exact audited VSIX with SHA binding.
+    expect(raw).toContain('"' + "$" + '{VSIX_PATH}"');
+    expect(raw).toContain("VSIX_SHA256");
   });
 
   it("extract-changelog-section.mjs exists and is testable", () => {
