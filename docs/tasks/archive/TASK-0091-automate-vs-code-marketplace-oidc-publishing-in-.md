@@ -117,7 +117,10 @@ cannot be performed by the agent).
   `ci.yml` contract strings stay at the current coupled version).
 - Any tag creation/movement/deletion, npm publish, Marketplace
   publish, GitHub Release creation, hosted-docs sync, stable-pointer
-  flip. This task builds and proves the automation only.
+  flip. This task leaves the automation implemented and CI-verified
+  only. Live Marketplace OIDC publishing will be proven by the next
+  tag-triggered release after the one-time Trusted Publishing policy
+  is configured.
 - Browser Companion (`feat/browser-companion-v0.3` stays
   paused/untouched; no files under its scope).
 - Legacy .NET/NuGet line (frozen/immutable; no pipeline).
@@ -235,7 +238,10 @@ cannot be performed by the agent).
 ## Completion notes
 
 TASK-0091 automation COMPLETE (no release performed; PR #26 open for
-user-authorized merge).
+user-authorized merge). The automation is implemented and CI-verified.
+Live Marketplace OIDC publishing will be proven by the next
+tag-triggered release after the one-time Trusted Publishing policy is
+configured.
 
 - Plan-first: TASK-0091 created via `task create`, fully planned, then
   `task start`; plan commit `3b1ff69` (task + ADR-0033) precedes
@@ -256,8 +262,9 @@ user-authorized merge).
   `version-parity` 32/32 green locally and in CI; new assertions fail
   on the old npm-only workflow (verified by markers).
 - Docs: ADR-0033 Accepted (amends ADR-0023 for Marketplace OIDC only);
-  ADR-0023 status pointer (history preserved); README VS Code +
-  Versioning state the automated one-release contract.
+  ADR-0023 status pointer (history preserved); root README kept
+  user-facing and concise (Marketplace availability + From source only;
+  release plumbing lives in release.yml/ADR-0033/tests).
 - Local validation (branch head `9f339ac`):
   `pnpm lint` + `format:check` + `typecheck` green;
   `pnpm build` + `gen:schemas` idempotent;
