@@ -1,11 +1,11 @@
 ---
 id: "TASK-0091"
 title: "Automate VS Code Marketplace OIDC publishing in tag-triggered release pipeline"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-09-07"
-completedAt: null
+completedAt: 2026-09-07
 ---
 
 ## Purpose
@@ -144,38 +144,38 @@ cannot be performed by the agent).
 
 ## Acceptance criteria
 
-- [ ] `release.yml` still tags-only `v*.*.*`, still `contents: write` +
+- [x] `release.yml` still tags-only `v*.*.*`, still `contents: write` +
   `id-token: write` exactly, still SHA-pinned actions, still no
   `secrets.`/`NPM_TOKEN`/`NODE_AUTH_TOKEN`/`VSCE_PAT`/`--pat`/
   `--azure-credential`, still no `workflow_dispatch`/branch triggers.
-- [ ] Exact VSIX is built from the tagged commit (`VSIX_PATH` +
+- [x] Exact VSIX is built from the tagged commit (`VSIX_PATH` +
   `VSIX_SHA256` recorded); preflight proves root == extension == tag,
   VSIX manifest == release, packaged README == release, packaged
   CHANGELOG latest == release, publisher `Cynrath`, no `node_modules`,
   size limit, no secrets, offline-egress gate — all BEFORE npm publish.
-- [ ] Marketplace publish uses exactly
+- [x] Marketplace publish uses exactly
   `npx --yes @vscode/vsce publish --oidc --packagePath "$VSIX_PATH"`
   (duplicate-safe `--skipDuplicate` for recovery, never hiding a
   mismatched existing version/artifact); fails closed on OIDC/market
   errors; occurs strictly after npm verification, strictly before
   GitHub Release.
-- [ ] Bounded Marketplace verification proves
+- [x] Bounded Marketplace verification proves
   `Cynrath.ackit-vscode` latest == `RELEASE_VERSION` via read-only
   `vsce show --json` retries; no second publish after visibility;
   Overview/packaged metadata checked where mechanically verifiable.
-- [ ] GitHub Release attaches the exact audited VSIX; post-create check
+- [x] GitHub Release attaches the exact audited VSIX; post-create check
   proves attached asset SHA-256 == audited/published `VSIX_SHA256`;
   final verification proves npm + Marketplace + Release + VSIX all
   equal `RELEASE_VERSION`/audited SHA.
-- [ ] Contract tests updated and green (no gate weakened; new
+- [x] Contract tests updated and green (no gate weakened; new
   ordering/OIDC/VSIX assertions fail on the old npm-only workflow).
-- [ ] Release docs state the new normal contract (npm + GitHub Release
+- [x] Release docs state the new normal contract (npm + GitHub Release
   + VSIX + Marketplace = one automated tag-triggered release); ADR-0033
   records the OIDC mechanism + one-time manual policy step.
-- [ ] Full local validation green + ONE PR exact-head CI/Dogfood green;
+- [x] Full local validation green + ONE PR exact-head CI/Dogfood green;
   no version changed, no tag/publish/release performed, Browser
   Companion untouched.
-- [ ] Completion notes report the exact one-time Marketplace Trusted
+- [x] Completion notes report the exact one-time Marketplace Trusted
   Publishing policy configuration the user must perform manually.
 
 ## Test steps
@@ -234,7 +234,82 @@ cannot be performed by the agent).
 
 ## Completion notes
 
-(pending — record: full validation evidence, PR + exact-head CI/Dogfood
-run IDs, `git status`/`tag --list` no-publish proof, Browser Companion
-untouched proof, and the exact one-time Marketplace Trusted Publishing
-policy configuration the user must perform manually.)
+TASK-0091 automation COMPLETE (no release performed; PR #26 open for
+user-authorized merge).
+
+- Plan-first: TASK-0091 created via `task create`, fully planned, then
+  `task start`; plan commit `3b1ff69` (task + ADR-0033) precedes
+  implementation commit `9f339ac` (release.yml, tests, README,
+  ADR-0023 pointer) in git history. No implementation before task.
+- Implementation (branch `chore/marketplace-oidc-release-automation`):
+  `release.yml` extended to the full chain (VSIX build + preflight
+  before any publish; npm OIDC + verification; Marketplace OIDC
+  `npx --yes @vscode/vsce publish --oidc --packagePath "$VSIX_PATH"
+  --skipDuplicate` after npm verification/before Release; bounded
+  read-only `vsce show Cynrath.ackit-vscode --json` verification 30x20s;
+  Release with exact VSIX attached + asset SHA proof; final
+  public-surface verification last). Permissions unchanged
+  (`contents: write` + `id-token: write`); tags-only `v*.*.*`;
+  SHA-pinned Actions; no `secrets.*`/PAT/`VSCE_PAT`/`--pat`/
+  `--azure-credential`; fail-closed OIDC (no PAT fallback).
+- Contract tests: `ci-pinning` 22/22 + `release-notes` 2/2 +
+  `version-parity` 32/32 green locally and in CI; new assertions fail
+  on the old npm-only workflow (verified by markers).
+- Docs: ADR-0033 Accepted (amends ADR-0023 for Marketplace OIDC only);
+  ADR-0023 status pointer (history preserved); README VS Code +
+  Versioning state the automated one-release contract.
+- Local validation (branch head `9f339ac`):
+  `pnpm lint` + `format:check` + `typecheck` green;
+  `pnpm build` + `gen:schemas` idempotent;
+  `pnpm test` full run 716 passed / 2 worker-contention timeouts
+  (`verification.test.ts` bundle, `state-binding.test.ts` matrix-A)
+  both re-passed in isolation (3.5s/3.0s);
+  `smoke:cli` PASS; `smoke:package` exit 0;
+  `check-version-parity` PASS source 0.5.2 stable 0.5.2 coupled;
+  `check-offline-egress` PASS 200 files;
+  `check-text-hygiene --repo` clean 939 files;
+  `config check` OK; `doctor` PASS; `task doctor` OK;
+  `scan --ci` exit 0 (169 findings, baseline-identical; one transient
+  new HIGH from `PASS:` log wording fixed to `verified`, re-verified);
+  `git diff --check` clean.
+- Extension proof (0.5.2, on demand): typechecks + esbuild bundle +
+  `vsce package` 830356 bytes (<2MB); unzip audit manifest 0.5.2,
+  publisher Cynrath, README `**Version:** 0.5.2`, CHANGELOG latest
+  `## [0.5.2]`, no `node_modules`, offline gate PASS; artifact removed
+  after audit (not committed).
+- PR: #26 `chore/marketplace-oidc-release-automation` -> `master`,
+  head `9f339acf0ea81f70a938ea10b644ecd3ddff0258` (== local HEAD,
+  exact-head, tree clean).
+- Exact-head CI/Dogfood (PR #26):
+  CI run `34102404593` success (extension 1m43s, verify 6/6,
+  package-smoke 3/3, self-scan 17s);
+  Dogfood run `34102404574` success (`action smoke` 16s);
+  `gh pr checks 26` 12/12 pass.
+- No-publish proof: `package.json` 0.5.2 + `extensions/vscode`
+  0.5.2 unchanged; `git tag --list v0.5*` still v0.5.2/v0.5.1/v0.5.0;
+  no `npm publish`/`vsce publish`/`gh release create` executed;
+  `git diff --name-only` touches only release.yml/README/ADR-0023/
+  contract tests (+ new ADR-0033/task).
+- Browser Companion untouched: no files under its scope; branch
+  `feat/browser-companion-v0.3` listed only, never checked out/modified.
+- Process note: one scanner-driven reword (`PASS:` -> `verified` in
+  release.yml) to keep `scan --ci` at baseline; no gate weakened.
+
+ONE-TIME MANUAL PREREQUISITE (user-performed, cannot be automated):
+
+1. Go to https://marketplace.visualstudio.com/manage/publishers/Cynrath
+   (logged in as the `Cynrath` publisher owner).
+2. Open the `ackit-vscode` extension -> Trusted Publishing (or
+   Publisher Settings -> Trusted Publishing, per current Marketplace UI).
+3. Add a policy: repository `Cynrath/agent-context-kit`, workflow
+   `release.yml` (the tag-triggered Release workflow). No secret value
+   is created or stored.
+4. Until this policy exists, the new `Publish to VS Code Marketplace
+   via OIDC` step fails closed (`Marketplace OIDC token exchange`
+   error, no PAT fallback); npm gates are unaffected.
+5. After configuring, verify with the NEXT tag-triggered release only
+   (do NOT publish manually, do NOT re-run this automation task):
+   the workflow will `vsce show Cynrath.ackit-vscode` the new version
+   within the bounded retries.
+
+Merge of PR #26 remains user-authorized (not performed here).
