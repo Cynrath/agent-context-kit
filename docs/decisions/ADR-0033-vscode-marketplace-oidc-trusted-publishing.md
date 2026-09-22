@@ -1,6 +1,9 @@
 # ADR-0033: VS Code Marketplace OIDC Trusted Publishing in the Tag-Triggered Release
 
-Status: Accepted · Date: 2026-09-07 · Task: TASK-0091 (amends ADR-0023 §Decision-2/Alternatives/Consequences, which remains in force otherwise)
+Status: Amended 2026-09-22 (TASK-0094) — automated OIDC premise not met by
+any published `@vscode/vsce`; ADR-0023 manual Marketplace path restored as
+normal with a fail-closed pre-npm gate. History below preserved verbatim;
+see Amendment at end. Original: Accepted · Date: 2026-09-07 · Task: TASK-0091
 
 ## Context
 
@@ -156,3 +159,31 @@ guarantees while closing the manual-publish drift gap.
 - `package.json`, `extensions/vscode/package.json` (ADR-0023 coupling)
 - `tests/contract/ci-pinning.test.ts`, `tests/contract/release-notes.test.ts`
 - TASK-0091 (automation; no version/tag/publish performed)
+
+## Amendment 2026-09-22 (TASK-0094) — automated premise not met, manual path restored
+
+Premise verdict (primary evidence, re-verified 2026-09-22): no published
+`@vscode/vsce` ships `--oidc`. `latest` 4.0.0 and `next` 4.0.1-0
+`publish --help` list `--pat`/`--azure-credential`/`--skip-duplicate` and
+no `--oidc`; `vsce show Cynrath.ackit-vscode --json` still reports live
+0.5.2. The v0.5.3 tag-trigger run 35727290676 failed closed at the
+automated Marketplace step (`unknown option '--skipDuplicate'`; deeper:
+`--oidc` unpublished), after npm 0.5.3 had published — the partial
+release this amendment makes structurally impossible.
+
+Decision change (history above verbatim, only this section added):
+
+- ADR-0023 manual Marketplace path is restored as the normal path:
+  the maintainer publishes the exact audited VSIX manually OUTSIDE the
+  workflow with their own credential; no PAT/secret lives in the repo;
+  no `secrets.*` Marketplace credential is referenced; no `--oidc` in
+  automation.
+- `release.yml` carries a fail-closed MANUAL MARKETPLACE GATE BEFORE npm
+  publish (live == target via read-only `vsce show`, else fail with
+  re-run instructions; npm never publishes while Marketplace lags) plus
+  a read-only post-npm re-verification (no publish attempt anywhere).
+- If upstream later publishes OIDC support, a NEW task + NEW patch
+  release (never a moved tag) may re-evaluate automation with a pinned
+  vsce version and contract coverage; this release stays manual-gate.
+- `v0.5.3` stays immutable as the partial-release marker; the pending
+  flip/site work moves to the 0.5.4 candidate.

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("release workflow uses --notes-file from CHANGELOG", () => {
-  it("release.yml is tag-only, exact SemVer, OIDC, no long-lived token, and uses --notes-file", () => {
+  it("release.yml is tag-only, exact SemVer, OIDC npm, no long-lived token, and uses --notes-file", () => {
     const raw = readFileSync(".github/workflows/release.yml", "utf8");
     expect(raw).toContain("tags:");
     expect(raw).toContain('"v*.*.*"');
@@ -15,14 +15,14 @@ describe("release workflow uses --notes-file from CHANGELOG", () => {
     expect(raw).toContain("CHANGELOG.md");
     // Must fail if section absent/empty
     expect(raw).toContain("is missing or empty");
-    // GitHub Release must be after npm publish + Marketplace publish/verification + npx
+    // GitHub Release must be after manual Marketplace gate + npm publish + re-verification + npx
+    const mktGateIdx = raw.indexOf("Manual Marketplace publish gate");
     const publishIdx = raw.indexOf("Publish to npm via OIDC");
-    const mktPublishIdx = raw.indexOf("Publish to VS Code Marketplace via OIDC");
-    const mktVerifyIdx = raw.indexOf("Verify Marketplace publication");
+    const mktVerifyIdx = raw.indexOf("Verify Marketplace still live after npm");
     const releaseIdx = raw.indexOf("Create GitHub Release");
-    expect(publishIdx).toBeGreaterThan(-1);
-    expect(mktPublishIdx).toBeGreaterThan(publishIdx);
-    expect(mktVerifyIdx).toBeGreaterThan(mktPublishIdx);
+    expect(mktGateIdx).toBeGreaterThan(-1);
+    expect(publishIdx).toBeGreaterThan(mktGateIdx);
+    expect(mktVerifyIdx).toBeGreaterThan(publishIdx);
     expect(releaseIdx).toBeGreaterThan(mktVerifyIdx);
     // Release must attach the exact audited VSIX with SHA binding.
     expect(raw).toContain('"' + "$" + '{VSIX_PATH}"');

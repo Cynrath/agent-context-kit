@@ -1,5 +1,14 @@
 # Changelog — VS Code Extension
 
+## [0.5.4] - 2026-09-22
+
+- Recovery: no extension UI behavior change beyond 0.5.3; manifest
+  `version` `0.5.3 → 0.5.4` per ADR-0023 version coupling
+  (root == extension == tag == release == action). Marketplace publish
+  for this line is manual-gate (TASK-0094); packaged README `Version:`
+  and CHANGELOG latest both `0.5.4`.
+- Offline-first unchanged: no network, no telemetry, no remote fonts.
+
 ## [0.5.3] - 2026-09-22
 
 - Growth: README opens with a 30-second onboarding path (open folder →

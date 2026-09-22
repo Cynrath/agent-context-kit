@@ -224,6 +224,42 @@ deployments outside this release, secret exposure.
 
 ## Completion notes
 
-(Work log appended per checklist item with command outputs; final
-parity table + SHAs + CI run URLs + verification verdict recorded
-before `task complete`.)
+### Round 1 — discovery + implementation (2026-09-22, branch `chore/ackit-0.5.4-release-recovery`)
+
+- AC-001 baseline re-verified: npm `latest` 0.5.3; tag `v0.5.3`
+  immutable; GitHub Release `v0.5.3` live (not draft/prerelease);
+  Marketplace `Cynrath.ackit-vscode` live 0.5.2 (`vsce show` 4.0.0,
+  lastUpdated 2026-09-06); `master` source 0.5.3 / pointer 0.5.2;
+  site `main` 0.5.2; DRAFT PR #31 (ACKit flip, 12/12 CI green) + #13
+  (site sync) open; `NEXT_VERSION` = 0.5.4.
+- Upstream re-verified: `@vscode/vsce` `latest` 4.0.0 / `next`
+  4.0.1-0; `pnpm dlx @vscode/vsce@4.0.0 publish --help` lists
+  `--pat`/`--azure-credential`/`--skip-duplicate`, NO `--oidc`.
+  ADR-0033 automated premise still unmet → manual gate (AC-003/004).
+- PR #31 classified B (revise flip 0.5.2→0.5.4 after publish, keep
+  DRAFT until Marketplace 0.5.4 live); site PR #13 classified B
+  (regen for 0.5.4 on the same branch line, then ready+merge).
+- Workflow fix: `release.yml` automated `vsce publish --oidc`
+  removed; fail-closed MANUAL Marketplace gate BEFORE npm publish
+  (live == target via read-only `vsce show`, else fail with re-run
+  instructions; npm never publishes while Marketplace lags) +
+  read-only post-npm re-verification; header/ordering/release-notes
+  template updated; `v0.5.3` run-35727290676 history noted.
+- Contract tests: `ci-pinning` (manual-gate ordering, no automated
+  publish invocation, no `publish --oidc`, neither skip flag in
+  automation, `secrets.`/`--azure-credential`/`--pat`/`vsce login`
+  absent, VSCE_PAT guard present) + `release-notes` (gate < npm <
+  re-verify < Release): 24/24 PASS.
+- Bump 0.5.3→0.5.4: root + extension manifests, extension README
+  Version/build copy, `ci.yml` manifest contract + VSIX filename x3,
+  README Development line + VSIX filename, root + extension
+  CHANGELOG 0.5.4 sections (0.5.3 history verbatim). Stable pins +
+  `publishedStable` stay 0.5.2 (two-phase).
+- ADR-0033 amended (status line + 2026-09-22 amendment section;
+  history verbatim).
+- Gates: `check-version-parity` PASS (source 0.5.4 / stable 0.5.2);
+  `check-text-hygiene` clean (951 files); `lint` PASS;
+  `format:check` PASS; `typecheck` PASS; `build` PASS;
+  `gen:schemas` no drift; `git diff --check` clean.
+- Full `vitest` running (background job); smoke/doctor/scan pending
+  before PR readiness.

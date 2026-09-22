@@ -387,7 +387,7 @@ From source:
 
 ```bash
 pnpm --filter vscode build
-vsce package # → ackit-vscode-0.5.3.vsix
+vsce package # → ackit-vscode-0.5.4.vsix
 ```
 
 Features: readiness tree, Problems `ACKITxxx`, graph “instructions for current file”, tasks/policy/optimize, palette `Refresh/Show Graph/Optimize/Diagnostics`, file watcher debounced, no telemetry.
@@ -438,7 +438,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the docs-first workflow.
 
 ### 🔖 Versioning
 
-Development: **`0.5.3`** on `master` · Latest stable: **`0.5.2`** · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases/latest) · `latest → 0.5.2` via OIDC Trusted Publishing with provenance. Stable pointer: [`release-state.json`](release-state.json). Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
+Development: **`0.5.4`** on `master` · Latest stable: **`0.5.2`** · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases/latest) · `latest → 0.5.2` via OIDC Trusted Publishing with provenance. Stable pointer: [`release-state.json`](release-state.json). Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
 
 ---
 

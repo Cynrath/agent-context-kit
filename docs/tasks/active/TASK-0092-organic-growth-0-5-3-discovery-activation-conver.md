@@ -1,7 +1,7 @@
 ---
 id: "TASK-0092"
 title: "Organic growth 0.5.3: discovery activation conversion"
-status: active
+status: blocked
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-09-22"
@@ -166,3 +166,19 @@ Partial-release truth table (2026-09-22): npm 0.5.3 LIVE (latest) |
 tag v0.5.3 immutable | GitHub Release v0.5.3 LIVE (+VSIX C55D0E18) |
 Marketplace 0.5.2 PENDING (external) | pointer 0.5.2 (held) |
 site 0.5.2 (held).
+
+### Round 5 — status → blocked, remaining scope superseded by TASK-0094
+
+- 2026-09-22: 0.5.3 Marketplace leg still pending on a user credential
+  that never arrived; re-publishing 0.5.3 to Marketplace now only to
+  supersede it days later is waste. Decision (goal-authorized release
+  recovery): Marketplace goes 0.5.2 → 0.5.4 in ONE manual publish;
+  the held flip (PR #31) + site sync (site PR #13) retarget to 0.5.4.
+- This task is NOT complete (AC-012 0.5.3-Marketplace leg unmet) and is
+  NOT abandoned: it stays `blocked` as the immutable 0.5.3 history
+  record. All remaining work items transfer to TASK-0094 (active),
+  which carries the explicit user authorization for the 0.5.4 recovery
+  (implementation + merges + tag + publishes + flips + site + cleanup).
+- Single-active-task rule: TASK-0094 is the only `active` task;
+  TASK-0092/TASK-0093 are `blocked` (external: user Marketplace
+  credential for the manual gate).
