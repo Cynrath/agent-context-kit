@@ -28,7 +28,7 @@ name: Release
 #      credential for audience marketplace.visualstudio.com; NO VSCE_PAT,
 #      NO stored vsce credentials, NO GitHub PAT secret, NO Azure
 #      long-lived PAT; `npx --yes @vscode/vsce publish --oidc
-#      --packagePath <exact-vsix>`; duplicate-safe `--skipDuplicate`
+#      --packagePath <exact-vsix>`; duplicate-safe `--skip-duplicate`
 #      for recovery, never hiding a mismatched existing version/artifact;
 #      fails closed with no PAT fallback),
 #  10. verifies Marketplace live state with bounded read-only retries
@@ -404,12 +404,12 @@ jobs:
             exit 61
           fi
           # Single OIDC publish from the exact audited VSIX. Duplicate-safe for
-          # recovery (--skipDuplicate): a rerun after a successful publish skips
+          # recovery (--skip-duplicate): a rerun after a successful publish skips
           # instead of failing, but verification below must still pass and any
           # mismatched existing version/artifact fails closed there.
           set +e
           PUBLISH_OUT="$(mktemp)"
-          npx --yes @vscode/vsce publish --oidc --packagePath "${VSIX_PATH}" --skipDuplicate 2>&1 | tee "${PUBLISH_OUT}"
+          npx --yes @vscode/vsce publish --oidc --packagePath "${VSIX_PATH}" --skip-duplicate 2>&1 | tee "${PUBLISH_OUT}"
           PUBLISH_CODE="${PIPESTATUS[0]}"
           set -e
           if [ "${PUBLISH_CODE}" -ne 0 ]; then
