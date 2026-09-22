@@ -192,7 +192,11 @@ describe("release workflow hardening", () => {
     expect(raw).toContain("--packagePath");
     expect(raw).toContain('"' + "$" + '{VSIX_PATH}"');
     // Duplicate-safe recovery where supported, without hiding mismatches.
-    expect(raw).toContain("--skipDuplicate");
+    // NOTE: the real vsce flag is kebab-case `--skip-duplicate`
+    // (`vsce publish --help`); camelCase `--skipDuplicate` does not exist
+    // in any published vsce and failed the v0.5.3 release run.
+    expect(raw).toContain("--skip-duplicate");
+    expect(raw).not.toContain("--skipDuplicate");
     // Forbidden credential mechanisms must never be used.
     expect(raw).not.toContain("secrets.VSCE_PAT");
     expect(raw).not.toContain("--azure-credential");
