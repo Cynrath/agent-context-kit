@@ -1,6 +1,6 @@
 {
   "name": "@cynrath/agent-context-kit",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Agent context and repository readiness toolkit for Codex, Claude Code, Cursor, Copilot, Gemini and MCP-based coding agents. Validates agent instructions, scans repositories, optimizes context and enforces evidence-backed workflows. Offline-first and deterministic.",
   "keywords": [
     "ackit",

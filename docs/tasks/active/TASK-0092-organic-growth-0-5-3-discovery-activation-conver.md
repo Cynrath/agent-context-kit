@@ -1,7 +1,7 @@
 ---
 id: "TASK-0092"
 title: "Organic growth 0.5.3: discovery activation conversion"
-status: active
+status: blocked
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-09-22"
@@ -201,3 +201,29 @@ site 0.5.2 (held).
 - Marketplace re-checked: still 0.5.2 — merges stay held. Flip PR #31
   re-greening on evidence head (10 pass + 2 windows pending at check
   time); site PR #13 open draft, docs-integrity PASS.
+
+### Round 5 — status → blocked, remaining scope superseded by TASK-0094
+
+- 2026-09-22: 0.5.3 Marketplace leg still pending on a user credential
+  that never arrived; re-publishing 0.5.3 to Marketplace now only to
+  supersede it days later is waste. Decision (goal-authorized release
+  recovery): Marketplace goes 0.5.2 → 0.5.4 in ONE manual publish;
+  the held flip (PR #31) + site sync (site PR #13) retarget to 0.5.4.
+- This task is NOT complete (AC-012 0.5.3-Marketplace leg unmet) and is
+  NOT abandoned: it stays `blocked` as the immutable 0.5.3 history
+  record. All remaining work items transfer to TASK-0094 (active),
+  which carries the explicit user authorization for the 0.5.4 recovery
+  (implementation + merges + tag + publishes + flips + site + cleanup).
+- Single-active-task rule: TASK-0094 is the only `active` task;
+  TASK-0092/TASK-0093 are `blocked` (external: user Marketplace
+  credential for the manual gate).
+
+### Round 6 — flip branch retargeted 0.5.3 → 0.5.4 (TASK-0094, DRAFT held)
+
+- Branch `chore/flip-stable-0.5.3` merged `origin/master` (0.5.4
+  candidate, PR #32) and all stable pins moved 0.5.3 → 0.5.4
+  (`release-state.json.publishedStable`, README install/npx/Action
+  `uses:`/Versioning, getting-started, agent-integration). Rounds 3–5
+  above preserved verbatim as 0.5.3 history. Branch name kept for PR
+  continuity; PR #31 title retargeted to v0.5.4, still DRAFT until
+  `vsce show Cynrath.ackit-vscode --json` reports 0.5.4.

@@ -4,6 +4,31 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.5.4] - 2026-09-22
+
+Release-recovery patch (no runtime feature behavior beyond 0.5.3; no new
+commands, reporters, or services). Closes the partial 0.5.3 release:
+npm 0.5.3 shipped while Marketplace stayed 0.5.2 because the
+tag-trigger workflow assumed an unpublished `vsce publish --oidc`
+capability (`@vscode/vsce` 4.0.0 has no `--oidc`; verified via
+`publish --help`).
+
+### Fixed
+
+- Release workflow no longer attempts automated `vsce publish --oidc`.
+  A fail-closed manual Marketplace gate verifies
+  `Cynrath.ackit-vscode` live == release version BEFORE npm publish,
+  so npm can never run ahead of Marketplace again (TASK-0094,
+  ADR-0033 amendment; ADR-0023 manual path restored as normal).
+- Contract tests lock the manual-gate reality (`--oidc` absent,
+  `--skipDuplicate` rejected, ordering: marketplace-live gate before
+  npm publish, no automated `vsce publish`).
+- Version coupling preserved: root == extension == tag == release
+  (0.5.4). Stable pins + `publishedStable` stay 0.5.2 until all live
+  surfaces verify, then flip to 0.5.4 in the same release plan.
+- `v0.5.3` preserved untouched as the partial-release marker; 0.5.3
+  history below unchanged.
+
 ## [0.5.3] - 2026-09-22
 
 Organic discovery/activation patch (no runtime feature behavior beyond
