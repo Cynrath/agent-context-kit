@@ -26,6 +26,8 @@ node dist/cli/index.js --version  # 0.5.2
 
 ## 30-second tour (verified commands — stable v0.5.2)
 
+Fastest check (no install): `npx --yes @cynrath/agent-context-kit@latest readiness` — scores the current repository 0–100 with actionable findings.
+
 ```bash
 ackit init --dry-run          # plan instruction shims + builtin skills
 ackit sync --check            # CI gate: are ACKit-owned assets in sync?
