@@ -1,11 +1,11 @@
 ---
 id: "TASK-0094"
 title: "Release recovery 0.5.4 — two-repo sync, marketplace fix, full publish"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-09-22"
-completedAt: null
+completedAt: 2026-09-22
 ---
 
 <!-- Dependency note (completion eve): TASK-0092/TASK-0093 were initial
