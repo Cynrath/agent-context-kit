@@ -110,4 +110,24 @@ Explicit user authorization (goal round 1/256, 2026-09-22): new patch release, c
 
 ## Completion notes
 
-(pending — baseline + evidence appended during execution; completion only via `ackit task complete` after composed gate: evidence complete, verdict PASS, stage complete, no blocking drift.)
+### Baseline T0 (2026-09-22, primary sources)
+
+- npm `@cynrath/agent-context-kit`: `latest` 0.5.2, 10 versions (0.1.0..0.5.2, no 0.5.0 — never published), desc = old instruction-graph wording, 14 keywords.
+- GitHub: 14 stars, 1 fork, 0 watchers; desc + homepage (`cynrath.github.io/agent-context-kit/`) set; 20/20 topics (agents-md, cli, codex, coding-agents, developer-tools, repository-scanner, security, gemini, ai-agents, context-engineering, github-actions, mcp, model-context-protocol, offline-first, typescript, vscode-extension, agent-skills, claude-code, cursor, policy-as-code) — at limit, no churn.
+- Marketplace Action exists (`agentcontextkit`); `action.yml` name kept; release v0.5.2 (2026-09-06) present; VS Code `Cynrath.ackit-vscode` 0.5.2.
+- README friction: no try-CTA above fold, provider soup without names, demo starts with install-gated `init`; install pins 0.5.2; Action example v0.5.2.
+- Site: generator-owned (`sync-ackit-docs.mjs`), 31 pages, meta/canonical/OG/Twitter + JSON-LD softwareVersion present, sitemap/robots generated, root index hand-maintained (hero/card/install/JSON-LD at 0.5.2, live 14/1 stars).
+- First-run: `readiness` exit 0 with 89/100 explainable output; `doctor` pass; `readiness --format` does NOT exist (fails closed); `scan --format markdown/sarif`, `optimize --format markdown` proven.
+- Canonical stable verified 0.5.2 (package.json, release-state, tag v0.5.2, npm latest, extension 0.5.2) -> target 0.5.3.
+
+### Progress
+
+- [x] Plan committed (dcda7ce) before implementation (Rule 3).
+- [x] Implementation committed (88685e7): package.json desc/keywords, README viewport + shareable docs + version line, action.yml desc, ext README onboarding, getting-started CTA, coupled 0.5.3 bump + CHANGELOGs + CI contract.
+- [x] Gates: install/lint/format/typecheck/build PASS; smoke:cli + smoke:package (0.5.3 tgz) PASS; doctor/task-doctor/scan--ci PASS; text-hygiene + version-parity (source 0.5.3/stable 0.5.2) + offline-egress PASS; contracts 43/43 PASS.
+- [x] npx CTA proven live on empty dir (exit 0).
+- [x] Full vitest: parallel runs flaky under load (hook timeouts in git-init-heavy suites; same files pass solo, e.g. release-tag-context + checkpoint-atomic 6/6) — rerun stabilized (maxWorkers=2, hookTimeout=120s).
+- [x] Branch `chore/growth-0.5.3` pushed; PR #28 open (base master, head 88685e7), CI pending.
+- Marketplace NOT recreated (existing listing kept).
+
+(pending — release phase: merge, tag, publish, flip, site sync.)
