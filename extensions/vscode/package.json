@@ -2,7 +2,7 @@
   "name": "ackit-vscode",
   "displayName": "ACKit Toolkit",
   "description": "Offline-first repository readiness, task status, verification-aware workflow and developer tooling for AI-assisted development in VS Code.",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "publisher": "Cynrath",
   "engines": {
     "vscode": "^1.90.0"

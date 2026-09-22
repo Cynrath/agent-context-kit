@@ -1,5 +1,14 @@
 # Changelog — VS Code Extension
 
+## [0.5.3] - 2026-09-22
+
+- Growth: README opens with a 30-second onboarding path (open folder →
+  automatic readiness → findings) plus the install-free terminal equivalent
+  (`npx --yes @cynrath/agent-context-kit@latest readiness`); no telemetry
+  added, offline-first unchanged.
+- Sync: manifest `version` `0.5.2 → 0.5.3` per ADR-0023 version coupling
+  (root == extension == tag == release == action).
+
 ## [0.5.2] - 2026-09-06
 
 - Fix: Marketplace content parity — packaged `README.md` now says

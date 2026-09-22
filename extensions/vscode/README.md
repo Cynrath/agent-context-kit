@@ -3,11 +3,20 @@
 Offline-first agent readiness for your repository — directly inside VS Code.
 
 - **Publisher:** `Cynrath` (`Cynrath.ackit-vscode`)
-- **Version:** `0.5.2` (Marketplace stable; source checkouts build `0.5.2`)
+- **Version:** `0.5.3` (Marketplace stable; source checkouts build `0.5.3`)
 - **Engine:** `VS Code ^1.90.0`
 - **Activation:** `onStartupFinished` (debounced, lazy refresh)
 - **Category:** `Linters`
 - **Offline:** No network, no telemetry, no remote fonts — all analysis via shared ACKit SDK
+
+## Get findings in 30 seconds
+
+1. Open your repository folder in VS Code (`File → Open Folder…`).
+2. Open the **ACKit** view (Activity Bar) — readiness scores automatically (`Overall 88/100` style with 6 categories).
+3. Expand **Findings** (grouped by severity) or run `ACKit: Show Readiness` from the Command Palette.
+4. Click a finding to jump to the exact file/line; use `ACKit: Refresh` after changes.
+
+Prefer the terminal? `npx --yes @cynrath/agent-context-kit@latest readiness` scores the same repository without installing anything.
 
 ## Views (Activity Bar → ACKit)
 

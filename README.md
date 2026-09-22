@@ -18,7 +18,22 @@
 </p>
 
 <h3 align="center">Turn any repository into an <em>agent-ready</em> repository.</h3>
-<p align="center">Evidence-backed completion · Independent verification · Cross-agent handoff · Deterministic drift · Provider-independent contract · Offline-first<br>Instruction graph · Skills · Scanning · Context packs · Tasks · Policy · Readiness · MCP<br><strong>Offline-first · Deterministic · Task-first</strong> — <code>ackit</code> on Node&nbsp;≥&nbsp;22</p>
+<p align="center">Agent context and repository readiness for <strong>Codex · Claude Code · Cursor · GitHub Copilot · Gemini · MCP</strong><br>Validates agent instructions, scans repositories, optimizes context and enforces evidence-backed workflows.<br><strong>Offline-first · Deterministic · No telemetry</strong> — <code>ackit</code> on Node&nbsp;≥&nbsp;22</p>
+
+<p align="center"><strong>Try it in 30 seconds — no install:</strong></p>
+
+```powershell
+npx --yes @cynrath/agent-context-kit@latest readiness
+```
+
+<p align="center">One command scores your repository <strong>0–100</strong> with actionable findings.</p>
+
+- Detect conflicting agent instructions (`AGENTS.md` / `CLAUDE.md` / provider scopes)
+- Find unsafe repository context (secrets, connection strings, absolute paths)
+- Measure repository readiness across instructions, security and context efficiency
+- Reduce wasted agent context (duplicate guidance, oversized files, low-value includes)
+- Enforce evidence-backed task completion with independent verification
+- Generate provider-aware context packs (Codex / Claude / Copilot / Gemini / generic)
 
 <p align="center">
   <a href="#quickstart"><strong>Quickstart →</strong></a> ·
@@ -157,7 +172,7 @@ OpenCode, Copilot, Gemini, Cursor, Cline, any MCP-capable agent).
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🩺</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Diagnostics</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit diagnostics bundle</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit.diagnostics.v1</code> + deterministic <code>bundle-manifest.json</code> (<code>sha256</code> + redaction count), 5-secret <code>[REDACTED]</code> proof</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">⚡</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Benchmarks</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>benchmarks/run.mjs</code></td><td style="border:1px solid #d0d7de; padding:8px;">7 deterministic fixtures, 8 metrics (<code>coldScanMs</code>/<code>warmScanMs</code>/<code>incrementalMs</code>/<code>peakRssMb</code>/<code>filesPerSec</code>/<code>packMs</code>/<code>graphMs</code>/<code>cacheHitRatio</code>), median-of-3</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🔌</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>SDK v1</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>import { scanRepository } from "@cynrath/agent-context-kit"</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>sideEffects:false</code>, <code>type:module</code>, <code>exports {".","./mcp"}</code>, <code>AbortSignal</code> &lt;200ms, <code>AckitError</code></td></tr>
-<tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>VS Code</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>extensions/vscode</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>0.5.2</code>, <code>Cynrath</code>, <code>lints</code> Linters, <code>onStartupFinished</code>, readiness tree + Problems <code>ACKITxxx</code> + status-integrated Tasks view (canonical blockers/next actions, no mutation), <code>&lt;2MB</code> VSIX — <strong>Marketplace: <code>Cynrath.ackit-vscode</code></strong></td></tr>
+<tr><td style="border:1px solid #d0d7de; padding:8px;">🧩</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>VS Code</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>extensions/vscode</code></td><td style="border:1px solid #d0d7de; padding:8px;"><code>0.5.3</code>, <code>Cynrath</code>, <code>lints</code> Linters, <code>onStartupFinished</code>, readiness tree + Problems <code>ACKITxxx</code> + status-integrated Tasks view (canonical blockers/next actions, no mutation), <code>&lt;2MB</code> VSIX — <strong>Marketplace: <code>Cynrath.ackit-vscode</code></strong></td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🤖</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>MCP</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>ackit mcp serve</code></td><td style="border:1px solid #d0d7de; padding:8px;">Official SDK stdio, 16 read-only tools (incl. canonical <code>ackit_status</code>, workflow status, intent, checkpoint, verification bundle, drift, roles), 5 resources, 4 prompts, <code>InMemoryTransport</code> cancellation</td></tr>
 <tr><td style="border:1px solid #d0d7de; padding:8px;">🔐</td><td style="border:1px solid #d0d7de; padding:8px;"><strong>Trust-Flow Demo</strong></td><td style="border:1px solid #d0d7de; padding:8px;"><code>docs/guides/demo-trust-flow.md</code></td><td style="border:1px solid #d0d7de; padding:8px;">reproducible offline proof: missing proof blocks → bound independent verdict enables → mutation stales → fresh re-verification restores → handoff exports → second process resumes (<code>tests/e2e/trust-flow-demo.test.ts</code>)</td></tr>
 </tbody>
@@ -326,7 +341,7 @@ jobs:
       # optional: upload findings via actions/upload-artifact@v4
 ```
 
-Inputs `command/args/fail-threshold/upload-sarif`, outputs `findings-json/sarif-path`, annotations/SARIF 2.1.0/job summary, least-privilege. Guide: [`docs/guides/ci.md`](docs/guides/ci.md) · Action: [`action.yml`](action.yml)
+Inputs `command/args/fail-threshold/upload-sarif`, outputs `findings-json/sarif-path`, annotations/SARIF 2.1.0/job summary, least-privilege. Shareable local output: `ackit scan --format markdown` (copyable summary) or `--format sarif` for code scanning. Guide: [`docs/guides/ci.md`](docs/guides/ci.md) · Action: [`action.yml`](action.yml)
 
 ---
 
@@ -372,7 +387,7 @@ From source:
 
 ```bash
 pnpm --filter vscode build
-vsce package # → ackit-vscode-0.5.2.vsix
+vsce package # → ackit-vscode-0.5.3.vsix
 ```
 
 Features: readiness tree, Problems `ACKITxxx`, graph “instructions for current file”, tasks/policy/optimize, palette `Refresh/Show Graph/Optimize/Diagnostics`, file watcher debounced, no telemetry.
@@ -423,7 +438,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the docs-first workflow.
 
 ### 🔖 Versioning
 
-Development: **`0.5.2`** on `master` · Latest stable: **`0.5.2`** · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases/latest) · `latest → 0.5.2` via OIDC Trusted Publishing with provenance. Stable pointer: [`release-state.json`](release-state.json). Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
+Development: **`0.5.3`** on `master` · Latest stable: **`0.5.2`** · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases/latest) · `latest → 0.5.2` via OIDC Trusted Publishing with provenance. Stable pointer: [`release-state.json`](release-state.json). Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
 
 ---
 

@@ -1,5 +1,5 @@
 name: "AgentContextKit"
-description: "Offline-first agent readiness toolkit (scan/pack/graph/policy)"
+description: "Agent readiness and repository context checks for coding agents (scan, readiness, instruction graph, policy, SARIF). Offline-first and deterministic."
 author: "Cynrath"
 branding:
   icon: "shield"

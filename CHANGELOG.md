@@ -4,6 +4,36 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [0.5.3] - 2026-09-22
+
+Organic discovery/activation patch (no runtime feature behavior beyond
+0.5.2; no new commands, reporters, or services).
+
+### Changed
+
+- npm metadata: description now names the multi-provider scope (Codex,
+  Claude Code, Cursor, Copilot, Gemini, MCP-based coding agents) with
+  instruction validation, repository scanning, context optimization and
+  evidence-backed workflows; keywords add `agents-md`,
+  `agent-instructions`, `claude-code`, `codex`, `cursor`,
+  `github-copilot`, `gemini`, `context-engineering`,
+  `repository-readiness`, `developer-tools` (existing keywords kept).
+- README first viewport: single install-free try CTA
+  (`npx --yes @cynrath/agent-context-kit@latest readiness`), provider
+  line, outcome-focused bullets and offline/deterministic trust note;
+  deep technical content kept below with anchors intact.
+- README/Action docs surface the existing shareable path
+  (`ackit scan --format markdown`, `--format sarif`, Action SARIF/job
+  summary); `action.yml` description improved for Marketplace discovery
+  (`name: AgentContextKit` unchanged, inputs/outputs compatible).
+- VS Code README opens with a 30-second onboarding path (open folder →
+  automatic readiness → findings) plus the install-free terminal
+  equivalent; extension CHANGELOG gains the `0.5.3` section.
+- Getting-started guide gains the install-free readiness check.
+- Install/Action pins keep pointing at published stable `0.5.2` until
+  publication; the stable pointer flips to `0.5.3` after the tag-trigger
+  release verifies (ADR-0029).
+
 ## [0.5.2] - 2026-09-06
 
 VS Code Marketplace content parity patch (no runtime feature behavior
