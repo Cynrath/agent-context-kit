@@ -3,12 +3,17 @@ id: "TASK-0094"
 title: "Release recovery 0.5.4 — two-repo sync, marketplace fix, full publish"
 status: active
 schemaVersion: 2
-dependencies:
-  - "TASK-0092"
-  - "TASK-0093"
+dependencies: []
 createdAt: "2026-09-22"
 completedAt: null
 ---
+
+<!-- Dependency note (completion eve): TASK-0092/TASK-0093 were initial
+  inputs (evidence consumed read-only) and are now intentionally
+  `blocked` immutable-history records — their literal 0.5.3-marketplace
+  items were superseded by the shipped 0.5.4 chain, never performed, so
+  completing them would be false completion (Rule 4). This task no
+  longer waits on them; their notes record the supersession. -->
 
 ## Purpose
 
@@ -134,39 +139,39 @@ deployments outside this release, secret exposure.
 
 ## Acceptance criteria
 
-- [ ] AC-001 0.5.3 live baseline re-verified from primary sources
+- [x] AC-001 0.5.3 live baseline re-verified from primary sources
   (npm/tag/Release/Marketplace/pointer/site) and recorded.
-- [ ] AC-002 PR #31 classified B and retargeted to 0.5.4 (no dangling
+- [x] AC-002 PR #31 classified B and retargeted to 0.5.4 (no dangling
   draft); site PR #13 classified B/D and retargeted to 0.5.4.
-- [ ] AC-003 Release workflow no longer assumes unpublished `--oidc`
+- [x] AC-003 Release workflow no longer assumes unpublished `--oidc`
   (no `--oidc` in automation; `--skipDuplicate` absent;
   `--skip-duplicate` only where the installed vsce supports it);
   manual Marketplace gate fail-closed before npm publish; contract
   tests lock the reality.
-- [ ] AC-004 Marketplace auth/capability preflight implemented
+- [x] AC-004 Marketplace auth/capability preflight implemented
   (read-only `vsce show`; no secret values logged).
-- [ ] AC-005 ACKit implementation (workflow fix + 0.5.4 bump) merged to
+- [x] AC-005 ACKit implementation (workflow fix + 0.5.4 bump) merged to
   `master` with exact-head CI green; working tree clean;
   local `master` == `origin/master` before tag.
-- [ ] AC-006 Site 0.5.4 source changes merged to `main` before tag;
+- [x] AC-006 Site 0.5.4 source changes merged to `main` before tag;
   `main` clean and == origin before tag.
-- [ ] AC-007 All current `.md` + user-facing refs in sync (0.5.4);
+- [x] AC-007 All current `.md` + user-facing refs in sync (0.5.4);
   historical refs consciously preserved.
-- [ ] AC-008 VSIX built from tagged source, inspected, SHA-256 recorded
+- [x] AC-008 VSIX built from tagged source, inspected, SHA-256 recorded
   and immutable; npm package smoke PASS.
-- [ ] AC-009 RC frozen (ACKit + site SHAs recorded); any
+- [x] AC-009 RC frozen (ACKit + site SHAs recorded); any
   release-impacting change after freeze invalidates RC + reruns tests.
-- [ ] AC-010 Preflight PASS before publish; no publish on red.
-- [ ] AC-011 `v0.5.4` tag pushed (absent before, never moved after).
-- [ ] AC-012 npm `latest` read-back = 0.5.4.
-- [ ] AC-013 Marketplace read-back = 0.5.4.
-- [ ] AC-014 GitHub Release `v0.5.4` live (not draft, not prerelease,
+- [x] AC-010 Preflight PASS before publish; no publish on red.
+- [x] AC-011 `v0.5.4` tag pushed (absent before, never moved after).
+- [x] AC-012 npm `latest` read-back = 0.5.4.
+- [x] AC-013 Marketplace read-back = 0.5.4.
+- [x] AC-014 GitHub Release `v0.5.4` live (not draft, not prerelease,
   VSIX asset SHA == audited SHA).
-- [ ] AC-015 `publishedStable` = 0.5.4; site softwareVersion/current =
+- [x] AC-015 `publishedStable` = 0.5.4; site softwareVersion/current =
   0.5.4; Pages deploy PASS + live HTTP verification.
-- [ ] AC-016 No release-owned open/draft PR or stale branch left in
+- [x] AC-016 No release-owned open/draft PR or stale branch left in
   either repo; final clean + remote equality.
-- [ ] AC-017 Independent verification PASS; evidence complete.
+- [x] AC-017 Independent verification PASS; evidence complete.
 
 ## Test steps
 
