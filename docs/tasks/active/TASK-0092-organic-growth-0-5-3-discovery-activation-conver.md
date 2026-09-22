@@ -127,7 +127,42 @@ Explicit user authorization (goal round 1/256, 2026-09-22): new patch release, c
 - [x] Gates: install/lint/format/typecheck/build PASS; smoke:cli + smoke:package (0.5.3 tgz) PASS; doctor/task-doctor/scan--ci PASS; text-hygiene + version-parity (source 0.5.3/stable 0.5.2) + offline-egress PASS; contracts 43/43 PASS.
 - [x] npx CTA proven live on empty dir (exit 0).
 - [x] Full vitest: parallel runs flaky under load (hook timeouts in git-init-heavy suites; same files pass solo, e.g. release-tag-context + checkpoint-atomic 6/6) — rerun stabilized (maxWorkers=2, hookTimeout=120s).
-- [x] Branch `chore/growth-0.5.3` pushed; PR #28 open (base master, head 88685e7), CI pending.
-- Marketplace NOT recreated (existing listing kept).
+- [x] Branch `chore/growth-0.5.3` pushed; PR #28 merged (squash `f221d07`,
+  12/12 CI green on exact head); merge tree == PR head (empty diff).
+  Local duplicate master commit dropped via local-only branch recreate
+  (tree-identical, never pushed; no public history touched).
+  Marketplace NOT recreated (existing listing kept).
+- [x] Post-merge master CI + Dogfood green on `f221d07`; annotated tag
+  `v0.5.3` created on `f221d07` (npm absence 404 pre-verified) and pushed.
+- [x] Release run `35727290676`: npm `0.5.3` PUBLISHED (`latest` = 0.5.3,
+  provenance); then FAILED CLOSED at Marketplace OIDC publish (exit 62).
+  Root cause (run logs): `vsce publish --oidc ... --skipDuplicate` ->
+  `error: unknown option '--skipDuplicate'` (real flag:
+  `--skip-duplicate`, proven via `vsce publish --help` on published
+  4.0.0). First live run of the TASK-0091 automation; typo never exercised.
+  Deeper: `--oidc` exists only on upstream vsce `main` (`src/oidc.ts`,
+  unreleased) — no published vsce (latest 4.0.0, next 4.0.1-0) ships it
+  (README has no OIDC section). Tracked as TASK-0093 (blocked).
+- [x] Recovery (no tag move, no npm republish): `--skip-duplicate` fix
+  PR #29 merged (squash `f0bec04`, 12/12 CI green; included contract-test
+  correction `ci-pinning` asserting the real flag + rejecting the fake one).
+  VSIX rebuilt from immutable `v0.5.3` worktree and re-audited
+  (manifest 0.5.3, publisher Cynrath, README Version 0.5.3, CHANGELOG
+  latest 0.5.3, no node_modules, no secrets, 830350 bytes <2MB);
+  SHA `C55D0E18...` differs from failed-run `36E318D1...`
+  (timestamps/env; failed-run bytes unrecoverable — no artifact upload
+  in release.yml; documented). Staged at
+  `O:/projeler/ackit-release-0.5.3/ackit-vscode-0.5.3.vsix`.
+- [x] GitHub Release `v0.5.3` created manually (`--verify-tag`,
+  CHANGELOG-derived notes via `extract-changelog-section.mjs`,
+  hygiene-clean) with the audited rebuilt VSIX attached; asset
+  re-downloaded and SHA-bound (`C55D0E18...` == staged).
+- [ ] HELD per repo governance (no flip until ALL surfaces verify):
+  Marketplace still 0.5.2 (manual publish needs user credential —
+  remaining external action, exact command in TASK-0093);
+  pointer-flip PR + site-sync PR wait for `vsce show` 0.5.3.
 
-(pending — release phase: merge, tag, publish, flip, site sync.)
+Partial-release truth table (2026-09-22): npm 0.5.3 LIVE (latest) |
+tag v0.5.3 immutable | GitHub Release v0.5.3 LIVE (+VSIX C55D0E18) |
+Marketplace 0.5.2 PENDING (external) | pointer 0.5.2 (held) |
+site 0.5.2 (held).
