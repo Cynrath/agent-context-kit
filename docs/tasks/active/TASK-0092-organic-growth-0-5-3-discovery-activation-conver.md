@@ -177,3 +177,14 @@ site 0.5.2 (held).
   manual Marketplace path stands (TASK-0093).
 - DRAFT PR opened for review + CI only; merge converts to ready ONLY
   after `vsce show Cynrath.ackit-vscode --json` reports 0.5.3.
+- DRAFT flip PR #31: 12/12 exact-head CI green (verify x6, package-smoke
+  x3, extension, dogfood, action smoke). Merge held on Marketplace only.
+- DRAFT site PR Cynrath.github.io#13 (branch
+  `chore/ackit-v0.5.3-site-sync`, commit `7bbad17`): generator overview
+  conversion + 4 landing pages (`agents-md-validator`,
+  `ai-agent-readiness`, `context-optimization`, `mcp-repository-tools`,
+  unique content, real commands/outputs, internal links) + regen
+  (34 pages, 0.5.3) + root UI hand-sync + sitemap/robots.
+  `verify-site.mjs` PASS (34 pages / 0.5.3 / 34 nav), generator
+  idempotence hash-proven, `docs-integrity` CI PASS. Merge held until
+  flip PR #31 merges (then one final regen before ready).
