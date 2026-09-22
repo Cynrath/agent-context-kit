@@ -307,3 +307,48 @@ deployments outside this release, secret exposure.
   capability probe. KNOWN STOP: Marketplace live is 0.5.2 and no user
   credential exists in this session → the manual gate cannot pass →
   NO tag/npm/Release per governance §37 (never partial-publish).
+
+### Round 2 — PUBLISHED 0.5.4 end-to-end (2026-09-22)
+
+- User performed the manual Marketplace publish in their own terminal
+  (staged VSIX `O:/projeler/ackit-release-0.5.4/ackit-vscode-0.5.4.vsix`,
+  SHA-256 `07D50EEA…697A0`, 830796 bytes, pre-audited). Agent verified
+  read-only: `vsce show` → live **0.5.4** (lastUpdated 15:11:09Z).
+- Freeze re-confirmed (clean trees, HEADs unchanged) + preflight PASS
+  (no `v0.5.4` tag local/remote, npm 0.5.4 → 404, package.json 0.5.4).
+- Annotated tag `v0.5.4` created on `03a7a13` and pushed (never to move).
+  Tag-trigger release run `35745729268`: validation + full gates PASS →
+  manual gate PASS (marketplace 0.5.4 live) → **npm publish PASS**
+  (`latest` read-back 0.5.4) → registry/consumer/npx PASS →
+  marketplace re-verify PASS → **GitHub Release `v0.5.4` created**
+  (not draft/prerelease, VSIX asset `ackit-vscode-0.5.4.vsix`
+  830446 bytes, in-run SHA `56481D54…31C2C6`).
+- The run's FINAL wrapper step failed closed on a STALE marketplace
+  replica read (`Marketplace latest='0.5.2'`, exit 91, 15:16:53Z) AFTER
+  every publish+verification had passed. Per recovery semantics (repair
+  downstream manually, never republish/re-run into the npm absence
+  gate) the agent performed the identical final checks read-only:
+  npm 0.5.4 + `latest` 0.5.4; `vsce show` 0.5.4 (15:17:24Z, top versions
+  0.5.4/0.5.2/0.5.1); Release `v0.5.4` live; asset re-downloaded and
+  SHA-bound (`56481D54…` == audited). **Final verification PASS —
+  failure was a stale read, substance complete, nothing republished.**
+- Flip PR #31 rebased onto `03a7a13` (`4506a00`, parity 0.5.4/0.5.4),
+  12/12 CI green → marked ready → squash-merged `3e9893a`
+  (post-merge master CI + Dogfood green). Branch deleted local+remote.
+  `publishedStable` = 0.5.4 on `master`.
+- Site final regen from flipped master (1-file delta: flipped README
+  pins into `llms-full.txt`) → verify PASS → `6318e0b` → PR #13 marked
+  ready (`docs-integrity` PASS) → squash-merged `5f6976d` to `main`.
+  Branch deleted local+remote. Pages deploy SUCCESS on `5f6976d`;
+  live HTTP verified: docs overview 0.5.4 + install CTA, root
+  hero/card/install x2/gh-version 0.5.4, sitemap 34 pages incl. 4
+  landing pages.
+- Final parity (all live): package.json 0.5.4 · npm latest 0.5.4 · tag
+  v0.5.4 · Release v0.5.4 (+SHA-bound VSIX) · extension manifest 0.5.4 ·
+  Marketplace live 0.5.4 · publishedStable 0.5.4 · README stable 0.5.4 ·
+  Action example v0.5.4 (name `AgentContextKit` unchanged) · site
+  softwareVersion 0.5.4 · site install refs 0.5.4. **Zero drift.**
+- Open PRs: none in either repo (release-owned). Branches: only
+  unrelated `feat/browser-companion-v0.3` (untouched, pre-existing).
+  Both repos final clean, local canonical == remote.
+- `v0.5.3` preserved untouched everywhere (tag/npm/Release/history).

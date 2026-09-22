@@ -104,3 +104,23 @@ BLOCKED — created 2026-09-22 from the v0.5.3 partial-release findings
 the staged audited VSIX, and/or (2) upstream vsce OIDC release +
 maintainer decision on automation redesign. Neither is agent-completable
 in this round.
+
+### Closure 2026-09-22 (via TASK-0094 — 0.5.3 leg intentionally superseded)
+
+- AC-001 PASS: premise verdict re-verified twice (vsce 4.0.0/4.0.1-0
+  have no `--oidc`) and recorded in ADR-0033 amendment + TASK-0094.
+- Decision taken (option b): manual Marketplace path restored as normal
+  with a fail-closed pre-npm gate in `release.yml` + contract tests;
+  ADR-0023 path restored. Upstream OIDC stays a future NEW-task topic.
+- AC-002 (marketplace **0.5.3**) will NEVER pass literally — and must
+  not: per goal-authorized recovery, Marketplace went 0.5.2 → **0.5.4**
+  in one user-performed manual publish (verified `vsce show` 0.5.4),
+  and the 0.5.4 chain (tag/npm/Release/flips/site/Pages) is fully
+  green. The 0.5.3 gap remains recorded history, not rewritten.
+- AC-003 PASS (manual-gate automation + parity proof: staged VSIX SHA
+  `07D50EEA…`, in-run VSIX SHA `56481D54…` == Release asset).
+  AC-004 PASS (flip PR #31 + site PR #13 merged post-verification).
+  AC-005 PASS (no tag move, no npm republish, no force-push, no PAT).
+- This task stays `blocked` (not completed) as the honest record: its
+  literal 0.5.3-marketplace item was superseded, not performed. No
+  further action; TASK-0094 owns the completed release.
