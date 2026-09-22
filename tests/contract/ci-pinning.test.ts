@@ -64,9 +64,11 @@ describe("CI workflow hardening", () => {
   });
 });
 
-/** Controlled-release gate: release.yml must stay a tags-only, OIDC-only,
- * no-long-lived-token pipeline whose ordering guarantees npm publish happens
- * strictly before GitHub Release creation (REQ-SEC-004/005, REQ-GOV-010). */
+/** Controlled-release gate: release.yml must stay a tags-only, npm-OIDC +
+ * manual-Marketplace-gate, no-long-lived-token pipeline whose ordering
+ * guarantees the manual Marketplace gate passes BEFORE npm publish and the
+ * GitHub Release is created only after every publish + verification
+ * (REQ-SEC-004/005, REQ-GOV-010). */
 describe("release workflow hardening", () => {
   const raw = readFileSync(RELEASE_WORKFLOW, "utf8");
 
@@ -147,21 +149,25 @@ describe("release workflow hardening", () => {
     expect(absence).toBeLessThan(publish);
   });
 
-  it("creates the GitHub Release only AFTER npm + Marketplace publish + verifications", () => {
+  it("creates the GitHub Release only AFTER manual Marketplace gate + npm + re-verifications", () => {
     const publish = raw.indexOf(
       'run: npm publish "' + "$" + "{TARBALL_PATH}" + '" --access public',
     );
     const verify = raw.indexOf("Verify registry metadata, shasum, and dist-tag");
     const npxSmoke = raw.indexOf("npx consumer smoke");
-    const mktPublish = raw.indexOf("Publish to VS Code Marketplace via OIDC");
-    const mktVerify = raw.indexOf("Verify Marketplace publication");
+    const mktGate = raw.indexOf("Manual Marketplace publish gate");
+    const mktVerify = raw.indexOf("Verify Marketplace still live after npm");
     const release = raw.indexOf("gh release create");
+    expect(mktGate).toBeGreaterThan(-1);
+    expect(mktVerify).toBeGreaterThan(-1);
+    // Fail-closed ordering (TASK-0094): Marketplace must be live BEFORE npm
+    // publishes, so npm can never run ahead of Marketplace again.
+    expect(mktGate).toBeLessThan(publish);
     expect(publish).toBeGreaterThan(-1);
     expect(npxSmoke).toBeGreaterThan(publish);
     expect(verify).toBeGreaterThan(publish);
-    expect(mktPublish).toBeGreaterThan(npxSmoke);
-    expect(mktPublish).toBeGreaterThan(verify);
-    expect(mktVerify).toBeGreaterThan(mktPublish);
+    expect(mktVerify).toBeGreaterThan(npxSmoke);
+    expect(mktVerify).toBeGreaterThan(verify);
     expect(release).toBeGreaterThan(mktVerify);
   });
 
@@ -187,40 +193,55 @@ describe("release workflow hardening", () => {
     expect(raw).toContain("set -euo pipefail");
   });
 
-  it("publishes the Marketplace VSIX via OIDC trusted publishing with no PAT fallback", () => {
-    expect(raw).toContain("publish --oidc");
-    expect(raw).toContain("--packagePath");
-    expect(raw).toContain('"' + "$" + '{VSIX_PATH}"');
-    // Duplicate-safe recovery where supported, without hiding mismatches.
+  it("gates on the manual Marketplace publish with no automated publish and no PAT", () => {
+    // No automated Marketplace publish exists by design (TASK-0094):
+    // `--oidc` is unpublished in @vscode/vsce 4.0.0 (verified via
+    // `publish --help`); automation only READS live state via `vsce show`.
+    expect(raw).not.toContain("publish --oidc");
+    // No automated publish invocation anywhere (comments/echo may document
+    // the manual user command; the invocation string is the real gate).
+    expect(raw).not.toContain("npx --yes @vscode/vsce publish");
     // NOTE: the real vsce flag is kebab-case `--skip-duplicate`
     // (`vsce publish --help`); camelCase `--skipDuplicate` does not exist
-    // in any published vsce and failed the v0.5.3 release run.
-    expect(raw).toContain("--skip-duplicate");
+    // in any published vsce and failed the v0.5.3 release run. Neither
+    // form belongs in automation that never publishes.
+    expect(raw).not.toContain("--skip-duplicate");
     expect(raw).not.toContain("--skipDuplicate");
+    // The manual gate reads live state before npm may publish.
+    expect(raw).toContain("Manual Marketplace publish gate");
+    expect(raw).toContain("vsce show Cynrath.ackit-vscode --json");
     // Forbidden credential mechanisms must never be used.
     expect(raw).not.toContain("secrets.VSCE_PAT");
+    expect(raw).not.toContain("secrets.");
     expect(raw).not.toContain("--azure-credential");
     expect(raw).not.toMatch(/--pat(\s|=|$)/);
     expect(raw).not.toMatch(/\bvsce login\b/i);
     // Fail-closed guard that rejects a stray VSCE_PAT instead of using it.
-    expect(raw).toContain("VSCE_PAT must not be set for OIDC trusted publishing");
-    // OIDC audience boundary documented for the manual policy step.
-    expect(raw).toContain("marketplace.visualstudio.com");
+    expect(raw).toContain("VSCE_PAT must not be set");
   });
 
-  it("verifies Marketplace live state with bounded read-only retries and no second publish", () => {
-    const mktPublish = raw.indexOf("Publish to VS Code Marketplace via OIDC");
-    const mktVerify = raw.indexOf("Verify Marketplace publication");
-    expect(mktPublish).toBeGreaterThan(-1);
-    expect(mktVerify).toBeGreaterThan(mktPublish);
+  it("verifies Marketplace live state read-only before npm and after npm, never publishing", () => {
+    const mktGate = raw.indexOf("Manual Marketplace publish gate");
+    const npmPublish = raw.indexOf(
+      'run: npm publish "' + "$" + "{TARBALL_PATH}" + '" --access public',
+    );
+    const mktVerify = raw.indexOf("Verify Marketplace still live after npm");
+    expect(mktGate).toBeGreaterThan(-1);
+    expect(mktVerify).toBeGreaterThan(mktGate);
+    expect(mktVerify).toBeGreaterThan(npmPublish);
     expect(raw).toContain("vsce show Cynrath.ackit-vscode --json");
-    expect(raw).toMatch(/seq 1 30/);
-    // Verification loop is read-only: it must not publish again after visibility.
+    // Both Marketplace steps are read-only: neither invokes a publish
+    // command (prose mentions in comments/echo are documentation, not
+    // automation — the invocation check below is the real gate).
+    const gateBlock = raw.slice(mktGate, npmPublish) || "";
+    expect(gateBlock).not.toContain("npx --yes @vscode/vsce publish");
+    expect(gateBlock).not.toContain("run: npm publish");
+    expect(gateBlock).not.toContain("run: vsce publish");
     const verifyBlock =
       raw.slice(mktVerify, raw.indexOf("Create GitHub Release and attach audited VSIX")) || "";
-    expect(verifyBlock).not.toMatch(/vsce publish/);
-    expect(verifyBlock).not.toMatch(/npm publish/);
-    expect(raw).toContain("no further publish attempted");
+    expect(verifyBlock).not.toContain("npx --yes @vscode/vsce publish");
+    expect(verifyBlock).not.toContain("run: npm publish");
+    expect(verifyBlock).not.toContain("run: vsce publish");
   });
 
   it("audits the exact VSIX before any publish and binds its SHA-256 to publish + Release", () => {

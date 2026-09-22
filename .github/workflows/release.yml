@@ -6,7 +6,8 @@ name: Release
 # runs. The deliberate human/maintainer action is creating and pushing an
 # annotated vX.Y.Z tag AFTER explicit user authorization recorded in the
 # active task. This workflow then publishes ALL release surfaces in one
-# deterministic chain:
+# deterministic chain, with a FAIL-CLOSED MANUAL Marketplace gate BEFORE
+# npm publish (TASK-0094; ADR-0033 amended, ADR-0023 manual path restored):
 #   1. checks out the exact tagged commit,
 #   2. validates tag <-> package.json <-> extensions/vscode/package.json
 #      <-> package-name identity (+ npm CLI capability),
@@ -18,40 +19,54 @@ name: Release
 #      CHANGELOG latest == release; publisher == Cynrath; no node_modules;
 #      size limit; no secrets; offline-egress gate) BEFORE any publish,
 #   6. confirms the exact version is absent from the npm registry,
-#   7. publishes to npm via OIDC Trusted Publishing (short-lived credentials;
+#   7. MANUAL MARKETPLACE GATE (fail-closed, BEFORE npm publish): verifies
+#      `vsce show Cynrath.ackit-vscode --json` already reports the release
+#      version (user-published OUTSIDE this workflow with their own
+#      credential: `vsce publish --packagePath <exact-vsix>`; NO OIDC flag
+#      in automation — unpublished in @vscode/vsce 4.0.0; NO VSCE_PAT,
+#      NO stored credentials, NO long-lived credential in the repo). If
+#      Marketplace is not
+#      yet at the release version, the run FAILS HERE with instructions
+#      and npm is NEVER published (no partial release possible).
+#      Re-run the failed workflow AFTER the manual publish; the
+#      duplicate-safe flow then proceeds (verification must still pass),
+#   8. publishes to npm via OIDC Trusted Publishing (short-lived credentials;
 #      NO long-lived npm token lives in GitHub Secrets),
-#   8. verifies registry metadata/shasum/dist-tag with bounded retries plus a
+#   9. verifies registry metadata/shasum/dist-tag with bounded retries plus a
 #      fresh isolated consumer (mktemp + unique npm_config_cache, no global mutation)
 #      and a secondary npx smoke,
-#   9. publishes the exact audited VSIX to the VS Code Marketplace via
-#      @vscode/vsce OIDC Trusted Publishing (short-lived Marketplace
-#      credential for audience marketplace.visualstudio.com; NO VSCE_PAT,
-#      NO stored vsce credentials, NO GitHub PAT secret, NO Azure
-#      long-lived PAT; `npx --yes @vscode/vsce publish --oidc
-#      --packagePath <exact-vsix>`; duplicate-safe `--skip-duplicate`
-#      for recovery, never hiding a mismatched existing version/artifact;
-#      fails closed with no PAT fallback),
-#  10. verifies Marketplace live state with bounded read-only retries
-#      (`vsce show Cynrath.ackit-vscode --json`; latest == RELEASE_VERSION;
-#      publisher/extension identity checked where mechanically verifiable;
-#      NO second publish attempt after successful visibility),
-#  11. and ONLY THEN creates the immutable GitHub Release with the exact
+#   10. re-verifies Marketplace live state read-only (latest ==
+#      RELEASE_VERSION; NO publish attempt here — the gate in step 7 is the
+#      only Marketplace check; NO second publish after visibility),
+#   11. and ONLY THEN creates the immutable GitHub Release with the exact
 #      audited VSIX attached, verifies the attached asset SHA-256 equals
-#      the audited/published SHA-256, and runs final public-surface
+#      the audited SHA-256, and runs final public-surface
 #      verification (npm latest + Marketplace latest + Release + VSIX).
 #
-# If npm publish succeeds but a later step fails, do not republish npm:
-# the version-absence gate makes a rerun fail safely; repair only the
-# failed downstream state manually (never move/delete the tag).
-# If Marketplace publish succeeds but verification times out on
-# propagation, do NOT publish again during the delay; the bounded
-# verification fails closed and the duplicate-safe publish covers a
-# genuine recovery retry (verification must still pass).
+# If the manual Marketplace gate fails, do NOT push npm: publish the exact
+# audited VSIX manually (`vsce publish --packagePath <VSIX_PATH>` with the
+# maintainer's own credential, outside this workflow), then RE-RUN the failed
+# workflow run — the gate then passes and npm publishes. Never move/delete
+# the tag; a rerun after a successful npm publish fails safely at the
+# version-absence gate and only manual downstream repair applies.
 #
-# One-time manual prerequisite (cannot be automated here): the
-# Marketplace publisher `Cynrath` must have a Trusted Publishing policy
-# for repository `Cynrath/agent-context-kit` + workflow `release.yml`
-# (see ADR-0033). Without it the Marketplace OIDC step fails closed.
+# Historical note (v0.5.3, run 35727290676): the workflow attempted an
+# automated Marketplace publish using an OIDC flag plus a camelCase
+# duplicate option (both literals recorded in TASK-0092/TASK-0094 evidence;
+# the run failed closed on an unknown-option error for the duplicate flag,
+# and deeper the OIDC flag is unpublished in @vscode/vsce 4.0.0).
+# npm 0.5.3 had already published → partial release.
+# The manual gate above makes that ordering impossible: Marketplace must be
+# live BEFORE npm publishes.
+#
+# Manual Marketplace prerequisite (outside this workflow, user-performed):
+# the maintainer publishes the exact audited VSIX built from the tagged
+# source (`vsce publish --packagePath ackit-vscode-<VERSION>.vsix`) with
+# their own credential BEFORE pushing the tag (or before re-running this
+# workflow after a gate failure). No PAT or long-lived credential lives in
+# the repo and this workflow references no credential from GitHub Secrets.
+# (See ADR-0033 amendment: upstream OIDC unpublished, ADR-0023 manual path
+# restored.)
 
 on:
   push:
@@ -68,7 +83,7 @@ concurrency:
 
 jobs:
   release:
-    name: validated publish (npm + Marketplace) + verify + GitHub Release + VSIX
+    name: validated publish (manual Marketplace gate + npm) + verify + GitHub Release + VSIX
     runs-on: ubuntu-latest
     steps:
       # actions/checkout@v4 (f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a)
@@ -296,23 +311,39 @@ jobs:
           echo "::error::could not confirm version absence on npm"
           exit 11
 
-      - name: Probe Marketplace pre-publish state (informational, never gates publish)
+      - name: Manual Marketplace publish gate (fail-closed, BEFORE npm publish)
         run: |
           set -euo pipefail
+          # No automated `vsce publish` exists here by design (TASK-0094):
+          # `--oidc` is unpublished in @vscode/vsce 4.0.0 and any automated
+          # publish would risk another npm-ahead-of-Marketplace partial.
+          # The maintainer publishes the exact audited VSIX manually OUTSIDE
+          # this workflow; this gate only READS live state and fails closed
+          # before npm publish when Marketplace is not yet at the target.
+          if [ -n "${VSCE_PAT:-}" ]; then
+            echo "::error::VSCE_PAT must not be set (manual publish uses the maintainer's own credential outside this workflow)"
+            exit 60
+          fi
+          seen=0
           for attempt in 1 2 3; do
             if npx --yes @vscode/vsce show Cynrath.ackit-vscode --json > /tmp/mkt-pre.json 2> /tmp/mkt-pre.err; then
               PRE_VER="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/mkt-pre.json','utf8')).versions?.[0]?.version ?? 'unknown'")"
-              echo "Marketplace pre-publish latest: ${PRE_VER} (release target ${RELEASE_VERSION})"
+              echo "Marketplace live latest: ${PRE_VER} (release target ${RELEASE_VERSION})"
               if [ "${PRE_VER}" = "${RELEASE_VERSION}" ]; then
-                echo "::notice::Marketplace already reports ${RELEASE_VERSION} pre-publish; publish step is duplicate-safe recovery, verification must still pass"
+                echo "Manual Marketplace gate PASS — ${RELEASE_VERSION} already live; npm publish may proceed"
+                seen=1
+              else
+                echo "::error::Marketplace live is '${PRE_VER}', not '${RELEASE_VERSION}'. Publish the exact audited VSIX manually (vsce publish --packagePath ${VSIX_PATH}) with your own credential, then RE-RUN this failed workflow. npm publish is BLOCKED until this gate passes."
+                exit 61
               fi
               exit 0
             fi
-            echo "pre-publish probe attempt ${attempt}/3 failed; retrying after 5s"
+            echo "marketplace gate probe attempt ${attempt}/3 failed; retrying after 5s"
             cat /tmp/mkt-pre.err || true
             sleep 5
           done
-          echo "::warning::Marketplace pre-publish probe unavailable; proceeding to OIDC publish (verification remains fail-closed)"
+          echo "::error::Marketplace live state unreadable after 3 attempts; failing closed before npm publish"
+          exit 62
 
       - name: Publish to npm via OIDC Trusted Publishing
         run: npm publish "${TARBALL_PATH}" --access public --provenance
@@ -389,40 +420,7 @@ jobs:
           echo "::warning::npx smoke failed but fresh isolated consumer already passed; continuing"
           # do not fail the release — fresh consumer is the hard gate; npx cache may be stale
 
-      - name: Publish to VS Code Marketplace via OIDC Trusted Publishing
-        run: |
-          set -euo pipefail
-          # Fail closed on forbidden credential mechanisms (never use PAT/secrets/stored credentials).
-          if [ -n "${VSCE_PAT:-}" ]; then
-            echo "::error::VSCE_PAT must not be set for OIDC trusted publishing"
-            exit 60
-          fi
-          test -f "${VSIX_PATH}"
-          CURRENT_SHA="$(sha256sum "${VSIX_PATH}" | cut -d' ' -f1)"
-          if [ "${CURRENT_SHA}" != "${VSIX_SHA256}" ]; then
-            echo "::error::VSIX SHA changed since audit ${VSIX_SHA256} != ${CURRENT_SHA}; refusing to publish"
-            exit 61
-          fi
-          # Single OIDC publish from the exact audited VSIX. Duplicate-safe for
-          # recovery (--skip-duplicate): a rerun after a successful publish skips
-          # instead of failing, but verification below must still pass and any
-          # mismatched existing version/artifact fails closed there.
-          set +e
-          PUBLISH_OUT="$(mktemp)"
-          npx --yes @vscode/vsce publish --oidc --packagePath "${VSIX_PATH}" --skip-duplicate 2>&1 | tee "${PUBLISH_OUT}"
-          PUBLISH_CODE="${PIPESTATUS[0]}"
-          set -e
-          if [ "${PUBLISH_CODE}" -ne 0 ]; then
-            echo "::error::Marketplace OIDC publish failed (exit ${PUBLISH_CODE}); failing closed with no PAT fallback"
-            exit 62
-          fi
-          if grep -qi "already published\|Skipping publish\|already exists" "${PUBLISH_OUT}"; then
-            echo "::notice::Marketplace publish reported duplicate/skip; proceeding to bounded live verification (mismatch still fails closed)"
-          else
-            echo "Marketplace OIDC publish accepted for Cynrath.ackit-vscode ${RELEASE_VERSION}"
-          fi
-
-      - name: Verify Marketplace publication (bounded live verification, read-only)
+      - name: Verify Marketplace still live after npm (read-only, no publish)
         run: |
           set -euo pipefail
           seen=0
@@ -506,7 +504,7 @@ jobs:
             echo "- VSIX: ackit-vscode-${RELEASE_VERSION}.vsix (SHA-256 ${VSIX_SHA256})"
             echo "- Node >= 22"
             echo "- npm/npx distribution via OIDC Trusted Publishing + provenance"
-            echo "- VSIX/Marketplace distribution via @vscode/vsce OIDC Trusted Publishing (no PAT)"
+            echo "- VSIX/Marketplace distribution via manual maintainer publish of the exact audited VSIX (fail-closed gate before npm; no PAT in repo)"
             echo "- legacy .NET/NuGet line unchanged"
           } > "${RELEASE_NOTES_TMP}"
           gh release create "${RELEASE_TAG}" \
