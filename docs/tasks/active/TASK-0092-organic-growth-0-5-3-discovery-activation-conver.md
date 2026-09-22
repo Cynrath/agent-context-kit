@@ -167,6 +167,41 @@ tag v0.5.3 immutable | GitHub Release v0.5.3 LIVE (+VSIX C55D0E18) |
 Marketplace 0.5.2 PENDING (external) | pointer 0.5.2 (held) |
 site 0.5.2 (held).
 
+### Round 3 — flip prepared as DRAFT (not for merge until Marketplace)
+
+- Branch `chore/flip-stable-0.5.3`: `release-state.json.publishedStable`
+  0.5.2 -> 0.5.3 + stable pins -> 0.5.3 (README install/npx/Action
+  `uses:`/Versioning line, getting-started x3, agent-integration).
+  History/archive/ADR/task records untouched (no blind replace).
+- Upstream re-check 2026-09-22+: vsce `latest` still 4.0.0 (no `--oidc`);
+  manual Marketplace path stands (TASK-0093).
+- DRAFT PR opened for review + CI only; merge converts to ready ONLY
+  after `vsce show Cynrath.ackit-vscode --json` reports 0.5.3.
+- DRAFT flip PR #31: 12/12 exact-head CI green (verify x6, package-smoke
+  x3, extension, dogfood, action smoke). Merge held on Marketplace only.
+- DRAFT site PR Cynrath.github.io#13 (branch
+  `chore/ackit-v0.5.3-site-sync`, commit `7bbad17`): generator overview
+  conversion + 4 landing pages (`agents-md-validator`,
+  `ai-agent-readiness`, `context-optimization`, `mcp-repository-tools`,
+  unique content, real commands/outputs, internal links) + regen
+  (34 pages, 0.5.3) + root UI hand-sync + sitemap/robots.
+  `verify-site.mjs` PASS (34 pages / 0.5.3 / 34 nav), generator
+  idempotence hash-proven, `docs-integrity` CI PASS. Merge held until
+  flip PR #31 merges (then one final regen before ready).
+
+### Round 4 — topics + measurement evidence (Marketplace still 0.5.2)
+
+- GitHub topics optimized via `gh repo edit` (authorized path):
+  `cli` -> `github-copilot` (Copilot profiles + copilot-instructions
+  genuinely supported; `cli` lowest search value). 20/20 topics verified
+  live; description + homepage already optimal, untouched. Social preview
+  image: no brand pipeline — none added (per rules).
+- Public baseline: npm last-week downloads = 17 (2026-09-15→21, registry
+  API). T0+7 first check / T0+28 main evaluation from 2026-09-22.
+- Marketplace re-checked: still 0.5.2 — merges stay held. Flip PR #31
+  re-greening on evidence head (10 pass + 2 windows pending at check
+  time); site PR #13 open draft, docs-integrity PASS.
+
 ### Round 5 — status → blocked, remaining scope superseded by TASK-0094
 
 - 2026-09-22: 0.5.3 Marketplace leg still pending on a user credential
@@ -182,3 +217,13 @@ site 0.5.2 (held).
 - Single-active-task rule: TASK-0094 is the only `active` task;
   TASK-0092/TASK-0093 are `blocked` (external: user Marketplace
   credential for the manual gate).
+
+### Round 6 — flip branch retargeted 0.5.3 → 0.5.4 (TASK-0094, DRAFT held)
+
+- Branch `chore/flip-stable-0.5.3` merged `origin/master` (0.5.4
+  candidate, PR #32) and all stable pins moved 0.5.3 → 0.5.4
+  (`release-state.json.publishedStable`, README install/npx/Action
+  `uses:`/Versioning, getting-started, agent-integration). Rounds 3–5
+  above preserved verbatim as 0.5.3 history. Branch name kept for PR
+  continuity; PR #31 title retargeted to v0.5.4, still DRAFT until
+  `vsce show Cynrath.ackit-vscode --json` reports 0.5.4.

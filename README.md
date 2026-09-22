@@ -187,11 +187,11 @@ OpenCode, Copilot, Gemini, Cursor, Cline, any MCP-capable agent).
 ```bash
 # global (recommended)
 npm install --global @cynrath/agent-context-kit
-ackit --version  # 0.5.2
+ackit --version  # 0.5.4
 
 # one-shot, pinned
-npx --yes @cynrath/agent-context-kit@0.5.2 --version
-npx --yes @cynrath/agent-context-kit@0.5.2 --help
+npx --yes @cynrath/agent-context-kit@0.5.4 --version
+npx --yes @cynrath/agent-context-kit@0.5.4 --help
 
 # from source
 pnpm install --frozen-lockfile && pnpm build
@@ -321,7 +321,7 @@ More: [`docs/architecture/overview.md`](docs/architecture/overview.md)
 
 ### 🤖 GitHub Action
 
-Official `Cynrath/agent-context-kit@v0.5.2` (SHA-pinned for high-assurance):
+Official `Cynrath/agent-context-kit@v0.5.4` (SHA-pinned for high-assurance):
 
 ```yaml
 permissions:
@@ -331,7 +331,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
-      - uses: Cynrath/agent-context-kit@v0.5.2
+      - uses: Cynrath/agent-context-kit@v0.5.4
         with:
           command: scan
           args: "--json"
@@ -438,7 +438,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the docs-first workflow.
 
 ### 🔖 Versioning
 
-Development: **`0.5.4`** on `master` · Latest stable: **`0.5.2`** · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases/latest) · `latest → 0.5.2` via OIDC Trusted Publishing with provenance. Stable pointer: [`release-state.json`](release-state.json). Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
+Development: **`0.5.4`** on `master` · Latest stable: **`0.5.4`** · [Changelog](CHANGELOG.md) · [Releases](https://github.com/Cynrath/agent-context-kit/releases/latest) · `latest → 0.5.4` via OIDC Trusted Publishing with provenance. Stable pointer: [`release-state.json`](release-state.json). Legacy `.NET/NuGet 1.0.0-rc.1` at `258918b` is frozen.
 
 ---
 

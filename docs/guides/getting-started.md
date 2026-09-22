@@ -14,17 +14,17 @@ npm install --global @cynrath/agent-context-kit
 ackit --version
 ```
 
-One-shot usage: `npx --yes @cynrath/agent-context-kit@0.5.2 --help` (pinned to stable `0.5.2`).
+One-shot usage: `npx --yes @cynrath/agent-context-kit@0.5.4 --help` (pinned to stable `0.5.4`).
 
 From a source checkout instead:
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm build
-node dist/cli/index.js --version  # 0.5.2
+node dist/cli/index.js --version  # 0.5.4
 ```
 
-## 30-second tour (verified commands — stable v0.5.2)
+## 30-second tour (verified commands — stable v0.5.4)
 
 Fastest check (no install): `npx --yes @cynrath/agent-context-kit@latest readiness` — scores the current repository 0–100 with actionable findings.
 
