@@ -166,3 +166,14 @@ Partial-release truth table (2026-09-22): npm 0.5.3 LIVE (latest) |
 tag v0.5.3 immutable | GitHub Release v0.5.3 LIVE (+VSIX C55D0E18) |
 Marketplace 0.5.2 PENDING (external) | pointer 0.5.2 (held) |
 site 0.5.2 (held).
+
+### Round 3 — flip prepared as DRAFT (not for merge until Marketplace)
+
+- Branch `chore/flip-stable-0.5.3`: `release-state.json.publishedStable`
+  0.5.2 -> 0.5.3 + stable pins -> 0.5.3 (README install/npx/Action
+  `uses:`/Versioning line, getting-started x3, agent-integration).
+  History/archive/ADR/task records untouched (no blind replace).
+- Upstream re-check 2026-09-22+: vsce `latest` still 4.0.0 (no `--oidc`);
+  manual Marketplace path stands (TASK-0093).
+- DRAFT PR opened for review + CI only; merge converts to ready ONLY
+  after `vsce show Cynrath.ackit-vscode --json` reports 0.5.3.
