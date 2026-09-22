@@ -263,3 +263,47 @@ deployments outside this release, secret exposure.
   `gen:schemas` no drift; `git diff --check` clean.
 - Full `vitest` running (background job); smoke/doctor/scan pending
   before PR readiness.
+
+### Round 1 continued — PR #32 merged, site + flip retargeted (2026-09-22)
+
+- Full `vitest` (local, `maxWorkers=2`): 717 passed / 1 failed / 3
+  skipped of 721; the single failure (`checkpoint/handoff`, loaded
+  machine) passes 10/10 solo — parallel-load flake of the documented
+  class (cf. TASK-0092), NOT a product defect. Exact-head CI is the
+  hard gate (below).
+- `smoke:cli` PASS; `smoke:package` PASS (`cynrath-...-0.5.4.tgz`);
+  `doctor` + `task doctor` PASS (single-active enforced: TASK-0094
+  active, TASK-0092 → blocked with Round 5 supersede note, TASK-0093
+  blocked); `scan --ci` exit 0 (baseline findings untouched by diff).
+- PR #32 (implementation) 12/12 exact-head CI green → squash-merged
+  `83e3800` to `master`; remote + local feature branches deleted.
+  Post-merge `master` CI + Dogfood green on `83e3800`.
+- Single-active violation avoided: no code written before TASK-0094
+  existed (plan committed `9b5eed6` first, Rule 3). One transient
+  self-correction, never committed: during flip-merge conflict
+  resolution this agent briefly dropped TASK-0092 Rounds 3–4 text and
+  restored it verbatim from `8187ec8` before committing (Rule 9 —
+  documented here, history intact in `375ef30`).
+- Site retarget (site branch `chore/ackit-v0.5.3-site-sync`): regen
+  from ACKit 0.5.4 source → 34 pages 0.5.4 + root hand-sync 6 spots
+  (softwareVersion/hero/card/install x2/gh-version) →
+  `verify-site.mjs` PASS (34/0.5.4/34); consecutive regen runs
+  hash-stable (idempotence); committed `c1e3756`, pushed; site PR #13
+  retargeted to v0.5.4 (still DRAFT, `docs-integrity` CI PASS).
+  Honest anomaly note: an intermediate hash comparison across a
+  stash/pop cycle differed once (line-ending normalization suspected);
+  final state re-proven stable across back-to-back runs + verify PASS.
+- Flip retarget (ACKit `chore/flip-stable-0.5.3`): merged
+  `origin/master`, pins 0.5.3→0.5.4 (release-state, README
+  install/npx/Action/Versioning/table, guides), parity PASS
+  (0.5.4/0.5.4); committed `375ef30`, pushed; PR #31 retargeted to
+  v0.5.4 (still DRAFT; CI running).
+- Stale-ref scan (master): all remaining 0.5.3 `.md` hits classified
+  historical/evidence (CHANGELOG/ADR/task history) — PRESERVED; one
+  source-tracking drift found (README VS Code table cell) → fixed in
+  this final-touch change. No 0.5.3 in `*.{yml,yaml,json}`.
+- Preflight/marketplace/publish state: NEXT — RC freeze SHAs, tag
+  absence (`v0.5.4`) + npm absence (0.5.4) + `gh auth` + marketplace
+  capability probe. KNOWN STOP: Marketplace live is 0.5.2 and no user
+  credential exists in this session → the manual gate cannot pass →
+  NO tag/npm/Release per governance §37 (never partial-publish).
