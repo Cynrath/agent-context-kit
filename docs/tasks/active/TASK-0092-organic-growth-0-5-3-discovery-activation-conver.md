@@ -188,3 +188,16 @@ site 0.5.2 (held).
   `verify-site.mjs` PASS (34 pages / 0.5.3 / 34 nav), generator
   idempotence hash-proven, `docs-integrity` CI PASS. Merge held until
   flip PR #31 merges (then one final regen before ready).
+
+### Round 4 — topics + measurement evidence (Marketplace still 0.5.2)
+
+- GitHub topics optimized via `gh repo edit` (authorized path):
+  `cli` -> `github-copilot` (Copilot profiles + copilot-instructions
+  genuinely supported; `cli` lowest search value). 20/20 topics verified
+  live; description + homepage already optimal, untouched. Social preview
+  image: no brand pipeline — none added (per rules).
+- Public baseline: npm last-week downloads = 17 (2026-09-15→21, registry
+  API). T0+7 first check / T0+28 main evaluation from 2026-09-22.
+- Marketplace re-checked: still 0.5.2 — merges stay held. Flip PR #31
+  re-greening on evidence head (10 pass + 2 windows pending at check
+  time); site PR #13 open draft, docs-integrity PASS.
