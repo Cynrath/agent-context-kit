@@ -4,6 +4,16 @@ All notable changes to ACKit (`@cynrath/agent-context-kit`) are documented in th
 
 This project follows Semantic Versioning.
 
+## [Unreleased]
+
+### Added
+
+- Community integration docs for GitHub Spec Kit: new
+  `docs/guides/spec-kit-bridge.md`, README ecosystem section and docs index
+  link pointing at [`@cynrath/ackit-spec-kit-bridge`](https://github.com/Cynrath/ackit-spec-kit-bridge)
+  (bridge CLI + native Spec Kit extension + `ackit-verified-sdd` workflow).
+  No ACKit core behavior changed.
+
 ## [0.5.4] - 2026-09-22
 
 Release-recovery patch (no runtime feature behavior beyond 0.5.3; no new
