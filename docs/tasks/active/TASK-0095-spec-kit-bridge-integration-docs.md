@@ -1,12 +1,12 @@
 ---
 id: "TASK-0095"
 title: "Spec Kit bridge integration docs"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   []
 createdAt: "2026-10-02"
-completedAt: null
+completedAt: 2026-10-02
 ---
 
 
@@ -47,24 +47,23 @@ history rewrite, no tag/release actions under this task.
 
 ## Acceptance criteria
 
-- [ ] Guide renders correct links (bridge repo public).
-- [ ] README/docs-table changes are link-only additions.
-- [ ] CHANGELOG entry under `[Unreleased]`, no version bump.
-- [ ] Hygiene + config + scan gates pass.
-- [ ] PR opened from feature branch; merged only with green CI.
-
-## Acceptance criteria
-
-- [ ] Implementation matches scope.
-- [ ] Test plan executed with pass counts recorded.
+- [x] Guide renders correct links (bridge repo public).
+- [x] README/docs-table changes are link-only additions.
+- [x] CHANGELOG entry under `[Unreleased]`, no version bump.
+- [x] Hygiene + config + scan gates pass.
+- [x] PR opened from feature branch; merged only with green CI.
 
 ## Test steps
 
-1. 
+1. `node scripts/check-text-hygiene.mjs README.md docs/guides/spec-kit-bridge.md CHANGELOG.md` → clean.
+2. `node dist/cli/index.js config check` → ackit.yml OK.
+3. `node dist/cli/index.js scan --ci` → exit 0 (only 2 LOW informational in touched files).
+4. `git diff --check` → clean.
+5. PR #37: 12/12 checks pass → squash-merged 2026-10-02.
 
 ## Risks
 
-- 
+- Docs-only; no runtime/security impact. Rollback: focused commit revert.
 
 ## Rollback plan
 
@@ -72,4 +71,7 @@ Focused commit revert.
 
 ## Completion notes
 
-(placeholder)
+PR Cynrath/agent-context-kit#37 merged as 133ff55 after 12/12 green checks.
+Bridge repo public at https://github.com/Cynrath/ackit-spec-kit-bridge with
+matching positioning sentence. Gates evidenced below via evidence registry +
+independent verification verdict.
