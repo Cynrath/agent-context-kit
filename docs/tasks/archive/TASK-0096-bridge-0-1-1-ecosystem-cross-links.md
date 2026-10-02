@@ -1,11 +1,11 @@
 ---
 id: "TASK-0096"
 title: "Bridge 0.1.1 ecosystem cross-links"
-status: active
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-10-02"
-completedAt: null
+completedAt: 2026-10-02
 ---
 
 ## Purpose
@@ -42,7 +42,7 @@ core dependency on the bridge.
 - [x] Guide links hosted bridge docs, npm, repo; community wording explicit.
 - [x] No bridge core dependency introduced.
 - [x] Hygiene + diff-check clean.
-- [ ] PR merged with green CI.
+- [x] PR merged with green CI.
 
 ## Test steps
 
@@ -60,4 +60,5 @@ Focused commit revert.
 
 ## Completion notes
 
-Implementation done; pending PR/CI/merge.
+Merged as e923e1d (PR #39, squash). CI green (verify x6, package-smoke x3,
+self-scan, action smoke, extension). Hygiene + diff-check clean.
