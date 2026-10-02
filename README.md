@@ -402,10 +402,20 @@ Guide: [`docs/guides/vscode.md`](docs/guides/vscode.md)
 |---|---|
 | Architecture | [`docs/architecture/overview.md`](docs/architecture/overview.md) |
 | Concepts | `instruction-graph` · `context-budget` · `provider-profiles` · `readiness` · [`workflows`](docs/concepts/workflows.md) · [`intent`](docs/concepts/intent.md) · [`checkpoints`](docs/concepts/checkpoints.md) · [`evidence-verification`](docs/concepts/evidence-verification.md) |
-| Guides | [`getting-started`](docs/guides/getting-started.md) · [`readiness`](docs/guides/readiness.md) · [`optimize`](docs/guides/optimize.md) · [`provider-profiles`](docs/guides/provider-profiles.md) · [`instruction-graph`](docs/guides/instruction-graph.md) · [`rule-packs`](docs/guides/rule-packs.md) · [`ci`](docs/guides/ci.md) · [`watch-dashboard`](docs/guides/watch-dashboard.md) · [`diagnostics`](docs/guides/diagnostics.md) · [`sdk`](docs/guides/sdk.md) · [`vscode`](docs/guides/vscode.md) · [`monorepo`](docs/guides/monorepo.md) · [`workflow-adoption`](docs/guides/workflow-adoption.md) · [`workflow-example`](docs/guides/workflow-example.md) · [`demo-trust-flow`](docs/guides/demo-trust-flow.md) |
+| Guides | [`getting-started`](docs/guides/getting-started.md) · [`readiness`](docs/guides/readiness.md) · [`optimize`](docs/guides/optimize.md) · [`provider-profiles`](docs/guides/provider-profiles.md) · [`instruction-graph`](docs/guides/instruction-graph.md) · [`rule-packs`](docs/guides/rule-packs.md) · [`ci`](docs/guides/ci.md) · [`watch-dashboard`](docs/guides/watch-dashboard.md) · [`diagnostics`](docs/guides/diagnostics.md) · [`sdk`](docs/guides/sdk.md) · [`vscode`](docs/guides/vscode.md) · [`monorepo`](docs/guides/monorepo.md) · [`workflow-adoption`](docs/guides/workflow-adoption.md) · [`workflow-example`](docs/guides/workflow-example.md) · [`demo-trust-flow`](docs/guides/demo-trust-flow.md) · [`spec-kit-bridge`](docs/guides/spec-kit-bridge.md) |
 | Reference | `cli` · `config` · `rules` · `readiness` · `profile` · `rule-pack` · `instruction-graph` · `diagnostics` · `sdk` · `exit-codes` · `mcp` · `schemas` · [`drift`](docs/reference/drift.md) · [`policy`](docs/reference/policy.md) · [`status`](docs/reference/cli.md#cli-reference) · [`provider-surfaces`](docs/reference/provider-surfaces.md) |
 | Decisions | [`docs/decisions/`](docs/decisions/) · `v0.2.0`: [`docs/v0.2.0/`](docs/v0.2.0/) · `ADR-0025..0028`: workflow/evidence/checkpoint/policy-v2 |
 | Tasks | [`docs/tasks/active`](docs/tasks/active) |
+| Ecosystem | [Spec Kit bridge](docs/guides/spec-kit-bridge.md) — community integration ([`@cynrath/ackit-spec-kit-bridge`](https://github.com/Cynrath/ackit-spec-kit-bridge)) connecting Spec Kit intent artifacts to ACKit tasks, evidence, verification gates, and handoffs |
+
+---
+
+### 🔗 Ecosystem
+
+Community integration for ACKit and GitHub Spec Kit: [Spec Kit bridge](docs/guides/spec-kit-bridge.md)
+([`@cynrath/ackit-spec-kit-bridge`](https://github.com/Cynrath/ackit-spec-kit-bridge)) connects
+Spec Kit's intent-driven development artifacts to ACKit's deterministic repository context, task
+lifecycle, evidence, verification, and completion gates. Offline-first, no telemetry.
 
 ---
 
