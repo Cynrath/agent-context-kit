@@ -13,6 +13,11 @@ This project follows Semantic Versioning.
   link pointing at [`@cynrath/ackit-spec-kit-bridge`](https://github.com/Cynrath/ackit-spec-kit-bridge)
   (bridge CLI + native Spec Kit extension + `ackit-verified-sdd` workflow).
   No ACKit core behavior changed.
+- Bridge 0.1.1 cross-links: ownership boundaries (Spec Kit owns intent,
+  ACKit owns trust, bridge coordinates), freshness-model summary, and
+  links to the hosted bridge docs
+  ([cynrath.github.io/ackit-spec-kit-bridge](https://cynrath.github.io/ackit-spec-kit-bridge/)),
+  npm, and the bridge repo with explicit community-integration wording.
 
 ## [0.5.4] - 2026-09-22
 
