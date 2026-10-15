@@ -8,6 +8,9 @@ This project follows Semantic Versioning.
 
 ### Added
 
+- Context7 library parsing configuration and optional Docs7 Free documentation
+  site manifest, with a guide for owner claiming, verification and automatic refresh;
+  no CLI/runtime, package version or existing hosting changes.
 - Community integration docs for GitHub Spec Kit: new
   `docs/guides/spec-kit-bridge.md`, README ecosystem section and docs index
   link pointing at [`@cynrath/ackit-spec-kit-bridge`](https://github.com/Cynrath/ackit-spec-kit-bridge)
