@@ -6,7 +6,7 @@ This guide describes documentation distribution only. It does not introduce netw
 
 The repository root `context7.json` sets the library title, description, best-practice rules and current documentation folders. The README and maintained `docs/guides`, `docs/reference` and `docs/concepts` pages remain the source of truth. Historical tasks, generated output and tests are excluded.
 
-Context7 library ID convention: `/cynrath/agent-context-kit`. **Check the actual library ID in your Context7 dashboard before claiming**. Registration and ownership are different steps.
+Context7 library ID convention: `/cynrath/agent-context-kit`. **Confirm the actual library ID in your Context7 dashboard before switching configuration sources**. Indexing, ownership and verified-badge status are separate.
 
 ## 2. Existing ownership and configuration source
 
