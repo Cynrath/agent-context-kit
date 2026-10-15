@@ -410,6 +410,8 @@ Guide: [`docs/guides/vscode.md`](docs/guides/vscode.md)
 
 ---
 
+**Context7 / Docs7:** Maintained indexing settings live in [`context7.json`](context7.json); Docs7 navigation uses [`docs/docs.json`](docs/docs.json). See the [Context7, Docs7 and verification guide](docs/guides/context7-docs7.md) for owner claiming, badge requests and optional Docs7 Free hosting. Existing documentation hosting remains unchanged.
+
 ### 🔗 Ecosystem
 
 Community integration for ACKit and GitHub Spec Kit: [Spec Kit bridge](docs/guides/spec-kit-bridge.md)
