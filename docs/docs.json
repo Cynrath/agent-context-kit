@@ -1,0 +1,57 @@
+{
+  "$schema": "https://context7.com/schema/docs7.json",
+  "name": "ACKit — AgentContextKit",
+  "colors": {
+    "primary": "#0B84FF"
+  },
+  "filterSidebar": true,
+  "navigation": {
+    "groups": [
+      {
+        "group": "Start here",
+        "pages": [
+          "index",
+          "guides/getting-started",
+          "guides/workflow-adoption",
+          "guides/agent-integration"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "guides/ci",
+          "guides/monorepo",
+          "guides/spec-kit-bridge",
+          "guides/demo-trust-flow",
+          "guides/context7-docs7"
+        ]
+      },
+      {
+        "group": "Concepts",
+        "pages": [
+          "concepts/intent",
+          "concepts/instruction-graph",
+          "concepts/context-budget",
+          "concepts/evidence-verification",
+          "concepts/workflows",
+          "concepts/agent-skills",
+          "concepts/checkpoints"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/cli",
+          "reference/config",
+          "reference/policy",
+          "reference/mcp",
+          "reference/sdk",
+          "reference/schemas",
+          "reference/exit-codes",
+          "reference/rules",
+          "reference/drift"
+        ]
+      }
+    ]
+  }
+}

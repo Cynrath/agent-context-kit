@@ -1,0 +1,48 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "ACKit — AgentContextKit",
+  "description": "Offline-first TypeScript and Node.js toolkit for coding-agent repository readiness, context optimization, instruction validation, task workflows, policy checks, evidence and verification.",
+  "folders": [
+    "docs/guides",
+    "docs/reference",
+    "docs/concepts",
+    "docs/architecture",
+    "docs/decisions"
+  ],
+  "excludeFolders": [
+    "docs/tasks",
+    "docs/history",
+    "docs/rebuild",
+    "docs/v0.2.0",
+    "docs/evidence",
+    "node_modules",
+    "dist",
+    "fixtures",
+    "tests",
+    "benchmarks",
+    "specs",
+    "src",
+    ".agents",
+    ".specify",
+    ".ackit-spec-kit"
+  ],
+  "excludeFiles": [
+    "CHANGELOG.md",
+    "CODE_OF_CONDUCT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "SECURITY.md",
+    "SUPPORT.md"
+  ],
+  "rules": [
+    "Use the maintained guides and references for ACKit — AgentContextKit; archived task records and past release notes are historical evidence.",
+    "Preserve existing offline-first behavior; do not require network services, telemetry or untrusted plugins for the product runtime.",
+    "Do not treat generated verification results as valid without the documented evidence and freshness checks."
+  ],
+  "previousVersions": [
+    {
+      "tag": "v0.5.4"
+    }
+  ]
+}
