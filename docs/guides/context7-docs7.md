@@ -8,19 +8,22 @@ The repository root `context7.json` sets the library title, description, best-pr
 
 Context7 library ID convention: `/cynrath/agent-context-kit`. **Check the actual library ID in your Context7 dashboard before claiming**. Registration and ownership are different steps.
 
-## 2. Claim ownership (requires the owner's login)
+## 2. Existing ownership and configuration source
 
-1. Sign into [Context7](https://context7.com/dashboard).
-2. Find this GitHub library, select **Manage** or navigate to its library URL followed by `/admin`.
-3. Select **Claim Library**. Context7 shows a JSON snippet containing an exact `url` and a unique `public_key`.
-4. Add those **exact** fields to the existing **root** `context7.json` on the default branch while keeping the other configuration fields. The Context7-provided `url` and `public_key` values must match the claim dialog exactly. Do not substitute an API key, generate a public key locally or add a dummy value.
-5. Commit the file via the normal branch/PR workflow, merge after checks, then select **Claim Library** again.
+The library is already **owned by the maintainer's teamspace**. Do not repeat Claim Library and do not invent or add a `public_key`.
 
-The claim public key is intended to be published in the repository. Context7 API tokens, npm credentials and other secrets must **never** be added to the file.
+By default, an owned Context7 library may say **Config source: Configuration is managed here**. This means admin-form settings currently take precedence; merely committing `context7.json` does not activate it. The maintainer may either:
+
+1. **Keep dashboard-managed settings:** edit Configuration fields in the admin UI, click **Save changes**, then **Refresh**.
+2. **Use version-controlled settings:** review existing dashboard include/exclude rules and compare them with `context7.json`, then choose **Config source → Switch** to read settings from the repository file, and **Refresh**. This changes the source of configuration; it is not needed for claiming ownership.
+
+Avoid switching blindly: existing dashboard exclusions may differ from the repository file. The repository config intentionally indexes maintained feature docs and the README, not archived tasks or generated content. Leave **Index every version, old ones too** disabled unless historical-version docs are explicitly required.
+
+Never commit Context7 API tokens, npm credentials or other secrets. If this library is ever unclaimed by an owner, use the [official claim process](https://context7.com/docs/howto/claiming-libraries) only then.
 
 ## 3. Apply for the verified badge
 
-Open the claimed library's **Admin** page and choose **Apply for Verification**. Context7 may grant the badge automatically based on reputation or quality thresholds. If the instant check does not qualify, provide the official documentation URL, a factual project description and developer value in the manual application. Verification is free; approval is decided by Context7, not by a repository setting.
+Open the already-owned library's **Admin** page and select the orange **Apply for Verification** link. Context7 may grant the badge automatically based on reputation or quality thresholds. If the instant check does not qualify, provide the official documentation URL, a factual project description and developer value in the manual application. Verification is free; approval is decided by Context7, not by a repository setting.
 
 ## 4. Connect Docs7 Free (optional; existing GitHub Pages stays active)
 
@@ -40,7 +43,7 @@ After the Docs7 production build is successful, open:
 - `/llms.txt` and `/llms-full.txt` on that site;
 - `/guides/getting-started.md` for an agent-readable page;
 - the Context7 library page, making sure the new documentation and code examples are retrievable;
-- the Context7 library Admin page for claim and verification status.
+- the Context7 library Admin page for ownership/config source and verification status.
 
 If configuration changes do not appear, use the library page's **Refresh** and inspect the Docs7 build log. Context7 may also refresh public libraries automatically.
 
