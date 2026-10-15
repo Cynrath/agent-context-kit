@@ -8,34 +8,36 @@
   "navigation": {
     "groups": [
       {
-        "group": "Start here",
+        "group": "Introduction",
         "pages": [
           "index",
           "guides/getting-started",
-          "guides/workflow-adoption",
-          "guides/agent-integration"
+          "guides/feature-index",
+          "guides/workflow-adoption"
         ]
       },
       {
         "group": "Guides",
         "pages": [
+          "guides/agent-integration",
           "guides/ci",
           "guides/monorepo",
-          "guides/spec-kit-bridge",
+          "guides/workflow-example",
           "guides/demo-trust-flow",
+          "guides/spec-kit-bridge",
           "guides/context7-docs7"
         ]
       },
       {
         "group": "Concepts",
         "pages": [
-          "concepts/intent",
-          "concepts/instruction-graph",
+          "concepts/agent-skills",
+          "concepts/checkpoints",
           "concepts/context-budget",
           "concepts/evidence-verification",
-          "concepts/workflows",
-          "concepts/agent-skills",
-          "concepts/checkpoints"
+          "concepts/instruction-graph",
+          "concepts/intent",
+          "concepts/workflows"
         ]
       },
       {
@@ -43,13 +45,28 @@
         "pages": [
           "reference/cli",
           "reference/config",
-          "reference/policy",
-          "reference/mcp",
-          "reference/sdk",
-          "reference/schemas",
+          "reference/drift",
           "reference/exit-codes",
+          "reference/mcp",
+          "reference/policy",
+          "reference/provider-surfaces",
           "reference/rules",
-          "reference/drift"
+          "reference/schemas",
+          "reference/sdk"
+        ]
+      },
+      {
+        "group": "Architecture and security",
+        "pages": [
+          "architecture/overview",
+          "security/SECURITY_MODEL",
+          "security/THREAT_MODEL"
+        ]
+      },
+      {
+        "group": "Benchmarks",
+        "pages": [
+          "benchmarks/public-evidence"
         ]
       }
     ]

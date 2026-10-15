@@ -7,7 +7,9 @@
     "docs/reference",
     "docs/concepts",
     "docs/architecture",
-    "docs/decisions"
+    "docs/decisions",
+    "docs/security",
+    "docs/benchmarks"
   ],
   "excludeFolders": [
     "docs/tasks",
@@ -36,13 +38,11 @@
     "SUPPORT.md"
   ],
   "rules": [
-    "Use the maintained guides and references for ACKit — AgentContextKit; archived task records and past release notes are historical evidence.",
-    "Preserve existing offline-first behavior; do not require network services, telemetry or untrusted plugins for the product runtime.",
-    "Do not treat generated verification results as valid without the documented evidence and freshness checks."
+    "For commands and options use docs/reference/cli.md and the latest supported npm package; never suggest commands absent from those sources.",
+    "Use docs/guides/feature-index.md to discover implemented features and link to canonical guides and references for details.",
+    "ACKit runtime is offline-first, deterministic and does not require hosted Context7/Docs7, telemetry, LLM APIs or network service calls.",
+    "State-bound verification must respect task acceptance criteria, fresh evidence, independent verification and stale/replay guards; do not bypass completion gates.",
+    "Treat historical ADRs, archived tasks and old release notes as history, not current product governance."
   ],
-  "previousVersions": [
-    {
-      "tag": "v0.5.4"
-    }
-  ]
+  "branch": "master"
 }
