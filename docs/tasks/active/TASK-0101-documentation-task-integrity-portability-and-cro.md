@@ -35,7 +35,7 @@ necessary edits, tests, commits and PRs on 2026-11-17.
 ## Out of scope
 
 - Rewriting historical ADR/task evidence; casually closing TASK-0087/0092/0093;
-  hosted account setup/deployment; speculative refactoring or dependency upgrades.
+  hosted account setup/deployment; speculative refactoring or unrelated dependency upgrades.
 
 ## Affected files
 
@@ -43,6 +43,9 @@ necessary edits, tests, commits and PRs on 2026-11-17.
   documentation checks; runtime files only for confirmed audit defects.
 - Root package manifest/lockfile only for necessary audited dependency fixes;
   regenerate schemas only if the validated generator actually changes them.
+- `examples/sdk-consumer.mjs` and SDK reference signatures: inspection found
+  string roots where the actual scanner requires `{ canonicalPath }` and stale
+  rule-pack/readiness signatures. Verify the corrected example on a real fixture.
 
 ## Dependencies
 

@@ -373,8 +373,9 @@ function buildProgram(invocation: CliInvocation): Command {
     .command("serve")
     .description("serve the ACKit MCP server over stdio (protocol-pure stdout)")
     .action(async () => {
-      // Delegate to the dedicated entry so stdout carries only JSON-RPC.
-      await import("../mcp/stdio.js");
+      // Bind the advertised startup root without reopening per-tool overrides.
+      const { serveAckitMcp } = await import("../mcp/stdio.js");
+      await serveAckitMcp((program.opts() as Partial<GlobalOptions>).root);
       // stdio entry keeps the process alive until the transport closes.
       return new Promise<void>((resolve) => {
         process.on("exit", () => resolve());

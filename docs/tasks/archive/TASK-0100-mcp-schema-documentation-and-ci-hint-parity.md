@@ -1,12 +1,12 @@
 ---
 id: "TASK-0100"
 title: "MCP schema documentation and CI hint parity"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0099"
 createdAt: "2026-11-17"
-completedAt: null
+completedAt: 2026-11-17
 ---
 
 
@@ -49,11 +49,11 @@ TASK-0099. TASK-0101 follows this task.
 
 ## Acceptance criteria
 
-- [~] Docs list precisely the tool input properties; no per-call root or pack
+- [x] Docs list precisely the tool input properties; no per-call root or pack
   includeGlobs is reintroduced.
-- [ ] Report-only scan hints 0, `ci: true` hints 1 only for unsuppressed findings
+- [x] Report-only scan hints 0, `ci: true` hints 1 only for unsuppressed findings
   at the configured threshold; clean/suppressed cases hint 0.
-- [ ] Cancellation, stdio purity, root confinement and CLI/SDK/MCP parity pass.
+- [x] Cancellation, stdio purity, root confinement and CLI/SDK/MCP parity pass.
 
 ## Test steps
 
@@ -78,6 +78,26 @@ Forward corrective PR limited to MCP implementation/docs/tests; no tag changes.
 
 ## Completion notes
 
-Plan allocated by repository CLI on 2026-11-17. No implementation yet.
+Verified 2026-11-17 on Windows / Node 26.13.1 / pnpm 11.22.0.
+
+- Actual `tools/list` properties for all 16 tools now match the reference table.
+  The docs no longer advertise per-call root or pack includeGlobs. No removed
+  security-sensitive input was restored.
+- `ci` was accepted but unused. Default/false scans now hint 0; true hints 1 at
+  an unsuppressed policy threshold and 0 for clean/suppressed fixtures. Reports
+  remain available, the hint is advisory, and the server stays responsive.
+- CLI accepted global `--root` but imported a side-effect entry that read only
+  environment/cwd. An explicit stdio serve function now receives the startup
+  root. Real CLI stdio clients prove flag-over-environment, environment-over-cwd
+  and cwd fallback, with paths containing spaces. Direct stdio entry still works.
+- MCP/stdio/cancellation/status projection suites: 7 files, 30 tests PASS.
+  Filesystem/adversarial boundary subset: 23 PASS / 2 existing privilege skips.
+  Final full `pnpm test --maxWorkers=2`: 122 files PASS; 754 PASS / 3 unchanged
+  Windows privilege-dependent symlink skips (757 total).
+- `pnpm lint`, `format:check`, `typecheck`, `build`, offline-egress, doctor,
+  task doctor, `scan --ci` exit 0 and `git diff --check` PASS.
+- No public SDK export change, new tool, network/write capability, data migration,
+  permission or publication action. Successor TASK-0101 owns docs/portability and
+  the already identified dependency-security audit. Forward PR is rollback.
 
 Dependencies: TASK-0099

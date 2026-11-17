@@ -75,7 +75,9 @@ export async function createAckitMcpServer(requestedRoot?: string | undefined): 
           signal: extra.signal,
         });
         const reportJson = renderScanJson(executed.result);
-        return textResult(`${reportJson}\nexit_code_hint=${executed.exceededThreshold ? 1 : 0}`);
+        return textResult(
+          `${reportJson}\nexit_code_hint=${args.ci === true && executed.exceededThreshold ? 1 : 0}`,
+        );
       } catch (error) {
         if (error instanceof ScanContractError || error instanceof GitUnavailableError) {
           return textResult(
