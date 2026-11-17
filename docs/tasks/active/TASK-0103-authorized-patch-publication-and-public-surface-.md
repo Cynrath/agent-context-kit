@@ -1,7 +1,7 @@
 ---
 id: "TASK-0103"
 title: "Authorized patch publication and public-surface verification"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0102"
@@ -68,7 +68,7 @@ external blocker; do independent authorized work first, never partial-publish np
 
 ## Acceptance criteria
 
-- [ ] PR merged only after all exact-head CI checks pass; master SHA verified.
+- [~] PR merged only after all exact-head CI checks pass; master SHA verified.
 - [ ] Marketplace target visible before new immutable tag triggers npm publication.
 - [ ] npm latest, fresh CLI/SDK/MCP and new-tag external Action consumer pass.
 - [ ] GitHub Release tag/VSIX identity and downloaded asset checksum pass.
@@ -105,5 +105,27 @@ can correct artifacts; never overwrite/repoint/delete the released version.
 ## Completion notes
 
 Plan allocated by repository CLI on 2026-11-17. No publication or tag action yet.
+
+### Publication preflight 2026-11-17
+
+- TASK-0098/0099/0100/0101/0104/0102 are verified and archived. Runtime correction
+  commit `a0e077c`; release preparation `eae5351`; current source/extension 0.5.5.
+  Full local suite: 772 PASS / 3 existing Windows privilege skips; extension
+  8 unit + 6 Electron PASS; explicit CLI/package/Action consumers, schemas,
+  SARIF validation, offline, production audit and ACKit gates PASS.
+- Local audited VSIX: 414975 bytes, SHA-256
+  `8fa4cfc2f804f1440fcf1c5abe215570b7ee5c4c1762654a53676696c8d9fd9f`;
+  tarball: 497350 bytes, SHA-256
+  `699437eff29c9dbd74ccd7104e2116ea1a384229cfb1b4e65cc49c88fa6b6a7f`.
+- Existing stored Cynrath publisher was found and `vsce@4.1.1 verify-pat Cynrath`
+  exited 0 (publish-right verification). No secret value was printed or written
+  to repository/log files. No new credential or permission was created.
+- Remote master is `64a9c9d56ea36eb475de29d050596b506264a07e`; strict rules require
+  all 12 established CI contexts. No release-owned open PR exists yet. The
+  branch will be pushed only after this status/evidence commit and clean-tree
+  verification. Publishing still waits for exact-head PR and master checks.
+- npm latest/Marketplace are 0.5.4; npm 0.5.5 and remote tag are absent at the
+  preparation read. Stable pointer remains 0.5.4. Recheck immediately before
+  publishing; no immutable version or existing tag will be changed.
 
 Dependencies: TASK-0102

@@ -1,13 +1,13 @@
 ---
 id: "TASK-0102"
 title: "Patch release preparation and full validation"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0101"
   - "TASK-0104"
 createdAt: "2026-11-17"
-completedAt: null
+completedAt: 2026-11-17
 ---
 
 
@@ -60,7 +60,7 @@ TASK-0101 and TASK-0104. TASK-0103 requires all acceptance below and exact-head 
 - [x] All required local checks pass with exact counts/commands recorded;
   no skipped mandatory tests or unresolved release-scope security finding.
 - [x] Actual tarball/VSIX audited, SHA-256 recorded and release notes reviewed.
-- [~] Final diff and ACKit checks pass; all pre-release work is committed and
+- [x] Final diff and ACKit checks pass; all pre-release work is committed and
   the tree is clean before an authorized push.
 
 ## Test steps
@@ -127,6 +127,11 @@ Final local validation 2026-11-17, after TASK-0104 corrective verification:
 - Final diff reviewed. The implementation/evidence commit and clean-tree proof
   are the remaining Git criterion before completion. Hosted OS/Node matrix,
   protected PR merge and all publication actions belong to TASK-0103.
+
+Git criterion verified: implementation/evidence commit
+`eae5351fd3df07106a83a8bb12935241ed69f8bd` exists and `git status --short --branch`
+shows only the branch header (clean tree). All pre-release implementation is
+committed before any push. This closure record follows the observed proof.
 
 ### Dependency checkpoint 2026-11-17
 
