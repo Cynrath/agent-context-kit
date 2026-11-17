@@ -1,7 +1,7 @@
 ---
 id: "TASK-0099"
 title: "CI extension gates schema drift and artifact integrity"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0098"
@@ -22,6 +22,11 @@ User authorized scoped changes, tests, commits, branch pushes and PRs on 2026-11
   fallbacks, and hardcodes the source version/VSIX filename.
 - Remove bypasses and correct underlying lint/test defects. Add usable extension
   scripts and narrowly scoped formatting configuration if necessary.
+- Pre-implementation inspection also found fabricated Electron assertions,
+  standalone unit tests importing the host-only `vscode` module, CommonJS
+  bundling of SDK `import.meta.url` asset lookups, and string-prefix finding path
+  checks. Replace these with real host/data assertions, a tested pure diagnostic
+  boundary, and a resource-aware bundle without changing the public SDK.
 - Add schema drift and CLI smoke to CI; preserve real-tarball consumer smoke.
 - Derive extension version from manifests, strengthen parity guard and packaged
   VSIX inspection, and keep release security gates and Marketplace-first order.
@@ -34,7 +39,8 @@ User authorized scoped changes, tests, commits, branch pushes and PRs on 2026-11
 ## Affected files
 
 - `.github/workflows/ci.yml`, extension scripts/source/tests/configuration as
-  required by real failures, parity scripts/contracts and VSIX integrity checks.
+  required by real failures, extension build/resource metadata, parity
+  scripts/contracts and VSIX integrity checks.
 
 ## Dependencies
 
@@ -48,12 +54,14 @@ TASK-0098. TASK-0100 follows this task.
 
 ## Acceptance criteria
 
-- [ ] Lint, unit and Electron commands propagate real failures with no bypass.
+- [~] Lint, unit and Electron commands propagate real failures with no bypass.
 - [ ] Extension source/test typechecks and lint/unit/Electron tests actually pass.
 - [ ] CI has schema drift, CLI/package smoke, version parity and VSIX integrity
   checks; source version and package filename are derived, not release literals.
 - [ ] VSIX manifest/README/CHANGELOG identity, file allowlist, size and secret
   checks pass; release fail-closed gates remain effective.
+- [ ] Bundled SDK version/templates load inside the extension host and finding
+  navigation/diagnostics cannot resolve traversal or sibling-prefix paths.
 
 ## Test steps
 
@@ -78,6 +86,10 @@ Forward corrective PR; no weakening checks, history rewriting or tag changes.
 
 ## Completion notes
 
-Plan allocated by repository CLI on 2026-11-17. No implementation yet.
+Plan allocated by repository CLI on 2026-11-17. Before implementation, unmasked
+lint failed with 4 errors/2 warnings; source and test typechecks passed. The
+additional runtime/test findings above were inspected and added to this plan
+before their implementation. All existing assertions will be strengthened or
+replaced with actual production-boundary/host behavior, never bypassed.
 
 Dependencies: TASK-0098
