@@ -2,7 +2,7 @@
   "name": "ackit-vscode",
   "displayName": "ACKit Toolkit",
   "description": "Offline-first repository readiness, task status, verification-aware workflow and developer tooling for AI-assisted development in VS Code.",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "publisher": "Cynrath",
   "engines": {
     "vscode": "^1.90.0"
@@ -101,9 +101,12 @@
     }
   },
   "scripts": {
-    "build": "esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=dist/extension.js --external:vscode --sourcemap",
+    "build": "node scripts/build.mjs",
+    "lint": "biome check src scripts --error-on-warnings",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
     "compile:test": "tsc -p tsconfig.test.json",
-    "test": "npm run compile:test && node ./out/test/runTest.js",
+    "test:unit": "npm run compile:test && mocha --ui tdd out/test/suite/unit.test.js --timeout 5000",
+    "test": "node ./out/test/runTest.js",
     "pretest": "npm run compile:test"
   },
   "devDependencies": {

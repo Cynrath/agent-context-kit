@@ -45,3 +45,9 @@ v0.5 line additions (Accepted 2026-09-05, governing TASK-0078 … TASK-0086):
 - ADR-0030 deterministic verification state binding (verdict ↔ bundle/state digests, staleness + replay at the binding layer)
 - ADR-0031 structural verifier independence + replay hardening (reviewed-bundle proof, independence gate, review-artifact lifecycle)
 - ADR-0032 canonical read-only status projection (composed task/stage/blockers/staleness/next-actions, no second engine)
+
+Distribution correction (Accepted 2026-11-17):
+
+- [ADR-0034 source-built Action distribution](ADR-0034-source-built-action-distribution.md)
+  amends ADR-0020's entrypoint/bootstrap while preserving offline runtime and
+  avoiding committed generated output.

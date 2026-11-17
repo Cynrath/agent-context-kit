@@ -1,12 +1,14 @@
 import type { RepositoryRoot } from "../core/filesystem/root.js";
 import { runScan, type ScanPipelineOptions } from "../core/scanner/pipeline.js";
+import { defaultRegistry } from "../core/scanner/registry.js";
 import type { ScanResult } from "../core/scanner/types.js";
 import { AckitError } from "./errors.js";
 
 /**
  * Scans a repository and returns the stable finding set (REQ-API-001).
- * Thin alias over the internal pipeline with an API-friendly name; behavior
- * is identical to `ackit scan` minus CLI concerns.
+ * Uses the same built-in catalog and pipeline as the CLI. Repository config
+ * and policy orchestration belong to the CLI/MCP layer; callers can supply
+ * explicit pipeline options and additional trusted rules here.
  * REQ-V020-J-002: typed errors (AckitError) + AbortSignal cancellation.
  */
 export async function scanRepository(
@@ -37,7 +39,7 @@ export async function scanRepository(
     const scanPromise = runScan(root, {
       ...(rest as ScanPipelineOptions),
       signal,
-      rules: [...extraRules],
+      rules: [...defaultRegistry.getAll(), ...extraRules],
     });
     if (signal === undefined) return await scanPromise;
     return await Promise.race([scanPromise, abortedPromise]);

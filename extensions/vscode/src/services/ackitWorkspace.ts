@@ -5,7 +5,6 @@ import {
   buildInstructionGraph,
   buildStatusReport,
   loadAckitConfig,
-  resolveEffectiveStack,
   scanRepository,
   scoreRepository,
   validateSkills,
@@ -39,7 +38,9 @@ export class AckitWorkspaceService implements vscode.Disposable {
   private snapshots = new Map<string, WorkspaceSnapshot>();
   private disposables: vscode.Disposable[] = [];
   private debounceTimer: NodeJS.Timeout | undefined;
-  private currentAbort: AbortController | undefined;
+  private refreshes = new Map<string, Promise<void>>();
+  private controllers = new Map<string, AbortController>();
+  private disposed = false;
   private readonly _onDidChange = new vscode.EventEmitter<string>();
   readonly onDidChange = this._onDidChange.event;
 
@@ -65,8 +66,11 @@ export class AckitWorkspaceService implements vscode.Disposable {
   }
 
   dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
-    this.currentAbort?.abort();
+    for (const controller of this.controllers.values()) controller.abort();
+    this.controllers.clear();
     this._onDidChange.dispose();
     for (const d of this.disposables) d.dispose();
   }
@@ -94,6 +98,7 @@ export class AckitWorkspaceService implements vscode.Disposable {
   }
 
   async refreshAll(): Promise<void> {
+    if (this.disposed) return;
     const roots = this.getRoots();
     for (const root of roots) {
       await this.refreshRoot(root);
@@ -101,30 +106,46 @@ export class AckitWorkspaceService implements vscode.Disposable {
   }
 
   private scheduleRefresh() {
+    if (this.disposed) return;
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => {
+      this.debounceTimer = undefined;
       void this.refreshAll();
     }, 400);
   }
 
-  async refreshRoot(root: string): Promise<void> {
-    // Cancel previous
-    this.currentAbort?.abort();
+  refreshRoot(root: string): Promise<void> {
+    if (this.disposed) return Promise.resolve();
+    // A watcher must not cancel an explicit caller and return stale data.
+    // Each root publishes complete snapshots in request order.
+    const previous = this.refreshes.get(root) ?? Promise.resolve();
+    const current = previous.then(() => this.performRefreshRoot(root));
+    this.refreshes.set(root, current);
+    return current.finally(() => {
+      if (this.refreshes.get(root) === current) this.refreshes.delete(root);
+    });
+  }
+
+  private async performRefreshRoot(root: string): Promise<void> {
+    if (this.disposed) return;
     const ac = new AbortController();
-    this.currentAbort = ac;
+    this.controllers.set(root, ac);
     const signal = ac.signal;
 
-    const snapshot: WorkspaceSnapshot = this.snapshots.get(root) ?? {
-      root,
-      scan: null,
-      readiness: null,
-      graph: null,
-      diagnostics: null,
-      optimize: null,
-      taskStatus: null,
-      error: null,
-      updatedAt: 0,
-    };
+    const oldSnapshot = this.snapshots.get(root);
+    const snapshot: WorkspaceSnapshot = oldSnapshot
+      ? { ...oldSnapshot }
+      : {
+          root,
+          scan: null,
+          readiness: null,
+          graph: null,
+          diagnostics: null,
+          optimize: null,
+          taskStatus: null,
+          error: null,
+          updatedAt: 0,
+        };
 
     try {
       // Avoid scanning own cache/dist
@@ -142,16 +163,16 @@ export class AckitWorkspaceService implements vscode.Disposable {
         // Use scoreRepository with minimal inputs
         const readiness = scoreRepository(
           {
-            graph: graph as never,
-            pack: pack as never,
+            graph,
+            pack,
             scan,
-            skills: skills as never,
-            policy: { findings: [] } as never,
-            tasks: { dirExists: true, totalTasks: 0 } as never,
+            skills,
+            policy: { findings: [] },
+            tasks: { dirExists: true, totalTasks: 0 },
           },
           {},
         );
-        snapshot.readiness = readiness as unknown as ScoreReport;
+        snapshot.readiness = readiness;
       } catch {
         snapshot.readiness = null;
       }
@@ -203,9 +224,12 @@ export class AckitWorkspaceService implements vscode.Disposable {
       if ((e as DOMException).name === "AbortError") return;
       snapshot.error = (e as Error).message;
     } finally {
-      snapshot.updatedAt = Date.now();
-      this.snapshots.set(root, snapshot);
-      this._onDidChange.fire(root);
+      if (this.controllers.get(root) === ac) this.controllers.delete(root);
+      if (!this.disposed && !signal.aborted) {
+        snapshot.updatedAt = Date.now();
+        this.snapshots.set(root, snapshot);
+        this._onDidChange.fire(root);
+      }
     }
   }
 }

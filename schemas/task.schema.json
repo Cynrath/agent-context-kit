@@ -37,13 +37,9 @@
     },
     "completedAt": {
       "default": null,
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "intentRef": {

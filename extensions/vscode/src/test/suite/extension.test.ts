@@ -1,120 +1,118 @@
 import * as assert from "node:assert";
-import * as vscode from "vscode";
-import * as path from "node:path";
 import * as fs from "node:fs";
+import * as path from "node:path";
+import * as vscode from "vscode";
+import type { WorkspaceSnapshot } from "../../services/ackitWorkspace.js";
 
 suite("ACKit Extension Integration", () => {
-  test("extension activates", async () => {
+  let root: string;
+  let snapshot: WorkspaceSnapshot;
+  suiteSetup(async () => {
+    const folder = vscode.workspace.workspaceFolders?.[0];
+    assert.ok(folder, "Disposable workspace missing");
+    root = folder.uri.fsPath;
     const ext = vscode.extensions.getExtension("Cynrath.ackit-vscode");
     assert.ok(ext, "Extension not found");
-    if (!ext.isActive) await ext.activate();
+    await ext.activate();
     assert.ok(ext.isActive, "Extension not active");
+    snapshot = await vscode.commands.executeCommand<WorkspaceSnapshot>("ackit.refresh");
   });
 
-  test("ACKit activity container exists", async () => {
-    // The activity bar container is registered via package.json; check that views are registered
-    // We can't directly query activity bar, but we can check that tree views can be created
-    const ext = vscode.extensions.getExtension("Cynrath.ackit-vscode");
-    assert.ok(ext);
-    // Check contributes.views
-    const pkg = ext.packageJSON as { contributes?: { views?: Record<string, Array<{ id: string }>> } };
-    const views = pkg.contributes?.views?.ackit?.map((v) => v.id) ?? [];
-    assert.ok(views.includes("ackit.readiness"), "ackit.readiness view missing");
-    assert.ok(views.includes("ackit.findings"), "ackit.findings view missing");
-    assert.ok(views.includes("ackit.graph"), "ackit.graph view missing");
-  });
-
-  test("Readiness tree has real data", async () => {
-    // Trigger refresh and check that readiness provider returns data
-    await vscode.commands.executeCommand("ackit.refresh");
-    // Wait a bit for async refresh
-    await new Promise((r) => setTimeout(r, 1500));
-    // The tree view should have items; we can't easily query tree data, but we can check that diagnostics are not empty?
-    // As a proxy, check that the extension's service has updated
-    // For now, just assert that refresh command succeeded without throwing
-    assert.ok(true);
-  });
-
-  test("Findings tree has real data", async () => {
-    await vscode.commands.executeCommand("ackit.refresh");
-    await new Promise((r) => setTimeout(r, 1000));
-    assert.ok(true);
-  });
-
-  test("Problems diagnostics appear", async () => {
-    // After refresh, diagnostics collection should have entries
-    await vscode.commands.executeCommand("ackit.refresh");
-    await new Promise((r) => setTimeout(r, 1200));
-    const diags = vscode.languages.getDiagnostics();
-    // At least one diagnostic may exist from fixture, or none if clean — just ensure no crash
-    assert.ok(Array.isArray(diags));
-  });
-
-  test("Instructions-for-current-file works", async () => {
-    // Create a test file and try to resolve instructions
-    const ws = vscode.workspace.workspaceFolders?.[0];
-    if (!ws) return;
-    const testFile = path.join(ws.uri.fsPath, "src", "test-current.ts");
-    fs.mkdirSync(path.dirname(testFile), { recursive: true });
-    fs.writeFileSync(testFile, "console.log('test');", "utf8");
-    const uri = vscode.Uri.file(testFile);
-    const doc = await vscode.workspace.openTextDocument(uri);
-    await vscode.window.showTextDocument(doc);
-    // Execute the command; it should not throw
-    try {
-      await vscode.commands.executeCommand("ackit.instructionsForCurrentFile");
-    } catch {
-      // The command may be named differently; try again without Thenable.catch
-      try {
-        await vscode.commands.executeCommand("ackit.instructionsForCurrentFile");
-      } catch {
-        // ignore
-      }
-    }
-    // Cleanup
-    fs.unlinkSync(testFile);
-    assert.ok(true);
-  });
-
-  test("graph command works", async () => {
-    await vscode.commands.executeCommand("ackit.showGraph");
-    assert.ok(true);
-  });
-
-  test("optimize produces real findings", async () => {
-    // Execute optimize command; it should show quick pick or message, not just terminal
-    try {
-      await vscode.commands.executeCommand("ackit.optimize");
-    } catch {}
-    assert.ok(true);
-  });
-
-  test("diagnostics command uses real diagnostics", async () => {
-    await vscode.commands.executeCommand("ackit.diagnostics");
-    // Should open a document with JSON
-    await new Promise((r) => setTimeout(r, 800));
-    const editor = vscode.window.activeTextEditor;
-    // If diagnostics opened a JSON doc, it will be active
-    assert.ok(editor || true);
-  });
-
-  test("refresh works after file create/change/delete", async () => {
-    const ws = vscode.workspace.workspaceFolders?.[0];
-    if (!ws) return;
-    const tmpFile = path.join(ws.uri.fsPath, `tmp-${Date.now()}.md`);
-    fs.writeFileSync(tmpFile, "# Test\n", "utf8");
-    await vscode.commands.executeCommand("ackit.refresh");
-    await new Promise((r) => setTimeout(r, 800));
-    fs.writeFileSync(tmpFile, "# Test changed\n", "utf8");
-    await new Promise((r) => setTimeout(r, 800));
-    fs.unlinkSync(tmpFile);
-    await new Promise((r) => setTimeout(r, 800));
-    await vscode.commands.executeCommand("ackit.refresh");
-    assert.ok(true);
-  });
-
-  test("extension host does not crash", async () => {
+  test("registers every advertised command and view", async () => {
     const ext = vscode.extensions.getExtension("Cynrath.ackit-vscode");
     assert.ok(ext?.isActive);
+    const pkg = ext.packageJSON as {
+      contributes: { commands: { command: string }[]; views: { ackit: { id: string }[] } };
+    };
+    const commands = await vscode.commands.getCommands(true);
+    for (const command of pkg.contributes.commands)
+      assert.ok(commands.includes(command.command), command.command);
+    for (const view of ["ackit.readiness", "ackit.findings", "ackit.graph", "ackit.tasks"])
+      assert.ok(
+        pkg.contributes.views.ackit.some((item) => item.id === view),
+        view,
+      );
+  });
+  test("service provides real scan, graph, readiness and optimization data", () => {
+    assert.ok(snapshot);
+    assert.strictEqual(snapshot.error, null);
+    assert.ok(
+      snapshot.scan?.findings.some(
+        (finding) => finding.relativePath === "sample.txt" && finding.ruleId === "ACKIT020",
+      ),
+    );
+    assert.ok(snapshot.graph?.nodes.some((node) => node.relativePath === "AGENTS.md"));
+    assert.ok(snapshot.readiness, "SDK identity/templates failed to load");
+    assert.ok(Number.isFinite(snapshot.readiness.overall));
+    assert.ok(Array.isArray(snapshot.optimize));
+  });
+  test("refresh publishes actual ACKit diagnostics for the fixture finding", async () => {
+    const snapshot = await vscode.commands.executeCommand<WorkspaceSnapshot>("ackit.refresh");
+    assert.ok(snapshot?.readiness, "Packaged SDK identity/templates failed to load");
+    assert.ok(Number.isFinite(snapshot.readiness.overall));
+    const uri = vscode.Uri.file(path.join(root, "sample.txt"));
+    const diagnostics = vscode.languages
+      .getDiagnostics(uri)
+      .filter((item) => item.source === "ackit");
+    assert.ok(
+      diagnostics.some((item) => item.code === "ACKIT020"),
+      "Fixture diagnostic missing",
+    );
+  });
+  test("opens a contained finding and refuses traversal", async () => {
+    await vscode.commands.executeCommand("ackit.openFinding", {
+      relativePath: "sample.txt",
+      line: 1,
+      column: 1,
+    });
+    const editor = vscode.window.activeTextEditor;
+    assert.strictEqual(editor?.document.uri.fsPath, path.join(root, "sample.txt"));
+    await vscode.commands.executeCommand("ackit.openFinding", {
+      relativePath: "../outside.txt",
+      line: 1,
+      column: 1,
+    });
+    assert.strictEqual(
+      vscode.window.activeTextEditor?.document.uri.fsPath,
+      editor?.document.uri.fsPath,
+    );
+  });
+  test("diagnostics command opens actual JSON output", async () => {
+    await vscode.commands.executeCommand("ackit.diagnostics");
+    const document = vscode.window.activeTextEditor?.document;
+    assert.strictEqual(document?.languageId, "json");
+    const data = JSON.parse(document?.getText() ?? "null") as { config: unknown; tasks: unknown };
+    assert.strictEqual(data.config, "ok");
+    assert.strictEqual(data.tasks, "ok");
+  });
+  test("service reflects a fixture create/change/delete lifecycle", async () => {
+    const file = path.join(root, "lifecycle.txt");
+    fs.writeFileSync(file, "TODO: lifecycle fixture\n", "utf8");
+    snapshot = await vscode.commands.executeCommand<WorkspaceSnapshot>("ackit.refresh");
+    assert.ok(snapshot.scan?.findings.some((finding) => finding.relativePath === "lifecycle.txt"));
+    fs.writeFileSync(file, "Resolved lifecycle fixture\n", "utf8");
+    snapshot = await vscode.commands.executeCommand<WorkspaceSnapshot>("ackit.refresh");
+    assert.ok(!snapshot.scan?.findings.some((finding) => finding.relativePath === "lifecycle.txt"));
+    fs.unlinkSync(file);
+    snapshot = await vscode.commands.executeCommand<WorkspaceSnapshot>("ackit.refresh");
+    assert.strictEqual(snapshot.error, null);
+  });
+  test("overlapping explicit refreshes each return a completed current scan", async () => {
+    const file = path.join(root, "overlap.txt");
+    fs.writeFileSync(file, "TODO: overlapping refresh fixture\n", "utf8");
+    try {
+      const inspect = () =>
+        vscode.commands
+          .executeCommand<WorkspaceSnapshot>("ackit.refresh")
+          .then((value) =>
+            Boolean(
+              value?.scan?.findings.some((finding) => finding.relativePath === "overlap.txt"),
+            ),
+          );
+      assert.deepStrictEqual(await Promise.all([inspect(), inspect()]), [true, true]);
+    } finally {
+      fs.unlinkSync(file);
+      await vscode.commands.executeCommand("ackit.refresh");
+    }
   });
 });

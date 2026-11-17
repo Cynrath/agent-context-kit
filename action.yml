@@ -24,8 +24,40 @@ inputs:
 outputs:
   findings-json:
     description: "path to findings JSON"
+    value: ${{ steps.ackit.outputs.findings-json }}
   sarif-path:
     description: "SARIF file path when upload-sarif=true"
+    value: ${{ steps.ackit.outputs.sarif-path }}
 runs:
-  using: "node24"
-  main: "dist/action/index.js"
+  using: "composite"
+  steps:
+    # actions/setup-node@v4
+    - uses: actions/setup-node@ae0d4ed08881f17d1511386f5be3e62356acd4a6
+      with:
+        node-version: "24"
+    - name: Locate the Action manifest
+      id: action-package
+      shell: bash
+      env:
+        ACKIT_ACTION_PATH: ${{ github.action_path }}
+      run: node "${ACKIT_ACTION_PATH}/scripts/action-package-path.mjs" >> "${GITHUB_OUTPUT}"
+    # pnpm/action-setup@v4
+    - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+      with:
+        package_json_file: ${{ steps.action-package.outputs.path }}
+    - name: Build the exact Action source
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: |
+        pnpm install --frozen-lockfile --ignore-scripts --filter @cynrath/agent-context-kit
+        pnpm build
+    - name: Run ACKit against the consumer
+      id: ackit
+      shell: bash
+      env:
+        ACKIT_ACTION_PATH: ${{ github.action_path }}
+        INPUT_COMMAND: ${{ inputs.command }}
+        INPUT_ARGS: ${{ inputs.args }}
+        INPUT_FAIL_THRESHOLD: ${{ inputs.fail-threshold }}
+        INPUT_UPLOAD_SARIF: ${{ inputs.upload-sarif }}
+      run: node "${ACKIT_ACTION_PATH}/dist/action/index.js"

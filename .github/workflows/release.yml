@@ -184,10 +184,10 @@ jobs:
             echo "::error::extension publisher '${EXT_PUB}' != 'Cynrath'"
             exit 52
           fi
-          pnpm --filter ackit-vscode exec esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=dist/extension.js --external:vscode --sourcemap
+          pnpm --filter ackit-vscode run build
           test -f extensions/vscode/dist/extension.js
           cd extensions/vscode
-          npx --yes @vscode/vsce package --no-dependencies --no-yarn --out "ackit-vscode-${RELEASE_VERSION}.vsix"
+          npx --yes @vscode/vsce@4.1.1 package --no-dependencies --no-yarn --out "ackit-vscode-${RELEASE_VERSION}.vsix"
           test -f "ackit-vscode-${RELEASE_VERSION}.vsix"
           VSIX_ABS="$(pwd)/ackit-vscode-${RELEASE_VERSION}.vsix"
           VSIX_SHA256="$(sha256sum "${VSIX_ABS}" | cut -d' ' -f1)"
@@ -250,7 +250,7 @@ jobs:
             exit 61
           fi
           cd extensions/vscode
-          npx --yes @vscode/vsce ls --no-dependencies --no-yarn > /tmp/vsce-ls.txt
+          npx --yes @vscode/vsce@4.1.1 ls --no-dependencies --no-yarn > /tmp/vsce-ls.txt
           cat /tmp/vsce-ls.txt
           if grep -q "node_modules" /tmp/vsce-ls.txt; then
             echo "::error::vsce ls lists node_modules"
@@ -267,6 +267,7 @@ jobs:
             echo "::error::secret pattern in VSIX manifest"
             exit 64
           fi
+          node scripts/check-vsix.mjs "${VSIX_PATH}"
           node scripts/check-offline-egress.mjs
           if grep -R "fetch.*http" extensions/vscode/src; then
             echo "::error::extension source contains remote fetch"
@@ -326,7 +327,7 @@ jobs:
           fi
           seen=0
           for attempt in 1 2 3; do
-            if npx --yes @vscode/vsce show Cynrath.ackit-vscode --json > /tmp/mkt-pre.json 2> /tmp/mkt-pre.err; then
+            if npx --yes @vscode/vsce@4.1.1 show Cynrath.ackit-vscode --json > /tmp/mkt-pre.json 2> /tmp/mkt-pre.err; then
               PRE_VER="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/mkt-pre.json','utf8')).versions?.[0]?.version ?? 'unknown'")"
               echo "Marketplace live latest: ${PRE_VER} (release target ${RELEASE_VERSION})"
               if [ "${PRE_VER}" = "${RELEASE_VERSION}" ]; then
@@ -425,7 +426,7 @@ jobs:
           set -euo pipefail
           seen=0
           for attempt in $(seq 1 30); do
-            if npx --yes @vscode/vsce show Cynrath.ackit-vscode --json > /tmp/mkt-show.json 2> /tmp/mkt-show.err; then
+            if npx --yes @vscode/vsce@4.1.1 show Cynrath.ackit-vscode --json > /tmp/mkt-show.json 2> /tmp/mkt-show.err; then
               MKT_VER="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/mkt-show.json','utf8')).versions?.[0]?.version ?? ''")"
               if [ "${MKT_VER}" = "${RELEASE_VERSION}" ]; then
                 seen=1
@@ -532,8 +533,17 @@ jobs:
             echo "::error::npm latest='${NPM_LATEST}' != '${RELEASE_VERSION}'"
             exit 90
           fi
-          npx --yes @vscode/vsce show Cynrath.ackit-vscode --json > /tmp/mkt-final.json
-          MKT_FINAL="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/mkt-final.json','utf8')).versions?.[0]?.version ?? ''")"
+          MKT_FINAL=""
+          for attempt in $(seq 1 6); do
+            if npx --yes @vscode/vsce@4.1.1 show Cynrath.ackit-vscode --json > /tmp/mkt-final.json 2> /tmp/mkt-final.err; then
+              MKT_FINAL="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/mkt-final.json','utf8')).versions?.[0]?.version ?? ''")"
+              if [ "${MKT_FINAL}" = "${RELEASE_VERSION}" ]; then
+                break
+              fi
+            fi
+            echo "final Marketplace read attempt ${attempt}/6: stale or unreadable; target ${RELEASE_VERSION}"
+            if [ "${attempt}" -lt 6 ]; then sleep 10; fi
+          done
           if [ "${MKT_FINAL}" != "${RELEASE_VERSION}" ]; then
             echo "::error::Marketplace latest='${MKT_FINAL}' != '${RELEASE_VERSION}'"
             exit 91

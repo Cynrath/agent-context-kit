@@ -9,16 +9,16 @@ The programmatic SDK is the single supported import for embedding ACKit in Node.
 
 | Symbol | Kind | Description |
 |---|---|---|
-| `scanRepository(root, opts?)` | function | Scans a repository, returns `ScanResult` (deterministic findings, diagnostics, filesScanned). `opts.signal?: AbortSignal` cancels within 200ms. |
-| `loadAckitConfig(root, opts?)` | function | Loads `ackit.yml` + policy chain, returns `{ok, config}` or `{ok:false, errors}` with `AckitError`-compatible codes. |
+| `scanRepository(root, opts?)` | function | Scans a repository, returns `ScanResult` (deterministic findings, diagnostics, filesScanned). Accepts `opts.signal?: AbortSignal`. |
+| `loadAckitConfig(rootPath, opts?)` | function | Loads and validates `ackit.yml`, merges configuration defaults and returns `{ok, config}` or `{ok:false, errors}`. `rootPath` is a directory string. |
 | `buildContextPack(root, opts?)` | function | Builds a budgeted deterministic context pack (`PackResult`). `opts.signal` supported. |
 | `buildInstructionGraph(root, opts?)` | function | Builds the instruction graph (`InstructionGraph`). `opts.signal` supported. |
 | `resolveEffectiveStack(graph, provider, forPath?)` | function | Pure function resolving the effective instruction stack for a provider/path. |
 | `analyzeOptimize(root, opts?)` | function | Optimization findings + suggestions (pack/context waste analysis). |
 | `validateSkills(root)` | function | Validates `.agents/skills/*/SKILL.md` set, returns `{skills, issues}`. |
-| `evaluateRulePacks(root, opts?)` | function | Evaluates declarative rule packs (exported since v0.2.0). |
-| `loadRulePacks(root)` | function | Loads rule pack documents. |
-| `scoreRepository(root, opts?)` | function | Readiness scoring engine (exported since v0.2.0). |
+| `evaluateRulePacks(effectivePacks, context)` | function | Evaluates loaded declarative rules against repository files/configuration (exported since v0.2.0). |
+| `loadRulePacks(root, rulePackPaths)` | function | Loads the explicit repository-relative rule-pack paths. |
+| `scoreRepository(inputs, opts?)` | function | Scores collected graph/pack/scan/skills/policy/task inputs (exported since v0.2.0). |
 | `detectProfiles`, `loadBuiltInProfiles`, `resolveProfile` | functions | Stack/profile detection and resolution. |
 | `ProfileSchema` | constant | Stack-profile zod schema. |
 | `READINESS_ENGINE_VERSION` | constant | Readiness engine version marker. |
@@ -65,13 +65,29 @@ Additions require ADR + contract test update; the allowlist test fails on accide
 
 ## Error model
 
+For scanning, packs, graphs, skills and rule-pack loading, `root` is a descriptor
+`{ canonicalPath: string }`, not a path string. Resolve it with Node's `realpath`:
+
+```js
+import { realpath } from "node:fs/promises";
+const root = { canonicalPath: await realpath(process.cwd()) };
+```
+
+`scanRepository` runs built-in rules plus `opts.extraRules` through the shared
+pipeline. It does not load `ackit.yml` or apply its external policy chain;
+configured CLI/MCP scans add that orchestration. Supply explicit limits and
+exclusions when embedding the lower-level SDK scanner.
+
 ```ts
 import { AckitError, scanRepository } from "@cynrath/agent-context-kit";
+import { realpath } from "node:fs/promises";
+const root = { canonicalPath: await realpath(process.cwd()) };
+const signal = new AbortController().signal;
 try {
   const result = await scanRepository(root, { signal });
 } catch (e) {
   if (e instanceof DOMException && e.name === "AbortError") {
-    console.log("aborted within 200ms");
+    console.log("aborted");
   } else if (e instanceof AckitError) {
     console.error(e.code, e.message, e.remediation);
   } else if (e instanceof Error) {
@@ -84,14 +100,20 @@ Stable codes: `CONFIG-UNKNOWN-KEY` (did-you-mean hint in `remediation`), `CONFIG
 
 ## Cancellation (AbortSignal)
 
-All async SDK entries accept `{ signal?: AbortSignal }` and reject with `DOMException { name:"AbortError" }` within 200ms when `signal.aborted` is true before the call, and cooperatively abort mid-flight where checkpoints exist (scan batches, pack checkpoints, graph per-file).
+The scanning, context-pack and instruction-graph entries accept
+`{ signal?: AbortSignal }` and reject with `DOMException { name:"AbortError" }`
+within 200ms when `signal.aborted` is true before the call. Mid-flight cancellation
+is cooperative at scan batches, pack checkpoints and graph file boundaries;
+it is not a fixed wall-clock guarantee for arbitrary caller-supplied rules.
 
 ```ts
 import { scanRepository } from "@cynrath/agent-context-kit";
+import { realpath } from "node:fs/promises";
+const root = { canonicalPath: await realpath(process.cwd()) };
 const ac = new AbortController();
 setTimeout(() => ac.abort(), 10);
 try {
-  const result = await scanRepository(process.cwd(), { signal: ac.signal });
+  const result = await scanRepository(root, { signal: ac.signal });
   console.log(result.findings.length);
 } catch (e) {
   if (e instanceof DOMException && e.name === "AbortError") console.log("aborted");

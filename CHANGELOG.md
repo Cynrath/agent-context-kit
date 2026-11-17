@@ -6,11 +6,50 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-11-17
+
+Compatible audit and reliability patch. Public CLI/SDK exports and offline
+analysis remain unchanged; the corrections below restore documented behavior.
+
+### Fixed
+
+- GitHub Action threshold failures survive a successful CLI process exit;
+  policy-suppressed findings do not fail the Action. CLI errors and bounded
+  process failures remain failures, and SARIF uses the canonical 2.1.0 writer.
+- The Action builds its exact source checkout with pinned Node/pnpm setup and a
+  frozen install, then runs offline against the consumer. Clean-tag consumers
+  no longer depend on missing ignored CLI files. Setup needs registry access;
+  no generated `dist` is tracked (ADR-0034).
+- SDK scans run the built-in rule catalog by default and append trusted extra
+  rules. VS Code now receives real findings, keeps packaged SDK identity/templates
+  available in its CommonJS bundle, and confines finding paths to the workspace.
+- Action setup locates its own pinned manifest relative to the consumer workspace;
+  VS Code serializes overlapping refreshes per root and publishes completed snapshots.
+  Consumer diagnostics redact canonical path aliases on macOS as well.
+- MCP tool reference matches all 16 live input schemas; scan `ci` controls the
+  severity exit hint. CLI `--root` now binds MCP startup ahead of environment/cwd
+  fallback without reopening per-tool root overrides.
+- CI propagates extension lint/unit/Electron failures, verifies schema drift and
+  CLI smoke, derives version/VSIX names, and audits actual packaged content/CRC.
+  Extension tests assert real runtime data; VSIX excludes source maps and tools.
+- Final Marketplace verification retries stale/unreadable visibility reads within
+  a fixed bound and still fails closed unless the exact release version is seen.
+- Repaired README links, SDK example/signatures and portable path fixtures;
+  documented the separate historical task namespace and truthful Docs7 blockers.
+
+### Security
+
+- Updated compatible MCP SDK/Zod versions and affected runtime transitives;
+  production dependency audit reports zero known advisories. Existing development
+  tool advisories are separately triaged in TASK-0101, not hidden or suppressed.
+- Marketplace-first manual gate, npm OIDC/provenance, exact-tag identity and
+  immutable artifact checks remain in force. No credential or permission change.
+
 ### Added
 
 - Context7 library parsing configuration and optional Docs7 Free documentation
-  site manifest, with a guide for owner claiming, verification and automatic refresh;
-  no CLI/runtime, package version or existing hosting changes.
+  site manifest, with a guide for ownership, verification and automatic refresh;
+  documentation hosting/account verification remains separate from offline runtime.
 - Community integration docs for GitHub Spec Kit: new
   `docs/guides/spec-kit-bridge.md`, README ecosystem section and docs index
   link pointing at [`@cynrath/ackit-spec-kit-bridge`](https://github.com/Cynrath/ackit-spec-kit-bridge)

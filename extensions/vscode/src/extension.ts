@@ -3,10 +3,9 @@ import {
   analyzeOptimize,
   buildInstructionGraph,
   resolveEffectiveStack,
-  scanRepository,
-  scoreRepository,
 } from "@cynrath/agent-context-kit";
 import * as vscode from "vscode";
+import { diagnosticKind, resolveFindingPath } from "./diagnostics.js";
 import { AckitWorkspaceService } from "./services/ackitWorkspace.js";
 
 let service: AckitWorkspaceService | undefined;
@@ -398,11 +397,8 @@ export async function activate(context: vscode.ExtensionContext) {
           service?.getSnapshot()?.root ?? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
         if (!root) continue;
         // Only create diagnostics for files that are inside workspace
-        const full = path.isAbsolute(f.relativePath)
-          ? f.relativePath
-          : path.join(root, f.relativePath);
-        // Ensure inside root
-        if (!full.startsWith(root)) continue;
+        const full = resolveFindingPath(root, f.relativePath);
+        if (full === null) continue;
         uri = vscode.Uri.file(full);
       } catch {
         continue;
@@ -411,14 +407,7 @@ export async function activate(context: vscode.ExtensionContext) {
       const col = Math.max(0, (f.column ?? 1) - 1);
       // Handle invalid line/col: if 0, use 0,0 range
       const range = new vscode.Range(line, col, line, col + 10);
-      const severity =
-        f.severity === "critical" || f.severity === "high"
-          ? vscode.DiagnosticSeverity.Error
-          : f.severity === "medium"
-            ? vscode.DiagnosticSeverity.Warning
-            : f.severity === "low"
-              ? vscode.DiagnosticSeverity.Information
-              : vscode.DiagnosticSeverity.Hint;
+      const severity = vscode.DiagnosticSeverity[diagnosticKind(f.severity)];
       const diag = new vscode.Diagnostic(range, f.message, severity);
       diag.code = f.ruleId;
       diag.source = "ackit";
@@ -450,6 +439,7 @@ export async function activate(context: vscode.ExtensionContext) {
       const roots = service?.getRoots() ?? [];
       for (const r of roots) await service?.refreshRoot(r);
       vscode.window.showInformationMessage(`ACKit: refreshed ${roots.length} workspace(s)`);
+      return service?.getSnapshot();
     }),
     vscode.commands.registerCommand("ackit.showGraph", async (nodeId?: string) => {
       const snap = service?.getSnapshot();
@@ -502,7 +492,8 @@ export async function activate(context: vscode.ExtensionContext) {
             vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ??
             "";
           if (!root) return;
-          const full = path.join(root, finding.relativePath);
+          const full = resolveFindingPath(root, finding.relativePath);
+          if (full === null) return;
           const uri = vscode.Uri.file(full);
           const doc = await vscode.workspace.openTextDocument(uri);
           const editor = await vscode.window.showTextDocument(doc);
@@ -512,8 +503,8 @@ export async function activate(context: vscode.ExtensionContext) {
           );
           editor.selection = new vscode.Selection(pos, pos);
           editor.revealRange(new vscode.Range(pos, pos));
-        } catch (e) {
-          vscode.window.showErrorMessage(`Could not open finding: ${e}`);
+        } catch {
+          vscode.window.showErrorMessage("Could not open finding.");
         }
       },
     ),

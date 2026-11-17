@@ -62,6 +62,36 @@ describe("CI workflow hardening", () => {
     expect(raw).toContain("scan --ci");
     expect(raw).toContain("smoke:package");
   });
+
+  it("enforces schema/CLI/version gates and real extension failures", () => {
+    const doc = parse(raw) as {
+      jobs: Record<string, { steps: { run?: string; "continue-on-error"?: boolean }[] }>;
+    };
+    const runs = doc.jobs["verify"]?.steps.map((step) => step.run ?? "").join("\n") ?? "";
+    for (const marker of [
+      "pnpm gen:schemas",
+      "git diff --exit-code -- schemas",
+      "pnpm smoke:cli",
+      "node scripts/check-version-parity.mjs",
+    ])
+      expect(runs).toContain(marker);
+    const extension = doc.jobs["extension"]?.steps ?? [];
+    for (const step of extension) {
+      expect(step["continue-on-error"]).not.toBe(true);
+      expect(step.run ?? "").not.toMatch(/\|\|\s*(?:true|echo)|--diagnostic-level=warn/);
+    }
+    const commands = extension.map((step) => step.run ?? "").join("\n");
+    for (const marker of [
+      "run lint",
+      "run typecheck",
+      "run test:unit",
+      "xvfb-run -a pnpm --filter ackit-vscode test",
+      "node scripts/check-vsix.mjs",
+      "pkg.version!==root.version",
+    ])
+      expect(commands).toContain(marker);
+    expect(commands).not.toMatch(/ackit-vscode-\d+\.\d+\.\d+\.vsix/);
+  });
 });
 
 /** Controlled-release gate: release.yml must stay a tags-only, npm-OIDC +
@@ -316,5 +346,17 @@ describe("release workflow hardening", () => {
     expect(raw).not.toContain("v0.2.0");
     expect(raw).toContain("v" + "$" + "{RELEASE_VERSION}");
     expect(raw).toContain("AgentContextKit v" + "$" + "{RELEASE_VERSION}" + " release");
+  });
+
+  it("bounds final Marketplace stale-read retries and still fails closed", () => {
+    const doc = parse(raw) as { jobs: { release: { steps: { name?: string; run?: string }[] } } };
+    const final = doc.jobs.release.steps.at(-1);
+    expect(final?.name).toContain("Final public-surface verification");
+    const run = final?.run ?? "";
+    expect(run).toMatch(/for attempt in \$\(seq 1 6\); do/);
+    expect(run).toContain('if [ "' + "$" + '{attempt}" -lt 6 ]; then sleep 10; fi');
+    expect(run).toContain('"' + "$" + '{MKT_FINAL}" = "' + "$" + '{RELEASE_VERSION}"');
+    expect(run).toContain("exit 91");
+    expect(run).not.toMatch(/\|\|\s*true|vsce.*publish/);
   });
 });

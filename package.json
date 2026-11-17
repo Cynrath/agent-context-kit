@@ -1,6 +1,6 @@
 {
   "name": "@cynrath/agent-context-kit",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Agent context and repository readiness toolkit for Codex, Claude Code, Cursor, Copilot, Gemini and MCP-based coding agents. Validates agent instructions, scans repositories, optimizes context and enforces evidence-backed workflows. Offline-first and deterministic.",
   "keywords": [
     "ackit",
@@ -79,15 +79,16 @@
     "test": "vitest run",
     "check:text-hygiene": "node scripts/check-text-hygiene.mjs --repo",
     "smoke:cli": "node tests/e2e/cli-scaffold.smoke.mjs",
+    "smoke:action": "node scripts/action-consumer-smoke.mjs",
     "smoke:package": "node scripts/package-smoke.mjs"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "commander": "^15.0.0",
     "ignore": "^7.0.6",
     "picomatch": "^4.0.5",
     "yaml": "^2.9.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.10",
