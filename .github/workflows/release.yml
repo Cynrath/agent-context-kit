@@ -533,8 +533,17 @@ jobs:
             echo "::error::npm latest='${NPM_LATEST}' != '${RELEASE_VERSION}'"
             exit 90
           fi
-          npx --yes @vscode/vsce@4.1.1 show Cynrath.ackit-vscode --json > /tmp/mkt-final.json
-          MKT_FINAL="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/mkt-final.json','utf8')).versions?.[0]?.version ?? ''")"
+          MKT_FINAL=""
+          for attempt in $(seq 1 6); do
+            if npx --yes @vscode/vsce@4.1.1 show Cynrath.ackit-vscode --json > /tmp/mkt-final.json 2> /tmp/mkt-final.err; then
+              MKT_FINAL="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/mkt-final.json','utf8')).versions?.[0]?.version ?? ''")"
+              if [ "${MKT_FINAL}" = "${RELEASE_VERSION}" ]; then
+                break
+              fi
+            fi
+            echo "final Marketplace read attempt ${attempt}/6: stale or unreadable; target ${RELEASE_VERSION}"
+            if [ "${attempt}" -lt 6 ]; then sleep 10; fi
+          done
           if [ "${MKT_FINAL}" != "${RELEASE_VERSION}" ]; then
             echo "::error::Marketplace latest='${MKT_FINAL}' != '${RELEASE_VERSION}'"
             exit 91

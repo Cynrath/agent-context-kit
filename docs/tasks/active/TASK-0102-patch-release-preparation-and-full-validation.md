@@ -1,7 +1,7 @@
 ---
 id: "TASK-0102"
 title: "Patch release preparation and full validation"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0101"
@@ -44,7 +44,7 @@ chain. npm latest and Marketplace were both independently read as 0.5.4 on
 
 ## Dependencies
 
-TASK-0101. TASK-0103 requires all acceptance below and exact-head PR CI.
+TASK-0101 and TASK-0104. TASK-0103 requires all acceptance below and exact-head PR CI.
 
 ## Required tests
 
@@ -57,10 +57,10 @@ TASK-0101. TASK-0103 requires all acceptance below and exact-head PR CI.
 
 - [x] Source/extension/package docs are coupled at the next absent patch;
   published-stable claims remain truthful until publication.
-- [ ] All required local checks pass with exact counts/commands recorded;
+- [x] All required local checks pass with exact counts/commands recorded;
   no skipped mandatory tests or unresolved release-scope security finding.
-- [ ] Actual tarball/VSIX audited, SHA-256 recorded and release notes reviewed.
-- [ ] Final diff and ACKit checks pass; all pre-release work is committed and
+- [x] Actual tarball/VSIX audited, SHA-256 recorded and release notes reviewed.
+- [~] Final diff and ACKit checks pass; all pre-release work is committed and
   the tree is clean before an authorized push.
 
 ## Test steps
@@ -89,7 +89,44 @@ Forward corrective PR before release; never reuse or move immutable versions.
 
 ## Completion notes
 
-Plan allocated by repository CLI on 2026-11-17. Full validation not yet run.
+Final local validation 2026-11-17, after TASK-0104 corrective verification:
+
+- Source/extension/packaged metadata 0.5.5; stable pointer/install pins remain
+  0.5.4 as required by ADR-0029. npm/Marketplace both re-read 0.5.4; target npm
+  0.5.5 returns E404 and remote v0.5.5 tag is absent. No breaking public SDK/CLI
+  export/argument removal. Source README build instructions now use the real
+  package selector and audited bundled VSIX command.
+- Pinned pnpm 11.22.0 frozen install PASS; root lint, format, typecheck, build,
+  version 0.5.5 and schema generation/no drift PASS. Full current code suite:
+  125 files PASS, 772 tests PASS / 3 unchanged Windows privilege-dependent
+  symlink skips (775 total). Release/version/tag/VSIX/docs subset also passed.
+- CLI smoke, explicit real-tarball package consumer smoke, documentation command
+  smoke and clean Action source consumer PASS. The Action consumer now exercises
+  scan/optimize/drift thresholds, CLI error preservation, legacy no-op and
+  canonical CLI/Action optimize SARIF equality with no consumer runtime files.
+- Final extension source/test typechecks, strict lint, build, 8 unit and 6 real
+  Electron host tests PASS at 0.5.5. An initial command batch used an incorrect
+  relative toolchain prefix; it was cancelled and not counted. The verified
+  root-cwd run explicitly reported pnpm 11.22.0 and all actual checks above.
+- Audited artifacts in ignored `artifacts/release-0.5.5/`:
+  - `ackit-vscode-0.5.5.vsix`: 31 entries, 414975 bytes, SHA-256
+    `8fa4cfc2f804f1440fcf1c5abe215570b7ee5c4c1762654a53676696c8d9fd9f`.
+  - `cynrath-agent-context-kit-0.5.5.tgz`: 497350 bytes, SHA-256
+    `699437eff29c9dbd74ccd7104e2116ea1a384229cfb1b4e65cc49c88fa6b6a7f`.
+  Actual VSIX manifest/XML/SDK/README/CHANGELOG, templates, file list, icon,
+  bounded ZIP extraction/CRC, size and secret checks PASS. Local checksum file
+  contains filenames/hashes only. Extracted 0.5.5 release notes pass text hygiene.
+- Production dependency audit: zero known advisories (TASK-0101 has the explicit
+  separate development-tool advisory disposition). Offline-egress, config,
+  doctor/task doctor, skills (4/0 issues), instructions, scan --ci (exit 0),
+  text hygiene, version parity and git diff --check PASS.
+- Final Marketplace read now has six bounded attempts with exact target
+  comparison and exit 91 retained. Focused workflow contracts PASS; all original
+  publish-order/security/absence/OIDC/artifact gates remain. No dispatch/rerun,
+  permission, credential or deployment action.
+- Final diff reviewed. The implementation/evidence commit and clean-tree proof
+  are the remaining Git criterion before completion. Hosted OS/Node matrix,
+  protected PR merge and all publication actions belong to TASK-0103.
 
 ### Dependency checkpoint 2026-11-17
 

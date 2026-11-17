@@ -347,4 +347,16 @@ describe("release workflow hardening", () => {
     expect(raw).toContain("v" + "$" + "{RELEASE_VERSION}");
     expect(raw).toContain("AgentContextKit v" + "$" + "{RELEASE_VERSION}" + " release");
   });
+
+  it("bounds final Marketplace stale-read retries and still fails closed", () => {
+    const doc = parse(raw) as { jobs: { release: { steps: { name?: string; run?: string }[] } } };
+    const final = doc.jobs.release.steps.at(-1);
+    expect(final?.name).toContain("Final public-surface verification");
+    const run = final?.run ?? "";
+    expect(run).toMatch(/for attempt in \$\(seq 1 6\); do/);
+    expect(run).toContain('if [ "' + "$" + '{attempt}" -lt 6 ]; then sleep 10; fi');
+    expect(run).toContain('"' + "$" + '{MKT_FINAL}" = "' + "$" + '{RELEASE_VERSION}"');
+    expect(run).toContain("exit 91");
+    expect(run).not.toMatch(/\|\|\s*true|vsce.*publish/);
+  });
 });
