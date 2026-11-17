@@ -7,7 +7,7 @@ import { buildContextPack, RANKING_WEIGHTS } from "../../../src/core/context/pac
 let repo: { rootPath: string; cleanup(): Promise<void> };
 
 const SECRET_VALUE = "AKIAIOSFODNN7EXAMPLE";
-const WIN_ABS = "C:\\Users\\gizem\\AppData\\Local\\Temp\\cache";
+const WIN_ABS = "C:\\Users\\fixture-user\\AppData\\Local\\Temp\\cache";
 
 beforeAll(async () => {
   const rootPath = await mkdtemp(path.join(tmpdir(), "ackit-pack-"));
@@ -54,7 +54,7 @@ describe("context pack engine (REQ-CTX-001..004)", () => {
 
   it("scrubs machine-local absolute paths out of emitted content (Windows-style)", async () => {
     const result = await pack();
-    expect(result.markdown).not.toContain("C:\\Users\\gizem");
+    expect(result.markdown).not.toContain("C:\\Users\\fixture-user");
     expect(result.markdown).toContain("<local-path>");
     const scrubbedEntry = result.manifest.find((item) => item.relativePath === "notes.md");
     expect(scrubbedEntry?.action).toBe("scrubbed");

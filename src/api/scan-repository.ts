@@ -6,8 +6,9 @@ import { AckitError } from "./errors.js";
 
 /**
  * Scans a repository and returns the stable finding set (REQ-API-001).
- * Thin alias over the internal pipeline with an API-friendly name; behavior
- * is identical to `ackit scan` minus CLI concerns.
+ * Uses the same built-in catalog and pipeline as the CLI. Repository config
+ * and policy orchestration belong to the CLI/MCP layer; callers can supply
+ * explicit pipeline options and additional trusted rules here.
  * REQ-V020-J-002: typed errors (AckitError) + AbortSignal cancellation.
  */
 export async function scanRepository(

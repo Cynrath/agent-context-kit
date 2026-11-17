@@ -364,13 +364,9 @@
                   "type": "boolean"
                 },
                 "problemCode": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "changed": {
@@ -395,13 +391,9 @@
                   ]
                 },
                 "independenceCode": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 }
               },

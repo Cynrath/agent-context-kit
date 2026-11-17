@@ -28,12 +28,14 @@ Open the already-owned library's **Admin** page and select the orange **Apply fo
 ## 4. Connect Docs7 Free (optional; existing GitHub Pages stays active)
 
 1. Open [Docs7](https://context7.com/docs7) while signed into Context7.
-2. Add a new site from GitHub; select `Cynrath/agent-context-kit`.
+2. In the teamspace's Docs7 tab, choose **Add new repository**, then **Form**;
+   select `Cynrath/agent-context-kit`.
 3. Set production branch to `master`, and **Docs path** to `docs`. The `docs/docs.json` file defines the navigation and `docs/index.mdx` is the entry page.
 4. Publish the site. Keep the assigned `*.docs7.io` address separate from existing GitHub Pages until you intentionally decide otherwise.
 5. Enable **Add to Context7** when connecting the repository (or use the site's **Context7** tab) so successful production builds refresh the library automatically. Do not create a duplicate library if the original GitHub library is already registered.
 
-Docs7 Free currently allows up to three sites. The hosted documentation site and agent-readable endpoints are available on Free; autonomous Docs7 documentation editing agents and PR previews require Pro.
+See [Docs7 plans](https://context7.com/docs/docs7/plans) for current site limits,
+preview access and documentation-editing agent availability.
 
 ## 5. Verify deployment and indexing
 

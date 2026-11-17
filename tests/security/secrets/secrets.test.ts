@@ -45,7 +45,7 @@ beforeAll(async () => {
   // Absolute path leakage.
   await writeFile(
     path.join(r, "notes.md"),
-    "Build cache lives at C:\\Users\\gizem\\AppData\\Local\\Temp\\build\n",
+    "Build cache lives at C:\\Users\\fixture-user\\AppData\\Local\\Temp\\build\n",
     "utf8",
   );
   // Unpinned workflow action.

@@ -80,3 +80,22 @@ Docs7 production build, endpoint or exact-head CI evidence. Literal acceptance
 therefore remains open; do not complete/archive it. TASK-0101 will reconcile the
 local checks and external evidence. TASK-0098 is the next dependency-ready audit
 task; historical blocked TASK-0087/0092/0093 remain untouched.
+
+### Local evidence reconciliation 2026-11-17 (TASK-0101)
+
+- The current official Context7 schema was fetched over HTTPS (200) and
+  `context7.json` validated with AJV plus standard formats: true, no errors.
+- All 32 `docs/docs.json` navigation routes resolve to actual `.md`/`.mdx` files.
+  The required name/colors/navigation and filterSidebar fields match the current
+  official Docs7 quickstart/configuration docs. The guide now links current plan
+  details instead of making the obsolete claim that previews require Pro.
+- Formal compilation of the downloaded upstream Docs7 schema is inconclusive:
+  AJV's Unicode regex mode rejects its unrelated PostHog API-key pattern
+  `^phc\_` (`Invalid escape` at
+  `anyOf.0.properties.integrations.properties.posthog.properties.apiKey.pattern`).
+  The repository configuration contains no PostHog integration. No schema gate
+  was disabled or provider schema rewritten to hide this external incompatibility.
+- **Not run:** Docs7 production build, live site/agent endpoints, account/admin
+  ownership or badge verification. No deployment/account action is authorized
+  by the corrective patch tasks. The task stays blocked, not completed/archived;
+  this external documentation work is not a patch-publication prerequisite.
