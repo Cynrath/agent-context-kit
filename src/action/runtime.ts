@@ -4,8 +4,50 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { renderSarif } from "../core/reporting/sarif.js";
-import { type Finding, FindingSchema, SEVERITY_ORDER } from "../core/scanner/types.js";
+import { z } from "zod";
+import {
+  projectOptimizeSuggestions,
+  renderSarif,
+  type SarifFinding,
+} from "../core/reporting/sarif.js";
+import { FindingSchema, SEVERITY_ORDER } from "../core/scanner/types.js";
+
+const SuggestionSchema = z.object({
+  id: z.string(),
+  category: z.string(),
+  severity: z.enum(["high", "medium", "low"]),
+  message: z.string(),
+  evidencePaths: z.array(z.string()),
+  evidence: z
+    .array(z.object({ relativePath: z.string(), line: z.number().int().positive().optional() }))
+    .optional(),
+});
+const DriftFindingSchema = z.object({
+  code: z.string(),
+  severity: z.enum(["blocking", "warning"]),
+  taskId: z.string(),
+  detail: z.string(),
+});
+
+function projectFindings(report: Record<string, unknown>): SarifFinding[] {
+  if (report["schemaVersion"] === "ackit.drift-report.v1" && report["findings"] !== undefined) {
+    return DriftFindingSchema.array()
+      .parse(report["findings"])
+      .map((finding) => ({
+        ruleId: finding.code,
+        category: "task-docs-integrity",
+        severity: finding.severity === "blocking" ? "high" : "medium",
+        message: `${finding.taskId}: ${finding.detail}`,
+        evidence: "",
+        fingerprint: JSON.stringify([finding.code, finding.taskId, finding.detail]),
+        suppressed: false,
+        suppressionReason: null,
+      }));
+  }
+  if (report["findings"] !== undefined) return FindingSchema.array().parse(report["findings"]);
+  if (report["suggestions"] === undefined) return [];
+  return projectOptimizeSuggestions(SuggestionSchema.array().parse(report["suggestions"]));
+}
 
 interface CliResult {
   status: number | null;
@@ -94,6 +136,9 @@ export function runAction(options: ActionOptions = {}): number {
       return cliExit || 1;
     }
     if (!result.stdout.trim()) {
+      // The managed pre-commit entry intentionally succeeds silently when no
+      // active workflow task exists. Other report-producing commands fail closed.
+      if (cliExit === 0 && command === "drift" && args.includes("check-active")) return 0;
       error(`::error::ACKit CLI returned no JSON report (exit ${cliExit})`);
       return cliExit || 1;
     }
@@ -101,8 +146,16 @@ export function runAction(options: ActionOptions = {}): number {
     if (report === null || typeof report !== "object" || Array.isArray(report)) {
       throw new Error("Invalid CLI JSON report");
     }
-    const rawFindings = (report as Record<string, unknown>)["findings"] ?? [];
-    const findings: Finding[] = FindingSchema.array().parse(rawFindings);
+    const payload = report as Record<string, unknown>;
+    const requiredField =
+      command === "scan" || command === "drift"
+        ? "findings"
+        : command === "optimize"
+          ? "suggestions"
+          : undefined;
+    if (requiredField !== undefined && payload[requiredField] === undefined)
+      throw new Error("Missing command report findings");
+    const findings = projectFindings(payload);
     const activeFindings = findings.filter((finding) => !finding.suppressed);
     const runnerTemp = env["RUNNER_TEMP"] || tmpdir();
     mkdirSync(runnerTemp, { recursive: true });
@@ -123,11 +176,10 @@ export function runAction(options: ActionOptions = {}): number {
           : finding.severity === "medium"
             ? "warning"
             : "notice";
-      log(
-        `::${level} file=${escapeCommand(finding.relativePath, true)},line=${finding.line}::${escapeCommand(
-          `${finding.ruleId}: ${finding.message}`,
-        )}`,
-      );
+      const location = finding.relativePath
+        ? ` file=${escapeCommand(finding.relativePath, true)},line=${finding.line ?? 1}`
+        : "";
+      log(`::${level}${location}::${escapeCommand(`${finding.ruleId}: ${finding.message}`)}`);
     }
     const summaryPath = env["GITHUB_STEP_SUMMARY"];
     if (summaryPath) {

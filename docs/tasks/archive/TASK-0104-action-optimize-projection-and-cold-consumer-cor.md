@@ -1,12 +1,12 @@
 ---
 id: "TASK-0104"
 title: "Action optimize projection and cold consumer corrective verification"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0101"
 createdAt: "2026-11-17"
-completedAt: null
+completedAt: 2026-11-17
 ---
 
 
@@ -72,16 +72,16 @@ its existing version/docs/workflow changes are preserved on the same branch.
 
 ## Acceptance criteria
 
-- [~] Optimize above/below-threshold and CLI-error cases return correct codes;
+- [x] Optimize above/below-threshold and CLI-error cases return correct codes;
   original JSON remains unchanged and canonical SARIF has source IDs/locations.
-- [ ] Real exported source frozen-installs and builds, then scan/optimize work
+- [x] Real exported source frozen-installs and builds, then scan/optimize work
   from an independent repository with no consumer dependencies/dist.
-- [ ] A failed consumer command reports a useful sanitized status/cause and
+- [x] A failed consumer command reports a useful sanitized status/cause and
   remains a hard failure; no frozen/build/threshold test is skipped or masked.
-- [ ] SARIF artifact URIs encode reserved/Unicode path characters correctly.
-- [ ] Nonempty drift reports remain available, with documented severity mapping
+- [x] SARIF artifact URIs encode reserved/Unicode path characters correctly.
+- [x] Nonempty drift reports remain available, with documented severity mapping
   and valid location-free SARIF results for task-level findings.
-- [ ] Focused/full affected quality, offline and ACKit checks pass with evidence.
+- [x] Focused/full affected quality, offline and ACKit checks pass with evidence.
 
 ## Test steps
 
@@ -112,14 +112,41 @@ Forward corrective PR/commit only; preserve all existing work and immutable tags
 
 ## Completion notes
 
-CLI-allocated plan created 2026-11-17 from the final clean-consumer failure and
-source review. No implementation for this corrective task before this plan.
+Verified 2026-11-17 on Windows / Node 26.13.1 / pnpm 11.22.0.
 
-The optimize regression was run before its fix: expected failure code 1, actual
-0. A repeat clean install/build passed without changing bootstrap gates; the
-earlier opaque install failure is not reproducible and its original stdout was
-lost. Preserve that uncertainty; improve future failure visibility and require
-fresh successful consumer checks. URI requirement verified against the
-[OASIS SARIF 2.1.0 specification](https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/sarif-v2.1.0-os.html).
+- Before-fix optimize regression: expected exit 1, actual 0. Typed projections
+  now handle scanner findings, optimize suggestions and drift code/detail data
+  while preserving original JSON. Scan schemas remain strict; missing expected
+  arrays fail closed. CLI nonzero codes win over threshold results.
+- Drift blocking/warning map to high/medium only in the Action projection.
+  Task-level SARIF omits invented file locations; check-active's successful
+  silent legacy no-op is preserved. CLI optimize and Action share one canonical
+  SARIF suggestion projection/writer. Reserved/Unicode path segments are encoded.
+- Real clean export/frozen install/build/independent consumer PASS repeatedly
+  at 0.5.5: scan/optimize/drift above/below thresholds, actual invalid-option
+  CLI errors, legacy no-op, original reports, and CLI/Action optimize SARIF
+  equality. Consumer supplies no node_modules or dist.
+- The initial opaque install failure was not reproduced; original stdout was
+  unavailable, so no source/environment root cause is invented. Frozen/build
+  gates were unchanged. A bounded process helper now includes stdout/error/status
+  and sanitizes source/fixture paths. Its real failing-child test asserts exact
+  outer exit 1, inner exit 7, stdout cause and path redaction.
+- First full run: 771 PASS / 1 diagnostic-test failure (empty stderr before its
+  expected marker) / 3 existing skips. The diagnostic boundary was isolated from
+  unnecessary full repository export; no timeout was raised and no assertion
+  or consumer gate was removed. Final full run: 125 files PASS; 772 tests PASS,
+  3 unchanged Windows privilege-dependent symlink skips (775 total).
+- Focused Action/diagnostic/reporting/projection/drift suites: 5 files / 36 PASS.
+  Root lint, format, typecheck, build, doctor/task doctor, scan --ci (exit 0),
+  offline-egress and git diff --check PASS. A transient Windows Biome file-mapping
+  write error cleared on the explicit rerun; final lint/format passed normally.
+- Actual scan/optimize/drift SARIF documents validate against both current
+  [OASIS 2.1.0 errata schema](https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json)
+  and the producer-declared SchemaStore schema, with standard format validation.
+  A deliberately invalid URI was rejected by both. No provider schema was edited
+  and URI checks remained enabled.
+- No new public SDK export, dependency, network/runtime capability, credential,
+  permission, deployment, tag or publication change. Forward corrective commit
+  is rollback. Resume TASK-0102 immediately, preserving its metadata/workflow work.
 
 Dependencies: TASK-0101

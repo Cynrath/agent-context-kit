@@ -1,5 +1,42 @@
 import { getPackageIdentity } from "../../shared/version.js";
+import type { OptimizeSuggestion } from "../context/optimize.js";
 import type { Finding } from "../scanner/types.js";
+
+/** Shared SARIF projection; optimizer categories are also valid properties. */
+export type SarifFinding = Omit<
+  Finding,
+  "category" | "remediation" | "documentationKey" | "relativePath" | "line" | "column"
+> & {
+  category: string;
+  relativePath?: string;
+  line?: number;
+  column?: number;
+  remediation?: string;
+  documentationKey?: string;
+};
+
+type OptimizeSarifSource = Pick<
+  OptimizeSuggestion,
+  "id" | "severity" | "message" | "evidence" | "evidencePaths"
+> & { category: string };
+
+export function projectOptimizeSuggestions(
+  suggestions: readonly OptimizeSarifSource[],
+): SarifFinding[] {
+  return suggestions.map((suggestion) => ({
+    ruleId: suggestion.id,
+    category: suggestion.category,
+    severity: suggestion.severity,
+    message: suggestion.message,
+    relativePath: suggestion.evidence?.[0]?.relativePath ?? suggestion.evidencePaths[0],
+    line: suggestion.evidence?.[0]?.line ?? 1,
+    column: 1,
+    evidence: "",
+    fingerprint: suggestion.id,
+    suppressed: false,
+    suppressionReason: null,
+  }));
+}
 
 const SEVERITY_LEVEL: Record<string, "error" | "warning" | "note"> = {
   critical: "error",
@@ -14,7 +51,7 @@ const SEVERITY_LEVEL: Record<string, "error" | "warning" | "note"> = {
  * secret can appear (REQ-GOV-005).
  */
 export function renderSarif(
-  findings: readonly Finding[],
+  findings: readonly SarifFinding[],
   options: { policyDigest?: string | undefined } = {},
 ): string {
   const identity = getPackageIdentity();
@@ -32,14 +69,25 @@ export function renderSarif(
     message: {
       text: `${finding.message}${finding.evidence.length > 0 ? ` [evidence: ${finding.evidence}]` : ""}`,
     },
-    locations: [
-      {
-        physicalLocation: {
-          artifactLocation: { uri: finding.relativePath.split("\\").join("/") },
-          region: { startLine: finding.line, startColumn: finding.column },
-        },
-      },
-    ],
+    ...(finding.relativePath
+      ? {
+          locations: [
+            {
+              physicalLocation: {
+                artifactLocation: {
+                  uri: finding.relativePath
+                    .split("\\")
+                    .join("/")
+                    .split("/")
+                    .map(encodeURIComponent)
+                    .join("/"),
+                },
+                region: { startLine: finding.line ?? 1, startColumn: finding.column ?? 1 },
+              },
+            },
+          ],
+        }
+      : {}),
     fingerprints: { "ackit/v1": finding.fingerprint },
     properties: {
       severity: finding.severity,

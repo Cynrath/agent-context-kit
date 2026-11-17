@@ -25,11 +25,17 @@ installs the frozen lockfile and builds in the Action checkout. Setup requires
 registry access; the resulting CLI execution is offline and scans the consumer's
 working directory. Consumer dependencies and scripts are never installed or run.
 
-`fail-threshold` is inclusive (`low|medium|high|critical`), ignores explicitly
-policy-suppressed findings, and cannot clear a nonzero CLI exit code. SARIF is
+`fail-threshold` is inclusive (`low|medium|high|critical`) for scan findings and
+optimize suggestions, ignores explicitly policy-suppressed findings, and cannot
+clear a nonzero CLI exit code. The original command JSON stays intact. SARIF is
 generated only when requested and is not uploaded automatically. Consumers need
 `contents: read`; SARIF upload is a separate opt-in step with its own permissions.
 Use the Action outputs to locate generated files rather than guessing paths.
+
+For `drift check`, blocking maps to high and warning maps to medium for the
+Action threshold; CLI `--ci` errors are still preserved independently. Its
+task-level SARIF results have no fabricated file location. SARIF file paths are
+URI-encoded, including spaces, reserved characters and Unicode.
 
 `pnpm run smoke:action` exports clean source into a separate Action checkout,
 installs/builds it and scans an unrelated Git fixture without consumer runtime

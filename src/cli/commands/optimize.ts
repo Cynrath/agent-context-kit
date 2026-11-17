@@ -3,9 +3,9 @@ import process from "node:process";
 import { loadAckitConfig } from "../../core/config/index.js";
 import { analyzeOptimize, applyFixes } from "../../core/context/index.js";
 import { resolveRepositoryRoot } from "../../core/filesystem/root.js";
+import { projectOptimizeSuggestions, renderSarif } from "../../core/reporting/sarif.js";
 import { emitDiagnostic } from "../../shared/diagnostics.js";
 import { EXIT_CODES, type ExitCodeValue } from "../../shared/exit-codes.js";
-import { getPackageIdentity } from "../../shared/version.js";
 import type { InstructionsCommandOptions } from "../context.js";
 import { reportConfigErrors } from "./config.js";
 
@@ -142,28 +142,7 @@ export async function runOptimizeCommand(
   }
 
   if (fmt === "sarif") {
-    // Minimal SARIF 2.1.0 for optimize suggestions as results
-    const sarif = {
-      $schema: "https://json.schemastore.org/sarif-2.1.0.json",
-      version: "2.1.0",
-      runs: [
-        {
-          tool: { driver: { name: "ackit", version: getPackageIdentity().version, rules: [] } },
-          results: suggestions.map((s) => ({
-            ruleId: s.id,
-            level: s.severity === "high" ? "error" : s.severity === "medium" ? "warning" : "note",
-            message: { text: s.message },
-            locations: (s.evidence ?? []).map((e) => ({
-              physicalLocation: {
-                artifactLocation: { uri: e.relativePath },
-                region: e.line ? { startLine: e.line } : undefined,
-              },
-            })),
-          })),
-        },
-      ],
-    };
-    process.stdout.write(`${JSON.stringify(sarif, null, 2)}\n`);
+    process.stdout.write(renderSarif(projectOptimizeSuggestions(suggestions)));
     return EXIT_CODES.ok;
   }
 
