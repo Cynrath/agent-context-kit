@@ -40,6 +40,7 @@ const paths = [
   "tsconfig.build.json",
   "extensions/vscode/package.json",
   "action.yml",
+  "scripts/action-package-path.mjs",
 ];
 
 function run(command, args, options = {}) {
@@ -80,6 +81,23 @@ try {
   }
   if (existsSync(path.join(source, "dist")) || existsSync(path.join(source, "node_modules")))
     throw new Error("Export must start without runtime");
+  const manifestOutput = run(
+    process.execPath,
+    [path.join(source, "scripts/action-package-path.mjs")],
+    {
+      cwd: consumer,
+      env: { ...process.env, GITHUB_WORKSPACE: consumer, ACKIT_ACTION_PATH: source },
+    },
+  ).trim();
+  if (!manifestOutput.startsWith("path=")) throw new Error("Action manifest path output missing");
+  const pinnedManifest = JSON.parse(
+    readFileSync(path.join(consumer, manifestOutput.slice(5)), "utf8"),
+  );
+  if (
+    pinnedManifest.packageManager !==
+    JSON.parse(readFileSync(path.join(source, "package.json"), "utf8")).packageManager
+  )
+    throw new Error("Action manifest pin resolved to the consumer");
   run(
     process.execPath,
     [

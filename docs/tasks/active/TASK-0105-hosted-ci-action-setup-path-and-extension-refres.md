@@ -1,7 +1,7 @@
 ---
 id: "TASK-0105"
 title: "Hosted CI Action setup path and extension refresh race correction"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0102"
@@ -58,13 +58,13 @@ TASK-0102 (and its full audit chain). TASK-0103 waits on this correction.
 
 ## Acceptance criteria
 
-- [ ] Pinned pnpm setup reads the Action manifest correctly for local and
+- [x] Pinned pnpm setup reads the Action manifest correctly for local and
   external consumer layouts; no preparatory dogfood build or mutable version pin.
-- [ ] Every explicit overlapping refresh awaits a completed current scan;
+- [x] Every explicit overlapping refresh awaits a completed current scan;
   lifecycle/diagnostics assertions pass with disposal/cancellation respected.
-- [ ] Canonical temporary path aliases are fully redacted on macOS and other
+- [x] Canonical temporary path aliases are fully redacted on macOS and other
   hosts without weakening the exact stdout/status/path assertions.
-- [ ] Local focused/full/host checks and all required exact-head hosted checks
+- [~] Local focused/full/host checks and all required exact-head hosted checks
   pass; failures and corrective evidence are recorded truthfully.
 
 ## Test steps
@@ -101,5 +101,28 @@ Planned from actual hosted failures on PR head
 pnpm/action-setup readTarget uses path.join(GITHUB_WORKSPACE, packageJsonFile).
 The existing lifecycle and macOS redaction assertions exposed real owner-side
 defects; none will be removed or turned into warnings.
+
+### Local corrective evidence 2026-11-17
+
+- Pinned upstream source confirms path.join(workspace, input). The new locator
+  resolves the Action's own canonical manifest to a relative input, validates its
+  exact packageManager pin, and handles distinct checkout/workspace directories.
+  Its contract reads the target with the same path.join operation while a consumer
+  has a deliberately different pin. Real exported consumer PASS with that locator.
+- New real-host overlap regression failed before the service fix: [false,true]
+  instead of [true,true]. Per-root request queues and fresh snapshot objects now
+  publish only completed/non-disposed results. After-fix Electron: 7 PASS,
+  including the unchanged lifecycle assertion; 8 host-free unit tests PASS.
+- Diagnostic helper now redacts declared and realpath aliases longest first.
+  Both exact failure/status/stdout assertions remain; a real directory link/
+  junction test covers canonical output without depending on a machine path.
+- Focused root contracts: 4 files / 32 PASS. Full root suite: 126 files PASS,
+  774 PASS / 3 unchanged Windows privilege-dependent symlink skips (777 total).
+  Root lint/format/typecheck/build, schema regeneration/no drift, extension strict
+  lint/typechecks/build, cold Action consumer, offline and ACKit doctor/task doctor
+  and git diff --check PASS. No timeout, assertion or publish gate was weakened.
+- Required hosted checks are still unproven for the successor commit. This task
+  remains active until the new exact-head matrix/Action/extension checks pass;
+  no old run will be rerun. No publication or tag action has occurred.
 
 Dependencies: TASK-0102

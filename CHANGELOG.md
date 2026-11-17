@@ -23,6 +23,9 @@ analysis remain unchanged; the corrections below restore documented behavior.
 - SDK scans run the built-in rule catalog by default and append trusted extra
   rules. VS Code now receives real findings, keeps packaged SDK identity/templates
   available in its CommonJS bundle, and confines finding paths to the workspace.
+- Action setup locates its own pinned manifest relative to the consumer workspace;
+  VS Code serializes overlapping refreshes per root and publishes completed snapshots.
+  Consumer diagnostics redact canonical path aliases on macOS as well.
 - MCP tool reference matches all 16 live input schemas; scan `ci` controls the
   severity exit hint. CLI `--root` now binds MCP startup ahead of environment/cwd
   fallback without reopening per-tool root overrides.

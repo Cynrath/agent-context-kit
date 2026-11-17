@@ -3,9 +3,11 @@ import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
 interface ActionStep {
+  id?: string;
   uses?: string;
   run?: string;
   env?: Record<string, string>;
+  with?: Record<string, string>;
 }
 const raw = readFileSync("action.yml", "utf8");
 const expression = (value: string): string => `$${"{"}{ ${value} }}`;
@@ -20,7 +22,13 @@ describe("clean-tag Action distribution", () => {
     for (const step of action.runs.steps.filter((step) => step.uses)) {
       expect(step.uses).toMatch(/@[0-9a-f]{40}$/);
     }
-    expect(raw).toContain(`${expression("github.action_path")}/package.json`);
+    const setup = action.runs.steps.find((step) => step.uses?.startsWith("pnpm/action-setup@"));
+    expect(setup?.with?.["package_json_file"]).toBe(
+      expression("steps.action-package.outputs.path"),
+    );
+    expect(
+      action.runs.steps.find((step) => step.id === "action-package")?.env?.["ACKIT_ACTION_PATH"],
+    ).toBe(expression("github.action_path"));
     expect(raw).toContain("pnpm install --frozen-lockfile --ignore-scripts");
     expect(raw).toContain("pnpm build");
     expect(raw.indexOf("pnpm build")).toBeLessThan(raw.indexOf("/dist/action/index.js"));

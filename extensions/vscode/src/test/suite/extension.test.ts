@@ -97,4 +97,22 @@ suite("ACKit Extension Integration", () => {
     snapshot = await vscode.commands.executeCommand<WorkspaceSnapshot>("ackit.refresh");
     assert.strictEqual(snapshot.error, null);
   });
+  test("overlapping explicit refreshes each return a completed current scan", async () => {
+    const file = path.join(root, "overlap.txt");
+    fs.writeFileSync(file, "TODO: overlapping refresh fixture\n", "utf8");
+    try {
+      const inspect = () =>
+        vscode.commands
+          .executeCommand<WorkspaceSnapshot>("ackit.refresh")
+          .then((value) =>
+            Boolean(
+              value?.scan?.findings.some((finding) => finding.relativePath === "overlap.txt"),
+            ),
+          );
+      assert.deepStrictEqual(await Promise.all([inspect(), inspect()]), [true, true]);
+    } finally {
+      fs.unlinkSync(file);
+      await vscode.commands.executeCommand("ackit.refresh");
+    }
+  });
 });

@@ -8,6 +8,8 @@
   extension; readiness now works without relying on checkout files.
 - Finding navigation and diagnostics reject traversal, sibling-prefix paths and
   directory links escaping the workspace.
+- Overlapping watcher/manual refreshes are serialized per root, so explicit
+  refresh commands return a completed current scan rather than cancelled stale data.
 - Real host-free unit and Electron data/command/lifecycle tests are enforced in CI;
   VSIX packaging excludes source maps and verifies manifest/README/CHANGELOG parity.
 - Compatible runtime security dependency updates; offline analysis and existing
