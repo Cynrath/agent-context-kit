@@ -1,10 +1,11 @@
 ---
 id: "TASK-0103"
 title: "Authorized patch publication and public-surface verification"
-status: active
+status: pending
 schemaVersion: 2
 dependencies:
   - "TASK-0102"
+  - "TASK-0105"
 createdAt: "2026-11-17"
 completedAt: null
 ---
@@ -68,7 +69,7 @@ external blocker; do independent authorized work first, never partial-publish np
 
 ## Acceptance criteria
 
-- [~] PR merged only after all exact-head CI checks pass; master SHA verified.
+- [ ] PR merged only after all exact-head CI checks pass; master SHA verified.
 - [ ] Marketplace target visible before new immutable tag triggers npm publication.
 - [ ] npm latest, fresh CLI/SDK/MCP and new-tag external Action consumer pass.
 - [ ] GitHub Release tag/VSIX identity and downloaded asset checksum pass.
@@ -127,5 +128,15 @@ Plan allocated by repository CLI on 2026-11-17. No publication or tag action yet
 - npm latest/Marketplace are 0.5.4; npm 0.5.5 and remote tag are absent at the
   preparation read. Stable pointer remains 0.5.4. Recheck immediately before
   publishing; no immutable version or existing tag will be changed.
+
+### Hosted CI checkpoint — publication held
+
+PR #43 exists at head `5daa10f9c572462cd89265b73f0affc5d9bb8578`. Linux and
+Windows verification passed, but Action setup, extension lifecycle and macOS
+diagnostic redaction failed. Required checks correctly block merge. TASK-0105
+owns the observed corrections and actual new-head CI proof; this task resumes
+afterward. No master merge, Marketplace publication, tag, npm publication or
+GitHub Release has been performed. Docs7 Preview separately reported success;
+it is not evidence of the production/account acceptance in TASK-0097.
 
 Dependencies: TASK-0102
