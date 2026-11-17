@@ -27,6 +27,11 @@ User authorized scoped changes, tests, commits, branch pushes and PRs on 2026-11
   bundling of SDK `import.meta.url` asset lookups, and string-prefix finding path
   checks. Replace these with real host/data assertions, a tested pure diagnostic
   boundary, and a resource-aware bundle without changing the public SDK.
+- The first real host run then proved an SDK defect: `scanRepository` documents
+  built-in rules plus optional extra rules but passes only `extraRules` (empty by
+  default) to the pipeline. Restore the existing built-in contract with a focused
+  SDK regression before rerunning extension tests; this is required for real
+  extension findings and remains backward-compatible with the documented API.
 - Add schema drift and CLI smoke to CI; preserve real-tarball consumer smoke.
 - Derive extension version from manifests, strengthen parity guard and packaged
   VSIX inspection, and keep release security gates and Marketplace-first order.
@@ -41,6 +46,8 @@ User authorized scoped changes, tests, commits, branch pushes and PRs on 2026-11
 - `.github/workflows/ci.yml`, extension scripts/source/tests/configuration as
   required by real failures, extension build/resource metadata, parity
   scripts/contracts and VSIX integrity checks.
+- `src/api/scan-repository.ts` and focused SDK scanning tests for the observed
+  missing-catalog defect; no new API or dependencies.
 
 ## Dependencies
 
