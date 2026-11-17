@@ -1,12 +1,12 @@
 ---
 id: "TASK-0105"
 title: "Hosted CI Action setup path and extension refresh race correction"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0102"
 createdAt: "2026-11-17"
-completedAt: null
+completedAt: 2026-11-17
 ---
 
 
@@ -64,7 +64,7 @@ TASK-0102 (and its full audit chain). TASK-0103 waits on this correction.
   lifecycle/diagnostics assertions pass with disposal/cancellation respected.
 - [x] Canonical temporary path aliases are fully redacted on macOS and other
   hosts without weakening the exact stdout/status/path assertions.
-- [~] Local focused/full/host checks and all required exact-head hosted checks
+- [x] Local focused/full/host checks and all required exact-head hosted checks
   pass; failures and corrective evidence are recorded truthfully.
 
 ## Test steps
@@ -124,5 +124,20 @@ defects; none will be removed or turned into warnings.
 - Required hosted checks are still unproven for the successor commit. This task
   remains active until the new exact-head matrix/Action/extension checks pass;
   no old run will be rerun. No publication or tag action has occurred.
+
+### Hosted completion proof 2026-11-17
+
+PR #43 head `49af9ad672662e8d3b939f9668b10fb18f94e668` passed every required
+context: Linux/Windows/macOS x Node 22/24, all three package consumers, self-scan,
+real extension/Electron and actual composite Action dogfood. CI run 44098952486
+and Action run 44098952856 succeeded; all 13 reported checks (12 required plus
+Docs7 Preview) were SUCCESS. No failed run was rerun and no gate was bypassed.
+
+At the user's explicit merge/delete request, PR #43 was squash-merged through
+the protected procedure as `3c70d09a6104ba2eec2b02a2d9c4e24edc4d89ef`. The old
+feature branch was deleted remotely and locally only after verifying its exact
+tip and identical merged tree. Primary checkout is clean master, equal to
+origin/master. TASK-0103 resumes publication; artifacts will be rebuilt from
+the final master and re-audited before any publish.
 
 Dependencies: TASK-0102
