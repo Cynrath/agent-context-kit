@@ -1,7 +1,7 @@
 ---
 id: "TASK-0103"
 title: "Authorized patch publication and public-surface verification"
-status: active
+status: pending
 schemaVersion: 2
 dependencies:
   - "TASK-0102"
@@ -73,7 +73,7 @@ external blocker; do independent authorized work first, never partial-publish np
 - [x] Marketplace target visible before new immutable tag triggers npm publication.
 - [x] npm latest, fresh CLI/SDK/MCP and new-tag external Action consumer pass.
 - [x] GitHub Release tag/VSIX identity and downloaded asset checksum pass.
-- [~] Stable-pointer bookkeeping merged with CI; final master clean/aligned;
+- [ ] Stable-pointer bookkeeping merged with CI; final master clean/aligned;
   task evidence and open blockers match the actual public state.
 
 ## Test steps
@@ -238,3 +238,13 @@ waits for master checks, a fresh audited master VSIX and current target absence.
   blocked and are not casually closed by this release.
 
 Dependencies: TASK-0102
+
+### Follow-up CI held for a shared-build race
+
+PR #45 head `2e8e0ae89dc2164bf90cccaff468e47cf569c6d1` passed the new npm
+processing contracts and other executed checks, but Linux/Node 24 job
+`134218923233` failed one built-CLI assertion (exit 1 instead of 2): the loader
+read an incomplete `dist/core/policy/tiers.js` during a parallel prepack rebuild.
+TASK-0107 plans isolation of both source-checkout pack writers; no assertion is
+weakened and no failed run is rerun. The protected bookkeeping merge remains
+held. Independent public release/install verification is unaffected.
