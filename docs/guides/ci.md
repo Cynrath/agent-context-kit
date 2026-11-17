@@ -16,6 +16,26 @@ Matrix: **ubuntu + windows + macos × Node 22 + 24**.
 TASK-0286 hardens this further (SHA-pinned actions, package smoke, self-scan,
 MCP smoke).
 
+## GitHub Action distribution
+
+The Action keeps `command`, `args`, `fail-threshold`, `upload-sarif` and the
+`findings-json` / `sarif-path` outputs. Pin a published tag or full commit SHA.
+It sets up Node 24 and the exact pnpm version from its own `package.json`, then
+installs the frozen lockfile and builds in the Action checkout. Setup requires
+registry access; the resulting CLI execution is offline and scans the consumer's
+working directory. Consumer dependencies and scripts are never installed or run.
+
+`fail-threshold` is inclusive (`low|medium|high|critical`), ignores explicitly
+policy-suppressed findings, and cannot clear a nonzero CLI exit code. SARIF is
+generated only when requested and is not uploaded automatically. Consumers need
+`contents: read`; SARIF upload is a separate opt-in step with its own permissions.
+Use the Action outputs to locate generated files rather than guessing paths.
+
+`pnpm run smoke:action` exports clean source into a separate Action checkout,
+installs/builds it and scans an unrelated Git fixture without consumer runtime
+files. `pnpm run smoke:action --ref vX.Y.Z` repeats the check from a release tag.
+ADR-0034 records the source distribution decision; generated `dist` is untracked.
+
 ## Using ACKit as a gate in your repo
 
 ```bash

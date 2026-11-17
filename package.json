@@ -79,6 +79,7 @@
     "test": "vitest run",
     "check:text-hygiene": "node scripts/check-text-hygiene.mjs --repo",
     "smoke:cli": "node tests/e2e/cli-scaffold.smoke.mjs",
+    "smoke:action": "node scripts/action-consumer-smoke.mjs",
     "smoke:package": "node scripts/package-smoke.mjs"
   },
   "dependencies": {

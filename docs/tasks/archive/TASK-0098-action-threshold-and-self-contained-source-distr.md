@@ -1,12 +1,12 @@
 ---
 id: "TASK-0098"
 title: "Action threshold and self-contained source distribution"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   []
 createdAt: "2026-11-17"
-completedAt: null
+completedAt: 2026-11-17
 ---
 
 
@@ -52,13 +52,13 @@ None. Successor TASK-0099 starts after local acceptance is verified and committe
 
 ## Acceptance criteria
 
-- [ ] Threshold breach fails; below-threshold and suppressed findings pass;
+- [x] Threshold breach fails; below-threshold and suppressed findings pass;
   CLI nonzero/invalid input/timeout errors remain failures.
-- [ ] Optional SARIF is canonical 2.1.0 with actual package identity and valid
+- [x] Optional SARIF is canonical 2.1.0 with actual package identity and valid
   relative locations; outputs exist only when their files exist.
-- [ ] Clean exported Action source installs/builds separately from an unrelated
+- [x] Clean exported Action source installs/builds separately from an unrelated
   consumer fixture and scans it without consumer dependencies or build output.
-- [ ] Dogfood exercises the bootstrap without a preparatory build; focused and
+- [x] Dogfood exercises the bootstrap without a preparatory build; focused and
   affected full tests plus quality/offline/ACKit checks pass.
 
 ## Test steps
@@ -89,4 +89,26 @@ No reset, rebase, force push or release mutation is authorized.
 
 ## Completion notes
 
-Plan allocated by repository CLI on 2026-11-17. Implementation and evidence pending.
+Verified 2026-11-17 on Windows / Node 26.13.1 / pinned pnpm 11.22.0.
+
+- Root cause confirmed in the old tracked handwritten entry: after setting
+  threshold failure to 1, `result.status` reset it to 0. The entry also depended
+  on ignored CLI files absent from a tag. Strict owning source now builds both
+  entries, preserves CLI nonzero codes, and filters suppressed threshold inputs.
+- The canonical SARIF writer replaces the divergent hand-built report (which
+  hardcoded an old tool version). Output/annotation/timeout/input regressions
+  are covered. The tracked legacy `dist` entry is removed from Git; generated
+  outputs stay ignored.
+- `pnpm run smoke:action` PASS: clean exported source, independent frozen install
+  and build, unrelated consumer with no dependencies/dist, high threshold 0,
+  low threshold 1, CLI invalid-option 2, SARIF 2.1.0 and source-version parity.
+- Focused Action/projection/composition/offline tests: 5 files, 29 tests PASS.
+  Full `pnpm test --maxWorkers=2`: 118 files PASS; 735 tests PASS, 3 existing
+  platform-conditional symlink tests skipped (Windows privilege probe).
+- `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm build`, offline-egress
+  (203 files), doctor, task doctor, `scan --ci` (exit 0), text hygiene and
+  `git diff --check` PASS. No new unsuppressed High/Critical finding.
+- Dogfood contract proves no preparatory install/build; hosted exact-head
+  execution and the OS/Node matrix are explicit TASK-0103 release prerequisites.
+- No data migration, credential, permission or publication action. Successor:
+  TASK-0099 (CI/extension gates). Forward PR correction is the rollback path.
