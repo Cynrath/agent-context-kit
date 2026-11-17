@@ -1,7 +1,7 @@
 ---
 id: "TASK-0102"
 title: "Patch release preparation and full validation"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0101"
@@ -24,6 +24,10 @@ chain. npm latest and Marketplace were both independently read as 0.5.4 on
   until TASK-0103 proves all public channels at the new version (ADR-0029).
 - Execute the entire requested local verification matrix and audit VSIX/tarball.
 - Record authorization, exact evidence, risks and release-ready decision.
+- Correct the final read-only Marketplace visibility probe: TASK-0094 records
+  that the 0.5.4 release's last one-shot read saw a stale replica after successful
+  publication. Add bounded retries while requiring exact target visibility and
+  retaining exit 91 on exhaustion; no publish order, permission or gate changes.
 
 ## Out of scope
 
@@ -34,6 +38,8 @@ chain. npm latest and Marketplace were both independently read as 0.5.4 on
 
 - Root/extension manifests and release docs, relevant lockfile metadata, task
   evidence; ignored local packages/checksums are never tracked.
+- `.github/workflows/release.yml` final visibility read and its focused workflow
+  contract, planned before implementing this demonstrated release-wrapper fix.
 
 ## Dependencies
 
@@ -48,7 +54,7 @@ TASK-0101. TASK-0103 requires all acceptance below and exact-head PR CI.
 
 ## Acceptance criteria
 
-- [ ] Source/extension/package docs are coupled at the next absent patch;
+- [~] Source/extension/package docs are coupled at the next absent patch;
   published-stable claims remain truthful until publication.
 - [ ] All required local checks pass with exact counts/commands recorded;
   no skipped mandatory tests or unresolved release-scope security finding.
