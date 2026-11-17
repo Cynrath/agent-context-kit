@@ -1,7 +1,7 @@
 ---
 id: "TASK-0103"
 title: "Authorized patch publication and public-surface verification"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0102"
@@ -69,8 +69,8 @@ external blocker; do independent authorized work first, never partial-publish np
 
 ## Acceptance criteria
 
-- [ ] PR merged only after all exact-head CI checks pass; master SHA verified.
-- [ ] Marketplace target visible before new immutable tag triggers npm publication.
+- [x] PR merged only after all exact-head CI checks pass; master SHA verified.
+- [~] Marketplace target visible before new immutable tag triggers npm publication.
 - [ ] npm latest, fresh CLI/SDK/MCP and new-tag external Action consumer pass.
 - [ ] GitHub Release tag/VSIX identity and downloaded asset checksum pass.
 - [ ] Stable-pointer bookkeeping merged with CI; final master clean/aligned;
@@ -138,5 +138,19 @@ owns the observed corrections and actual new-head CI proof; this task resumes
 afterward. No master merge, Marketplace publication, tag, npm publication or
 GitHub Release has been performed. Docs7 Preview separately reported success;
 it is not evidence of the production/account acceptance in TASK-0097.
+
+### Protected merge verified; primary checkout on master
+
+PR #43 implementation head `49af9ad672662e8d3b939f9668b10fb18f94e668` passed all
+12 required checks plus Docs7 Preview. The user then explicitly requested merging
+and deleting the feature branch and continuing on the main branch. The protected
+squash merge is `3c70d09a6104ba2eec2b02a2d9c4e24edc4d89ef`; the exact old tip and
+identical merged tree were checked before deleting its local/remote refs.
+Primary workspace is clean master equal to origin/master. TASK-0105 is complete.
+
+Primary work remains on master. Protected metadata integration uses only a
+temporary detached records worktree/PR transport, removed after merge; no direct
+master push or persistent development branch is introduced. Publication still
+waits for master checks, a fresh audited master VSIX and current target absence.
 
 Dependencies: TASK-0102
