@@ -1,7 +1,7 @@
 ---
 id: "TASK-0103"
 title: "Authorized patch publication and public-surface verification"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0102"
@@ -71,9 +71,9 @@ external blocker; do independent authorized work first, never partial-publish np
 
 - [x] PR merged only after all exact-head CI checks pass; master SHA verified.
 - [x] Marketplace target visible before new immutable tag triggers npm publication.
-- [ ] npm latest, fresh CLI/SDK/MCP and new-tag external Action consumer pass.
-- [ ] GitHub Release tag/VSIX identity and downloaded asset checksum pass.
-- [ ] Stable-pointer bookkeeping merged with CI; final master clean/aligned;
+- [x] npm latest, fresh CLI/SDK/MCP and new-tag external Action consumer pass.
+- [x] GitHub Release tag/VSIX identity and downloaded asset checksum pass.
+- [~] Stable-pointer bookkeeping merged with CI; final master clean/aligned;
   task evidence and open blockers match the actual public state.
 
 ## Test steps
@@ -104,6 +104,11 @@ Before publication, forward corrective PR. After publication, only a NEW patch
 can correct artifacts; never overwrite/repoint/delete the released version.
 
 ## Completion notes
+
+All three public channels now serve 0.5.5, independently verified below. The
+stable-pointer follow-up still requires exact-head CI and protected merge.
+
+### Original plan checkpoint (historical)
 
 Plan allocated by repository CLI on 2026-11-17. No publication or tag action yet.
 
@@ -188,5 +193,48 @@ waits for master checks, a fresh audited master VSIX and current target absence.
   skill discovery (8 issues). Moving that clean worktree outside the primary
   repository restored 4 skills / 0 issues and doctor PASS; no product policy,
   scan suppression or skill validator was changed. Scan CI remained exit 0.
+
+### Public release verified; stable bookkeeping in progress
+
+- npm version and latest both returned 0.5.5 after processing, without another
+  publish. Downloaded registry tarball SHA-1 equals the original workflow value
+  `41ff5b1865ef6ede16ac9c4d5743b34519f38537`; SHA-512 integrity also matches
+  `sha512-sjiGI6x/NP8IyPEoNt/QAB9kJMVdG/L7EiHF1kQyjF8QwT4FRZnGj0YDTwHdwwd9YrOOpJ08XSu7FP5E8r15Xw==`.
+- Independent consumers used empty directories outside the checkout and unique
+  npm caches. Fresh npx and installed CLI returned 0.5.5. Published SDK found the
+  built-in marker rule. Published MCP handshook version 0.5.5, listed 16 tools
+  without per-call root/includeGlobs overrides, and produced ci false/true hints
+  0/1. `npm audit signatures --omit=dev`: 100 signatures / 17 attestations
+  verified. No global package or authentication state was modified.
+- Public Marketplace latest remained 0.5.5 after npm. Its own VsixSha256 and
+  downloaded package match the exact uploaded VSIX:
+  `b0c66db5b6aa4f3b12c58126021cc66d5407c1b99825295060772e277f8e6939`.
+- Manual downstream GitHub Release creation succeeded at
+  `https://github.com/Cynrath/agent-context-kit/releases/tag/v0.5.5`
+  (2026-11-17T17:00:09Z), after all independent npm/Marketplace consumers and
+  checksums passed. The release is public, stable, latest and uses the existing
+  immutable tag. Downloaded asset, API digest and release-note checksum agree
+  with the Marketplace VSIX above; packaged manifest/README/CHANGELOG, 31 ZIP
+  entries, CRC/bounds and offline/security preflight PASS (415230 bytes).
+- The failed workflow's separately rebuilt ZIP had SHA-256 `35ae1f0...` and was
+  never uploaded as a Release asset. The repair attaches the original audited
+  Marketplace VSIX, byte-identical across both public extension channels. No
+  immutable asset was replaced and no workflow rerun/dispatch was performed.
+- TASK-0106 owns the observed too-short next-release wait, planned before code
+  in `1219388` and implemented in `8e7452f`: bounded 30-minute visibility reads,
+  35-minute step timeout, unchanged fail-closed gates. Behavioral regression
+  proved the old failure and all 28 workflow contracts now pass. Full root suite
+  is 126 files / 778 PASS / 3 existing Windows privilege skips (781 total).
+- Stable pointer/current install pins now advance to the verified 0.5.5 in the
+  same follow-up, including the Action demo's stale pin/distribution copy. The
+  getting-started task example uses the installed `task create` command.
+  Source/extension versions and all runtime files remain identical to the tag.
+- Follow-up stable documentation checks: version/readme/distribution/canonical
+  docs contracts 48/48 PASS; version parity reports source/stable both 0.5.5.
+  Text hygiene, task doctor and diff check PASS. Exact-head PR CI and protected
+  stable-bookkeeping merge remain the final completion gate.
+- TASK-0097's live ownership/production evidence is recorded; completion waits
+  for the guide follow-up's exact-head CI. Historical TASK-0087/0092/0093 remain
+  blocked and are not casually closed by this release.
 
 Dependencies: TASK-0102
