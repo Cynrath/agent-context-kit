@@ -1,8 +1,9 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readdirSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { packIsolatedProject } from "../../../scripts/isolated-package.mjs";
 import { renderMarkdownReport } from "../../../src/core/reporting/index.js";
 import { getPackageIdentity } from "../../../src/shared/version.js";
 
@@ -29,18 +30,24 @@ function listTarball(tarball: string): string[] {
     .map((line) => line.replace(/^package\//, ""));
 }
 
+function checkoutBuildStamps() {
+  return ["dist/core/policy/tiers.js", "schemas/ackit.schema.json"].map((file) => ({
+    file,
+    modified: statSync(path.join(REPO_ROOT, file)).mtimeMs,
+  }));
+}
+
 describe("tarball contents inspection (REQ-PKG-001)", () => {
   it("packed tarball fits the files allowlist with no tests/cache/artifacts", () => {
     const work = mkdtempSync(path.join(tmpdir(), "ackit-inspect-"));
+    const before = checkoutBuildStamps();
     try {
-      execFileSync(PNPM, ["pack", "--pack-destination", work], {
-        cwd: REPO_ROOT,
-        encoding: "utf8",
-        shell: PNPM_SHELL,
-      });
-      const tarballName = readdirSync(work).find((entry) => entry.endsWith(".tgz"));
-      expect(tarballName).toBeDefined();
-      const files = listTarball(path.join(work, tarballName as string));
+      const tarball = packIsolatedProject(REPO_ROOT, work);
+      expect(
+        checkoutBuildStamps(),
+        "pack must not rewrite modules read by parallel CLI tests",
+      ).toEqual(before);
+      const files = listTarball(tarball);
 
       const violations = files.filter((file) => {
         if (file.endsWith("/")) return false;
@@ -80,6 +87,7 @@ describe("version identity triple-check (REQ-ARCH-009)", () => {
 
   it("real tarball installs into a temp consumer and the installed CLI passes smoke", () => {
     const work = mkdtempSync(path.join(tmpdir(), "ackit-tar-e2e-"));
+    const before = checkoutBuildStamps();
     try {
       execFileSync(PNPM, ["run", "smoke:package"], {
         cwd: REPO_ROOT,
@@ -87,6 +95,9 @@ describe("version identity triple-check (REQ-ARCH-009)", () => {
         shell: PNPM_SHELL,
         timeout: 300000,
       });
+      expect(checkoutBuildStamps(), "package smoke must preserve the shared CLI build").toEqual(
+        before,
+      );
     } finally {
       rmSync(work, { recursive: true, force: true });
     }

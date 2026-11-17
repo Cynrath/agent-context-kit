@@ -1,4 +1,4 @@
-# ACKit feature reference (v0.5.4)
+# ACKit feature reference (v0.5.5)
 
 This index covers the documented, implemented ACKit surfaces. The [CLI reference](../reference/cli.md), [SDK reference](../reference/sdk.md), [MCP reference](../reference/mcp.md) and [README](../../README.md) are authoritative for exact contracts. This index does not claim features beyond the current published code.
 

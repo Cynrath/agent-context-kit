@@ -1,7 +1,7 @@
 ---
 id: "TASK-0097"
 title: "Context7 ownership-ready configuration and Docs7 documentation distribution"
-status: blocked
+status: pending
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-10-15"
@@ -36,10 +36,10 @@ Expose the maintained ACKit documentation to Context7 and prepare Docs7 hosting 
 
 ## Acceptance criteria
 
-- [ ] Repository metadata and exclusions match official Context7 schema.
-- [ ] Docs7 schema and navigated paths match actual docs; existing pages remain source of truth.
-- [ ] Claim instructions require exact per-library public key from the owner's Context7 panel.
-- [ ] Existing hosting and released package identities are unchanged.
+- [x] Repository metadata and exclusions match official Context7 schema.
+- [x] Docs7 schema and navigated paths match actual docs; existing pages remain source of truth.
+- [x] Claim instructions require exact per-library public key from the owner's Context7 panel.
+- [x] Existing hosting and released package identities are unchanged.
 - [ ] Validated by repository checks, PR CI and Docs7 production build; external verification clearly recorded.
 - [ ] Release decision follows repository release governance and only occurs after complete evidence.
 
@@ -70,6 +70,13 @@ Revert the documentation/configuration PR; keep historical tags/releases untouch
 
 ## Completion notes
 
+Current status: external ownership and production proof are now available.
+The conditional claim-key instruction has been clarified without adding any
+challenge or credential. Exact-head validation of this documentation follow-up
+is still required before completing and archiving the task.
+
+### Original blocked checkpoint (historical, retained verbatim)
+
 PENDING. The GitHub connector provides file edits but no checkout/execution; source checkout failed DNS resolution to github.com (`Could not resolve host: github.com`) and pnpm is unavailable in the container, so the repository-built CLI could not allocate a task ID. `TASK-0097` uses the next unused ID after checked `TASK-0096` as a documented manual fallback. No local validation, Docs7 deploy, claim or badge may be asserted.
 
 ### Audit checkpoint 2026-11-17
@@ -99,3 +106,46 @@ task; historical blocked TASK-0087/0092/0093 remain untouched.
   ownership or badge verification. No deployment/account action is authorized
   by the corrective patch tasks. The task stays blocked, not completed/archived;
   this external documentation work is not a patch-publication prerequisite.
+
+### External evidence reconciliation 2026-11-17
+
+- Public Context7 library `https://context7.com/cynrath/agent-context-kit`
+  returns 200. Provider metadata reports
+  `claimedBy=f799b9e6-8500-464e-a177-3bf3216860aa`, `verified=true`,
+  `verifiedAt=2026-10-15T10:16:21.849Z`, `configSource=context7json`.
+  This is provider read-back, not an inferred badge or a new account action.
+- Docs7 Production check `134103983215` on master
+  `b7f07d68638a288a0c802f72dedd329014f4679d` concluded success with
+  "Deployment succeeded". The provider's existing site/deployment records are
+  `2adaa5e1-d7a5-49d4-9c9d-040f49885e22` /
+  `3fdd8869-f560-49b1-a866-c03963f2050f`, in the same owner teamspace.
+- `https://cynrath-agent-context-kit.docs7.io/`,
+  `/guides/getting-started`, `/llms.txt`, `/llms-full.txt` and
+  `/guides/getting-started.md` each returned HTTP 200 with the expected HTML,
+  plain-text or Markdown content type. Agent content includes current
+  `canonicalPath`, `exit_code_hint` and feature-index documentation.
+- The successful provider production render accepts this actual configuration
+  and its 32 real documentation routes. The previously recorded generic
+  upstream-schema regex compilation problem is preserved; no schema pattern
+  or validation gate was weakened to manufacture a formal-schema pass.
+- The claim guide now explicitly requires the exact per-library URL and
+  public key from the owner panel only if the already-owned library becomes
+  unclaimed. No key was invented, no ownership/config-source setting changed,
+  no duplicate library/site created, and no deployment was dispatched.
+- Existing GitHub Pages configuration and immutable package identities remain
+  unchanged by this documentation task. TASK-0103 separately owns the authorized
+  patch release for verified runtime/CI fixes; docs alone did not trigger it.
+- PR #44 head `716dd255a351bbd338980f82c9b6cae24341039f` passed all required
+  cross-platform checks before merge. Follow-up guide/task changes still await
+  their own local documentation checks and exact-head PR evidence.
+- Follow-up local validation: documentation distribution/canonical docs gates
+  11/11 PASS; repository text hygiene, task doctor and diff check PASS.
+  The current goal's explicit Git/PR/master-merge authorization, also recorded
+  in TASK-0103, covers this scoped evidence follow-up. It does not authorize
+  a deployment or account/credential change in this task.
+- Context7's connected resolve/query tools independently found the exact
+  `/cynrath/agent-context-kit` library and returned the current master SDK/MCP
+  pages: SDK root descriptor `canonicalPath`, built-in/extra rules, fixed
+  MCP startup root, unsupported per-call root/includeGlobs and ci-controlled
+  `exit_code_hint=0/1`. Retrieval of the corrected documentation is verified,
+  beyond the public ownership/badge/config-source metadata above.

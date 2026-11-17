@@ -1,3 +1,4 @@
+import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -206,6 +207,71 @@ describe("release workflow hardening", () => {
     expect(raw).toContain("dist.shasum --json");
     expect(raw).toContain("JSON.parse(require('fs').readFileSync(0,'utf8'))");
     expect(raw).toMatch(/seq 1 30/);
+  });
+
+  it.each([
+    {
+      scenario: "delayed visibility",
+      visibleAfter: 46,
+      shasum: "audited",
+      latest: "0.0.1",
+      exit: 0,
+    },
+    {
+      scenario: "permanent absence",
+      visibleAfter: 999,
+      shasum: "audited",
+      latest: "0.0.1",
+      exit: 20,
+    },
+    { scenario: "wrong shasum", visibleAfter: 1, shasum: "different", latest: "0.0.1", exit: 21 },
+    { scenario: "wrong latest", visibleAfter: 1, shasum: "audited", latest: "0.0.0", exit: 22 },
+  ])("runs the npm processing gate: $scenario", (fixture) => {
+    const doc = parse(raw) as { jobs: { release: { steps: { name?: string; run?: string }[] } } };
+    const step = doc.jobs.release.steps.find((item) =>
+      item.name?.startsWith("Verify registry metadata, shasum, and dist-tag"),
+    );
+    if (!step?.run) throw new Error("Registry verification step missing");
+    const bash =
+      process.platform === "win32"
+        ? path.resolve(
+            execFileSync("git", ["--exec-path"], { encoding: "utf8", windowsHide: true }).trim(),
+            "../../../bin/bash.exe",
+          )
+        : "bash";
+    // Execute the actual workflow shell; replace only network calls and waits.
+    // The delayed case exceeds the old 30-attempt budget without real sleeps.
+    const stubs = String.raw`
+attempts=0
+npm() {
+  case "$*" in
+    "view @cynrath/agent-context-kit@$RELEASE_VERSION version")
+      attempts=$((attempts + 1))
+      [ "$attempts" -ge "$MOCK_VISIBLE_AFTER" ] ;;
+    "view @cynrath/agent-context-kit@$RELEASE_VERSION dist.shasum --json")
+      printf '"%s"\n' "$MOCK_SHASUM" ;;
+    "view @cynrath/agent-context-kit dist-tags.latest")
+      printf '%s\n' "$MOCK_LATEST" ;;
+    *) return 99 ;;
+  esac
+}
+sleep() { :; }
+`;
+    const result = spawnSync(bash, ["--noprofile", "--norc", "-c", `${stubs}\n${step.run}`], {
+      encoding: "utf8",
+      windowsHide: true,
+      timeout: 10_000,
+      env: {
+        ...process.env,
+        RELEASE_VERSION: "0.0.1",
+        TARBALL_SHASUM: "audited",
+        MOCK_VISIBLE_AFTER: String(fixture.visibleAfter),
+        MOCK_SHASUM: fixture.shasum,
+        MOCK_LATEST: fixture.latest,
+      },
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(fixture.exit);
   });
 
   it("keeps GitHub Release after every publish and final verification last (failed publish aborts first)", () => {

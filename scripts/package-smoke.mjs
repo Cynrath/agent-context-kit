@@ -1,26 +1,22 @@
 #!/usr/bin/env node
 // Packs the project and installs the tarball into a temp dir, then smokes the
 // installed CLI: --version / --help / config check / doctor / scan on a fixture.
-// Usage: node scripts/package-smoke.mjs   (requires prior `pnpm build`)
+// Usage: pnpm run smoke:package (build/pack run in a private source export).
 import { execFileSync, spawnSync } from "node:child_process";
-import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { packIsolatedProject } from "./isolated-package.mjs";
 
-const repoRoot = path.resolve(
-  path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")),
-  "..",
-);
+const repoRoot = fileURLToPath(new URL("../", import.meta.url));
 const pkg = JSON.parse(readFileSync(path.join(repoRoot, "package.json"), "utf8"));
 const work = mkdtempSync(path.join(tmpdir(), "ackit-pkg-smoke-"));
+if (
+  path.dirname(work) !== path.resolve(tmpdir()) ||
+  !path.basename(work).startsWith("ackit-pkg-smoke-")
+)
+  throw new Error("Unsafe package-smoke cleanup boundary");
 
 function run(cmd, args, opts = {}) {
   const res = spawnSync(cmd, args, { encoding: "utf8", ...opts });
@@ -32,16 +28,9 @@ function run(cmd, args, opts = {}) {
   return res;
 }
 
-// 1) Pack.
-const PNPM = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
-execFileSync(PNPM, ["pack", "--pack-destination", work], {
-  cwd: repoRoot,
-  encoding: "utf8",
-  shell: process.platform === "win32",
-});
-const tarballName = readdirSync(work).find((entry) => entry.endsWith(".tgz"));
-if (!tarballName) throw new Error("pack produced no tarball");
-const tarball = path.join(work, tarballName);
+// 1) Preserve lifecycle coverage without mutating sibling tests' dist/schemas.
+const tarball = packIsolatedProject(repoRoot, work);
+const tarballName = path.basename(tarball);
 if (!existsSync(tarball)) throw new Error(`tarball not found: ${tarball}`);
 
 // 2) Install into an isolated consumer project.
