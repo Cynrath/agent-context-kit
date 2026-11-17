@@ -1,7 +1,7 @@
 ---
 id: "TASK-0103"
 title: "Authorized patch publication and public-surface verification"
-status: active
+status: pending
 schemaVersion: 2
 dependencies:
   - "TASK-0102"
@@ -70,7 +70,7 @@ external blocker; do independent authorized work first, never partial-publish np
 ## Acceptance criteria
 
 - [x] PR merged only after all exact-head CI checks pass; master SHA verified.
-- [~] Marketplace target visible before new immutable tag triggers npm publication.
+- [x] Marketplace target visible before new immutable tag triggers npm publication.
 - [ ] npm latest, fresh CLI/SDK/MCP and new-tag external Action consumer pass.
 - [ ] GitHub Release tag/VSIX identity and downloaded asset checksum pass.
 - [ ] Stable-pointer bookkeeping merged with CI; final master clean/aligned;
@@ -152,5 +152,41 @@ Primary work remains on master. Protected metadata integration uses only a
 temporary detached records worktree/PR transport, removed after merge; no direct
 master push or persistent development branch is introduced. Publication still
 waits for master checks, a fresh audited master VSIX and current target absence.
+
+### Publication checkpoint — registry processing
+
+- Protected records PR #44 head `716dd255a351bbd338980f82c9b6cae24341039f`
+  passed all 12 required checks plus Docs7 Preview, then merged as
+  `b7f07d68638a288a0c802f72dedd329014f4679d`. Both commits have identical tree
+  `0822388ec806d47223eb64eca22168858c48b294`. Primary checkout remains clean
+  master equal to origin/master; both old PR transport branches were deleted.
+- Post-merge CI run `44101924915` had two macOS jobs canceled before acquiring
+  a hosted runner (empty steps/runner name; capacity annotation), not test
+  failures. Other executed jobs and Action run `44101925039` passed. The
+  identical-tree PR platform matrix passed; no workflow was dispatched/rerun.
+- Marketplace publication of audited `ackit-vscode-0.5.5.vsix` succeeded;
+  public latest read-back returned 0.5.5 before tag push. Uploaded VSIX size
+  415230 bytes, SHA-256
+  `b0c66db5b6aa4f3b12c58126021cc66d5407c1b99825295060772e277f8e6939`.
+- NEW annotated tag `v0.5.5` object
+  `857d91b4866fd88c691eca2b230457ef9da11310` peels to `b7f07d6`.
+  The tag has not been moved/deleted. New-tag cold external Action consumer
+  passed scan/optimize/drift, thresholds, CLI errors and canonical SARIF.
+- Release run `44129100682` passed full quality, VSIX preflight, tarball smoke,
+  Marketplace-first gate and npm OIDC publication. Published tarball SHA-1
+  `41ff5b1865ef6ede16ac9c4d5743b34519f38537`; signed provenance transparency
+  log index `3949357822`. npm reported that package processing was pending.
+- The 30 x 10s registry-visibility gate expired with exit 20. Subsequent fresh
+  npm-cache and direct HTTPS probes still returned 404; latest remained 0.5.4.
+  npm's official 2026-07-28 publish-time scanning announcement allows 15 minutes
+  or longer processing. This is not a failed upload or proof of public success.
+  Downstream consumer/GitHub Release steps were skipped. No second publish,
+  tag change, workflow rerun or stable-pointer update has been attempted.
+- Publication read-back continues after the bounded TASK-0097 documentation
+  reconciliation unit; this scheduling change is not task completion.
+- A temporary records worktree nested under ignored temp caused duplicate
+  skill discovery (8 issues). Moving that clean worktree outside the primary
+  repository restored 4 skills / 0 issues and doctor PASS; no product policy,
+  scan suppression or skill validator was changed. Scan CI remained exit 0.
 
 Dependencies: TASK-0102

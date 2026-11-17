@@ -19,7 +19,7 @@ By default, an owned Context7 library may say **Config source: Configuration is 
 
 Avoid switching blindly: existing dashboard exclusions may differ from the repository file. The repository config intentionally indexes maintained feature docs and the README, not archived tasks or generated content. Leave **Index every version, old ones too** disabled unless historical-version docs are explicitly required.
 
-Never commit Context7 API tokens, npm credentials or other secrets. If this library is ever unclaimed by an owner, use the [official claim process](https://context7.com/docs/howto/claiming-libraries) only then.
+Never commit Context7 API tokens, npm credentials or other secrets. If this library is ever unclaimed by an owner, use the [official claim process](https://context7.com/docs/howto/claiming-libraries) only then. Copy the exact per-library `url` and `public_key` from that library's **Claim Library** dialog in the owner's Context7 panel; never invent a key or reuse another library's challenge. Existing ownership needs no new challenge.
 
 ## 3. Apply for the verified badge
 
