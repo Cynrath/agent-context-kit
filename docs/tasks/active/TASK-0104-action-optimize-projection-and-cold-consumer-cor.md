@@ -1,7 +1,7 @@
 ---
 id: "TASK-0104"
 title: "Action optimize projection and cold consumer corrective verification"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0101"
@@ -23,6 +23,9 @@ commits and PR work are authorized by the 2026-11-17 goal.
 - Restore optimize projections without changing the original JSON report or
   scanner behavior. Reuse the canonical SARIF writer with source suggestion IDs,
   severities and relative locations; do not invent a parallel report format.
+- The shared SARIF writer currently emits raw path characters. Encode URI path
+  segments for spaces, fragment/query characters and Unicode per SARIF 2.1.0
+  section 3.10.4, preserving path separators and the existing report contract.
 - The real clean-consumer smoke failed at its frozen install with an empty error
   because the helper reads only stderr. Surface safe stdout/error/status details,
   diagnose the actual bootstrap failure, and fix its source contract without
@@ -54,12 +57,13 @@ its existing version/docs/workflow changes are preserved on the same branch.
 
 ## Acceptance criteria
 
-- [ ] Optimize above/below-threshold and CLI-error cases return correct codes;
+- [~] Optimize above/below-threshold and CLI-error cases return correct codes;
   original JSON remains unchanged and canonical SARIF has source IDs/locations.
 - [ ] Real exported source frozen-installs and builds, then scan/optimize work
   from an independent repository with no consumer dependencies/dist.
 - [ ] A failed consumer command reports a useful sanitized status/cause and
   remains a hard failure; no frozen/build/threshold test is skipped or masked.
+- [ ] SARIF artifact URIs encode reserved/Unicode path characters correctly.
 - [ ] Focused/full affected quality, offline and ACKit checks pass with evidence.
 
 ## Test steps
@@ -93,5 +97,12 @@ Forward corrective PR/commit only; preserve all existing work and immutable tags
 
 CLI-allocated plan created 2026-11-17 from the final clean-consumer failure and
 source review. No implementation for this corrective task before this plan.
+
+The optimize regression was run before its fix: expected failure code 1, actual
+0. A repeat clean install/build passed without changing bootstrap gates; the
+earlier opaque install failure is not reproducible and its original stdout was
+lost. Preserve that uncertainty; improve future failure visibility and require
+fresh successful consumer checks. URI requirement verified against the
+[OASIS SARIF 2.1.0 specification](https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/sarif-v2.1.0-os.html).
 
 Dependencies: TASK-0101
