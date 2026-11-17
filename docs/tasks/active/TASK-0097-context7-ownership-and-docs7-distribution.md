@@ -1,7 +1,7 @@
 ---
 id: "TASK-0097"
 title: "Context7 ownership-ready configuration and Docs7 documentation distribution"
-status: active
+status: pending
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-10-15"
@@ -40,7 +40,7 @@ Expose the maintained ACKit documentation to Context7 and prepare Docs7 hosting 
 - [x] Docs7 schema and navigated paths match actual docs; existing pages remain source of truth.
 - [x] Claim instructions require exact per-library public key from the owner's Context7 panel.
 - [x] Existing hosting and released package identities are unchanged.
-- [~] Validated by repository checks, PR CI and Docs7 production build; external verification clearly recorded.
+- [ ] Validated by repository checks, PR CI and Docs7 production build; external verification clearly recorded.
 - [ ] Release decision follows repository release governance and only occurs after complete evidence.
 
 ## Test steps
