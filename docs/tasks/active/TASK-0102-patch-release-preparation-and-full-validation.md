@@ -1,10 +1,11 @@
 ---
 id: "TASK-0102"
 title: "Patch release preparation and full validation"
-status: active
+status: pending
 schemaVersion: 2
 dependencies:
   - "TASK-0101"
+  - "TASK-0104"
 createdAt: "2026-11-17"
 completedAt: null
 ---
@@ -54,7 +55,7 @@ TASK-0101. TASK-0103 requires all acceptance below and exact-head PR CI.
 
 ## Acceptance criteria
 
-- [~] Source/extension/package docs are coupled at the next absent patch;
+- [x] Source/extension/package docs are coupled at the next absent patch;
   published-stable claims remain truthful until publication.
 - [ ] All required local checks pass with exact counts/commands recorded;
   no skipped mandatory tests or unresolved release-scope security finding.
@@ -89,5 +90,16 @@ Forward corrective PR before release; never reuse or move immutable versions.
 ## Completion notes
 
 Plan allocated by repository CLI on 2026-11-17. Full validation not yet run.
+
+### Dependency checkpoint 2026-11-17
+
+Source/extension metadata is coupled at 0.5.5, stable remains 0.5.4, npm target
+and remote tag are absent. The versioned full suite passed 758 tests (3 unchanged
+Windows privilege skips), extension 8 unit/6 Electron tests passed, and the final
+visibility-read contract passed. The actual clean Action consumer then failed
+at frozen install with an opaque diagnostic; source review also found optimize
+suggestions omitted from Action threshold projection. TASK-0104 owns corrective
+verification before this task resumes final checks. All working changes remain
+preserved. No push, tag, PR merge or publication has occurred.
 
 Dependencies: TASK-0101
