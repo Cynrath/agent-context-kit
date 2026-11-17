@@ -23,6 +23,10 @@ commits and PR work are authorized by the 2026-11-17 goal.
 - Restore optimize projections without changing the original JSON report or
   scanner behavior. Reuse the canonical SARIF writer with source suggestion IDs,
   severities and relative locations; do not invent a parallel report format.
+- The same scanner-only validation rejects advertised `drift check` findings
+  (`code/detail`, blocking/warning). Add its explicit projection, preserving raw
+  JSON and CLI codes; map blocking to high and warning to medium for Action
+  thresholds. Global task drift has no invented file location in SARIF.
 - The shared SARIF writer currently emits raw path characters. Encode URI path
   segments for spaces, fragment/query characters and Unicode per SARIF 2.1.0
   section 3.10.4, preserving path separators and the existing report contract.
@@ -64,6 +68,8 @@ its existing version/docs/workflow changes are preserved on the same branch.
 - [ ] A failed consumer command reports a useful sanitized status/cause and
   remains a hard failure; no frozen/build/threshold test is skipped or masked.
 - [ ] SARIF artifact URIs encode reserved/Unicode path characters correctly.
+- [ ] Nonempty drift reports remain available, with documented severity mapping
+  and valid location-free SARIF results for task-level findings.
 - [ ] Focused/full affected quality, offline and ACKit checks pass with evidence.
 
 ## Test steps
