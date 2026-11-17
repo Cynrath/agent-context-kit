@@ -1,12 +1,12 @@
 ---
 id: "TASK-0107"
 title: "Isolate package smoke builds from parallel CLI contracts"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0105"
 createdAt: "2026-11-17"
-completedAt: null
+completedAt: 2026-11-17
 ---
 
 
@@ -33,14 +33,27 @@ checkout, rewriting shared dist/schemas while sibling CLI contracts read them.
 ## Explicit authorization
 
 The current goal authorizes scoped bug/CI/test fixes, ordinary commits/pushes
-and protected PR/master integration. This task performs no publication,
-workflow dispatch/rerun, tag, permission, credential or deployment action.
+and protected PR/master integration. Publication, workflow dispatch, tag,
+permission, credential and deployment actions remain outside this task. The
+later scoped CI retry authorization below is the only rerun exception.
+
+### Scoped CI retry authorization (2026-11-17)
+
+After the corrected head `7a191414d7ff351acc20b8051914ca0492962ee2` passed
+11/13 checks, GitHub canceled the two remaining macOS jobs without assigning
+a runner or executing any steps. Annotations explicitly report macOS arm64
+capacity constraints. In response to a concrete approval request, the user
+authorized finishing the proposed retries of only `verify macos-latest /
+node-24` and `package-smoke macos-latest` in CI run `44151390824`, at most three
+attempts per job. This narrowly supersedes the earlier no-rerun boundary for
+these two capacity-canceled CI jobs. Release-workflow reruns, workflow dispatch,
+tag/package changes and permission changes remain outside this authorization.
 
 ## Out of scope
 
 - Runtime/public API/version changes; serializing the suite; skipping prepack,
   weakening CLI exit-code expectations, retries that hide the race; republish,
-  tag movement, workflow dispatch/rerun, deployment or unrelated refactoring.
+  tag movement, workflow dispatch, unapproved reruns, deployment or unrelated refactoring.
 
 ## Affected files
 
@@ -61,7 +74,7 @@ workflow dispatch/rerun, tag, permission, credential or deployment action.
 - [x] Lifecycle-enabled packing preserves the checkout's built modules/schemas.
 - [x] Actual tarball allowlist, installed CLI/task/MCP and parallel CLI checks pass.
 - [x] No lifecycle/quality assertion is skipped, serialized or weakened.
-- [~] Full local gates and required exact-head PR CI pass with recorded evidence.
+- [x] Full local gates and required exact-head PR CI pass with recorded evidence.
 
 ## Test steps
 
@@ -73,7 +86,8 @@ workflow dispatch/rerun, tag, permission, credential or deployment action.
    project (no ignored dist/node_modules), frozen-install, and perform real
    prepack/pack there. Require bounded, redacted child-process failures.
 4. Run focused parallel packaging/CLI tests, then full affected checks and
-   exact-head hosted matrix; leave previous failures visible, never rerun them.
+   exact-head hosted matrix; preserve previous failure evidence. Only the later
+   scoped user approval below permits retrying capacity-canceled CI jobs.
 
 ## Security and compatibility
 
@@ -97,9 +111,9 @@ the failing CI gate honest. No immutable release/package/tag is changed.
 
 ## Completion notes
 
-Implementation and local checks are verified; the corrected head still awaits
-required PR CI. TASK-0103 stays pending this correction and protected bookkeeping
-merge. Public release 0.5.5 and its immutable artifacts remain unchanged.
+All literal criteria are verified. Exact-head PR CI passed and the correction
+landed on protected master. Public release 0.5.5 and its immutable artifacts
+remain unchanged; TASK-0103 owns final release bookkeeping.
 
 - Plan `4d0aa26` preceded implementation. A regression assertion around the old
   actual pack reproduced writes to both `dist/core/policy/tiers.js` and
@@ -121,4 +135,33 @@ merge. Public release 0.5.5 and its immutable artifacts remain unchanged.
   continues to run the default full-suite command on its normal matrix.
 - Lint, format, strict typecheck, build, schema no-drift, text hygiene, task
   doctor and static offline gate PASS. Required exact-head CI is the remaining
-  completion evidence; no new live publish/dispatch/rerun is part of this task.
+  completion evidence. Live publication and workflow dispatch remain outside
+  this task; the separately approved capacity-only CI retry is recorded below.
+
+### CI capacity checkpoint
+
+Attempt 1 of run `44151390824` passed 11/13 checks on exact head `7a19141`.
+The two remaining macOS jobs were canceled with zero steps/empty runner and
+explicit hosted-arm64 capacity annotations, not test failures. After the
+separate user approval above, `gh run rerun 44151390824 --failed` was submitted
+only after confirming those were the only non-success jobs. Attempt 2 has
+passed the macOS package smoke first while macOS/Node 24 remained queued. The
+Release workflow and immutable publications were not rerun or changed.
+
+### Final CI and merge proof
+
+- CI run `44151390824`, attempt 2, concluded success. PR #45 exact head
+  `7a191414d7ff351acc20b8051914ca0492962ee2` has 13/13 successful checks,
+  including all 12 required checks, default full-suite OS/Node 22/24 matrix,
+  standalone package smokes, extension/Electron, Action and Docs7 Preview.
+- macOS/Node 24 log confirms 126 files / 781 tests PASS, including actual
+  tarball, CLI-dist and 28 workflow tests. Linux/Node 24 likewise passed 781.
+  Windows default full suites passed with the existing privilege skips.
+- Protected squash merge `f42937d7ffc97a5d21307935995d1a858c4af847` on
+  2026-11-17T19:17:40Z has the exact verified PR tree
+  `d4ed9f68296312691879ccd5ec65a8d79ef6c01e`. The temporary remote branch is
+  deleted; primary master is clean and equal to origin/master. Production
+  code/manifests/lock/templates/extension/Action inputs match immutable v0.5.5.
+- One explicitly approved capacity-only retry round was used. The original
+  cancellations/failure logs remain visible; no release workflow, tag or
+  published artifact was rerun, moved or overwritten.
