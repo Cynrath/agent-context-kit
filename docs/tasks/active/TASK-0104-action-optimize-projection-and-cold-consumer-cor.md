@@ -52,6 +52,12 @@ commits and PR work are authorized by the 2026-11-17 goal.
   contract requires correction, and affected CI guide/task evidence.
 - `src/cli/commands/optimize.ts` for its existing SARIF format only; JSON and
   business logic remain unchanged.
+- A small adjacent consumer-command helper to isolate real subprocess diagnostic
+  testing from the expensive repository export/install fixture. The first full
+  run had 771 passes/1 failure: the diagnostic test ended with empty stderr
+  before its expected marker, while focused/real consumer checks passed. Test
+  the same actual failing child/status/stdout/redaction boundary directly; do
+  not raise timeouts, remove assertions or skip the full consumer check.
 
 ## Dependencies
 
