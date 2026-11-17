@@ -30,6 +30,9 @@ commits and PR work are authorized by the 2026-11-17 goal.
 - The shared SARIF writer currently emits raw path characters. Encode URI path
   segments for spaces, fragment/query characters and Unicode per SARIF 2.1.0
   section 3.10.4, preserving path separators and the existing report contract.
+- CLI optimize has its own raw-path SARIF construction. Route that existing
+  format through the same typed suggestion projection and canonical writer, so
+  CLI and Action reports stay semantically identical and URI-safe.
 - The real clean-consumer smoke failed at its frozen install with an empty error
   because the helper reads only stderr. Surface safe stdout/error/status details,
   diagnose the actual bootstrap failure, and fix its source contract without
@@ -47,6 +50,8 @@ commits and PR work are authorized by the 2026-11-17 goal.
   `tests/unit/action/runtime.test.ts`, Action distribution contracts,
   `scripts/action-consumer-smoke.mjs`, `action.yml` only if the observed bootstrap
   contract requires correction, and affected CI guide/task evidence.
+- `src/cli/commands/optimize.ts` for its existing SARIF format only; JSON and
+  business logic remain unchanged.
 
 ## Dependencies
 
