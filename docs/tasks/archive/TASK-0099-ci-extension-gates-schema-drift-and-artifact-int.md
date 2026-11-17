@@ -1,12 +1,12 @@
 ---
 id: "TASK-0099"
 title: "CI extension gates schema drift and artifact integrity"
-status: active
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0098"
 createdAt: "2026-11-17"
-completedAt: null
+completedAt: 2026-11-17
 ---
 
 
@@ -61,13 +61,13 @@ TASK-0098. TASK-0100 follows this task.
 
 ## Acceptance criteria
 
-- [~] Lint, unit and Electron commands propagate real failures with no bypass.
-- [ ] Extension source/test typechecks and lint/unit/Electron tests actually pass.
-- [ ] CI has schema drift, CLI/package smoke, version parity and VSIX integrity
+- [x] Lint, unit and Electron commands propagate real failures with no bypass.
+- [x] Extension source/test typechecks and lint/unit/Electron tests actually pass.
+- [x] CI has schema drift, CLI/package smoke, version parity and VSIX integrity
   checks; source version and package filename are derived, not release literals.
-- [ ] VSIX manifest/README/CHANGELOG identity, file allowlist, size and secret
+- [x] VSIX manifest/README/CHANGELOG identity, file allowlist, size and secret
   checks pass; release fail-closed gates remain effective.
-- [ ] Bundled SDK version/templates load inside the extension host and finding
+- [x] Bundled SDK version/templates load inside the extension host and finding
   navigation/diagnostics cannot resolve traversal or sibling-prefix paths.
 
 ## Test steps
@@ -93,10 +93,44 @@ Forward corrective PR; no weakening checks, history rewriting or tag changes.
 
 ## Completion notes
 
-Plan allocated by repository CLI on 2026-11-17. Before implementation, unmasked
-lint failed with 4 errors/2 warnings; source and test typechecks passed. The
-additional runtime/test findings above were inspected and added to this plan
-before their implementation. All existing assertions will be strengthened or
-replaced with actual production-boundary/host behavior, never bypassed.
+Verified 2026-11-17; source/extension remain at the existing 0.5.4 during audit.
+
+- Removed all three CI exit-code fallbacks. Added schema drift, CLI smoke and
+  dynamic source/extension/VSIX parity gates; the existing real-tarball jobs stay.
+  Pinned packaging/probes to published vsce 4.1.1. Release retains every original
+  preflight, absence, Marketplace-first, npm OIDC and immutable-artifact gate;
+  the portable VSIX audit is an additional pre-publish check.
+- Unmasked lint initially failed (4 errors/2 warnings). The old standalone unit
+  suite required host-only `vscode` and the Electron suite contained unconditional
+  assertions/catches. Production diagnostic/path logic now has 8 passing host-free
+  tests; Electron has 6 passing real data/command/diagnostic/lifecycle tests on
+  VS Code 1.146.0 (exit 0). No test failure fallback or disabled assertion remains.
+- Host tests exposed SDK's empty default rule list, now restored to built-ins
+  plus extras. SDK scan/cancellation tests: 6 PASS. Initial runtime packaging
+  errors were corrected through the real host; the final bundled SDK identity,
+  templates and readiness calculation pass. Finding paths reject traversal,
+  sibling prefixes and escaping directory links, with real filesystem tests.
+- Source maps were actually found in the first VSIX because the old ignore
+  matched only top-level maps. `**/*.map` now excludes them. Final audited VSIX:
+  31 entries, 375515 bytes, SHA-256
+  `ac731ccd09af55f23726dd7a16d329118e3ceefcd97bc5027a44fb0effadc2fd`.
+  Manifest/XML/SDK/README/CHANGELOG, profiles/roles, icon, path/file list, ZIP
+  bounds/CRC, size and credential-material checks PASS. Seven gate contracts
+  reject version/resource drift, unexpected files, actual synthetic key/token
+  material and payload corruption; detector header text is correctly accepted.
+- Focused workflow/version/VSIX/SDK suites: 5 files / 69 tests PASS.
+  Full `pnpm test --maxWorkers=2`: 120 files PASS; 745 tests PASS, 3 unchanged
+  Windows privilege-dependent symlink skips. The full suite also exercises
+  isolated real-tarball consumers.
+- Root lint/format/typecheck/build, extension source/test typechecks/lint/build,
+  schema generation with zero drift, CLI smoke, version parity, offline-egress
+  (204 files), text hygiene, doctor/task doctor, `scan --ci` exit 0 and
+  `git diff --check` PASS. No suppression/baseline or permission change.
+- Separate audit discovery: registry audit of unchanged production dependencies
+  returns 40 advisories (1 critical/11 high). Dependency remediation belongs to
+  the preplanned TASK-0101 audit, outside this task's explicit no-upgrade scope;
+  TASK-0102/0103 cannot release without its disposition and verification.
+- Successor TASK-0100: MCP schema/reference/CI hint parity. Hosted CI remains a
+  TASK-0103 prerequisite; no publication, tag or remote push occurred here.
 
 Dependencies: TASK-0098

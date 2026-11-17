@@ -62,6 +62,36 @@ describe("CI workflow hardening", () => {
     expect(raw).toContain("scan --ci");
     expect(raw).toContain("smoke:package");
   });
+
+  it("enforces schema/CLI/version gates and real extension failures", () => {
+    const doc = parse(raw) as {
+      jobs: Record<string, { steps: { run?: string; "continue-on-error"?: boolean }[] }>;
+    };
+    const runs = doc.jobs["verify"]?.steps.map((step) => step.run ?? "").join("\n") ?? "";
+    for (const marker of [
+      "pnpm gen:schemas",
+      "git diff --exit-code -- schemas",
+      "pnpm smoke:cli",
+      "node scripts/check-version-parity.mjs",
+    ])
+      expect(runs).toContain(marker);
+    const extension = doc.jobs["extension"]?.steps ?? [];
+    for (const step of extension) {
+      expect(step["continue-on-error"]).not.toBe(true);
+      expect(step.run ?? "").not.toMatch(/\|\|\s*(?:true|echo)|--diagnostic-level=warn/);
+    }
+    const commands = extension.map((step) => step.run ?? "").join("\n");
+    for (const marker of [
+      "run lint",
+      "run typecheck",
+      "run test:unit",
+      "xvfb-run -a pnpm --filter ackit-vscode test",
+      "node scripts/check-vsix.mjs",
+      "pkg.version!==root.version",
+    ])
+      expect(commands).toContain(marker);
+    expect(commands).not.toMatch(/ackit-vscode-\d+\.\d+\.\d+\.vsix/);
+  });
 });
 
 /** Controlled-release gate: release.yml must stay a tags-only, npm-OIDC +

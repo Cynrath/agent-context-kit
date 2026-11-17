@@ -1,57 +1,59 @@
 import * as assert from "node:assert";
-import * as vscode from "vscode";
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { diagnosticKind, resolveFindingPath } from "../../diagnostics.js";
 
-suite("ACKit Unit Tests", () => {
-  test("severity mapping", () => {
-    // Verify that findings severity maps to DiagnosticSeverity correctly
-    // This is a pure logic test, no VS Code API needed beyond enum
-    const map = (sev: string) => {
-      if (sev === "critical" || sev === "high") return vscode.DiagnosticSeverity.Error;
-      if (sev === "medium") return vscode.DiagnosticSeverity.Warning;
-      if (sev === "low") return vscode.DiagnosticSeverity.Information;
-      return vscode.DiagnosticSeverity.Hint;
-    };
-    assert.strictEqual(map("critical"), vscode.DiagnosticSeverity.Error);
-    assert.strictEqual(map("high"), vscode.DiagnosticSeverity.Error);
-    assert.strictEqual(map("medium"), vscode.DiagnosticSeverity.Warning);
-    assert.strictEqual(map("low"), vscode.DiagnosticSeverity.Information);
-    assert.strictEqual(map("info"), vscode.DiagnosticSeverity.Hint);
+suite("ACKit diagnostic boundaries (without a VS Code host)", () => {
+  for (const [severity, expected] of Object.entries({
+    critical: "Error",
+    high: "Error",
+    medium: "Warning",
+    low: "Information",
+    info: "Hint",
+  })) {
+    test(`maps ${severity} to ${expected}`, () =>
+      assert.strictEqual(diagnosticKind(severity), expected));
+  }
+  let fixture: string;
+  let root: string;
+  setup(() => {
+    fixture = mkdtempSync(path.join(tmpdir(), "ackit-vscode-unit-"));
+    root = path.join(fixture, "repo");
+    mkdirSync(path.join(root, "src"), { recursive: true });
+    mkdirSync(path.join(fixture, "repo-other"));
+    writeFileSync(path.join(root, "src", "app.ts"), "fixture\n");
+    writeFileSync(path.join(fixture, "repo-other", "outside.txt"), "outside\n");
   });
-
-  test("path handling — safe Uri.joinPath", () => {
-    const root = "/tmp/workspace";
-    const rel = "src/app.ts";
-    const uri = vscode.Uri.joinPath(vscode.Uri.file(root), rel);
-    assert.ok(uri.fsPath.endsWith("src/app.ts") || uri.fsPath.includes("src"));
-    // Ensure that absolute path outside root is not joined blindly
-    const evil = "/etc/passwd";
-    // Our code should check isInsideRoot before joining
-    assert.ok(!evil.startsWith(root));
+  teardown(() => {
+    assert.strictEqual(path.dirname(fixture), path.resolve(tmpdir()));
+    assert.ok(path.basename(fixture).startsWith("ackit-vscode-unit-"));
+    rmSync(fixture, { recursive: true, force: true });
   });
-
-  test("multi-root selection", () => {
-    // Simulate multi-root logic: active editor's folder should be preferred
-    // This is a logic test, not requiring actual workspace
-    const roots = ["/a", "/b", "/c"];
-    const active = "/b/src/file.ts";
-    const folder = roots.find((r) => active.startsWith(r));
-    assert.strictEqual(folder, "/b");
+  test("resolves a real contained file with portable separators", () => {
+    const expected = realpathSync(path.join(root, "src", "app.ts"));
+    assert.strictEqual(resolveFindingPath(root, "src/app.ts"), expected);
+    assert.strictEqual(resolveFindingPath(root, "src\\app.ts"), expected);
   });
-
-  test("watch debounce", async () => {
-    let count = 0;
-    let timer: NodeJS.Timeout | undefined;
-    const schedule = () => {
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => count++, 100);
-    };
-    schedule(); schedule(); schedule();
-    await new Promise((r) => setTimeout(r, 250));
-    assert.strictEqual(count, 1);
+  test("rejects traversal, sibling-prefix, absolute, empty and NUL paths", () => {
+    for (const relative of [
+      "../repo-other/outside.txt",
+      "..\\repo-other\\outside.txt",
+      path.join(root, "src/app.ts"),
+      "C:\\outside.txt",
+      "",
+      "src\0app.ts",
+      "missing.ts",
+    ]) {
+      assert.strictEqual(resolveFindingPath(root, relative), null, relative);
+    }
   });
-
-  test("error states", () => {
-    const snap = { error: "test error", scan: null } as unknown as { error: string | null; scan: unknown };
-    assert.ok(snap.error);
+  test("rejects a directory junction/symlink escaping the workspace", () => {
+    symlinkSync(
+      path.join(fixture, "repo-other"),
+      path.join(root, "link"),
+      process.platform === "win32" ? "junction" : "dir",
+    );
+    assert.strictEqual(resolveFindingPath(root, "link/outside.txt"), null);
   });
 });

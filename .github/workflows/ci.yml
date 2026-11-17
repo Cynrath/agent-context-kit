@@ -41,6 +41,14 @@ jobs:
         run: pnpm typecheck
       - name: Build
         run: pnpm build
+      - name: Schema drift
+        run: |
+          pnpm gen:schemas
+          git diff --exit-code -- schemas
+      - name: CLI smoke
+        run: pnpm smoke:cli
+      - name: Version parity
+        run: node scripts/check-version-parity.mjs
       - name: Offline-egress static gate
         run: node scripts/check-offline-egress.mjs
       - name: Text hygiene (C0 controls)
@@ -107,7 +115,8 @@ jobs:
         run: |
           node -e "
           const pkg=require('./extensions/vscode/package.json');
-          if(pkg.version!=='0.5.4') throw new Error('extension version must be 0.5.4');
+          const root=require('./package.json');
+          if(pkg.version!==root.version) throw new Error('extension/root version mismatch');
           if(pkg.publisher!=='Cynrath') throw new Error('publisher must be Cynrath');
           if(pkg.displayName!=='ACKit Toolkit') throw new Error('displayName must be ACKit Toolkit');
           if(!pkg.contributes.views.ackit.find(v=>v.id==='ackit.readiness')) throw new Error('ackit.readiness view missing');
@@ -116,85 +125,31 @@ jobs:
           console.log('manifest contract PASS');
           "
       - name: Extension typecheck
-        run: |
-          pnpm --filter ackit-vscode exec tsc -p tsconfig.json --noEmit
-          pnpm --filter ackit-vscode exec tsc -p tsconfig.test.json --noEmit
+        run: pnpm --filter ackit-vscode run typecheck
       - name: Extension lint (vscode src)
-        run: |
-          pnpm --filter ackit-vscode exec biome check src --diagnostic-level=warn || true
+        run: pnpm --filter ackit-vscode run lint
       - name: Extension build
         run: |
-          pnpm --filter ackit-vscode exec esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=dist/extension.js --external:vscode --sourcemap
+          pnpm --filter ackit-vscode run build
           test -f extensions/vscode/dist/extension.js
       - name: Extension unit tests
-        run: |
-          pnpm --filter ackit-vscode run compile:test
-          # run mocha unit tests directly (without Electron) if available
-          pnpm --filter ackit-vscode exec mocha out/test/suite/unit.test.js --timeout 5000 || echo "unit tests done"
+        run: pnpm --filter ackit-vscode run test:unit
       - name: VS Code Electron integration (xvfb)
-        run: |
-          pnpm --filter ackit-vscode run compile:test
-          xvfb-run -a pnpm --filter ackit-vscode test || echo "Electron integration completed (check logs)"
+        run: xvfb-run -a pnpm --filter ackit-vscode test
+      - name: Version parity
+        run: node scripts/check-version-parity.mjs
       - name: vsce ls
         run: |
           cd extensions/vscode
-          npx --yes @vscode/vsce ls --no-dependencies --no-yarn
+          npx --yes @vscode/vsce@4.1.1 ls --no-dependencies --no-yarn
       - name: vsce package --no-dependencies
         run: |
-          cd extensions/vscode
-          npx --yes @vscode/vsce package --no-dependencies --no-yarn --out ackit-vscode-0.5.4.vsix
-          test -f ackit-vscode-0.5.4.vsix
-          ls -lh ackit-vscode-0.5.4.vsix
-      - name: VSIX content audit
-        run: |
-          cd extensions/vscode
-          npx --yes @vscode/vsce ls --no-dependencies --no-yarn > /tmp/vsce-ls.txt
-          cat /tmp/vsce-ls.txt
-          if grep -q "node_modules" /tmp/vsce-ls.txt; then echo "::error::VSIX contains node_modules"; exit 1; fi
-          # check icon exists and size
-          ls -lh images/icon.png
-          file images/icon.png
-          # check VSIX size <2MB
-          size=$(stat -c%s ackit-vscode-0.5.4.vsix 2>/dev/null || stat -f%z ackit-vscode-0.5.4.vsix)
-          echo "VSIX size $size bytes"
-          if [ "$size" -gt 2097152 ]; then echo "::error::VSIX >2MB"; exit 1; fi
-          # check no secrets in VSIX
-          unzip -l ackit-vscode-0.5.4.vsix | head -20
-          if unzip -p ackit-vscode-0.5.4.vsix extension/package.json | grep -q "AKIA"; then echo "::error::secret in VSIX"; exit 1; fi
-      - name: Packaged VSIX parity (Marketplace content)
-        run: |
-          cd extensions/vscode
-          pkgver=$(node -p "require('./package.json').version")
+          pkgver=$(node -p "require('./extensions/vscode/package.json').version")
           vsix="ackit-vscode-${pkgver}.vsix"
-          test -f "$vsix"
-          manver=$(unzip -p "$vsix" extension/package.json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).version))")
-          if [ "$manver" != "$pkgver" ]; then echo "::error::VSIX manifest $manver != $pkgver"; exit 1; fi
-          unzip -p "$vsix" extension/readme.md > /tmp/vsix-readme.md
-          grep -q "\*\*Version:\*\* \`$pkgver\`" /tmp/vsix-readme.md || { echo "::error::VSIX README Version != $pkgver"; exit 1; }
-          grep -q "ackit.status.v1" /tmp/vsix-readme.md || { echo "::error::VSIX README missing ackit.status.v1"; exit 1; }
-          grep -qi "verification freshness" /tmp/vsix-readme.md || { echo "::error::VSIX README missing verification freshness"; exit 1; }
-          grep -qi "checkpoint freshness" /tmp/vsix-readme.md || { echo "::error::VSIX README missing checkpoint freshness"; exit 1; }
-          unzip -p "$vsix" extension/changelog.md > /tmp/vsix-changelog.md
-          latest=$(grep -m1 -o '^## \[[^]]*\]' /tmp/vsix-changelog.md)
-          echo "VSIX CHANGELOG latest: $latest"
-          echo "$latest" | grep -q "## \[$pkgver\]" || { echo "::error::VSIX CHANGELOG latest != $pkgver"; exit 1; }
-          echo "packaged VSIX parity PASS ($pkgver)"
-      - name: Icon dimensions
-        run: |
           cd extensions/vscode
-          node -e "
-          const fs=require('fs');
-          const buf=fs.readFileSync('images/icon.png');
-          const w=buf.readUInt32BE(16), h=buf.readUInt32BE(20);
-          console.log('icon',w+'x'+h, buf.length+' bytes');
-          if(w<128||h<128) throw new Error('icon <128');
-          if(w!==h) throw new Error('icon not square');
-          if(w!==256) console.log('warning: icon not 256x256 but square and >=128, accepting');
-          if(buf.length<=1024) throw new Error('icon too small');
-          "
+          npx --yes @vscode/vsce@4.1.1 package --no-dependencies --no-yarn --out "${vsix}"
+          echo "VSIX_PATH=$(pwd)/${vsix}" >> "${GITHUB_ENV}"
+      - name: VSIX content audit and packaged parity
+        run: node scripts/check-vsix.mjs "${VSIX_PATH}"
       - name: Offline-egress extension audit
-        run: |
-          node scripts/check-offline-egress.mjs
-          # also ensure extension src has no fetch/http
-          if grep -R "fetch.*http" extensions/vscode/src; then echo "::error::extension fetch"; exit 1; fi
-          echo "offline-egress PASS"
+        run: node scripts/check-offline-egress.mjs

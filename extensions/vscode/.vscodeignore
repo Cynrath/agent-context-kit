@@ -3,10 +3,13 @@
 src/**
 node_modules/**
 out/**
+scripts/**
+test-fixture/**
+*.vsix
 .gitignore
 .eslintrc*
-tsconfig.json
+tsconfig*.json
 webpack.config.js
-*.map
+**/*.map
 **/*.ts
 !dist/extension.js

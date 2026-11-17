@@ -379,11 +379,21 @@ export function checkParity(overrides = {}) {
       failures.push(`ci workflow unreadable: ${error.message}`);
     }
     if (ci !== "") {
-      if (!ci.includes(`'${source}'`)) {
-        failures.push(`.github/workflows/ci.yml manifest contract does not assert '${source}'`);
+      if (
+        !ci.includes("node scripts/check-version-parity.mjs") ||
+        !ci.includes("pkg.version!==root.version")
+      ) {
+        failures.push(
+          ".github/workflows/ci.yml must enforce dynamic extension/root version parity",
+        );
       }
-      if (!ci.includes(`ackit-vscode-${source}.vsix`)) {
-        failures.push(`.github/workflows/ci.yml VSIX filename does not track '${source}'`);
+      if (
+        !ci.includes("pkgver=$(node -p \"require('./extensions/vscode/package.json').version\")") ||
+        !ci.includes('vsix="ackit-vscode-' + "$" + '{pkgver}.vsix"')
+      ) {
+        failures.push(
+          ".github/workflows/ci.yml VSIX filename must derive from the extension manifest",
+        );
       }
     }
   }

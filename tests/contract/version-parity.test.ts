@@ -216,7 +216,7 @@ describe("version-parity guard probes (TASK-0078 A-E)", () => {
     const source = readSourceVersion();
     const stable = readPublishedStable();
     const extensionManifest = JSON.stringify({ version: source });
-    const ci = `contract '${source}' and ackit-vscode-${source}.vsix`;
+    const ci = readTree()[".github/workflows/ci.yml"] ?? "";
     const files: Record<string, string> = {};
     for (const file of CURRENT_FILES) {
       if (MUST_SHOW_STABLE.includes(file)) {
@@ -294,6 +294,18 @@ describe("version-parity guard probes (TASK-0078 A-E)", () => {
       ),
       `expected a CHANGELOG parity failure, got: ${failures.join("; ")}`,
     ).toBe(true);
+  });
+
+  it("rejects removed dynamic CI parity and literal VSIX filenames", () => {
+    const files = readTree();
+    files[".github/workflows/ci.yml"] = "legacy literal version check and ackit-vscode-0.5.4.vsix";
+    const { failures } = checkParity({ files });
+    expect(
+      failures.some((failure) => failure.includes("dynamic extension/root version parity")),
+    ).toBe(true);
+    expect(failures.some((failure) => failure.includes("derive from the extension manifest"))).toBe(
+      true,
+    );
   });
 });
 

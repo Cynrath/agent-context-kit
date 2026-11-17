@@ -25,6 +25,11 @@ necessary edits, tests, commits and PRs on 2026-11-17.
 - Inspect machine-specific fixtures, cross-surface exit contracts, cancellation,
   bounded processes, filesystem/traversal/secret boundaries, dependencies,
   offline behavior and packaging. Fix confirmed in-scope defects with tests.
+- Registry audit on 2026-11-17 found 40 advisories in the unchanged production
+  graph (1 critical/11 high). Inspect primary advisory ranges and reachability;
+  perform only necessary compatible security updates (SDK 1.x, Zod 4.x and
+  affected transitives), with frozen lockfile/schema/contract/runtime checks.
+  No major-version migration or indiscriminate dependency refresh.
 - Record source-grounded findings and distinguish external validation gaps.
 
 ## Out of scope
@@ -36,6 +41,8 @@ necessary edits, tests, commits and PRs on 2026-11-17.
 
 - README and maintained docs/configuration, task records, focused fixture/tests,
   documentation checks; runtime files only for confirmed audit defects.
+- Root package manifest/lockfile only for necessary audited dependency fixes;
+  regenerate schemas only if the validated generator actually changes them.
 
 ## Dependencies
 

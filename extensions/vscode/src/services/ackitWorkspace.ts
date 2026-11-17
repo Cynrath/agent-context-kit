@@ -5,7 +5,6 @@ import {
   buildInstructionGraph,
   buildStatusReport,
   loadAckitConfig,
-  resolveEffectiveStack,
   scanRepository,
   scoreRepository,
   validateSkills,
@@ -142,16 +141,16 @@ export class AckitWorkspaceService implements vscode.Disposable {
         // Use scoreRepository with minimal inputs
         const readiness = scoreRepository(
           {
-            graph: graph as never,
-            pack: pack as never,
+            graph,
+            pack,
             scan,
-            skills: skills as never,
-            policy: { findings: [] } as never,
-            tasks: { dirExists: true, totalTasks: 0 } as never,
+            skills,
+            policy: { findings: [] },
+            tasks: { dirExists: true, totalTasks: 0 },
           },
           {},
         );
-        snapshot.readiness = readiness as unknown as ScoreReport;
+        snapshot.readiness = readiness;
       } catch {
         snapshot.readiness = null;
       }

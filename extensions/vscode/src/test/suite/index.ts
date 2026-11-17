@@ -1,11 +1,12 @@
 import * as path from "node:path";
-import Mocha from "mocha";
 import { glob } from "glob";
+import Mocha from "mocha";
 
 export async function run(): Promise<void> {
   const mocha = new Mocha({ ui: "tdd", color: true, timeout: 20000 });
   const testsRoot = path.resolve(__dirname, ".");
-  const files = await glob("**/*.test.js", { cwd: testsRoot });
+  const files = await glob("**/extension.test.js", { cwd: testsRoot });
+  if (files.length === 0) throw new Error("No Electron integration tests found");
   for (const file of files) {
     mocha.addFile(path.resolve(testsRoot, file));
   }

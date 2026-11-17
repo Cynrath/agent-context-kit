@@ -1,5 +1,6 @@
 import type { RepositoryRoot } from "../core/filesystem/root.js";
 import { runScan, type ScanPipelineOptions } from "../core/scanner/pipeline.js";
+import { defaultRegistry } from "../core/scanner/registry.js";
 import type { ScanResult } from "../core/scanner/types.js";
 import { AckitError } from "./errors.js";
 
@@ -37,7 +38,7 @@ export async function scanRepository(
     const scanPromise = runScan(root, {
       ...(rest as ScanPipelineOptions),
       signal,
-      rules: [...extraRules],
+      rules: [...defaultRegistry.getAll(), ...extraRules],
     });
     if (signal === undefined) return await scanPromise;
     return await Promise.race([scanPromise, abortedPromise]);
