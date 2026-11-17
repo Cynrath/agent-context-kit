@@ -1,7 +1,7 @@
 ---
 id: "TASK-0106"
 title: "Tolerate npm publish-time processing without weakening release verification"
-status: active
+status: pending
 schemaVersion: 2
 dependencies:
   - "TASK-0105"
@@ -54,9 +54,9 @@ manual downstream repair authority; this task performs no publication action.
 
 ## Acceptance criteria
 
-- [ ] Delayed visibility beyond the old budget succeeds within a bounded wait.
-- [ ] Permanent absence, wrong shasum and wrong latest retain failure exits.
-- [ ] Marketplace-first, OIDC, immutable tag and all downstream gates remain.
+- [x] Delayed visibility beyond the old budget succeeds within a bounded wait.
+- [x] Permanent absence, wrong shasum and wrong latest retain failure exits.
+- [x] Marketplace-first, OIDC, immutable tag and all downstream gates remain.
 - [ ] Local checks and required exact-head PR CI pass; evidence matches results.
 
 ## Test steps
@@ -89,6 +89,27 @@ the released tag or overwrite an existing package/asset. No destructive Git.
 
 ## Completion notes
 
-Plan allocated using the installed repository CLI's supported `task create`
-syntax. The older title-only task alias is unavailable; it failed before any
-task file was created. Implementation has not started.
+Local implementation and verification passed; required new-head PR CI remains
+to be observed before completion. TASK-0103 resumes stable-pointer bookkeeping
+while this task awaits the same protected-PR evidence.
+
+- Plan commit `1219388` preceded the workflow/test changes. The installed CLI
+  allocated this task with `task create`; the old title-only alias failed
+  before creating a file. No manual task ID was invented.
+- The actual parsed registry-verification shell, with only npm and sleep
+  replaced by stubs, reproduced the old delayed-visibility failure: exit 20
+  instead of 0. The other three failure cases passed. After correction all
+  28 workflow contracts pass, including delayed success and unchanged exits
+  20 (permanent absence), 21 (shasum) and 22 (latest).
+- Full root suite: 126 files PASS, 778 tests PASS / 3 existing Windows symlink
+  privilege skips (781 total). Frozen install, lint, format, strict typecheck
+  and build PASS. The full suite also executes cold Action/package consumers.
+- A shared dependency junction was unsuitable for pnpm's workspace safety
+  checks. It was moved intact to ignored temp, and a separate frozen install
+  succeeded. Primary dependencies were preserved; no external target deleted.
+- The next-release gate now allows 90 x 20s reads and has a 35-minute outer
+  timeout. No version/shasum/latest condition, exit, consumer, ordering,
+  permission, authentication or immutable-artifact control was removed.
+- **Not run:** a new live publish/workflow dispatch or rerun; those actions
+  are outside this task. The existing 0.5.5 run remains failed at its original
+  visibility timeout, with downstream verification/release repair in TASK-0103.

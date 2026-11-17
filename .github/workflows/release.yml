@@ -350,16 +350,20 @@ jobs:
         run: npm publish "${TARBALL_PATH}" --access public --provenance
 
       - name: Verify registry metadata, shasum, and dist-tag (bounded propagation retry)
+        timeout-minutes: 35
         run: |
           set -euo pipefail
+          # npm scans uploads before making them installable; processing can
+          # exceed 15 minutes. Wait at most 30 minutes, then still fail closed.
+          # https://github.blog/changelog/2026-07-28-npm-publish-time-malware-scanning-and-dual-use-metadata/
           seen=0
-          for attempt in $(seq 1 30); do
+          for attempt in $(seq 1 90); do
             if npm view "@cynrath/agent-context-kit@${RELEASE_VERSION}" version > /dev/null 2>&1; then
               seen=1
               break
             fi
-            echo "attempt ${attempt}/30: published version not visible yet; waiting 10s"
-            sleep 10
+            echo "attempt ${attempt}/90: npm package processing or propagation pending; waiting 20s"
+            sleep 20
           done
           if [ "${seen}" -ne 1 ]; then
             echo "::error::published version never became visible on the registry"
