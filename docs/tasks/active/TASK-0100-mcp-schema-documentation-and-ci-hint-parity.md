@@ -1,7 +1,7 @@
 ---
 id: "TASK-0100"
 title: "MCP schema documentation and CI hint parity"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0099"
@@ -23,6 +23,10 @@ Scoped edits/tests/commits/PRs are user-authorized (2026-11-17).
 - Correct documentation without reopening root overrides or arbitrary file
   inclusion. Wire `ci` to the advisory exit hint while retaining report content.
 - Add schema/documentation and real-fixture behavioral contracts.
+- Startup inspection also confirmed that CLI `--root` is accepted globally but
+  the MCP side-effect entry ignores it. Bind only the startup root through an
+  explicit stdio serve function; preserve ACKIT_ROOT/cwd fallbacks and never add
+  a per-tool root override. Verify precedence via real CLI stdio clients.
 
 ## Out of scope
 
@@ -32,6 +36,7 @@ Scoped edits/tests/commits/PRs are user-authorized (2026-11-17).
 ## Affected files
 
 - `src/mcp/server.ts`, `docs/reference/mcp.md`, MCP contract/integration tests.
+- `src/mcp/stdio.ts`, CLI MCP registration and startup-root integration tests.
 
 ## Dependencies
 
@@ -44,7 +49,7 @@ TASK-0099. TASK-0101 follows this task.
 
 ## Acceptance criteria
 
-- [ ] Docs list precisely the tool input properties; no per-call root or pack
+- [~] Docs list precisely the tool input properties; no per-call root or pack
   includeGlobs is reintroduced.
 - [ ] Report-only scan hints 0, `ci: true` hints 1 only for unsuppressed findings
   at the configured threshold; clean/suppressed cases hint 0.
