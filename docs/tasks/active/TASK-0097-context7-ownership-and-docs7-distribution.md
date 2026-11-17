@@ -143,3 +143,9 @@ task; historical blocked TASK-0087/0092/0093 remain untouched.
   The current goal's explicit Git/PR/master-merge authorization, also recorded
   in TASK-0103, covers this scoped evidence follow-up. It does not authorize
   a deployment or account/credential change in this task.
+- Context7's connected resolve/query tools independently found the exact
+  `/cynrath/agent-context-kit` library and returned the current master SDK/MCP
+  pages: SDK root descriptor `canonicalPath`, built-in/extra rules, fixed
+  MCP startup root, unsupported per-call root/includeGlobs and ci-controlled
+  `exit_code_hint=0/1`. Retrieval of the corrected documentation is verified,
+  beyond the public ownership/badge/config-source metadata above.

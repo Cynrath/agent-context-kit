@@ -6,6 +6,8 @@ schemaVersion: 2
 dependencies:
   - "TASK-0102"
   - "TASK-0105"
+  - "TASK-0106"
+  - "TASK-0107"
 createdAt: "2026-11-17"
 completedAt: null
 ---

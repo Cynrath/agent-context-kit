@@ -58,10 +58,10 @@ workflow dispatch/rerun, tag, permission, credential or deployment action.
 
 ## Acceptance criteria
 
-- [ ] Lifecycle-enabled packing preserves the checkout's built modules/schemas.
-- [ ] Actual tarball allowlist, installed CLI/task/MCP and parallel CLI checks pass.
-- [ ] No lifecycle/quality assertion is skipped, serialized or weakened.
-- [ ] Full local gates and required exact-head PR CI pass with recorded evidence.
+- [x] Lifecycle-enabled packing preserves the checkout's built modules/schemas.
+- [x] Actual tarball allowlist, installed CLI/task/MCP and parallel CLI checks pass.
+- [x] No lifecycle/quality assertion is skipped, serialized or weakened.
+- [~] Full local gates and required exact-head PR CI pass with recorded evidence.
 
 ## Test steps
 
@@ -97,6 +97,28 @@ the failing CI gate honest. No immutable release/package/tag is changed.
 
 ## Completion notes
 
-Tool-allocated plan only; implementation has not started. TASK-0103 is pending
-this observed CI correction. Public npm/Marketplace/GitHub Release 0.5.5 and
-their independently verified immutable artifacts remain unchanged.
+Implementation and local checks are verified; the corrected head still awaits
+required PR CI. TASK-0103 stays pending this correction and protected bookkeeping
+merge. Public release 0.5.5 and its immutable artifacts remain unchanged.
+
+- Plan `4d0aa26` preceded implementation. A regression assertion around the old
+  actual pack reproduced writes to both `dist/core/policy/tiers.js` and
+  `schemas/ackit.schema.json` (timestamps changed). The original CLI failure
+  and old-path mutation proof remain recorded; no run was rerun or hidden.
+- Both pack callers now export current source inputs into private projects,
+  validate export/realpath bounds, frozen-install with the manifest's pinned
+  pnpm, and run the real prepack build/schema hooks there. Existing tarball
+  allowlist, CLI/task/MCP assertions remain. Each caller now asserts checkout
+  module/schema timestamps are unchanged; parallel CLI/package tests 6/6 PASS.
+- `pnpm exec` does not set npm_execpath, so an initial focused invocation hit
+  the helper's explicit pinned-runner guard. The supported `pnpm test` script
+  provides it and the corrected focused invocation passed. No guard was removed.
+- The first default full local run had two checkpoint 60s timeouts under load;
+  focused checkpoint/handoff checks then passed 20/20. On this 12-logical-CPU
+  host, `pnpm test --maxWorkers=8` ran the entire suite: 126 files PASS,
+  778 PASS / 3 existing Windows privilege skips (781 total), 126.44s.
+  The existing test timeout and all assertions remained in force. Hosted CI
+  continues to run the default full-suite command on its normal matrix.
+- Lint, format, strict typecheck, build, schema no-drift, text hygiene, task
+  doctor and static offline gate PASS. Required exact-head CI is the remaining
+  completion evidence; no new live publish/dispatch/rerun is part of this task.
