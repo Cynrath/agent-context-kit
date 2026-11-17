@@ -1,12 +1,12 @@
 ---
 id: "TASK-0106"
 title: "Tolerate npm publish-time processing without weakening release verification"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies:
   - "TASK-0105"
 createdAt: "2026-11-17"
-completedAt: null
+completedAt: 2026-11-17
 ---
 
 
@@ -57,7 +57,7 @@ manual downstream repair authority; this task performs no publication action.
 - [x] Delayed visibility beyond the old budget succeeds within a bounded wait.
 - [x] Permanent absence, wrong shasum and wrong latest retain failure exits.
 - [x] Marketplace-first, OIDC, immutable tag and all downstream gates remain.
-- [ ] Local checks and required exact-head PR CI pass; evidence matches results.
+- [x] Local checks and required exact-head PR CI pass; evidence matches results.
 
 ## Test steps
 
@@ -89,9 +89,8 @@ the released tag or overwrite an existing package/asset. No destructive Git.
 
 ## Completion notes
 
-Local implementation and verification passed; required new-head PR CI remains
-to be observed before completion. TASK-0103 resumes stable-pointer bookkeeping
-while this task awaits the same protected-PR evidence.
+All literal criteria passed locally and in exact-head hosted CI. The correction
+is merged on protected master; TASK-0103 owns final stable release bookkeeping.
 
 - Plan commit `1219388` preceded the workflow/test changes. The installed CLI
   allocated this task with `task create`; the old title-only alias failed
@@ -113,3 +112,13 @@ while this task awaits the same protected-PR evidence.
 - **Not run:** a new live publish/workflow dispatch or rerun; those actions
   are outside this task. The existing 0.5.5 run remains failed at its original
   visibility timeout, with downstream verification/release repair in TASK-0103.
+
+### Exact-head completion evidence
+
+PR #45 head `7a191414d7ff351acc20b8051914ca0492962ee2` passed all 13 checks
+(12 required) and merged as `f42937d7ffc97a5d21307935995d1a858c4af847`.
+Actual YAML-shell delayed-success and failure cases are among the 28 workflow
+contracts passing on the default full OS/Node matrix. macOS/Node 24 and Linux/
+Node 24 each report 126 files / 781 tests PASS. The later user-authorized CI
+capacity retry belongs to TASK-0107; the original Release run remains unchanged.
+The next-release change introduces no version, publication or permission change.

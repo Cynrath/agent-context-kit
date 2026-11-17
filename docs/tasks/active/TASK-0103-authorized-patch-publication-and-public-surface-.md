@@ -1,7 +1,7 @@
 ---
 id: "TASK-0103"
 title: "Authorized patch publication and public-surface verification"
-status: pending
+status: active
 schemaVersion: 2
 dependencies:
   - "TASK-0102"
@@ -27,8 +27,14 @@ publication; tag-triggered npm OIDC Trusted Publishing; and GitHub Release
 creation with audited VSIX assets. This is authorization for these exact actions
 in this task, not permission for direct master push or credential disclosure.
 Force push/reset/rebase/history rewrite/tag movement/deletion, workflow dispatch
-or rerun, deployments, secret/permission changes and legacy .NET releases remain
+or Release-workflow rerun, deployments, secret/permission changes and legacy .NET releases remain
 prohibited. No release artifact may be overwritten.
+
+On 2026-11-17 the user separately approved the concrete request to retry only
+the two runner-capacity-canceled macOS CI jobs in run `44151390824` at head
+`7a191414d7ff351acc20b8051914ca0492962ee2`, at most three attempts per job.
+TASK-0107 records the exact scope and provider cancellation evidence. Other
+workflow reruns remain unauthorized.
 
 ## Scope
 
@@ -47,7 +53,7 @@ prohibited. No release artifact may be overwritten.
 
 ## Out of scope
 
-- Direct master push, workflow dispatch/rerun, deployment or site publication;
+- Direct master push, workflow dispatch/unapproved rerun, deployment or site publication;
   credential creation/storage; tag or immutable version replacement; changes to
   unrelated repositories; closing old blocked tasks without literal evidence.
 
@@ -75,7 +81,7 @@ external blocker; do independent authorized work first, never partial-publish np
 - [x] Marketplace target visible before new immutable tag triggers npm publication.
 - [x] npm latest, fresh CLI/SDK/MCP and new-tag external Action consumer pass.
 - [x] GitHub Release tag/VSIX identity and downloaded asset checksum pass.
-- [ ] Stable-pointer bookkeeping merged with CI; final master clean/aligned;
+- [~] Stable-pointer bookkeeping merged with CI; final master clean/aligned;
   task evidence and open blockers match the actual public state.
 
 ## Test steps
@@ -107,8 +113,9 @@ can correct artifacts; never overwrite/repoint/delete the released version.
 
 ## Completion notes
 
-All three public channels now serve 0.5.5, independently verified below. The
-stable-pointer follow-up still requires exact-head CI and protected merge.
+All three public channels serve 0.5.5 and stable bookkeeping is merged after
+exact-head CI. Final task closure is awaiting the post-merge CI observation and
+the protected evidence/archive record integration.
 
 ### Original plan checkpoint (historical)
 
@@ -250,3 +257,28 @@ read an incomplete `dist/core/policy/tiers.js` during a parallel prepack rebuild
 TASK-0107 plans isolation of both source-checkout pack writers; no assertion is
 weakened and no failed run is rerun. The protected bookkeeping merge remains
 held. Independent public release/install verification is unaffected.
+
+### Protected stable-bookkeeping merge and task closure
+
+- PR #45 exact head `7a191414d7ff351acc20b8051914ca0492962ee2` passed all 13
+  checks, including 12 required. The two capacity-canceled macOS jobs were
+  retried only after separate user authorization. CI run `44151390824`,
+  attempt 2, concluded success; macOS/Node 24 and Linux/Node 24 each report
+  126 files / 781 tests PASS, including real tarball/CLI and workflow contracts.
+- Protected merge `f42937d7ffc97a5d21307935995d1a858c4af847` at
+  2026-11-17T19:17:40Z has the exact verified source tree
+  `d4ed9f68296312691879ccd5ec65a8d79ef6c01e`. Its temporary branch was deleted.
+  Primary checkout is clean master equal to origin/master. Source/stable parity
+  now both report 0.5.5. Production code, manifests, lock, schemas, templates,
+  extension and Action inputs are identical to immutable v0.5.5.
+- Docs7 Production check `134300433187` on merged master concluded success.
+  All six current site/agent/guide routes returned HTTP 200; getting-started
+  serves 0.5.5 and the claim-key guide contains the exact per-library instruction.
+  Context7 independently returned the corrected SDK/MCP documentation.
+- TASK-0107, TASK-0106 and TASK-0097 passed their literal acceptance gates and
+  were completed/archived with the repository CLI, without force. Their old
+  failure/manual-ID/provider-schema limitation evidence remains preserved.
+  Historical TASK-0087/0092/0093 remain blocked, unchanged.
+- Post-merge CI run `44157026151` is being observed; Action run `44157026472`
+  already concluded success. This task's final completion remains gated on
+  truthful post-merge evidence and final clean master/archive integration.

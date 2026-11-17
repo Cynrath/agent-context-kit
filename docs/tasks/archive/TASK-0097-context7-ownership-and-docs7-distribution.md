@@ -1,11 +1,11 @@
 ---
 id: "TASK-0097"
 title: "Context7 ownership-ready configuration and Docs7 documentation distribution"
-status: pending
+status: completed
 schemaVersion: 2
 dependencies: []
 createdAt: "2026-10-15"
-completedAt: null
+completedAt: 2026-11-17
 ---
 
 ## Purpose
@@ -40,8 +40,8 @@ Expose the maintained ACKit documentation to Context7 and prepare Docs7 hosting 
 - [x] Docs7 schema and navigated paths match actual docs; existing pages remain source of truth.
 - [x] Claim instructions require exact per-library public key from the owner's Context7 panel.
 - [x] Existing hosting and released package identities are unchanged.
-- [ ] Validated by repository checks, PR CI and Docs7 production build; external verification clearly recorded.
-- [ ] Release decision follows repository release governance and only occurs after complete evidence.
+- [x] Validated by repository checks, PR CI and Docs7 production build; external verification clearly recorded.
+- [x] Release decision follows repository release governance and only occurs after complete evidence.
 
 ## Test steps
 
@@ -70,10 +70,10 @@ Revert the documentation/configuration PR; keep historical tags/releases untouch
 
 ## Completion notes
 
-Current status: external ownership and production proof are now available.
-The conditional claim-key instruction has been clarified without adding any
-challenge or credential. Exact-head validation of this documentation follow-up
-is still required before completing and archiving the task.
+All literal acceptance criteria now have repository, exact-head CI and live
+provider evidence. The conditional claim-key guide is deployed and verified.
+Original blocked checkpoints and the historical manual ID fallback below are
+retained as history, not current completion claims.
 
 ### Original blocked checkpoint (historical, retained verbatim)
 
@@ -149,3 +149,28 @@ task; historical blocked TASK-0087/0092/0093 remain untouched.
   MCP startup root, unsupported per-call root/includeGlobs and ci-controlled
   `exit_code_hint=0/1`. Retrieval of the corrected documentation is verified,
   beyond the public ownership/badge/config-source metadata above.
+
+### Final production and governance proof
+
+- PR #45 exact head `7a191414d7ff351acc20b8051914ca0492962ee2` passed 13/13
+  checks before protected merge `f42937d7ffc97a5d21307935995d1a858c4af847`.
+  Docs7 Production check `134300433187` on that merged master concluded
+  success, title "Deployment succeeded". No deployment was dispatched by this
+  task; the existing integration processed the authorized protected merge.
+- All six live routes returned HTTP 200: site root, getting-started HTML,
+  llms.txt, llms-full.txt, getting-started Markdown and context7-docs7 Markdown.
+  The deployed guide contains the exact per-library challenge instruction;
+  getting-started is pinned to 0.5.5, and llms-full contains current canonicalPath
+  and exit_code_hint contracts plus 0.5.5 content. No static-only hosting claim.
+- Official Context7 schema validation and 32 real navigation routes remain
+  verified; the actual Docs7 production build accepts the project configuration.
+  The earlier generic upstream PostHog-regex/AJV compilation limitation remains
+  explicitly recorded, not relabeled as a formal AJV Docs7-schema pass.
+- Ownership, badge and repository-file configuration were read back from the
+  provider, and current SDK/MCP documentation was retrieved through Context7.
+  Existing hosting configuration/package identities were unchanged by this
+  documentation task. No account, credential, claim or config-source mutation.
+- TASK-0103's separate compatible runtime/CI patch was user-authorized, gated
+  by exact-head CI and live Marketplace before tag/npm publication. Ownership
+  and the earlier successful Docs7 production build were verified before tag
+  push; these docs-only follow-ups created no extra release or changed tag.
